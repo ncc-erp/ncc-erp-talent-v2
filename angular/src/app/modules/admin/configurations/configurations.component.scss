@@ -1,0 +1,56 @@
+.setting-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  ::ng-deep .panel {
+    .p-panel {
+      &-content {
+        height: 240px;
+        overflow-y: auto;
+      }
+      &-header {
+        height: 55px;
+      }
+    }
+
+    &--email-setting, &--komu-setting, &--notify-interviewer-setting {
+      .p-panel .p-panel-content {
+        height: auto;
+        overflow-y: auto;
+      }
+    }
+  }
+  .group-item:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+
+::ng-deep .p-password .p-inputtext {
+  width: 100%;
+}
+.p-inputtext:enabled,
+.p-inputtext:enabled:hover,
+.p-inputtext:enabled:focus {
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  box-shadow: none;
+}
+
+.label-title {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 0.25rem !important;
+}
+
+.label-checkbox {
+  color: #6c757d;
+  margin-left: 0.5rem;
+}
+
+.panel-title {
+  font-weight: 600;
+}
+
+

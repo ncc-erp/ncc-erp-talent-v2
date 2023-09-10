@@ -1,0 +1,59 @@
+<form [formGroup]="form">
+  <div class="form-group row">
+    <div class="col-md-12">
+      <label>
+        {{ "User Type" | localize }} <span class="text-danger">*</span>
+      </label>
+      <p-dropdown
+        [options]="_utilities.catUserType"
+        formControlName="userType"
+        placeholder="Select type"
+        optionLabel="name"
+        styleClass="w-100"
+        optionValue="id"
+        [filter]="true"
+        filterBy="name"
+      ></p-dropdown>
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.userType.errors?.required"
+      >
+        User Type is required!
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group row pb-5 justify-content-between">
+    <div class="col-md-12">
+      <label class="d-block">
+        {{ "Sub Position" | localize }} <span class="text-danger">*</span>
+      </label>
+      <div class="d-flex">
+        <div class="w-100">
+          <talent-position-dropdown
+            [id]="'ipPosition'"
+            [options]="_utilities.catPosition"
+            [optionSelected]="formControls.subPositionId.value"
+            (onChange)="onPositionSelect($event)"
+          >
+          </talent-position-dropdown>
+        </div>
+      </div>
+
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.subPositionId.errors?.required"
+      >
+        Position is required!
+      </span>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isLoading"
+    [showButtonSaveCloseActionCreate]="action"
+    [showButtonSaveClose]="true"
+    (onSave)="onSave($event)"
+  ></talent-dialog-action-toolbar>
+</form>

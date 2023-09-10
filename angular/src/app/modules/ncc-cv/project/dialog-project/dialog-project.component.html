@@ -1,0 +1,65 @@
+<form [formGroup]="form">
+  <div class="form-group row pb-5">
+    <div class="col-md-12">
+      <label> {{ "Name" | localize }} <span class="text-danger">*</span></label>
+      <input
+        talentAutoFocus
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.name.errors?.required"
+      >
+        Name is required!
+      </span>
+    </div>
+
+    <div class="col-md-12 pt-3">
+      <label>
+        {{ "Technology" | localize }}
+        <span class="text-danger">*</span></label
+      >
+      <textarea
+        pInputTextarea
+        [rows]="3"
+        type="text"
+        class="form-control"
+        formControlName="technology"
+      ></textarea>
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.technology.errors?.required"
+      >
+        Technology is required!
+      </span>
+    </div>
+
+    <div class="col-md-12 pt-3">
+      <label>
+        {{ "Description" | localize }}
+        <span class="text-danger">*</span></label
+      >
+      <textarea
+        pInputTextarea
+        [rows]="5"
+        type="text"
+        class="form-control"
+        formControlName="description"
+      ></textarea>
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.description.errors?.required"
+      >
+        Description is required!
+      </span>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isSaving"
+    (onSave)="onSave()"
+  ></talent-dialog-action-toolbar>
+</form>

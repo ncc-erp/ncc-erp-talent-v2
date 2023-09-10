@@ -1,0 +1,70 @@
+<form [formGroup]="form">
+  <div class="form-group row">
+    <div class="col-md-12">
+      <label> {{ "Name" | localize }} <span class="text-danger">*</span></label>
+      <input
+        talentAutoFocus
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.name.errors?.required"
+      >
+        Name is required!
+      </span>
+    </div>
+
+    <div class="col-md-12 pt-3">
+      <label>
+        {{ "Color" | localize }}
+        <span class="text-danger">*</span></label
+      >
+      <div class="group-color">
+        <div class="d-flex w-100 align-items-center">
+          <input
+            type="text"
+            class="form-control mr-3"
+            formControlName="colorCodeIp"
+            [value]="formControls.colorCode.value"
+          />
+          <p-colorPicker formControlName="colorCode"></p-colorPicker>
+        </div>
+
+        <div
+          class="text-danger"
+          *ngIf="submitted && formControls.colorCodeIp.errors?.required"
+        >
+          Color is required
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mt-3">
+      <div class="field-checkbox">
+        <label for="reference">
+          {{ "Reference to: " | localize }}</label
+        >
+        <p-dropdown
+          inputId="reference"
+          [options]="_utilities.catCvReferType"
+          formControlName="referenceType"
+          placeholder="Select Reference Type"
+          optionLabel="name"
+          optionValue="id"
+          [showClear]="true"
+          styleClass="w-100"
+        ></p-dropdown>
+      </div>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isLoading"
+    [showButtonSaveCloseActionCreate]="action"
+    [showButtonSaveClose]="true"
+    (onSave)="onSave($event)"
+  ></talent-dialog-action-toolbar>
+</form>

@@ -1,0 +1,83 @@
+<div class="card">
+  <p-table
+    [resizableColumns]="true"
+    styleClass="p-datatable-gridlines"
+    responsiveLayout="scroll"
+    [value]="items"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pResizableColumn>Mail</th>
+        <th *ngIf="mailInfo?.propertiesSupport?.length" pResizableColumn>
+          Properties Support
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body">
+      <tr>
+        <td>
+          <div class="row">
+            <div class="col-5 flex-center-vertical">
+              <label class="w-100px">Subject:</label>
+              <input
+                [(ngModel)]="mailInfo.subject"
+                type="text"
+                class="p-inputtext-sm w-100"
+                placeholder="Subject"
+                pInputText
+              />
+            </div>
+            <div class="col-7 flex-center-vertical">
+              <label for="mailcc" class="mr-3" title="Comma Separator ( , )"
+                >Cc:</label
+              >
+              <div class="w-100">
+                <p-chips
+                  inputId="mailCC"
+                  [(ngModel)]="mailInfo.cCs"
+                  placeholder="Separate email by comma or space"
+                  styleClass="w-100"
+                  separator=","
+                  addOnBlur="true"
+                ></p-chips>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-12">
+              <p-editor
+                [(ngModel)]="mailInfo.bodyMessage"
+                [style]="{ height: '45vh' }"
+              ></p-editor>
+            </div>
+          </div>
+        </td>
+        <td *ngIf="mailInfo?.propertiesSupport?.length">
+          <ul class="grid-col-2">
+            <li *ngFor="let property of mailInfo.propertiesSupport">
+              {{ property }}
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<div class="row justify-content-end text-right mt-2">
+  <div class="col">
+    <p-button
+      label="Close"
+      icon="pi pi-times"
+      styleClass="p-button-sm p-button-secondary"
+      (onClick)="ref.close()"
+    ></p-button>
+
+    <p-button
+      [disabled]="isSaving"
+      label="Save"
+      icon="pi pi-check"
+      styleClass="p-button-sm ml-2"
+      (click)="save()"
+    ></p-button>
+  </div>
+</div>

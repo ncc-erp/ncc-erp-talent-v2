@@ -1,0 +1,200 @@
+<section class="section-breadcrumb">
+  <div class="container-fluid">
+    <div class="breadcrum-container">
+      <div class="p-0">
+        <p-breadcrumb
+          [model]="breadcrumbConfig.menuItem"
+          [home]="breadcrumbConfig.homeItem"
+        ></p-breadcrumb>
+      </div>
+
+      <div *ngIf="candidate?.fullName" class="group-chip">
+        <p-chip
+          [label]="candidate.fullName"
+          [image]="getThumnailImage()"
+          [styleClass]="
+            candidate.isFemale ? 'chip chip-female' : 'chip chip-male'
+          "
+        ></p-chip>
+
+        <div *ngIf="candidate?.linkCV" class="tag chip chip-frame chip-cv">
+          <a [href]="candidate.linkCV" target="_blank">CV</a>
+        </div>
+
+        <div
+          *ngIf="candidate?.branchName"
+          class="tag tag--branch chip chip-frame"
+          [style.backgroundColor]="
+            _utilities.getBgTagBranchColor(candidate.branchName)
+          "
+        >
+          {{ candidate.branchName }}
+        </div>
+
+        <div
+          *ngIf="candidate?.cvStatusName"
+          class="tag chip chip-frame"
+          [style.backgroundColor]="
+            _utilities.getCVStatusColor(candidate.cvStatusName)
+          "
+        >
+          {{ candidate.cvStatusName }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-tab">
+  <p-tabView
+    [(activeIndex)]="tabActived"
+    (onChange)="updateQueryTabIndex($event.index)"
+  >
+    <p-tabPanel header="Header 1">
+      <ng-template pTemplate="header">
+        <div class="tab-header">
+          <i class="fas fa-id-card"></i>
+          <span>{{ "Personal Info" | localize }}</span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <talent-personal-info
+          *ngIf="
+            isViewMode &&
+              candidate &&
+              validPermissionUserType(
+                userType,
+                PS.Pages_CandidateIntern_ViewDetail_PersonInfo,
+                PS.Pages_CandidateStaff_ViewDetail_PersonInfo
+              );
+            else createTemplate
+          "
+          [_candidate]="_candidate"
+          [userType]="userType"
+          [candidateId]="candidateId"
+          [tabActived]="tabActived"
+          [isViewMode]="isViewMode"
+          [candidate]="candidate"
+          (activeChange)="activeChange($event)"
+          (onCreateCandidate)="onCreateCandidate($event)"
+          (candidateChange)="onCandidateChange($event)"
+        ></talent-personal-info>
+
+        <ng-template #createTemplate>
+          <talent-personal-info
+            [_candidate]="_candidate"
+            [userType]="userType"
+            [candidateId]="candidateId"
+            [tabActived]="tabActived"
+            [isViewMode]="isViewMode"
+            (activeChange)="activeChange($event)"
+            (onCreateCandidate)="onCreateCandidate($event)"
+            (candidateChange)="onCandidateChange($event)"
+          ></talent-personal-info>
+        </ng-template>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel header="Header 2" [disabled]="!hasCandidate()">
+      <ng-template pTemplate="header">
+        <div class="tab-header">
+          <i class="fas fa-graduation-cap"></i>
+          <span>{{ "Education" | localize }}</span>
+        </div>
+      </ng-template>
+      <ng-template
+        pTemplate="content"
+        *ngIf="
+          validPermissionUserType(
+            userType,
+            PS.Pages_CandidateIntern_ViewDetail_Education,
+            PS.Pages_CandidateStaff_ViewDetail_Education
+          )
+        "
+      >
+        <talent-candidate-education
+          [_candidate]="_candidate"
+          [userType]="userType"
+          [candidateId]="candidateId"
+          [isViewMode]="isViewMode"
+        ></talent-candidate-education>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel header="Header 3" [disabled]="!hasCandidate()">
+      <ng-template pTemplate="header">
+        <div class="tab-header">
+          <i class="fas fa-star"></i>
+          <span>{{ "Skills" | localize }}</span>
+        </div>
+      </ng-template>
+      <ng-template
+        pTemplate="content"
+        *ngIf="
+          validPermissionUserType(
+            userType,
+            PS.Pages_CandidateIntern_ViewDetail_Skill,
+            PS.Pages_CandidateStaff_ViewDetail_Skill
+          )
+        "
+      >
+        <talent-candidate-skill
+          [_candidate]="_candidate"
+          [userType]="userType"
+          [candidateId]="candidateId"
+          [isViewMode]="isViewMode"
+        ></talent-candidate-skill>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel header="Header 3" [disabled]="!hasCandidate()">
+      <ng-template pTemplate="header">
+        <div class="tab-header">
+          <i class="fas fa-bullhorn"></i>
+          <span>{{ "Current Requisition" | localize }}</span>
+        </div>
+      </ng-template>
+      <ng-template
+        pTemplate="content"
+        *ngIf="
+          validPermissionUserType(
+            userType,
+            PS.Pages_CandidateIntern_ViewDetail_RequestCV,
+            PS.Pages_CandidateStaff_ViewDetail_RequestCV
+          )
+        "
+      >
+        <talent-current-requisition
+          [_candidate]="_candidate"
+          [userType]="userType"
+          [candidateId]="candidateId"
+        ></talent-current-requisition>
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel header="Header 3" [disabled]="!hasCandidate()">
+      <ng-template pTemplate="header">
+        <div class="tab-header">
+          <i class="fas fa-history"></i>
+          <span>{{ "Application History" | localize }}</span>
+        </div>
+      </ng-template>
+      <ng-template
+        pTemplate="content"
+        *ngIf="
+          validPermissionUserType(
+            userType,
+            PS.Pages_CandidateIntern_ViewDetail_ApplicationHistory,
+            PS.Pages_CandidateStaff_ViewDetail_ApplicationHistory
+          )
+        "
+      >
+        <talent-application-history
+          [_candidate]="_candidate"
+          [userType]="userType"
+          [candidateId]="candidateId"
+        ></talent-application-history>
+      </ng-template>
+    </p-tabPanel>
+  </p-tabView>
+</section>

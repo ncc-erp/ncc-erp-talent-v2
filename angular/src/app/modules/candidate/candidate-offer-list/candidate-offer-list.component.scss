@@ -1,0 +1,12 @@
+@import "../../../../../styles/candidate/candidate.scss";
+
+::ng-deep .input-salary {
+  .p-inputnumber-input {
+    width: 100px;
+  }
+}
+
+.note-editing {
+  width: 150px;
+  resize: auto;
+}

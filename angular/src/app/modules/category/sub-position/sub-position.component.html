@@ -1,0 +1,117 @@
+<talent-section-breadcrumb
+  [breadcrumbConfig]="breadcrumbConfig"
+  [isShowBtn]="permission.isGranted(PS.Pages_SubPositions_Create)"
+  (onBtnClick)="openDialog(null, DIALOG_ACTION.CREATE)"
+>
+</talent-section-breadcrumb>
+
+<section class="section-table">
+  <div class="header-toolbar">
+    <div class="row">
+      <div class="col-12 col-md-4">
+        <div class="p-inputgroup">
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-search"
+            (click)="getDataPage(GET_FIRST_PAGE)"
+          ></button>
+          <input
+            type="text"
+            pInputText
+            [placeholder]="'Search by position/sub position name' | localize"
+            [(ngModel)]="searchText"
+            (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+            talentAutoFocus
+          />
+        </div>
+      </div>
+      <div class="col-12 col-md-5 col-lg-3 d-flex align-items-center">
+        <label class="mb-0 mr-2">Position</label>
+        <div class="w-100">
+          <p-dropdown [(ngModel)]="searchDetail.PositionId"
+          [options]="_utilities.catJobPosition"
+          placeholder="All"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-100"
+          [showClear]="true"
+          (onChange)="onFilter($event)"
+          [filter]="true"
+          filterBy="name"
+        ></p-dropdown>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p-table
+    [value]="subPositions"
+    [lazy]="true"
+    (onLazyLoad)="lazyLoadingData($event)"
+    [paginator]="true"
+    [rows]="defaultRows"
+    responsiveLayout="scroll"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [loading]="isLoading"
+    [(first)]="first"
+    [totalRecords]="totalItems"
+    [showCurrentPageReport]="subPositions.length"
+    currentPageReportTemplate="Total: {totalRecords}"
+    styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm tl-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-center w-70px">{{ "No" | localize }}</th>
+        <th pSortableColumn="name">
+          {{ "Sub Position" | localize }}
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="positionName">
+          {{ "Position" | localize }}
+          <p-sortIcon field="positionName"></p-sortIcon>
+        </th>
+        <th>{{ "Color" | localize }}</th>
+        <th class="w-100px text-center">
+          {{ "Action" | localize }}
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td class="text-center">{{ i + 1 }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.positionName }}</td>
+        <td class="text-center">
+          <p-colorPicker
+            *ngIf="item.colorCode"
+            [(ngModel)]="item.colorCode"
+            [disabled]="true"
+          ></p-colorPicker>
+        </td>
+        <td class="text-center">
+          <p-button
+            *ngIf="permission.isGranted(PS.Pages_SubPositions_Edit)"
+            title="{{ 'Edit' | localize }}"
+            icon="pi pi-pencil"
+            styleClass="p-button-sm p-button-secondary mr-1"
+            (click)="openDialog(item, DIALOG_ACTION.UPDATE)"
+          ></p-button>
+          <p-button
+            *ngIf="permission.isGranted(PS.Pages_SubPositions_Delete)"
+            title="{{ 'Delete' | localize }}"
+            icon="pi pi-trash"
+            styleClass="p-button-sm p-button-danger"
+            (click)="delete(item)"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="100%" class="text-center">No Record.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>

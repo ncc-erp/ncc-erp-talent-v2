@@ -1,0 +1,30 @@
+:host {
+  width: 100%;
+}
+
+.creation-date-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .creation-group-select {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .creation-group-label {
+    align-self: flex-end;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    .date-text {
+      min-width: fit-content;
+    }
+
+    .date-type {
+      color: #888;
+    }
+  }
+}
+

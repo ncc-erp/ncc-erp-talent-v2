@@ -1,0 +1,22 @@
+<div>
+  <image-cropper
+    [imageChangedEvent]="imageChangedEvent"
+    [maintainAspectRatio]="true"
+    [aspectRatio]="4 / 4"
+    [resizeToWidth]="256"
+    format="png"
+    (imageCropped)="imageCropped($event)"
+    (imageLoaded)="imageLoaded()"
+    class="cropper"
+  ></image-cropper>
+
+  <div class="text-center">
+    <h5>Crop result</h5>
+    <img [src]="croppedImage" />
+  </div>
+</div>
+
+<talent-dialog-action-toolbar
+  [dialogRef]="ref"
+  (onSave)="onSave()"
+></talent-dialog-action-toolbar>

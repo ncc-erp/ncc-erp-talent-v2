@@ -1,0 +1,7 @@
+<div
+  class="tag"
+  [class]="isSelectedAlready() ? 'tag--selected' : 'tag--select'"
+  (click)="seletedItem()"
+>
+  {{ isSelectedAlready() ? "Selected" : "Select" }}
+</div>

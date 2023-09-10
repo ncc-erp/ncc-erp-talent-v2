@@ -1,0 +1,67 @@
+@import "../../../../styles//variables";
+
+.tab-header {
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: max-content;
+}
+
+.breadcrum-container {
+  display: flex;
+  margin-right: -7.5px;
+  margin-left: -7.5px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.group-chip {
+  display: flex;
+  gap: 0.5rem;
+}
+
+::ng-deep .chip {
+  &.p-chip {
+    color: #fff;
+  }
+
+  &-female {
+    &.p-chip {
+      background-color: $color-female;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &-male {
+    &.p-chip {
+      color: #fff;
+      background-color: $color-male;
+    }
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &-frame {
+    display: flex;
+    line-height: 1.5;
+    border-radius: 16px;
+    padding: 0 0.5rem;
+  }
+
+  &-cv {
+    background-color: lightblue;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 500px) {
+  .breadcrum-container {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

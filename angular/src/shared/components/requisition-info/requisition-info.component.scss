@@ -1,0 +1,35 @@
+.requisition-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: space-between;
+
+  .group-info {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .group-item {
+    display: flex;
+    gap: 0.5rem;
+
+    .text-position {
+      color: #3655b7;
+      font-weight: 600;
+    }
+    
+    .text-user-type {
+      font-weight: 600;
+    }
+    
+    .text-branch {
+      color: #de0707;
+      font-weight: 600;
+    }
+    
+    .text-level {
+      color: #2499bf;
+      font-weight: 600;
+    }
+  }
+}

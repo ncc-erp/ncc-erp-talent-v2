@@ -1,0 +1,7 @@
+@mixin ellipsisWithLine($max-line) {
+  display: -webkit-box !important;
+  -webkit-line-clamp: $max-line;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: initial;
+}

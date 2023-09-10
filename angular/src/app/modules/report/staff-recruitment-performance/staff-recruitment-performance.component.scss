@@ -1,0 +1,15 @@
+::ng-deep #staff-recruit-performance{
+    .creation-group-select{
+        flex-basis: 50%;
+    }
+    .creation-group-label{
+        flex-basis: 50%;
+    }
+    .w-inherit{
+        width: inherit !important;
+    }
+    .msl-branch 
+        .p-multiselect {
+            width: inherit !important;
+        }
+}

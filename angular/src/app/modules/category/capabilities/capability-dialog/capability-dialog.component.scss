@@ -1,0 +1,31 @@
+@mixin lb-large-width {
+  width: 8rem;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    &--fromtype {
+      .gender-radio-group {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        label {
+          margin-right: 1rem;
+        }
+      }
+    }
+    
+    .lb-item {
+      @include lb-large-width();
+    }
+    .hr-color {
+      background-color: rgb(217, 0, 27);
+    }
+    .reviewer-color {
+      background-color: #28a745
+    }
+
+}

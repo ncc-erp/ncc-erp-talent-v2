@@ -1,0 +1,17 @@
+{
+  "app": {
+    "title": "Talent V2"
+  },
+  "role": {
+    "title": "Role",
+    "create": "Create",
+    "name": "Role Name",
+    "displayName": "Display Name"
+  },
+  "action": {
+    "title": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create"
+  }
+}

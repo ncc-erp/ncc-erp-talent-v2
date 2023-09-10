@@ -1,0 +1,56 @@
+.p-calendar {
+  .p-datepicker {
+    min-width: auto !important;
+    table td {
+      padding: 0;
+    }
+
+    .p-datepicker-header {
+      padding: 0;
+
+      .p-datepicker-title {
+        line-height: unset;
+        .p-datepicker-month,
+        .p-datepicker-year {
+          padding: 0 0.5rem;
+        }
+      }
+    }
+
+    .p-timepicker {
+      padding: 0;
+
+      button {
+        width: 1rem;
+        height: 1.5rem;
+      }
+
+      span {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+.p-datepicker-group-container {
+  .p-datepicker-group {
+    .p-datepicker-header {
+      padding: 0;
+
+      .p-datepicker-title {
+        line-height: unset;
+        .p-datepicker-month,
+        .p-datepicker-year {
+          padding: 0 0.5rem;
+        }
+      }
+    }
+
+    .p-datepicker-calendar-container {
+      table tbody tr td {
+        padding: 0;
+      }
+    }
+  }
+}
+

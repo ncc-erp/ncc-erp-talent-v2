@@ -1,0 +1,80 @@
+<div class="requisition-info-container">
+  <div class="group-info">
+    <div class="group-item">
+      <span
+        *ngIf="data?.id"
+        class="tl-link"
+        (click)="navigateToRequestDetail(data.id)"
+      >
+        #{{ data.id }}
+      </span>
+
+      <span
+        *ngIf="showUserType"
+        class="text-user-type"
+        [style.color]="_utilities.getUserTypeColor(data.userTypeName)"
+      >
+        {{ data.userTypeName }}
+      </span>
+
+      <span class="text-branch">
+        {{ data?.branchName }}
+      </span>
+
+      <span class="text-position">
+        {{ data?.subPositionName }}
+      </span>
+
+      <span
+        class="text-level"
+        *ngIf="showLevel && data?.levelInfo?.standardName"
+      >
+        {{ data.levelInfo.standardName }}
+      </span>
+    </div>
+
+    <div
+      *ngIf="showPriority && data?.priorityName"
+      class="tag ml-auto"
+      [style.backgroundColor]="
+        _utilities.getBgTagPriorityColor(data.priorityName)
+      "
+    >
+      {{ data.priorityName }}
+    </div>
+
+    <span
+      *ngIf="data?.requestStatusName"
+      class="tag ml-auto"
+      [style.backgroundColor]="
+        _utilities.getBgTagReqStatusColor(data.requestStatusName)
+      "
+    >
+      {{ data.requestStatusName }}
+    </span>
+  </div>
+
+  <div class="group-item">
+    <div class="col">
+      <div
+        *ngIf="showSkills"
+        class="skills max-line-content-1"
+        [collapseLine]="1"
+        talentResizeContent
+      >
+        <span
+          *ngFor="let skill of data?.skills; last as isLast"
+          class="block-hash-tag"
+        >
+          {{ skill.name }}
+        </span>
+      </div>
+    </div>
+
+    <div class="w-max-content" *ngIf="data?.isProjectTool">
+      <span class="tag">
+        {{ "P" }}
+      </span>
+    </div>
+  </div>
+</div>

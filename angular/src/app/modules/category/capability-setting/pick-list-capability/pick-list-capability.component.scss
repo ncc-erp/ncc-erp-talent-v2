@@ -1,0 +1,32 @@
+::ng-deep .p-picklist {
+
+  .p-picklist-header {
+    background: transparent;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 2px solid brown;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    font-size: 1.25rem;
+  }
+
+  &-buttons {
+    gap: 1rem;
+    button[icon="pi pi-angle-double-right"] {
+      display: none ;
+    }
+    button[icon='pi pi-angle-double-left'] {
+      display: none;
+    }
+  }
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.row-toolbar {
+  gap: 30px;
+}

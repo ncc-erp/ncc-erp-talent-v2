@@ -1,0 +1,38 @@
+.sidebar-logo-group {
+  border-bottom: 1px solid #4b545c;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .brand-link-custom {
+    border-bottom: 0;
+    .brand-image {
+      opacity: 0.8;
+    }
+  }
+}
+
+::ng-deep .sidebar-mini.sidebar-collapse {
+  .sidebar-logo-group {
+    justify-content: center;
+
+    .brand-link-custom {
+      display: none;
+      visibility: hidden;
+      width: 0;
+    }
+  }
+
+  .main-sidebar:not(.sidebar-no-expand):hover {
+    .sidebar-logo-group {
+      justify-content: space-between;
+      .brand-link-custom {
+        display: block;
+
+        img {
+          visibility: visible;
+        }
+      }
+    }
+  }
+}

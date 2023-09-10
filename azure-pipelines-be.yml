@@ -1,0 +1,53 @@
+trigger:
+  branches:
+    include:
+      - dev
+      - stg
+
+  paths:
+    include:
+      - aspnet-core/**
+      - azure-pipelines-be.yml
+
+pool:
+  name: 'ERP_DEV'
+
+jobs:
+  - job: DotnetBuild
+    steps: 
+    - script: |
+        export PATH=$PATH:/opt/dotnet6/
+        cd aspnet-core/src/TalentV2.Migrator
+        dotnet6 publish -c Release
+      displayName: 'Dotnet Publish Migrator'
+
+    - script: |
+        cd aspnet-core/src/TalentV2.Migrator/bin/Release/net6.0/publish/
+        zip -r backend_migrator.zip *
+      displayName: 'Compress Publish Migrator'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'aspnet-core/src/TalentV2.Migrator/bin/Release/net6.0/publish/backend_migrator.zip'
+        ArtifactName: 'dotnet-migrator-talent'
+        publishLocation: 'Container'
+      displayName: 'Publish Artifacts Migrator'
+
+    - script: |
+        export PATH=$PATH:/opt/dotnet6/
+        cd aspnet-core
+        dotnet6 publish -c Release
+      displayName: 'Dotnet Release Host'
+    
+    - script: |
+        cd aspnet-core/src/TalentV2.Web.Host/bin/Release/net6.0/publish/
+        zip -r backend_publish.zip *
+      displayName: 'Compress Release Host'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'aspnet-core/src/TalentV2.Web.Host/bin/Release/net6.0/publish/backend_publish.zip'
+        ArtifactName: 'dotnet-host-talent'
+        publishLocation: 'Container'
+      displayName: 'Publish Artifacts Host'
+

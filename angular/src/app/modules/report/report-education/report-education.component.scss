@@ -1,0 +1,29 @@
+::ng-deep #report-education {
+  .creation-group-select,
+  .creation-group-label {
+    flex-basis: 50%;
+  }
+
+  .w-inherit {
+    width: inherit !important;
+  }
+
+  .msl-branch .p-multiselect {
+    width: inherit !important;
+  }
+
+  .report-edu-chart {
+    display: grid;
+    align-items: end;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 900px) {
+  #report-education {
+    .report-edu-chart {
+      grid-template-columns: 1fr;
+    }
+  }
+}

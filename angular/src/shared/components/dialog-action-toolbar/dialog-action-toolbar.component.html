@@ -1,0 +1,29 @@
+<div class="row text-right">
+  <div class="col">
+    <p-button
+      *ngIf="showButtonCancel"
+      label="Close"
+      icon="pi pi-times"
+      styleClass="p-button-sm p-button-secondary"
+      (onClick)="dialogRef.close()"
+    ></p-button>
+
+    <p-button
+      *ngIf="isSave && showButtonSave"
+      [disabled]="disabledSaveBtn"
+      label="Save"
+      icon="pi pi-check"
+      styleClass="p-button-sm ml-2"
+      (click)="save()"
+    ></p-button>
+
+     <p-button
+      *ngIf="isSave && showButtonSaveClose && showButtonSaveCloseActionCreate==actionCreate"
+      [disabled]="disabledSaveBtn"
+      label="Save & Close"
+      icon="pi pi-check"
+      styleClass="p-button-sm ml-2"
+      (click)="save(true)"
+    ></p-button>
+  </div>
+</div>

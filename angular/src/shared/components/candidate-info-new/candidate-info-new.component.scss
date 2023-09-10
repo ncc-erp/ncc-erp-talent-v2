@@ -1,0 +1,102 @@
+@import "../../../../styles/variables";
+
+.candidate {
+  display: flex;
+  gap: 1rem;
+
+  .processStatus{
+    margin-bottom: 0;
+    margin-top: 2px;
+  }
+  .tag-unpro{ 
+    padding: 2px 5px 4px 5px;
+    background-color: #f15d22;
+  }
+
+  .tag-over{
+    padding: 2px 5px 4px 5px;
+    background-color: #D32F2F ;
+  }
+  .gender {
+    margin-bottom: 0;
+    margin-top: 2px;
+    align-self: flex-start;
+  }
+
+  .group-item {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .text-phone,
+  .text-mail {
+  }
+
+  .text-name {
+    max-width: 200px;
+    width: max-content;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-line;
+  }
+
+  .text-position {
+    color: #3655b7;
+    font-weight: 600;
+  }
+
+  .text-branch {
+    color: #de0707;
+    font-weight: 600;
+  }
+
+  .group-left {
+    display: flex;
+    gap: 1rem;
+
+    .photo img {
+      height: 4.3rem;
+      width: 4.3rem;
+      border-radius: 50%;
+    }
+
+    .group-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      justify-content: space-between;
+
+      &--name {
+        display: flex;
+      }
+
+      .section-skill {
+        display: flex;
+        flex-wrap: wrap;
+        min-width: 150px;
+      }
+    }
+  }
+
+  .group-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-left: auto;
+
+    .icon-cv {
+      height: 32px;
+    }
+
+    .status-cv {
+      align-self: flex-end;
+      letter-spacing: 1.1px;
+      font-weight: 400;
+    }
+  }
+
+  .row-item {
+    width: 100%;
+  }
+}

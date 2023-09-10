@@ -1,0 +1,79 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+
+
+trigger: 
+  - dev
+
+pool:
+  name: 'ERP_DEV'
+
+jobs:
+  - job: DotnetBuild
+    steps: 
+    - script: |
+        export PATH=$PATH:/opt/dotnet6/
+        cd aspnet-core/src/TalentV2.Migrator
+        dotnet6 build
+        dotnet6 publish
+        cd bin/Debug/net6.0/publish/
+        zip -r backend_migrator.zip *
+      displayName: 'Dotnet Build Migrator'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'aspnet-core/src/TalentV2.Migrator/bin/Debug/net6.0/publish/backend_migrator.zip'
+        ArtifactName: 'dev-dotnet-migrator-talent'
+        publishLocation: 'Container'
+      displayName: 'Publish Artifacts Migrator'
+
+    - script: |
+        export PATH=$PATH:/opt/dotnet6/
+        cd aspnet-core
+        dotnet6 build
+        dotnet6 publish
+        cd src/TalentV2.Web.Host/bin/Debug/net6.0/publish
+        zip -r backend_publish.zip *
+      displayName: 'Dotnet Build Host'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'aspnet-core/src/TalentV2.Web.Host/bin/Debug/net6.0/publish/backend_publish.zip'
+        ArtifactName: 'dev-dotnet-host-talent'
+        publishLocation: 'Container'
+      displayName: 'Publish Artifacts Host'
+
+  - job: AngularBuild
+    steps:
+      - script: |
+          cd angular 
+          export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm use 14.15
+          node -v
+          # echo "Copy node-modules"
+          # unzip -qo ~/soft/check_node/talent/node_modules.zip
+          # cp ~/soft/check_node/talent/check.sh ./check.sh
+          # echo "===Check package.json==="
+          # bash check.sh
+          echo "===Install package==="
+          npm i
+          echo "===Build node==="
+          ng build --prod
+          cd dist
+          zip -r frontend_publish.zip *
+        displayName: 'Build Frontend'
+        
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'angular/dist/frontend_publish.zip'
+          ArtifactName: 'dev-fe-talent'
+          publishLocation: 'Container'
+        displayName: 'Publish Artifacts Frontend'
+            
+          
+

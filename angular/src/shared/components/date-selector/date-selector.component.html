@@ -1,0 +1,37 @@
+<div class="creation-date-container">
+  <div class="creation-group-select">
+    <label for="creationDate">{{ label }}</label>
+    <div class="w-100">
+      <p-dropdown
+        inputId="creationDate"
+        [options]="timeOptions"
+        [formControl]="searchVal"
+        styleClass="w-100"
+        [showClear]="true"
+        (onChange)="onSelectChange(true)"
+        placeholder="All"
+      ></p-dropdown>
+    </div>
+  </div>
+
+  <div class="creation-group-label">
+    <p-button
+      *ngIf="dateType !== CreationTimeEnum.ALL"
+      [disabled]="dateType === CreationTimeEnum.CUSTOM"
+      icon="pi pi-chevron-left"
+      styleClass="p-button-rounded p-button-danger btn-pre"
+      (click)="onPreOrNext('Previous')"
+    ></p-button>
+
+    <label class="date-text" for="creationTime">
+      {{ dateText }}
+    </label>
+    <p-button
+      *ngIf="dateType !== CreationTimeEnum.ALL"
+      [disabled]="dateType === CreationTimeEnum.CUSTOM"
+      icon="pi pi-chevron-right"
+      styleClass="p-button-rounded p-button-danger btn-after"
+      (click)="onPreOrNext('Next')"
+    ></p-button>
+  </div>
+</div>

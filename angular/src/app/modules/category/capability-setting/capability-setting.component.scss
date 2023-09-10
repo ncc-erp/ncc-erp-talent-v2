@@ -1,0 +1,17 @@
+.capabilities-item {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 10px;
+  &-icon {
+    color: red;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+.hr-color {
+  background-color: rgb(217, 0, 27);
+}
+.reviewer-color {
+  background-color: #28a745
+}

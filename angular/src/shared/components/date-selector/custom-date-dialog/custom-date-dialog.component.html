@@ -1,0 +1,50 @@
+<form [formGroup]="form">
+  <div class="form-group row mb-5">
+    <div class="col-12">
+      <div class="d-flex">
+        <label for="fromdate" class="col-4 col-md-2">
+          {{ "From" | localize }} <span class="text-danger">*</span></label
+        >
+        <div class="calendar">
+          <p-calendar
+            formControlName="fromDate"
+            dateFormat="dd/mm/yy" 
+            [showIcon]="true"
+            inputId="fromdate"
+            styleClass="w-100"
+          ></p-calendar>
+          <span
+            class="text-danger"
+            *ngIf="submitted && formControls.fromDate.errors?.required"
+          >
+            This field is required!
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-4">
+      <div class="d-flex">
+        <label for="toDate" class="col-4 col-md-2">
+          {{ "To" | localize }} <span class="text-danger">*</span></label
+        >
+        <div class="calendar">
+          <p-calendar
+            formControlName="toDate"
+            [showIcon]="true"
+            inputId="toDate"
+            dateFormat="dd/mm/yy" 
+            styleClass="w-100"
+          ></p-calendar>
+          <span class="text-danger" *ngIf="submitted && formControls.toDate.errors?.required"> This field is required! </span>
+          <span class="text-danger" *ngIf="submitted && form.errors?.greaterThan"> Must be greater than or equal fromDate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    (onSave)="onSave()"
+  ></talent-dialog-action-toolbar>
+</form>

@@ -1,0 +1,14 @@
+﻿using Abp.Application.Services.Dto;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TalentV2.Users.Dto
+{
+    public class AvatarDto
+    {
+        public string AvatarPath { get; set; }
+    }
+}

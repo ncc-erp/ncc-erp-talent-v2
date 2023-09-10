@@ -1,0 +1,99 @@
+<div class="candidate">
+  <div class="group-left">
+    <div class="photo">
+      <img
+        *ngIf="!data?.avatar"
+        src="../../../assets/img/user-circle.png"
+        alt="Thumbnail"
+      />
+      <img
+        *ngIf="data?.avatar"
+        [src]="_utilities.getLinkFile(data.avatar)"
+        alt="Thumbnail"
+      />
+    </div>
+
+    <div class="group-info">
+      <div class="group-info--name">
+        <div class="group-item mr-2">
+          <span
+            class="text-name tl-link"
+            [class.tl-link--disabled]="!isOpenDetail"
+            (click)="navigateToCanDetail(data.id)"
+          >
+            {{ data.fullName }}
+          </span>
+          <span
+            class="tag gender"
+            [class]="data.isFemale ? 'tag--female' : 'tag--male'"
+          >
+            {{ data.isFemale ? "F" : "M" }}
+          </span>
+
+          <span class="text-branch">
+            {{ data?.branchName }}
+          </span>
+        </div>
+      </div>
+
+      <div class="section-skill">
+        <div class="row-item">
+          <span class="text-phone">
+            {{ data.phone || 'No phone exist' }}
+          </span>
+
+          <span class="ml-2 text-position">
+            {{ data.subPositionName }}
+          </span>
+        </div>
+
+        <div class="row-item">
+          <span class="text-mail">
+            {{ data?.email }}
+          </span>
+
+          <span
+            *ngIf="showUserType"
+            class="tag ml-2"
+            [style.backgroundColor]="
+              _utilities.getUserTypeColor(data.userTypeName)
+            "
+          >
+            {{ data.userTypeName }}
+          </span>
+        </div>
+
+        <div class="processStatus">
+          <span class="tag tag-unpro" *ngIf="data.processCVStatus === _utilities.catProcessCvStatusOption.UNPROCESS_CV">
+            {{"Unprocessed CV" | localize }}
+          </span>
+          <span class="tag tag-over" *ngIf="data.processCVStatus === _utilities.catProcessCvStatusOption.OVERDUE_CV">
+            {{"Overdue CV" | localize }}
+          </span>
+          <span class="tag tag-unpro" *ngIf="data.processCVStatus === _utilities.catProcessCvStatusOption.UNPROCESS_SEND_MAIL">
+            {{"Unprocessed Send Mail" | localize }}
+          </span>
+          <span class="tag tag-over" *ngIf="data.processCVStatus === _utilities.catProcessCvStatusOption.OVERDUE_SEND_MAIL">
+            {{"Overdue Send Mail" | localize }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group-right">
+    <span *ngIf="_utilities.getLinkFile(data.linkCV)">
+      <a [href]="_utilities.getLinkFile(data.linkCV)" target="_blank">
+        <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
+      </a>
+    </span>
+
+    <span
+      *ngIf="showCVStatus && data.cvStatusName"
+      class="status-cv"
+      [style.color]="_utilities.getCVStatusColor(data.cvStatusName)"
+    >
+      {{ data.cvStatusName }}
+    </span>
+  </div>
+</div>

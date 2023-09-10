@@ -1,0 +1,90 @@
+<form [formGroup]="form">
+  <div class="form-group row">
+    <div class="col-md-12">
+      <label>
+        {{ "Sub Position Name" | localize }}
+        <span class="text-danger">*</span></label
+      >
+      <input
+        talentAutoFocus
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.name.errors?.required"
+      >
+        Sub position name is required!
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group row pb-5 justify-content-between">
+    <div class="col-md-12">
+      <label class="d-block">
+        {{ "Position" | localize }} <span class="text-danger">*</span></label
+      >
+      <div class="d-flex">
+        <div class="mr-3 w-100">
+          <p-dropdown
+            [options]="_utilities.catJobPosition"
+            formControlName="positionId"
+            placeholder="Select type"
+            optionLabel="name"
+            styleClass="w-100"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+          ></p-dropdown>
+        </div>
+        <p-button
+          icon="pi pi-plus"
+          styleClass="p-button-outlined"
+          (onClick)="openMainPositionDialog()"
+        >
+        </p-button>
+      </div>
+
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.positionId.errors?.required"
+      >
+        Position is required!
+      </span>
+    </div>
+
+    <div class="col-md-12 pt-3">
+      <label>
+        {{ "Color" | localize }}
+        <span class="text-danger">*</span></label
+      >
+      <div class="group-color">
+        <div class="d-flex w-100 align-items-center">
+          <input
+            type="text"
+            class="form-control mr-3"
+            formControlName="colorCodeIp"
+            [value]="formControls.colorCode.value"
+          />
+          <p-colorPicker formControlName="colorCode"></p-colorPicker>
+        </div>
+
+        <div
+          class="text-danger"
+          *ngIf="submitted && formControls.colorCodeIp.errors?.required"
+        >
+          Color is required
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isLoading"
+    [showButtonSaveCloseActionCreate]="action"
+    [showButtonSaveClose]="true"
+    (onSave)="onSave($event)"
+  ></talent-dialog-action-toolbar>
+</form>

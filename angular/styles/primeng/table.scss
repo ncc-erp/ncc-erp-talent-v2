@@ -1,0 +1,100 @@
+@import "../mixin";
+
+.tl-table {
+  box-shadow: 0 0.6rem 1.2rem 0.2rem rgb(0 0 0 / 8%);
+
+  table {
+    th {
+      vertical-align: bottom;
+      text-align: center !important;
+    }
+  }
+
+  &-th-center {
+    table {
+      th {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  &-card-box {
+    box-shadow: 0 0 1px rgb(0 0 0 / 13%), 0 1px 3px rgb(0 0 0 / 20%);
+  }
+
+  &-min-100 {
+    table {
+      min-width: 100% !important;
+    }
+  }
+
+  &-max-440 {
+    .p-datatable-wrapper {
+      max-height: 440px;
+    }
+  }
+
+  &-max-500 {
+    .p-datatable-wrapper {
+      max-height: 500px;
+    }
+  }
+
+  &-scroll {
+    .p-datatable-thead {
+      tr {
+        th {
+          z-index: 1;
+          position: -webkit-sticky !important;
+          position: sticky !important;
+          top: -1px !important;
+        }
+
+        &:nth-child(2) {
+          th {
+            top: 40px !important;
+            outline: 1px solid #e9ecef;
+          }
+        }
+      }
+    }
+  }
+
+  .p-datatable-wrapper .p-datatable-table {
+    thead,
+    tbody {
+      tr {
+        th,
+        td {
+          &.candidate-infor {
+            width: 400px;
+          }
+        }
+
+        td {
+          div.skills {
+            text-align: left;
+            display: flex;
+            flex-wrap: wrap;
+            min-width: 150px;
+
+            &:hover {
+              cursor: pointer;
+            }
+          }
+
+          div.note {
+            white-space: pre-line;
+            word-break: break-word;
+            min-width: 150px;
+
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,159 @@
+<talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig">
+</talent-section-breadcrumb>
+
+<section class="content">
+  <div class="card">
+    <div class="card-body mb-0">
+      <div class="row-group">
+        <div class="col item-group item-group--search">
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-search"
+            (click)="getDataPage(1)"
+          ></button>
+          <input
+            talentAutoFocus
+            type="text"
+            class="w-100"
+            pInputText
+            [placeholder]="'Search by name' | localize"
+            [(ngModel)]="searchText"
+            (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+          />
+        </div>
+
+        <div class="col item-group">
+          <label for="e-position">
+            {{ "Position" | localize }}
+          </label>
+          <p-dropdown
+            inputId="e-position"
+            [options]="_utilities.catEmployeePosition"
+            [(ngModel)]="positionId"
+            placeholder="All"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-100"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            (onChange)="getDataPage(GET_FIRST_PAGE)"
+          ></p-dropdown>
+        </div>
+
+        <div class="col item-group">
+          <label for="branch"> {{ "Branch" | localize }}</label>
+          <div class="w-100">
+            <p-dropdown
+              inputId="branch"
+              [options]="_utilities.catBranch"
+              [(ngModel)]="branchId"
+              placeholder="All"
+              optionLabel="name"
+              optionValue="id"
+              styleClass="w-100"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              (onChange)="getDataPage(GET_FIRST_PAGE)"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <div class="col item-group">
+          <label for="e-position">
+            {{ "Version Position" | localize }}
+          </label>
+          <p-dropdown
+            inputId="e-position"
+            [options]="_utilities.catEmployeePosition"
+            [(ngModel)]="positionVersId"
+            placeholder="All"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-100"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            (onChange)="getDataPage(GET_FIRST_PAGE)"
+          ></p-dropdown>
+        </div>
+
+        <div class="col item-group">
+          <label for="e-position">
+            {{ "Version Language" | localize }}
+          </label>
+          <p-dropdown
+            inputId="e-position"
+            [options]="_utilities.catLanguage"
+            [(ngModel)]="languageId"
+            placeholder="All"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-100"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            (onChange)="getDataPage(GET_FIRST_PAGE)"
+          ></p-dropdown>
+        </div>
+
+        <div class="align-self-end">
+          <button
+            type="button"
+            class="btn"
+            style="margin-left: 5px; background-color: #dc3545; color: #ffffff"
+            (click)="clearFilters()"
+          >
+            {{ "Clear" | localize }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <!---search advance-->
+  </div>
+
+  <p-table
+    [value]="listEmployee"
+    [lazy]="true"
+    (onLazyLoad)="lazyLoadingData($event)"
+    [paginator]="true"
+    [rows]="defaultRows"
+    [(first)]="first"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [loading]="isLoading"
+    [totalRecords]="totalItems"
+    [showCurrentPageReport]="listEmployee.length"
+    currentPageReportTemplate="Total: {totalRecords}"
+    styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines tl-table tl-table-min-100"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-50px">{{ "No" | localize }}</th>
+        <th>{{ "Name" | localize }}</th>
+        <th>{{ "Position" | localize }}</th>
+        <th>{{ "Branch" | localize }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td class="text-center">{{ i + 1 }}</td>
+        <td>
+          <div class="tl-link" (click)="detailEmployee(item.userId)">
+            {{ item.surname }} {{ item.name }}
+          </div>
+        </td>
+        <td>{{ getNameById(position, item.positionId) }}</td>
+        <td>{{ getNameById(branch, item.branchId) }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="100%" class="text-center">No Record.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>

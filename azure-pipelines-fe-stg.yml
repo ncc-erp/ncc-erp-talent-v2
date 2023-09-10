@@ -1,0 +1,55 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+      - stg
+
+  paths:
+    include:
+      - angular
+      - azure-pipelines-fe-stg.yml
+
+pool:
+  name: 'ERP_DEV'
+
+jobs:
+  - job: AngularBuild
+    steps:
+
+
+      - script: |
+          cd angular/
+          export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm use 14.15
+          node -v
+          echo "=== INSTALL PACKAGE ==="
+          npm install
+        displayName: 'Install Package'
+      
+      - script: |
+          cd angular/
+          export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+          nvm use 14.15          
+          ng build --prod
+        displayName: 'Build Frontend'
+      
+      - script: |
+          cd angular/dist
+          zip -r frontend_publish.zip *
+        displayName: 'Compress Build FE'
+        
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'angular/dist/frontend_publish.zip'
+          ArtifactName: 'stg-fe-talent'
+          publishLocation: 'Container'
+        displayName: 'Publish Artifacts Frontend'
+            

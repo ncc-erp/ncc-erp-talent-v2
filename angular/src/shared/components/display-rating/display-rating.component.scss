@@ -1,0 +1,39 @@
+.rating {
+  &-icon {
+    color: #495057;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s,
+    box-shadow 0.2s;
+    font-size: 1.143rem;
+
+    &:not(:first-child) {
+      margin-left: 0.5rem;
+    }
+
+    &.pi-star-fill {
+      &--grey {
+        color: #9E9E9E;
+      }
+
+      &--gold {
+        color: gold;
+      }
+
+      &--orange {
+        color: #FF9800;
+      }
+
+      &--red {
+        color: #F44336;
+      }
+    }
+    
+  }
+
+  .pi-star:before {
+    content: "\e937";
+  }
+
+  .pi-star.pi-star-fill::before {
+    content: "\e936";
+  }
+}

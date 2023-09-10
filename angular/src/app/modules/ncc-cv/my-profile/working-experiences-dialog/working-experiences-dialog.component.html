@@ -1,0 +1,390 @@
+<div class="card">
+  <div class="card-header">
+    {{
+      action === DIALOG_ACTION.CREATE
+        ? ("Create experience" | localize)
+        : ("Edit experience" | localize)
+    }}
+  </div>
+  <div
+    class="card-body mb-3"
+    [formGroup]="stateForm"
+    style="height: 450px; overflow: scroll; overflow-x: hidden"
+  >
+    <div class="row">
+      <!---vùng 2-->
+      <div class="col-md-4">
+        <div class="col-md-12">
+          <label for="w-projectname">
+            {{ "Project name" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            *ngIf="isEdit"
+            pInputText
+            type="text"
+            id="w-projectname"
+            class="w-100"
+            formControlName="projectName"
+          />
+
+          <div class="w-100">
+            <p-autoComplete
+              *ngIf="!isEdit"
+              formControlName="project"
+              completeOnFocus="true"
+              [suggestions]="filteredListProject"
+              (completeMethod)="filterProject($event)"
+              field="name"
+              styleClass="w-100 project-complete"
+              (onSelect)="changeProject($event)"
+              (onKeyUp)="changeProject($event, true)"
+            ></p-autoComplete>
+          </div>
+
+          <div
+            *ngIf="submitted && formControls.projectName.errors?.required"
+            class="text-error text-danger"
+          >
+            Project is required
+          </div>
+        </div>
+      </div>
+
+      <!----vùng 3-->
+      <div class="col-md-8" *ngIf="isSale && !isUser && !isEdit">
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="w-start" for="dob">
+              {{ "Start Date" | localize }}
+              <span class="text-danger">*</span>
+            </label>
+
+            <p-calendar
+              inputId="w-start"
+              [showIcon]="true"
+              view="month"
+              dateFormat="mm/yy"
+              placeholder="mm/yyyy"
+              styleClass="w-100"
+              formControlName="startTime"
+            ></p-calendar>
+
+            <div
+              *ngIf="submitted && formControls.startTime.errors?.required"
+              class="text-error text-danger"
+            >
+              Start date is required
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="w-end" for="dob">
+              {{ "End Date" | localize }}
+            </label>
+
+            <p-calendar
+              *ngIf="!stateForm.get('currentlyWorking').value"
+              inputId="w-end"
+              [showIcon]="true"
+              view="month"
+              dateFormat="mm/yy"
+              placeholder="mm/yyyy"
+              styleClass="w-100"
+              formControlName="endTime"
+            ></p-calendar>
+
+            <p
+              *ngIf="stateForm.get('currentlyWorking').value"
+              style="width: 100%; display: block"
+            >
+              {{ "Now" | localize }}
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <section class="example-section">
+            <p-checkbox
+              formControlName="currentlyWorking"
+              [binary]="true"
+              inputId="w-is-working"
+              (click)="event.stopPropagination()"
+            ></p-checkbox>
+            <label for="w-is-working" class="ml-2">
+              {{ "Current working" | localize }}</label
+            >
+          </section>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-position">
+            {{ "Position" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            pInputText
+            type="text"
+            id="w-position"
+            class="w-100"
+            formControlName="position"
+          />
+
+          <div
+            *ngIf="submitted && formControls.position.errors?.required"
+            class="text-error text-danger"
+          >
+            Position is required
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-desc">
+            {{ "Description" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="2"
+            class="w-100"
+            id="w-desc"
+            type="text"
+            pInputText
+            formControlName="projectDescription"
+          >
+          </textarea>
+
+          <div
+            *ngIf="
+              submitted && formControls.projectDescription.errors?.required
+            "
+            class="text-error text-danger"
+          >
+            Description is required
+          </div>
+        </div>
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-responsibility">
+            {{ "Responsibility" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="2"
+            class="w-100"
+            id="w-responsibility"
+            type="text"
+            pInputText
+            formControlName="responsibility"
+          >
+          </textarea>
+
+          <div
+            *ngIf="submitted && formControls.responsibility.errors?.required"
+            class="text-error text-danger"
+          >
+            Responsibility is required
+          </div>
+        </div>
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-technologies">
+            {{ "Technologies" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="2"
+            class="w-100"
+            id="w-technologies"
+            type="text"
+            pInputText
+            formControlName="technologies"
+          >
+          </textarea>
+
+          <div
+            *ngIf="submitted && formControls.technologies.errors?.required"
+            class="text-error text-danger"
+          >
+            Technologies is required
+          </div>
+        </div>
+      </div>
+
+      <!--------form dành cho chính user đó và khi nhấn sửa--------->
+      <div class="col-md-8" *ngIf="isEdit || isUser">
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <label class="w-start" for="dob">
+              {{ "Start Date" | localize }}
+              <span class="text-danger">*</span>
+            </label>
+
+            <p-calendar
+              inputId="w-start"
+              view="month"
+              [showIcon]="true"
+              dateFormat="mm/yy"
+              placeholder="mm/yyyy"
+              styleClass="w-100"
+              formControlName="startTime"
+            ></p-calendar>
+
+            <div
+              *ngIf="submitted && formControls.startTime.errors?.required"
+              class="text-error text-danger"
+            >
+              Start date is required
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="w-end" for="dob">
+              {{ "End Date" | localize }}
+            </label>
+
+            <p-calendar
+              *ngIf="!stateForm.get('currentlyWorking').value"
+              inputId="w-end"
+              view="month"
+              [showIcon]="true"
+              dateFormat="mm/yy"
+              placeholder="mm/yyyy"
+              styleClass="w-100"
+              formControlName="endTime"
+            ></p-calendar>
+            <p
+              *ngIf="stateForm.get('currentlyWorking').value"
+              style="width: 100%; display: block"
+            >
+              {{ "Now" | localize }}
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <section class="example-section">
+            <p-checkbox
+              formControlName="currentlyWorking"
+              [binary]="true"
+              inputId="w-is-working"
+            ></p-checkbox>
+            <label for="w-is-working" class="ml-2">
+              {{ "Current working" | localize }}</label
+            >
+          </section>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-position">
+            {{ "Position" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            pInputText
+            type="text"
+            id="w-position"
+            class="w-100"
+            formControlName="position"
+          />
+          <div
+            *ngIf="submitted && formControls.position.errors?.required"
+            class="text-error text-danger"
+          >
+            Position is required
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-desc">
+            {{ "Description" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="2"
+            class="w-100"
+            id="w-desc"
+            type="text"
+            pInputText
+            formControlName="projectDescription"
+            [readonly]="isChoose"
+          >
+          </textarea>
+
+          <div
+            *ngIf="
+              submitted && formControls.projectDescription.errors?.required
+            "
+            class="text-error text-danger"
+          >
+            Description is required
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-responsibility">
+            {{ "Responsibility" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="2"
+            class="w-100"
+            id="w-responsibility"
+            type="text"
+            pInputText
+            formControlName="responsibility"
+          >
+          </textarea>
+
+          <div
+            *ngIf="submitted && formControls.responsibility.errors?.required"
+            class="text-error text-danger"
+          >
+            Responsibility is required
+          </div>
+        </div>
+
+        <div class="col-md-12 p-0 mb-2">
+          <label for="w-technologies">
+            {{ "Technologies" | localize }}
+            <span class="text-danger">*</span>
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="2"
+            class="w-100"
+            id="w-technologies"
+            type="text"
+            pInputText
+            formControlName="technologies"
+            [readonly]="isChoose"
+          >
+          </textarea>
+
+          <div
+            *ngIf="submitted && formControls.technologies.errors?.required"
+            class="text-error text-danger"
+          >
+            Technologies is required
+          </div>
+        </div>
+      </div>
+      <!----------------->
+    </div>
+  </div>
+</div>
+<div class="mb-3 px-3">
+  <talent-dialog-action-toolbar
+    [dialogRef]="dialogRef"
+    [disabledSaveBtn]="isLoading"
+    (onSave)="submitWorkingExp()"
+  ></talent-dialog-action-toolbar>
+</div>

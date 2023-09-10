@@ -1,0 +1,66 @@
+<form [formGroup]="form">
+  <div class="form-group row mb-5">
+    <div class="col-md-12">
+      <label> {{ "Name" | localize }} <span class="text-danger">*</span></label>
+      <input
+        talentAutoFocus
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.name.errors?.required"
+      >
+        Name is required!
+      </span>
+    </div>
+
+    <div class="group-item group-item--fromtype col-md-12">
+      <label style="padding-right: 30px;"> {{ "From" | localize }} </label>
+
+      <div class="gender-radio-group">
+        <p-radioButton
+          name="isHr"
+          [value]="false"
+          styleClass="radio"
+          formControlName="isHr"
+        ></p-radioButton>
+        <span for="gender" class="mb-0 reviewer-color tag ng-star-inserted" style="padding-right: 20px;">Reviewer</span>
+        <p-radioButton
+          name="isHr"
+          [value]="true"
+          styleClass="radio"
+          formControlName="isHr"
+        ></p-radioButton>
+        <span for="gender" class="mb-0 hr-color tag ng-star-inserted">HR</span>
+      </div>
+    </div>
+
+    <div class="col-md-12 mt-3">
+      <label> {{ "Guide line" | localize }}</label>
+        <div class=" w-100">
+            <p-editor
+                    formControlName="note"
+                    [style]="{height:'200px', maxHeight: '200px'}"
+                    >
+            </p-editor>
+        </div>
+
+        <span
+        class="text-danger"
+        *ngIf="submitted && formControls.note.errors?.maxlength"
+      >
+       Cannot greater than 5000 characters!
+      </span>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isLoading"
+    [showButtonSaveCloseActionCreate]="action"
+    [showButtonSaveClose]="true"
+    (onSave)="onSave($event)"
+  ></talent-dialog-action-toolbar>
+</form>

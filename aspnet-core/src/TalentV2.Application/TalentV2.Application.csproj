@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <VersionPrefix>1.0.0.0</VersionPrefix>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>TalentV2.Application</AssemblyName>
+    <PackageId>TalentV2.Application</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>TalentV2</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+	  <PackageReference Include="DocX" Version="1.7.1" />
+	  <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.4.21" />
+	  <PackageReference Include="puppeteer-report" Version="1.1.2" />
+	  <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+	  <PackageReference Include="System.IO.Packaging" Version="5.0.0" />
+	  <PackageReference Include="ClosedXML" Version="0.95.4" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.18" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TalentV2.Core\TalentV2.Core.csproj" />
+    <ProjectReference Include="..\TalentV2.EntityFrameworkCore\TalentV2.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+    <ItemGroup>
+	    <RuntimeHostConfigurationOption Include="System.Drawing.EnableUnixSupport" Value="true" />
+    </ItemGroup>
+</Project>

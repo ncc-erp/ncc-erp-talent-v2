@@ -1,0 +1,26 @@
+@import "../variables";
+
+.p-dynamic-dialog {
+  // Medium devices (tablets, 768px and up)
+  @media (max-width: 768px) {
+    &.p-dialog {
+      width: 60% !important;
+    }
+  }
+
+  // Small devices (landscape phones, 576px and up)
+  @media (max-width: 576px) { 
+    &.p-dialog {
+      width: 75% !important;
+    }
+  }
+}
+
+
+.p-dialog {
+  &-content {
+    .p-confirm-dialog-icon {
+      color: $color-warning-danger
+    }
+  }
+}

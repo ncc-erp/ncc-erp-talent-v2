@@ -1,0 +1,9 @@
+.grid-col-2{
+    grid-column: 2;
+    columns: 2;
+    list-style: none;
+}
+
+::ng-deep .p-chips-multiple-container {
+    width: 100%;
+}

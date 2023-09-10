@@ -1,0 +1,46 @@
+<form [formGroup]="form">
+  <div class="form-group row">
+    <div class="col-md-12">
+      <label>
+        {{ "Course List" | localize }}
+        <span class="text-danger">*</span>
+      </label>
+      <p-dropdown
+        [options]="_utilities.catLmsCourse"
+        formControlName="lmsCourse"
+        placeholder="Select course"
+        optionLabel="name"
+        styleClass="w-100"
+        [filter]="true"
+        filterBy="name"
+      >
+        <ng-template pTemplate="selectedItem">
+          <div *ngIf="getCourse()">
+            <img class="course-img" [src]="getCourse()?.fullPathImageCover" />
+            <span>{{ getCourse()?.name }}</span>
+          </div>
+        </ng-template>
+
+        <ng-template let-course pTemplate="item">
+          <div>
+            <img [src]="course.fullPathImageCover" class="course-img" />
+            <span>{{ course.name }}</span>
+          </div>
+        </ng-template></p-dropdown
+      >
+
+      <span
+        class="text-danger"
+        *ngIf="submitted && formControls.lmsCourse.errors?.required"
+      >
+        Course name is required!
+      </span>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isCreating"
+    (onSave)="onSave()"
+  ></talent-dialog-action-toolbar>
+</form>

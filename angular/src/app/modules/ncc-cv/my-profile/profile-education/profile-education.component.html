@@ -1,0 +1,166 @@
+<form [formGroup]="form">
+  <div class="card">
+    <div class="card-header">
+      {{
+        action === DIALOG_ACTION.CREATE
+          ? ("Create Education" | localize)
+          : ("Update Education" | localize)
+      }}
+    </div>
+    <div class="card-body max-height">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label for="edu-start"
+                >{{ "Year Start" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <div>
+                <p-inputNumber
+                  formControlName="startYear"
+                  mode="decimal"
+                  styleClass="w-100"
+                  placeholder="yyyy"
+                  inputId="edu-start"
+                  [useGrouping]="false"
+                  maxlength="4"
+                >
+                </p-inputNumber>
+
+                <div
+                  *ngIf="submitted && formControls.startYear.errors?.required"
+                  class="text-error text-danger"
+                >
+                  Year start is required
+                </div>
+
+                <div
+                  *ngIf="submitted && formControls.startYear.errors?.min"
+                  class="text-error text-danger"
+                >
+                  Input format: yyyy
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label for="edu-end"
+                >{{ "Year End" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <div>
+                <p-inputNumber
+                  formControlName="endYear"
+                  mode="decimal"
+                  styleClass="w-100"
+                  placeholder="yyyy"
+                  inputId="edu-end"
+                  [useGrouping]="false"
+                  maxlength="4"
+                >
+                </p-inputNumber>
+
+                <div
+                  *ngIf="submitted && formControls.endYear.errors?.required"
+                  class="text-error text-danger"
+                >
+                  Year and is required
+                </div>
+
+                <div
+                  *ngIf="submitted && formControls.endYear.errors?.min"
+                  class="text-error text-danger"
+                >
+                  Input format: yyyy
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label for="ct-school">
+                {{ "School/Center" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                pInputText
+                type="text"
+                id="ct-school"
+                class="w-100"
+                formControlName="schoolOrCenterName"
+              />
+
+              <div
+                *ngIf="
+                  submitted && formControls.schoolOrCenterName.errors?.required
+                "
+                class="text-error text-danger"
+              >
+                School/Center is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label for="edu-degree">
+                {{ "Degree" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <p-dropdown
+                inputId="edu-degree"
+                [options]="listDegree"
+                placeholder="Select degree"
+                formControlName="degreeType"
+                optionLabel="name"
+                optionValue="id"
+                styleClass="w-100"
+              ></p-dropdown>
+              <div
+                *ngIf="submitted && formControls.degreeType.errors?.required"
+                class="text-error text-danger"
+              >
+                Degree is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label for="edu-major">
+                {{ "Major" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                pInputText
+                type="text"
+                id="edu-major"
+                class="w-100"
+                formControlName="major"
+              />
+              <div
+                *ngIf="submitted && formControls.major.errors?.required"
+                class="text-error text-danger"
+              >
+                Major is required
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="dialogRef"
+    [disabledSaveBtn]="isLoading"
+    (onSave)="submitEducation()"
+  ></talent-dialog-action-toolbar>
+</form>

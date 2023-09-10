@@ -1,0 +1,21 @@
+<section class="section-breadcrumb">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col p-0">
+        <p-breadcrumb
+          *ngIf="showBreadCrumb"
+          [model]="breadcrumbConfig.menuItem"
+          [home]="breadcrumbConfig.homeItem"
+        ></p-breadcrumb>
+      </div>
+      <div class="col text-right p-0" *ngIf="isShowBtn">
+        <p-button
+          [label]="btnConfig.label"
+          [icon]="btnConfig.icon"
+          styleClass="p-button-sm"
+          (onClick)="onBtnClicked()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</section>

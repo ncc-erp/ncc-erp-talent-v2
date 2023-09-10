@@ -1,0 +1,19 @@
+:host ::ng-deep talent-date-selector {
+     .creation-date-container {
+          justify-content: space-around !important;
+          .creation-group-select {
+               flex-direction: row !important;
+               align-items: center !important;
+
+               label {
+                    margin: 0 10px !important;
+               }
+               .w-100 {
+                    width: 200px !important;
+               }
+          }
+          .creation-group-label {
+               width: 300px !important;
+          }   
+     }
+} 

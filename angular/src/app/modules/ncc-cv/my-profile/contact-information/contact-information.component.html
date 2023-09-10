@@ -1,0 +1,238 @@
+<form [formGroup]="form">
+  <div class="card">
+    <div class="card-header">
+      <h4>
+        {{ "Edit Infomation" | localize }} : {{ contactInfo?.surname }}
+        {{ contactInfo?.name }}
+      </h4>
+    </div>
+
+    <div class="card-body">
+      <div class="row pt-3">
+        <div class="col-md-3">
+          <div class="profile-wapper">
+            <div class="profile-avt" *ngIf="showImg">
+              <img [src]="contactInfo?.imgPath" alt="" accept=".jpg, .png" />
+            </div>
+            <div class="profile-avt" *ngIf="!showImg">
+              <img [src]="img.buffer" alt="" />
+            </div>
+            <div class="profile-address">
+              <input
+                type="button"
+                value="{{ 'Choose Photo' | localize }}"
+                style="width: 90%"
+                onclick="document.getElementById('uploadImages').click();"
+              />
+              <input
+                type="file"
+                (change)="changeInmage($event)"
+                id="uploadImages"
+              />
+              <ng-container *ngIf="contactInfo?.imgPath !== null">
+                <input
+                  *ngIf="contactInfo?.imgPath !== 'null'"
+                  type="button"
+                  class="mt-2"
+                  value="{{ 'Delete Photo' | localize }}"
+                  style="width: 90%"
+                  (click)="deleteImage()"
+                />
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-9">
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <label for="ct-surname">
+                {{ "Surname" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                pInputText
+                type="text"
+                id="ct-surname"
+                class="w-100"
+                formControlName="surname"
+              />
+
+              <div
+                *ngIf="submitted && formControls.surname.errors?.required"
+                class="text-error text-danger"
+              >
+                Surname is required
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="ct-name">
+                {{ "Name" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                pInputText
+                type="text"
+                class="w-100"
+                id="ct-name"
+                formControlName="name"
+              />
+
+              <div
+                *ngIf="submitted && formControls.name.errors?.required"
+                class="text-error text-danger"
+              >
+                Name is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label for="ct-position">
+                {{ "Position" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <p-dropdown
+                inputId="ct-position"
+                [options]="_utilities.catEmployeePosition"
+                formControlName="currentPositionId"
+                placeholder="All"
+                optionLabel="name"
+                optionValue="id"
+                styleClass="w-100"
+                [filter]="true"
+                filterBy="name"
+                [showClear]="true"
+              ></p-dropdown>
+              <div
+                *ngIf="
+                  submitted && formControls.currentPositionId.errors?.required
+                "
+                class="text-error text-danger"
+              >
+                Position is required
+              </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label for="ct-branch">
+                {{ "Branch" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <p-dropdown
+                inputId="ct-branch"
+                [options]="_utilities.catBranch"
+                formControlName="branchId"
+                placeholder="All"
+                optionLabel="displayName"
+                optionValue="id"
+                styleClass="w-100"
+                [filter]="true"
+                filterBy="displayName"
+                [showClear]="true"
+              ></p-dropdown>
+
+              <div
+                *ngIf="submitted && formControls.branchId.errors?.required"
+                class="text-error text-danger"
+              >
+                Branch is required
+              </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label class="lb-item" for="ct-address">
+                {{ "Address" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+
+              <textarea
+                pInputTextarea
+                rows="2"
+                class="w-100"
+                id="ct-address"
+                type="text"
+                pInputText
+                formControlName="address"
+              >
+              </textarea>
+
+              <div
+                *ngIf="submitted && formControls.address.errors?.required"
+                class="text-error text-danger"
+              >
+                Address is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-12">
+              <label class="lb-item" for="ct-sdt">
+                {{ "Phone" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+
+              <div class="w-100">
+                <p-inputMask
+                  inputId="ct-sdt"
+                  mask="9999999999"
+                  formControlName="phoneNumber"
+                  styleClass="w-100"
+                ></p-inputMask>
+              </div>
+
+              <div
+                *ngIf="submitted && formControls.phoneNumber.errors?.required"
+                class="text-error text-danger"
+              >
+                Phone is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <label for="ct-email">
+                {{ "Email" | localize }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                pInputText
+                type="text"
+                id="ct-email"
+                class="w-100"
+                formControlName="emailAddressInCV"
+              />
+              <div
+                *ngIf="
+                  submitted && formControls.emailAddressInCV.errors?.required
+                "
+                class="text-error text-danger"
+              >
+                Emmail is required
+              </div>
+
+              <div
+                *ngIf="submitted && formControls.emailAddressInCV.errors?.email"
+                class="text-error text-danger"
+              >
+                Email invalid, please check again
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="dialogRef"
+    [disabledSaveBtn]="isLoading"
+    (onSave)="submitInfoContact()"
+  ></talent-dialog-action-toolbar>
+</form>

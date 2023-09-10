@@ -1,0 +1,206 @@
+<div [@routerTransition]>
+  <talent-section-breadcrumb
+    [breadcrumbConfig]="breadcrumbConfig"
+    [isShowBtn]="isGranted(PS.Pages_Users_Create)"
+    (onBtnClick)="createUser()"
+  >
+  </talent-section-breadcrumb>
+
+  <section class="section-table">
+    <div class="header-toolbar">
+      <div class="row">
+        <div class="col-12 col-md-5">
+          <div class="p-inputgroup">
+            <button
+              type="button"
+              pButton
+              pRipple
+              icon="pi pi-search"
+              (click)="getDataPage(GET_FIRST_PAGE)"
+            ></button>
+
+            <input
+              talentAutoFocus
+              type="text"
+              pInputText
+              name="keyword"
+              [placeholder]="'Search by full name/email address' | localize"
+              [(ngModel)]="searchText"
+              (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+            />
+            <div class="input-group-append">
+              <button
+                pButton
+                pRipple
+                type="button"
+                class="p-button-sm p-button-outlined p-button-secondary"
+                (click)="advancedFiltersVisible = !advancedFiltersVisible"
+              >
+                <i
+                  class="fas"
+                  [class.fa-angle-up]="advancedFiltersVisible"
+                  [class.fa-angle-down]="!advancedFiltersVisible"
+                ></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
+        <div class="card-body">
+          <form class="form-horizontal">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group row mb-0">
+                  <label class="col-md-3 col-form-label">
+                    {{ "IsActive" | localize }}
+                  </label>
+                  <div class="col-md-9 pt-2">
+                    <div class="custom-control custom-radio d-inline">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="isActiveAll"
+                        name="isActive"
+                        [(ngModel)]="isActive"
+                        [value]="undefined"
+                        checked
+                      />
+                      <label class="custom-control-label" for="isActiveAll">
+                        {{ "All" | localize }}
+                      </label>
+                    </div>
+                    <div class="custom-control custom-radio d-inline mx-3">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="isActiveActive"
+                        name="isActive"
+                        [(ngModel)]="isActive"
+                        [value]="true"
+                      />
+                      <label class="custom-control-label" for="isActiveActive">
+                        {{ "Yes" | localize }}
+                      </label>
+                    </div>
+                    <div class="custom-control custom-radio d-inline">
+                      <input
+                        type="radio"
+                        class="custom-control-input"
+                        id="isActivePassive"
+                        name="isActive"
+                        [(ngModel)]="isActive"
+                        [value]="false"
+                      />
+                      <label class="custom-control-label" for="isActivePassive">
+                        {{ "No" | localize }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn bg-blue" (click)="getDataPage(1)">
+            {{ "Search" | localize }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-default float-right"
+            (click)="clearFilters()"
+          >
+            {{ "Clear" | localize }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p-table
+      [value]="users"
+      [lazy]="true"
+      (onLazyLoad)="loadUsers($event)"
+      [paginator]="true"
+      [rows]="defaultRows"
+      responsiveLayout="scroll"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [loading]="loading"
+      [totalRecords]="totalItems"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Total: {totalRecords}"
+      styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm tl-table-card-box"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th>{{ "Full Name" | localize }}</th>
+          <th pSortableColumn="emailAddress">
+            {{ "Email Address" | localize }}
+            <p-sortIcon field="emailAddress"></p-sortIcon>
+          </th>
+          <th>{{ "Branch" | localize }}</th>
+          <th>{{ "Roles" | localize }}</th>
+          <th>{{ "IsActive" | localize }}</th>
+          <th style="width: 310px">{{ "Actions" | localize }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user let-i="rowIndex">
+        <tr>
+          <td class="text-center">{{ i + 1 }}</td>
+          <td>{{ user.fullName }}</td>
+          <td>{{ user.emailAddress }}</td>
+          <td>{{ user.branchName }}</td>
+          <td>
+            <ul style="padding-left: 20px">
+              <li *ngFor="let roleName of user.roleNames">
+                {{ roleName }}
+              </li>
+            </ul>
+          </td>
+          <td>
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                disabled
+                [checked]="user.isActive"
+              />
+              <label class="custom-control-label"></label>
+            </div>
+          </td>
+          <td>
+            <button
+              *ngIf="permission.isGranted(PS.Pages_Users_Edit)"
+              type="button"
+              class="btn btn-sm bg-secondary"
+              (click)="editUser(user)"
+            >
+              <i class="fas fa-pencil-alt"></i>
+              {{ "Edit" | localize }}
+            </button>
+            <button
+              *ngIf="permission.isGranted(PS.Pages_Users_Delete)"
+              type="button"
+              class="btn btn-sm bg-danger mx-2"
+              (click)="delete(user)"
+            >
+              <i class="fas fa-trash"></i>
+              {{ "Delete" | localize }}
+            </button>
+            <button
+              *ngIf="permission.isGranted(PS.Pages_Users_ResetPassword)"
+              type="button"
+              class="btn btn-sm bg-secondary"
+              (click)="resetPassword(user)"
+            >
+              <i class="fas fa-lock"></i>
+              {{ "ResetPassword" | localize }}
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+</div>

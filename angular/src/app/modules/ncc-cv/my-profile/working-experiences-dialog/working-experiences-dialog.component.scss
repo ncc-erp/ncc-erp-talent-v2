@@ -1,0 +1,70 @@
+
+.max-height::-webkit-scrollbar {
+  background-color: #f7f9fc;
+  width: 3px;
+}
+
+label {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+textarea {
+  height: 100px;
+}
+
+::ng-deep .project-complete {
+  input {
+    width: 100%;
+  }
+
+  .p-autocomplete-item {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+
+
+// ::ng-deep .mat-form-field-flex > .mat-form-field-infix { padding: 0.4em 0px !important;}
+// ::ng-deep .mat-form-field-label-wrapper { top: -1.5em; }
+
+// ::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+//   transform: translateY(-1.1em) scale(.75);
+//   width: 133.33333%;
+// }
+.card-header{
+  font-size: 25px; font-family: auto;
+}
+// .search-area{
+//   border-style: ridge; 
+//   margin-top: -25px; 
+//   height: 207px; 
+//   overflow: scroll;
+// }
+// @media only screen and (max-width: 861px){
+//   .max-height {
+//       width: 90%;
+//   }
+//   .ncc_wminwwidth{
+//       /* max-height: 400px; */
+//       max-width: 95%;
+//   }
+// }
+// @media only screen and (max-height: 680px){
+//   .ncc_wminwwidth{
+//       max-height: 350px;
+//   }
+// }
+// .labelOfsearch:hover{
+//   color: indianred;
+//   font-weight: bold;
+// }
+// .a {
+//   color: blue;
+// }
+// .black {
+//   color: black;
+// }
+

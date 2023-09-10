@@ -1,0 +1,23 @@
+<p-dropdown
+  [inputId]="id"
+  [options]="options"
+  placeholder="All"
+  optionLabel="subPosition"
+  optionValue="id"
+  [(ngModel)]="optionSelected"
+  [filter]="true"
+  [disabled]="disabled"
+  styleClass="position-select"
+  [group]="true"
+  filterBy="subPosition"
+  [showClear]="true"
+  (onChange)="onSelectChange($event.value)"
+  appendTo="body"
+>
+  <ng-template let-group pTemplate="group">
+    <div class="p-d-flex p-ai-center">
+      <i class="pi pi-folder-open"></i>
+      <span class="ml-2">{{ group.position }}</span>
+    </div>
+  </ng-template>
+</p-dropdown>

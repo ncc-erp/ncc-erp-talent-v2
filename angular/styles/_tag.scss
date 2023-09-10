@@ -1,0 +1,74 @@
+.block-hash-tag {
+  padding: 0 5px;
+  border-radius: 3px;
+  display: inline-flex;
+  margin-right: 0.5rem;
+  background-color: #898a8a;
+  color: var(--primary-color-text);
+  margin-bottom: 4px;
+  align-items: center;
+  gap: 5px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  img.flag {
+    width: 17px;
+  }
+
+  &--clear-all {
+    background-color: $color-warning-danger;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.tag {
+  border-radius: 10rem;
+  display: inline-block;
+  width: max-content;
+  align-items: center;
+  line-height: 1.2;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  font-family: inherit;
+  margin-bottom: 4px;
+  background-color: $color-male;
+
+  &--female {
+    background-color: $color-female;
+  }
+  &--male {
+    background-color: $color-male;
+  }
+  
+  &--branch {
+    background-color: $color-tag-branch;
+  }
+
+  &--position {
+    background-color: $color-deep-sky-blue;
+  }
+
+  &--project-tool {
+    background-color: $color-blue-5;
+  }
+
+  &--select {
+    background-color: $color-tag-select;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &--selected {
+    background-color: $color-tag-selected;
+  }
+}
+

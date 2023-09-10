@@ -1,0 +1,251 @@
+<talent-section-breadcrumb
+  [breadcrumbConfig]="breadcrumbConfig"
+>
+</talent-section-breadcrumb>
+
+<section class="section-table">
+  <div class="header-toolbar">
+    <div class="row-group">
+      <div class="col item-group item-group--search">
+        <div class="p-inputgroup">
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-search"
+            (click)="onSearchEnter()"
+          ></button>
+          <input
+            type="text"
+            class="input-search"
+            pInputText
+            [placeholder]="'Search by name, Position' | localize"
+            [(ngModel)]="keyword"
+            (keyup.enter)="onSearchEnter()"
+            talentAutoFocus
+          />
+        </div>
+      </div>
+
+      <div class="col item-group">
+        <label for="userType">
+          {{ "User Type" | localize }}
+        </label>
+        <div class="w-100">
+          <p-dropdown
+            inputId="userType"
+            [options]="_utilities.catUserType"
+            [(ngModel)]="usertype"
+            placeholder="All"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-100"
+            [showClear]="true"
+            (onChange)="getDataPage(GET_FIRST_PAGE)"
+          ></p-dropdown>
+        </div>
+      </div>
+      
+      <div class="col item-group">
+        <label for="branch"> {{ "ApplyCV Branch" | localize }}</label>
+        <div class="w-100">
+          <p-dropdown
+          inputId="branch"
+          [options]="_utilities.catBranch"
+          [(ngModel)]="branchId"
+          placeholder="All"
+          optionLabel="displayName"
+          optionValue="id"
+          styleClass="w-100"
+          [filter]="true"
+          filterBy="displayName"
+          [showClear]="true"
+          (onChange)="getDataPage(GET_FIRST_PAGE)"
+        ></p-dropdown>
+        </div>
+      </div>
+   
+      <div
+        class="col item-group"
+        [class]="
+          !searchWithCreationTime || searchWithCreationTime.dateType === 'All'
+            ? 'creation-time-default'
+            : 'creation-time-open'
+        "
+      >
+        <talent-date-selector
+          (selectChange)="onTalentDateChange($event)"
+          [timeOptions]="FILTER_TIME"
+          class="talent-date"
+        ></talent-date-selector>
+      </div>
+
+    </div>
+</div>
+  <p-table
+    [value]="applyCvList"
+    [lazy]="true"
+    (onLazyLoad)="lazyLoadingData($event)"
+    [paginator]="true"
+    [rows]="defaultRows"
+    [(first)]="first"
+    responsiveLayout="scroll"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [loading]="isLoading"
+    [totalRecords]="totalItems"
+    sortField="applyCVDate"
+    [sortOrder]="SORT_TYPE.DESC"
+    [resizableColumns]="true"
+    columnResizeMode="expand"
+    [showCurrentPageReport]="applyCvList.length"
+    currentPageReportTemplate="Total: {totalRecords}"
+    styleClass="p-datatable-striped p-datatable-sm p-datatable-gridlines tl-table tl-table-min-100"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-50px text-center">
+          {{ "No" | localize }}
+        </th>
+
+        <th class="cv-info" pSortableColumn="fullName" pResizableColumn>
+          {{ "Info" | localize }} 
+          <p-sortIcon field="fullName"></p-sortIcon>
+        </th>
+        <th pResizableColumn >
+          {{ "Post Id" | localize }}
+        </th>
+        <th pResizableColumn pSortableColumn="applyCVDate">
+          {{ "Apply Date" | localize }}
+          <p-sortIcon field="applyCVDate"></p-sortIcon>
+        </th>
+        
+        <th pResizableColumn>
+          {{ "Position" | localize }}
+        </th>
+
+        <th pResizableColumn>
+          {{ "User Type" | localize }}
+        </th>
+
+        <th pResizableColumn>
+          {{ "Branch" | localize }}
+        </th>
+        <th pResizableColumn>
+          {{ "Status" | localize }}
+        </th>
+        <th pResizableColumn >
+          {{ "Action" | localize }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item let-i="rowIndex">
+      <tr>
+        <td class="text-center">
+          {{ i + 1 }}
+        </td>
+
+        <td class="cv-info">
+          <div class="apply-cv">
+            <div class="group-left">
+              <div class="photo">
+                <img
+                  *ngIf="!item?.avatarLink && item.isFemale"
+                  src="../../../assets/img/user-female-circle.png"
+                  alt="Thumbnail"
+                />
+                <img
+                  *ngIf="!item?.avatarLink && !item.isFemale"
+                  src="../../../assets/img/user-circle.png"
+                  alt="Thumbnail"
+                />
+                <img
+                  *ngIf="item?.avatarLink"
+                  [src]="_utilities.getLinkFile(item.avatarLink)"
+                  alt="Thumbnail"
+                />
+              </div>
+          
+              <div class="group-info">
+                <div class="group-info--name">
+                  <div class="group-item">
+                    <span
+                      class="text-name"
+                    >
+                      {{ item.fullName }}
+                    </span>
+                    <span
+                      class="tag gender"
+                      [class]="item.isFemale ? 'tag--female' : 'tag--male'"
+                    >
+                      {{ item.isFemale ? "F" : "M" }}
+                    </span>
+                  </div>
+                </div>
+          
+                <div class="section-skill">
+                  <div class="row-item">
+                    <span>
+                      {{ item.phone || 'No phone exist' }}
+                    </span>
+                  </div>
+                  <div class="row-item">
+                    <span>
+                      {{ item?.email || 'No mail exist' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="group-right">
+              <span *ngIf="_utilities.getLinkFile(item.attachCVLink)">
+                <a [href]="_utilities.getLinkFile(item.attachCVLink)" target="_blank">
+                  <img class="icon-cv" src="../../../assets/img/cv.png" alt="cv" />
+                </a>
+              </span>
+            </div>
+          </div>
+        </td>
+        
+        <td class="text-center">
+          {{ item.postId }}
+        </td>
+        
+        <td class="text-center">
+          {{ item.applyCVDate | talentDateTime: DATE_FORMAT.DD_MM_YYYY }}
+        </td>
+
+        <td class="text-center">
+          {{ item.jobTitle }}
+        </td>
+
+        <td class="text-center">
+          {{ item.positionType }}
+        </td>
+
+        <td class="text-center">
+          {{ item.branch }}
+        </td>
+
+        <td class="text-center">
+          <div class="custom-control custom-checkbox align-items-center">
+            <input type="checkbox" id="myCheckbox" disabled   [checked]="item.applied"/>
+            <label for="myCheckbox" ></label>
+          </div>
+        </td>
+
+        <td class="text-center">
+          <p-button
+          class="button-al"
+          *ngIf="permission.isGranted(PS.Pages_ApplyCV_Create)"
+          icon="pi pi-plus"
+          title="Create ApplyCV"
+          (click)="navigateToCanDetail(item)"
+          [disabled]="item.applied === true"
+          styleClass="p-button-sm p-button-primary"
+      ></p-button>
+      </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>

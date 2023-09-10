@@ -1,0 +1,73 @@
+@import "../variables";
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  &--items {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+}
+
+.expand-group {
+  display: flex;
+  align-items: center;
+
+  ::ng-deep .p-button:focus {
+    box-shadow: none;
+  }
+}
+
+::ng-deep .p-datatable-wrapper .p-datatable-table {
+  tbody,
+  thead tr {
+    th.req-info {
+      width: 250px;
+    } 
+    
+    td {
+      div.req-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        .tag {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+.sub-table {
+  max-height: 480px;
+  overflow: auto;
+}
+
+@media (max-width: 1200px) {
+  .filter-row {
+    &--items {
+      flex-basis: calc(50% - 1rem);
+      max-width: 100%;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-row {
+    &--items {
+      flex-basis: 100%;
+      max-width: 100%;
+    }
+  }
+}
+
+.quantity-onboard {
+  color: $color-blue-5;
+}
+
+.quantity-failed {
+  color: $color-warning-danger;
+}

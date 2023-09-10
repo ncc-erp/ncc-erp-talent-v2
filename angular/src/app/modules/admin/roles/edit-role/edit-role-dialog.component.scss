@@ -1,0 +1,10 @@
+::ng-deep .checkbox-inactive {
+  .p-treenode .p-treenode-content .p-checkbox-disabled {
+    border-color: #ced4da !important;
+    background: #ced4da !important;
+    .p-checkbox-box.p-highlight {
+      border-color: #ced4da !important;
+      background: #ced4da !important;
+    }
+  }
+}

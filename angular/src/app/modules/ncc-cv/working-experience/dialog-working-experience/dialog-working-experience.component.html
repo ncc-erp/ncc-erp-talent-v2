@@ -1,0 +1,168 @@
+<form [formGroup]="form">
+    <div class="row">
+        <div class="col-md-6 col-sm-12">
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label> {{ "Project Name" | localize }} <span class="text-danger">*</span></label>
+                    <textarea type="text" class="form-control" formControlName="projectName" pInputTextarea> </textarea>
+                    <span class="text-danger" *ngIf="submitted && formControls.projectName.errors?.required">
+                        Project Name is required!
+                    </span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <label for="" class="mr-2">
+                        {{ "Start Time" | localize }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="w-100">
+                        <p-calendar [showIcon]="true" inputId="startTime" dateFormat="dd/mm/yy" styleClass="w-100"
+                            formControlName="startTime" appendTo="body"></p-calendar>
+                        <div>
+                            <span class="text-danger" *ngIf="submitted && formControls.startTime.errors?.required">
+                                Start time is required
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div *ngIf="!currentlyWorking">
+                        <label for="" class="mr-2">
+                            {{ "End Time" | localize }}
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="w-100">
+                            <p-calendar [showIcon]="true" inputId="endTime" dateFormat="dd/mm/yy" styleClass="w-100"
+                                formControlName="endTime" appendTo="body"></p-calendar>
+                            <div>
+                                <span class="text-danger" *ngIf="submitted && formControls.endTime.errors?.required">
+                                    End time is required
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <p *ngIf="currentlyWorking" style="margin-top:30px;">
+                        Present
+                    </p>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" name="currentlyWorking"
+                            id="currentlyWorking" [checked]="currentlyWorking" (click)="toggleShow()" />
+                        <label class="custom-control-label mt-2" for="currentlyWorking">Currently working</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label> Position <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" formControlName="position" />
+                    <span class="text-danger" *ngIf="submitted && formControls.position.errors?.required">
+                        Position is required!
+                    </span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label> Description<span class="text-danger">*</span></label>
+                    <textarea type="text" class="form-control" formControlName="projectDescription"> </textarea>
+                    <span class="text-danger" *ngIf="submitted && formControls.projectDescription.errors?.required">
+                        Description is required!
+                    </span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label> Responsibility <span class="text-danger">*</span></label>
+                    <textarea type="text" class="form-control" formControlName="responsibility"> </textarea>
+                    <span class="text-danger" *ngIf="submitted && formControls.responsibility.errors?.required">
+                        Responsibility is required!
+                    </span>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label> Technology <span class="text-danger">*</span></label>
+                    <textarea type="text" class="form-control" formControlName="technologies"> </textarea>
+                    <span class="text-danger" *ngIf="submitted && formControls.technologies.errors?.required">
+                        Technology is required!
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-sm-12">
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label>Search by version name</label>
+                    <input type="text" class="form-control" name="versionName" formControlName="versionName"
+                        autocomplete="off" (keyup.enter)="searchVersion()" />
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label for="" class="mr-2">
+                        Location version
+                    </label>
+                    <div class="w-100">
+                        <p-dropdown inputId="versionPositionId" formControlName="versionPositionId"
+                            [(ngModel)]="versionPositionId"
+                            [options]="_utilities.catEmployeePosition" placeholder="All" optionLabel="name"
+                            optionValue="id" styleClass="w-100" [filter]="true" filterBy="name" appendTo="body"
+                            [showClear]="true" (onChange)="searchVersion()"></p-dropdown>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-12">
+                    <label for="" class="mr-2">
+                        Location language
+                    </label>
+                    <div class="w-100">
+                        <p-dropdown inputId="versionLanguageId" formControlName="versionLanguageId"
+                            [(ngModel)]="versionLanguageId"
+                            [options]="_utilities.catLanguage" placeholder="All" optionLabel="name"
+                            optionValue="id" styleClass="w-100" [filter]="true" filterBy="name" appendTo="body"
+                            [showClear]="true" (onChange)="searchVersion()"></p-dropdown>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-3 col-sm-12">
+                    <p-button label="{{ 'Search' | localize }}" icon="pi pi-search"
+                        styleClass="p-button-sm p-button-primary" (click)="searchVersion()"></p-button>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <p-button label="{{ 'Add for Version Default' | localize }}" icon="pi pi-plus"
+                        styleClass="p-button-sm p-button-primary" (click)="addVersionDefault()"></p-button>
+                </div>
+                <div class="col-md-12" *ngIf="isNoResult">
+                    No results found!
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="search-area" *ngIf="isResult">
+                    <div *ngFor="let item of listVersions; let i = index">
+
+                        <label class="labelOfsearch" style="font-weight: normal;">
+                            <input (change)="selectedProjectName(item, $event, i)" type="checkbox" name="scales"
+                                [checked]="item.ischecked">
+                            <span> Version Name: <span class="text-search">{{item.versionName}}</span> -
+                                Employee Name: <span class="text-search">{{item.employeeName}}</span></span></label>
+                    </div>
+
+                </div>
+                <div class="btn-add" *ngIf="isResult">
+                    <p-button label="{{ 'Add' | localize }}" icon="pi pi-plus"
+                        styleClass="p-button-sm p-button-primary w-100 btn-add" (click)="addVersion()"></p-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

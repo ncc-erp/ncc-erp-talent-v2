@@ -1,0 +1,56 @@
+<main class="tabUserRole">
+  <p-pickList
+    #pickList
+    [source]="roleMembers"
+    [target]="availableMembers"
+    [showSourceControls]="false"
+    [showTargetControls]="false"
+    dragdrop="true"
+    [disabled]="isLoading"
+    [responsive]="true"
+    [styleClass]="!showMemberNotInRole ? 'hideMemberList' : ''"
+    filterBy="fullName,phone,email,branchName"
+    [sourceStyle]="{ height: 'calc(100vh - 287px)' }"
+    [targetStyle]="{ height: 'calc(100vh - 287px)' }"
+    sourceFilterPlaceholder="Search by name, phone, email"
+    targetFilterPlaceholder="Search by name, phone, email"
+    (onMoveToTarget)="deleteMemberRole($event.items)"
+    (onMoveAllToTarget)="deleteMemberRole($event.items, true)"
+    (onMoveToSource)="addMemberRole($event.items)"
+    (onMoveAllToSource)="addMemberRole($event.items, true)"
+  >
+    <ng-template pTemplate="sourceHeader">
+      <div>
+        <span class="p-picklist-title">{{ "Members In Role" | localize }}</span>
+        <p-button
+          *ngIf="!showMemberNotInRole"
+          icon="pi pi-plus"
+          styleClass="p-button-sm ml-4"
+          (onClick)="openAddMember()"
+        ></p-button>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="targetHeader">
+      <div>
+        <span class="p-picklist-title">{{ "Members Not In Role" | localize }}</span>
+        <p-button
+          icon="pi pi-times"
+          styleClass="p-button-sm p-button-danger ml-4"
+          (onClick)="closeAddMember()"
+        ></p-button>
+      </div>
+    </ng-template>
+
+    <ng-template let-item let-i="index" pTemplate="item">
+      <div class="d-flex align-items-center">
+        <span class="mr-3">{{ i + 1 }}</span>
+        <talent-candidate-info-new
+          [data]="item"
+          [isOpenDetail]="false"
+          [showCVStatus]="false"
+        ></talent-candidate-info-new>
+      </div>
+    </ng-template>
+  </p-pickList>
+</main>

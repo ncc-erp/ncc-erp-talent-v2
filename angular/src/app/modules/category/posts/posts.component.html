@@ -1,0 +1,115 @@
+<div [@routerTransition]>
+    <talent-section-breadcrumb
+      [breadcrumbConfig]="breadcrumbConfig"
+      [isShowBtn]="permission.isGranted(PS.Pages_Posts_Create)"
+      (onBtnClick)="openDialog(null, DIALOG_ACTION.CREATE)"
+    >
+    </talent-section-breadcrumb>
+
+    <section class="section-table">
+      <div class="header-toolbar">
+        <div class="row">
+          <div class="col-12 col-md-5">
+            <div class="p-inputgroup">
+              <button
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-search"
+                (click)="getDataPage(GET_FIRST_PAGE)"
+              ></button>
+              <input
+                talentAutoFocus
+                type="text"
+                pInputText
+                name="keyword"
+                [placeholder]="'Search by post name/ url' | localize"
+                [(ngModel)]="keyword"
+                (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+              />
+            </div>
+          </div>
+          <div class="col-12 col-md-7">
+            <div class="col item-group item-group--creation-time p-0" >
+              <talent-date-selector
+                [label]="'Time'"
+                [timeOptions]="FILTER_TIME"
+                [defaultOption]="defaultOptionTime"
+                (selectChange)="onTalentDateChange($event)"
+                class="talent-date"
+              ></talent-date-selector>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p-table
+        [value]="posts"
+        [lazy]="true"
+        (onLazyLoad)="lazyLoadingData($event)"
+        [paginator]="true"
+        [rows]="defaultRows"
+        responsiveLayout="scroll"
+        [rowsPerPageOptions]="rowsPerPageOptions"
+        [loading]="isLoading"
+        [totalRecords]="totalItems"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Total: {totalRecords}"
+        styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm tl-table-card-box"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="w-70px text-center">{{ "No" | localize }}</th>
+            <th class="w-200px text-center">{{ " Creation Time" | localize }}</th>
+            <th class="w-200px text-center">{{ " Creator" | localize }}</th>
+            <th class="text-center" style="width:400px!important;">{{ "Post's Name" | localize }}</th>
+            <th class="text-center">{{ "Post URL" | localize }}</th>
+            <th class="w-200px text-center">{{ "Type" | localize }}</th>
+            <th class="w-200px text-center">{{ "Apply CV Link" | localize }}</th>
+            <th class="w-200px text-center">{{ "Apply Number" | localize }}</th>
+            <th class="w-200px text-center">{{ "Actions" | localize }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-post let-i="rowIndex">
+          <tr>
+            <td class="text-center">{{ i + 1 }}</td>
+            <td class="text-center">{{ post.postCreationTime | talentDateTime: DATE_FORMAT.DD_MM_YYYY }}</td>
+            <td>{{ post.creatorsName }}</td>
+            <td>
+              <span class=" max-line-content-2" [collapseLine]="2" talentResizeContent>
+                {{ post.postName }}
+              </span>
+            </td>
+            <td><a [href]="post.url">{{ post.url }}</a></td>
+            <td>{{ post.type }}</td>
+            <td><a [href]="post.applyCvLink">{{ post.applyCvLink }}</a></td>
+            <td class="text-center">{{ post.applyNumber }}</td>
+            <td class="text-center">
+              <p-button
+                *ngIf="permission.isGranted(PS.Pages_Posts_Edit)"
+                title="{{ 'Edit' | localize }}"
+                icon="pi pi-pencil"
+                styleClass="p-button-sm p-button-secondary mr-1"
+                (click)="openDialog(post, DIALOG_ACTION.UPDATE)"
+              ></p-button>
+              <p-button
+                *ngIf="permission.isGranted(PS.Pages_Posts_Delete)"
+                title="{{ 'Delete' | localize }}"
+                icon="pi pi-trash"
+                styleClass="p-button-sm p-button-danger mr-1"
+                (click)="delete(post)"
+              ></p-button>
+              <p-button
+                title="{{ 'Metadata' | localize }}"
+                icon="pi pi-eye"
+                styleClass="p-button-sm"
+                (click)="openMetadata(post)"
+            ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+   </div>
+

@@ -1,0 +1,53 @@
+html {
+  scroll-behavior: smooth;
+ }
+
+option[value=""][disabled] {
+  display: none;
+}
+
+option {
+  color: #000;
+}
+
+::placeholder {
+    color: #000;
+    opacity: 1;
+}
+
+.text-error.text-danger {
+    margin-top: -25px;
+}
+
+.text-error.file.text-danger {
+  margin-top: 5px;
+}
+
+.main-menu li button {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+button.btn-about {
+  border: none;
+  background: transparent;
+}
+
+.message-success {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.primary-button.large {
+    width: 145px;
+    height: 51px;
+    line-height: 51px;
+    font-size: 21px;
+    text-transform: uppercase;
+}
+
+label.contact-form__file-upload:hover {
+  cursor: pointer;
+}
