@@ -18,6 +18,7 @@ jobs:
       
       - name: Backup Log
         run: |
+          # cp -r /var/www/app_git/talent/dev-dotnet-host-talent/wwwroot/* /home/nccsoft/soft/check_node_git/talent/
           cp -r /var/www/app_git/talent/dev-dotnet-host-talent/wwwroot/Uploads/* /home/nccsoft/soft/check_node_git/talent/Uploads/
           cp -r /var/www/app_git/talent/dev-dotnet-host-talent/App_Data/Logs/* /home/nccsoft/data_git/talent/Logs/
 
