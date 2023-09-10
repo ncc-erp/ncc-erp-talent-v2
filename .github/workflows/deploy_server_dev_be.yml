@@ -15,12 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
-      - name: Backup Log
-        run: |
-          # cp -r /var/www/app_git/talent/dev-dotnet-host-talent/wwwroot/* /home/nccsoft/soft/check_node_git/talent/
-          cp -r /var/www/app_git/talent/dev-dotnet-host-talent/wwwroot/Uploads/* /home/nccsoft/soft/check_node_git/talent/Uploads/
-          cp -r /var/www/app_git/talent/dev-dotnet-host-talent/App_Data/Logs/* /home/nccsoft/data_git/talent/Logs/
 
       - name: Build Migrator
         run: |
@@ -29,18 +23,23 @@ jobs:
           dotnet6 build
           dotnet6 publish
 
-      - name: Copy New Migrator
-        run: |
-          cd aspnet-core/src/TalentV2.Migrator/bin/Debug/net6.0/publish/
-          rm -rf appsettings.json
-          cp -r * /var/www/migrator_git/talent/dev-dotnet-migrator-talent/
-
       - name: Build Host
         run: |
           export PATH=$PATH:/opt/dotnet6/
           cd aspnet-core/src/TalentV2.Web.Host
           dotnet6 build
           dotnet6 publish
+
+      - name: Copy New Migrator
+        run: |
+          cd aspnet-core/src/TalentV2.Migrator/bin/Debug/net6.0/publish/
+          rm -rf appsettings.json
+          cp -r . /var/www/migrator_git/talent/dev-dotnet-migrator-talent/
+
+      - name: Backup Log
+        run: |
+          cp -r /var/www/app_git/talent/dev-dotnet-host-talent/wwwroot/Uploads/* /home/nccsoft/soft/check_node_git/talent/Uploads/
+          cp -r /var/www/app_git/talent/dev-dotnet-host-talent/App_Data/Logs/* /home/nccsoft/data_git/talent/Logs/
 
       - name: Copy New Host
         run: |
