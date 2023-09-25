@@ -310,5 +310,15 @@ namespace TalentV2.APIs
         {
             return await _candidateManager.UpdateInterviewed(input);
         }
+        [HttpPost]
+        public async Task<IActionResult> ExportInfo(DomainServices.Candidates.Dtos.ExportInput input)
+        {
+            return await _candidateManager.ExportInfo(input);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ExportOnboard(DomainServices.Candidates.Dtos.ExportInput input)
+        {
+            return await _candidateManager.ExportOnboard(input);
+        }
     }
 }

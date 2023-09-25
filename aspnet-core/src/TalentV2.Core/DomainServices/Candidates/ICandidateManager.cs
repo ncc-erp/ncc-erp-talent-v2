@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Entities;
 using Abp.Domain.Services;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +62,12 @@ namespace TalentV2.DomainServices.Candidates
         void UpdateHrmTempEmployee(long requestCVId);
         Task<long> CloneCandidateByCvId(long cvId);
 
+        #region export Infomation
+
+        Task<FileContentResult> ExportInfo(Dtos.ExportInput input);
+        Task<FileContentResult> ExportOnboard(Dtos.ExportInput input);
+
+        #endregion
 
         #region send mail CV
         Task<MailPreviewInfoDto> PreviewBeforeSendMailCV(long cvId);
