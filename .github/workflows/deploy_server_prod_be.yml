@@ -41,6 +41,8 @@ jobs:
           cp -r /var/www/app_git/talentv2/prod-dotnet-host-talent/wwwroot/* /home/erp/data_git/talentv2/
           cp -r /var/www/app_git/talentv2/prod-dotnet-host-talent/App_Data/Logs/* /home/erp/data_git/talentv2/Logs/
           rm -rf /home/erp/data_git/talentv2/swagger/
+          rm -rf /var/www/app_git/talentv2/prod-dotnet-host-talent-bk/*
+          cp -r /var/www/app_git/talentv2/prod-dotnet-host-talent/* /var/www/app_git/talentv2/prod-dotnet-host-talent-bk/
 
       - name: Copy New Host
         run: |
