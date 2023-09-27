@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: dev
     name: Build Talentv2_BE Dev
     environment: dev
     steps:
@@ -56,7 +56,7 @@ jobs:
           chmod 777 -R wwwroot/
           
   deploy:
-    runs-on: self-hosted
+    runs-on: dev
     name: Deploy Talentv2_BE Dev
     environment: dev
     needs:

@@ -1,0 +1,87 @@
+name: Deploy Talentv2_BE PROD
+on:
+  push:
+    branches:
+      - prod
+    paths:
+    - 'aspnet-core/**'
+    - '.github/workflows/deploy_server_prod_be.yml'
+
+jobs:
+  build:
+    runs-on: prod
+    name: Build Talentv2_BE PROD
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build Migrator
+        run: |
+          export PATH=$PATH:/opt/dotnet6/
+          cd aspnet-core/src/TalentV2.Migrator
+          dotnet6 build
+          dotnet6 publish
+
+      - name: Copy New Migrator
+        run: |
+          cd aspnet-core/src/TalentV2.Migrator/bin/Debug/net6.0/publish/
+          rm -rf appsettings.json
+          cp -r * /var/www/migrator_git/talentv2/stg-dotnet-migrator-talent/
+
+      - name: Build Host
+        run: |
+          export PATH=$PATH:/opt/dotnet6/
+          cd aspnet-core/src/TalentV2.Web.Host
+          dotnet6 build
+          dotnet6 publish
+
+      - name: Backup Log
+        run: |
+          cp -r /var/www/app_git/talentv2/prod-dotnet-host-talent/wwwroot/* /home/erp/data_git/talentv2/
+          cp -r /var/www/app_git/talentv2/prod-dotnet-host-talent/App_Data/Logs/* /home/erp/data_git/talentv2/Logs/
+          rm -rf /home/erp/data_git/talentv2/swagger/
+
+      - name: Copy New Host
+        run: |
+          cd aspnet-core/src/TalentV2.Web.Host/bin/Debug/net6.0/publish/
+          rm -rf appsettings.json
+          rm -rf appsettings.Staging.json
+          cp -r * /var/www/app_git/talentv2/prod-dotnet-host-talent/
+          cd /var/www/app_git/talentv2/prod-dotnet-host-talent/
+          mkdir -p /var/www/app_git/talentv2/prod-dotnet-host-talent/App_Data/Logs/
+          cp -r /home/erp/data_git/talentv2/Logs/* /var/www/app_git/talentv2/prod-dotnet-host-talent/App_Data/Logs/
+          cp -r /home/erp/data_git/talentv2/* /var/www/app_git/talentv2/prod-dotnet-host-talent/wwwroot/
+          chmod 777 -R App_Data/
+          chmod 777 -R wwwroot/
+        
+  deploy:
+    runs-on: prod
+    name: Deploy Talentv2_BE PROD
+    environment: prod
+    needs:
+      - build
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Up Data appsettings.json
+        run: |
+          cd aspnet-core/
+          echo '${{ secrets.APP_SETTING_PROD }}' > appsettings.json
+
+      - name: Migrate Database
+        run: |
+          export PATH=$PATH:/opt/dotnet6/
+          sudo service erp-talentv2-git stop
+          cd aspnet-core/
+          cp appsettings.json /var/www/migrator_git/talentv2/stg-dotnet-migrator-talent/
+          cd /var/www/migrator_git/talentv2/stg-dotnet-migrator-talent/
+          dotnet6 TalentV2.Migrator.dll -q
+
+      - name: Restart Server
+        run: |
+          cd aspnet-core/
+          cp appsettings.json /var/www/app_git/talentv2/prod-dotnet-host-talent/
+          sudo service erp-talentv2-git restart
+          sudo service erp-talentv2-git status
