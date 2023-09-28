@@ -1205,8 +1205,8 @@ namespace TalentV2.DomainServices.Candidates
                 .ToListAsync();
 
             var requestCvsIdOnboarded = requestCvs
-                .Where(t => t.OnboardDate != null)
-                .ToDictionary(t => t.CVId);
+                 .Where(t => t.OnboardDate != null)
+                 .ToList();
             var listOnboarded = await IQGetAllCVs()
                 .Where(q => q.UserType.Equals(input.userType))
                 .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == RequestCVStatus.Onboarded))
@@ -1219,7 +1219,7 @@ namespace TalentV2.DomainServices.Candidates
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                    Time = requestCvsIdOnboarded.ContainsKey(u.Id) ? requestCvsIdOnboarded[u.Id].OnboardDate : null,
+                    Time = requestCvsIdOnboarded.Find(s => s.CVId.Equals(u.Id))?.OnboardDate,
                     ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
                     FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
                 })
@@ -1230,10 +1230,10 @@ namespace TalentV2.DomainServices.Candidates
 
             var requestCvsIdInterviewed = requestCvs
                 .Where(t => t.Interviewed.Equals(true) && t.InterviewTime != null)
-                .ToDictionary(t => t.CVId);
+                .Select(t => t.CVId).ToList();
             var listInterviewed = await IQGetAllCVs()
                 .Where(q => q.UserType.Equals(input.userType))
-                .Where(s => requestCvsIdInterviewed.ContainsKey(s.Id))
+                .Where(s => requestCvsIdInterviewed.Contains(s.Id))
                 .ToListAsync();
             var resultsInterViewed = listInterviewed
                 .Select((u, index) => new InterView()
@@ -1243,7 +1243,7 @@ namespace TalentV2.DomainServices.Candidates
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                    Time = requestCvsIdInterviewed.ContainsKey(u.Id) ? requestCvsIdInterviewed[u.Id].InterviewTime : null,
+                    Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
                     ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
                     FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
                 })

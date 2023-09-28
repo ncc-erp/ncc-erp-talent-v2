@@ -1,10 +1,22 @@
-<talent-section-breadcrumb
-  *ngIf="!isDialogMode"
-  [breadcrumbConfig]="breadcrumbConfig"
-  [isShowBtn]="permission.isGranted(PS.Pages_CandidateStaff_Create)"
-  (onBtnClick)="createCandidate()"
+<div class="breadcrumb header ">
+  <div>
+    <talent-section-breadcrumb
+      *ngIf="!isDialogMode"
+      [breadcrumbConfig]="breadcrumbConfig"
 >
 </talent-section-breadcrumb>
+
+</div>
+<div class="custom-button" *ngIf="isShowExportBtn()">
+  <button class="btn btn-success ml-2" (click)="showExportDialog()" >
+    <i class="pi pi-download fa-download mr-1"></i>
+    Export
+  </button>
+  <button class="btn btn-primary" (click)="createCandidate()">
+    <i class="pi pi-plus fa-square-plus mr-1"></i>Create
+  </button>
+</div>
+</div>
 
 <section class="section-table">
   <div class="header-toolbar pt-0">

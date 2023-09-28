@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace TalentV2.DomainServices.Reports.Dtos
 {
-    public class ReportEducationHaveCVOnboardDto : ReportEducationHaveCVPassTestDto
+    public class ReportEducationHaveCVPassInterViewDto : ReportEducationHaveCVPassTestDto
     {
     }
-
-    public class EducationDto
+    public class EducationPassInterViewDto
     {
         public string Name { get; set; }
         public long Id { get; set; }

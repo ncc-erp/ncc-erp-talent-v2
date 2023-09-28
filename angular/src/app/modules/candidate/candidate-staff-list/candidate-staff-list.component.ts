@@ -10,6 +10,8 @@ import { Filter, PagedListingComponentBase, PagedRequestDto } from '@shared/page
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CandidateStaff } from '../../../core/models/candidate/candidate.model';
 import { RequisitionStaffService } from '@app/core/services/requisition/requisition-staff.service';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {ExportCandidateComponent} from '@shared/components/export-candidate/export-candidate.component';
 
 @Component({
   selector: 'talent-candidate-staff-list',
@@ -60,7 +62,7 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
     public _utilities: UtilitiesService,
     public _candidateStaff: CandidateStaffService,
     private _reqStaff: RequisitionStaffService,
-
+    private _modalService: BsModalService
   ) {
     super(injector);
   }
@@ -261,5 +263,21 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
       (item) => item.propertyName != "creatorUserId"
     );
     this.getDataPage(this.GET_FIRST_PAGE);
+  }
+
+  isShowExportBtn(){
+    return this.isGranted(this.PS.Pages_CandidateIntern_Create);
+  }
+
+  showExportDialog(userType: number): void {
+    let createExportCandidate: BsModalRef;
+   userType = UserType.STAFF
+   createExportCandidate =  this._modalService.show(
+    ExportCandidateComponent, {
+      class: 'modal-lg',
+      initialState: {
+      userType: userType,
+      }, 
+    });
   }
 }

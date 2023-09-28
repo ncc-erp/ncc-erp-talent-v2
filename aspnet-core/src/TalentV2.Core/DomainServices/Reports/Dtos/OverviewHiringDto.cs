@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TalentV2.Constants.Enum;
+using TalentV2.DomainServices.Candidates.Dtos;
 
 namespace TalentV2.DomainServices.Reports.Dtos
 {
@@ -40,6 +40,7 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public long TotalCV { get; set; }
     }
 
+
     public class Chart
     {
         public int PixelWidth { get; set; }
@@ -53,36 +54,32 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public List<ModelChart> ModelCharts { get; set; }
 
     }
-    public class DateInput
-    {
-        public DateTime? FromDate { get; set; }
-        public DateTime? ToDate { get; set; }
-    }
-    public class Templates
-    {
-        public string Key { get; set; }
-        public float Percent { get; set; }
-    }
+
     public class ModelChart
     {
         public string BranchName { get; set; }
         public List<Templates> Temaplates { get; set; }
     }
-    public class ExportInput : DateInput
+
+    public class Templates
     {
-        public UserType userType { get; set; }
+        public string Key { get; set; }
+        public float Percent { get; set; }
     }
     public class BranchDtoExport
     {
         public long? id { get; set; }
         public string displayName { get; set; }
     }
+
     public class ExportChartInput : ExportInput
     {
         public List<BranchDtoExport> Branchs { get; set; }
     }
+
     public class ExportChartEducationInput : DateInput
     {
         public List<BranchDtoExport> Branchs { get; set; }
     }
+
 }

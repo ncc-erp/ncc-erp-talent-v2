@@ -28,6 +28,8 @@ import {
 import { DynamicDialogConfig, DynamicDialogRef } from "primeng/dynamicdialog";
 import { CandidateInternService } from "./../../../core/services/candidate/candidate-intern.service";
 import { RequisitionInternService } from "./../../../core/services/requisition/requisition-intern.service";
+import {BsModalRef, BsModalService} from "ngx-bootstrap/modal";
+import {ExportCandidateComponent} from "@shared/components/export-candidate/export-candidate.component";
 
 @Component({
   selector: "talent-candidate-intern-list",
@@ -82,7 +84,8 @@ export class CandidateInternListComponent
     public _utilities: UtilitiesService,
     public _candidateIntern: CandidateInternService,
     private _reqIntern: RequisitionInternService,
-    public _router: Router
+    public _router: Router,
+    private _modalService: BsModalService
   ) {
     super(injector);
   }
@@ -320,5 +323,20 @@ export class CandidateInternListComponent
       (item) => item.propertyName != "creatorUserId"
     );
     this.getDataPage(this.GET_FIRST_PAGE);
+  }
+  isShowExportBtn(){
+    return this.isGranted(this.PS.Pages_CandidateIntern_Create);
+  }
+
+  showExportDialog(userType: number): void {
+    let createExportCandidate: BsModalRef;
+    userType = UserType.INTERN
+    createExportCandidate =  this._modalService.show(
+    ExportCandidateComponent, {
+      class: 'modal-lg',
+      initialState: {
+        userType: userType,
+      }, 
+    });
   }
 }

@@ -12,6 +12,7 @@ import { ApiResponse } from './../../../../shared/paged-listing-component-base';
 import { CandidateCapability, CandidateRequisiton } from './../../models/candidate/candiadte-requisition.model';
 import { CandidateSkill, CandidateSkillPayload } from './../../models/candidate/candidate-skill.model';
 import { CatalogModel } from './../../models/common/common.dto';
+import {UserType} from '@shared/AppEnums';
 
 @Injectable({
   providedIn: 'root'
@@ -184,5 +185,12 @@ export class CandidateStaffService extends BaseApiService {
   cloneCandidateByCvId(id: number): Observable<ApiResponse<string>> {
     return this.get(`/CloneCandidateByCvId?cvId=${id}`);
   }
+  
+  exportInfomation(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
+    return this.createExport(payload, '/ExportInfo');
+  }
 
+  exportReport(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
+    return this.createExport(payload, '/ExportOnboard');
+  }
 }

@@ -105,6 +105,9 @@ import { SectionBreadcrumbComponent } from './components/section-breadcrumb/sect
 import { PositionDropdownComponent } from './components/position-dropdown/position-dropdown.component';
 import { PageErrorComponent } from './pages/page-error/page-error.component';
 import {SafeHtmlPipe} from '@shared/pipes/safe-html.pipe';
+
+import {ExportCandidateComponent} from './components/export-candidate/export-candidate.component'
+import {TabsModule} from "ngx-bootstrap/tabs";
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
   TableModule,
@@ -171,7 +174,8 @@ const candidate = [
   CandidateEducationComponent,
   CandidateSkillComponent,
   CurrentRequisitionComponent,
-  ApplicationHistoryComponent
+  ApplicationHistoryComponent,
+  ExportCandidateComponent,
 ]
 
 @NgModule({
@@ -184,6 +188,7 @@ const candidate = [
     DragDropModule,
     ToastModule,
     FormsModule,
+    TabsModule,
     ReactiveFormsModule,
     ImageCropperModule,
     ...materialLibs,
