@@ -1,6 +1,7 @@
 import {
   HttpClient,
   HttpErrorResponse,
+  HttpHeaders,
   HttpParams
 } from "@angular/common/http";
 import { InjectionToken } from "@angular/core";
@@ -102,5 +103,19 @@ export abstract class BaseApiService {
           return of({ loading: false, success: false, error: err.error.error });
         })
       );
+  }
+
+  createExport(item: any, subUrl: string = null): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(this.rootUrl + subUrl, item, {
+      headers: headers,
+      responseType: 'blob'
+    }).pipe(
+      catchError((err: HttpErrorResponse) => {
+        return of({ loading: false, success: false, error: err.error.error }); // Return an empty Blob in case of error
+      })
+    );
   }
 }

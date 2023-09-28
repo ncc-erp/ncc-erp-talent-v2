@@ -25,6 +25,8 @@ import { AppPreBootstrap } from './app-pre-bootstrap';
 import { AppSessionService } from '@shared/session/app-session.service';
 import * as _ from 'lodash';
 
+import { ExportDialogModule } from 'export-dialog/export-dialog.module';
+
 export function getCurrentLanguage(): string {
   if (abp.localization.currentLanguage.name) {
     return abp.localization.currentLanguage.name;
@@ -46,7 +48,8 @@ export function getCurrentLanguage(): string {
     TabsModule.forRoot(),
     ServiceProxyModule,
     RootRoutingModule,
-    ApplyCvModule
+    ApplyCvModule,
+    ExportDialogModule
   ],
   declarations: [RootComponent],
   providers: [

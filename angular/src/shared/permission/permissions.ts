@@ -233,9 +233,11 @@ export const PERMISSIONS_CONSTANT = {
 
     TabReport: "Reports",
     Pages_Reports_Overview: "Pages.Reports.Overview",
+    Pages_Reports_Overview_Export: "Pages.Reports.Overview.Export",
     Pages_Reports_Staff_Performance: "Pages.Report.Staff.Performance",
     Pages_Reports_Intern_Performance: "Pages.Report.Intern.Performance",
     Pages_Reports_Intern_Education: "Pages.Report.Intern.Education",
+    Pages_Reports_Intern_Education_Export: "Pages.Report.Intern.Education.Export",
 
     TabFakeCV: "Pages Fake CV Employee",
     MyProfile: "MyProfile",

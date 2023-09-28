@@ -1,0 +1,31 @@
+<div class="group-dialog">
+  <div class="header-container">
+    <div class="span" *ngIf="Loading">
+      <span class="af-V">Initiating the download process.</span>
+    </div>
+    <div *ngIf="!Loading">
+      <span class="af-V">Download of the file was successful</span>
+    </div>
+    <button class="header-container" (click)="clonedialog()">
+      <i class="pi pi-times af-V icon"></i>
+    </button>
+  </div>
+
+  <div class="hedaer-loading">
+    <div class="spinner-container" *ngIf="Loading">
+      <span class="letters"> Loading....</span>
+      <div class="loading-popup">
+        <div class="loading-spinner af-V icon"></div>
+      </div>
+    </div>
+
+    <div *ngIf="!Loading" class="spinner-container">
+      <span class="letters"> Download completed </span>
+      <div class="custom-control custom-checkbox align-items-center">
+        <div class="custom-checkbox" id="myCheckbox" disabled>
+          <div class="checkmark">✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

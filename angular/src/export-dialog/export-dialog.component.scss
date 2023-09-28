@@ -1,0 +1,78 @@
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.header-container {
+  border: none;
+  background-color: #f7f6f6;
+  display: flex;
+  height: 55px;
+  padding-right: 10px;
+}
+.hedaer-loading{
+  border: none;
+  background-color: #ffff;
+  display: flex;
+  padding-top: 5px;
+  padding-right: 5px;
+}
+
+.af-V {
+  font-size: x-large;
+  font-weight: 600;
+  
+}
+span.af-V{
+  top: 20px;
+  position: sticky;
+  padding-left: 23px;
+}
+span.letters {
+  padding-left: 20px;
+}
+
+.letters{
+  font-size: larger;
+}
+.spinner-container {
+  display: flex;
+  padding-top: 20px;
+}
+.loading-popup{
+  margin-left: 240px;
+}
+.icon {
+  margin-left:22px;
+}
+
+.custom-checkbox.disabled .checkmark {
+  color: #aaa;
+}
+
+.custom-checkbox .checkmark {
+  text-align: center;
+  font-size: 25px;
+  color: #fcfcfc;
+  line-height: 21px;
+  background-color: #28a745;
+  border-radius: 15px;
+  height: 30px;
+  width: 30px;
+  margin-left: 200px;
+  line-height: 30px;
+}
+

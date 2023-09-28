@@ -52,4 +52,8 @@ export class ReportOverviewService extends BaseApiService {
       })
     );
   }
+  
+  exportOverviewHiring(payload: {fromDate: string, toDate: string,userType: UserType, branchs?: any[] }): Observable<Blob> {
+    return this.createExport(payload, '/ExportOverviewHiring');
+  }
 }

@@ -2,6 +2,13 @@
   [breadcrumbConfig]="breadcrumbConfig"
 ></talent-section-breadcrumb>
 
+<div class="btexport" *ngIf="isShowExportBtn()">
+  <button class="btn btn-success ml-2" (click)="exportInternEducation()">
+    <i class="pi pi-download fa-download mr-1"></i>
+    Export
+  </button>
+</div>
+
 <section class="section-table" id="report-education">
   <div class="card">
     <div class="card-header">

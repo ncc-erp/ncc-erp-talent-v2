@@ -1,5 +1,5 @@
 import { LoopArrayPipe } from './../../../../shared/pipes/loop-array.pipe';
-import { REQUEST_CV_STATUS, } from './../../../../shared/AppEnums';
+import { REQUEST_CV_STATUS, ToastMessageType, } from './../../../../shared/AppEnums';
 import { forkJoin, of } from 'rxjs';
 import { ReportOverview, StatusStatistic } from '../../../core/models/report/report.model';
 import { ReportOverviewService } from '../../../core/services/report/report-overview.service';
@@ -16,9 +16,12 @@ import { Branch } from '@app/core/models/categories/branch.model';
 import { catchError } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CatalogModel } from '@app/core/models/common/common.dto';
+import {ExportDialogComponent} from 'export-dialog/export-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {ExportDialogService} from 'export-dialog/export-dialog.service';
 
 @Component({
-  selector: 'talent-recruitment-overview',
+  selector: 'talent-recruitment-overview',  
   templateUrl: './recruitment-overview.component.html',
   styleUrls: ['./recruitment-overview.component.scss'],
   providers: [LoopNumberPipe, LoopArrayPipe]
@@ -40,10 +43,13 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
   colOverview: number;
   colQuantity: number = 5; //Col: QuatyHiring, QuatyApply, QuatyFailed, ...
   colLabel: number = 2; //Col: No, PositionName
+  isDialogOpen = false;
   constructor(
     injector: Injector,
     public _utilities: UtilitiesService,
-    private _report: ReportOverviewService
+    private _report: ReportOverviewService,
+    public dialogService: MatDialog,
+    private _exportService: ExportDialogService
   ) {
     super(injector);
   }
@@ -156,5 +162,52 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
       menuItem: [{ label: "Reports", routerLink: DefaultRoute.Report, styleClass: 'menu-item-click' }, { label: "Recruitment Overview" }],
       homeItem: { icon: "pi pi-home", routerLink: "/" },
     };
+  }
+
+  isShowExportBtn() {
+    return this.isGranted(this.PS.Pages_Reports_Overview_Export);
+  }
+
+  exporOverviewHiring() {
+    const dialogConfig = {
+      hasBackdrop: false,
+      position: {
+        top: "48em",
+        right: "50px",
+      },
+      panelClass: "custom-dialog",
+    };
+    const userType = this.filterUserType?.id;
+    const fd = this.searchWithCreationTime?.fromDate.format(
+      DateFormat.YYYY_MM_DD
+    );
+    const td = this.searchWithCreationTime?.toDate.format(
+      DateFormat.YYYY_MM_DD
+    );
+    const branches = this.filterBranch.map((branch) => {
+      return {
+        id: branch.id !== null ? branch.id : "",
+        displayName: branch.displayName,
+      };
+    });
+    if (branches.length === 0) {
+      this.showToastMessage(ToastMessageType.ERROR, "Please select branch");
+      this.isDialogOpen = false;
+      return;
+    }
+    if (!this.isDialogOpen) {
+      const popup = this.dialogService.open(ExportDialogComponent, dialogConfig);
+      const sendataOverview = {
+        fromDate: fd,
+        toDate: td,
+        userType: userType,
+        branchs: branches,
+      };
+      this._exportService.exportOverviewHiring(sendataOverview);
+
+      setTimeout(() => {
+        popup.close();
+      }, 5000);
+    }
   }
 }
