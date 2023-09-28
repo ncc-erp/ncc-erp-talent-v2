@@ -319,9 +319,11 @@ namespace TalentV2.Authorization
         public const string TabReport = "Reports";
         #region Report
         public const string Pages_Reports_Overview = "Pages.Reports.Overview";
+        public const string Pages_Reports_Overview_Export = "Pages.Reports.Overview.Export";
         public const string Pages_Reports_Staff_Performance = "Pages.Report.Staff.Performance";
         public const string Pages_Reports_Intern_Performance = "Pages.Report.Intern.Performance";
         public const string Pages_Reports_Intern_Education = "Pages.Report.Intern.Education";
+        public const string Pages_Reports_Intern_Education_Export = "Pages.Report.Intern.Education.Export";
         #endregion
 
         #region NCC Fake CV
@@ -665,9 +667,11 @@ namespace TalentV2.Authorization
                     #region Tab Report
                     PermissionNames.TabReport,
                     PermissionNames.Pages_Reports_Overview,
+                    PermissionNames.Pages_Reports_Overview_Export,
                     PermissionNames.Pages_Reports_Staff_Performance,
                     PermissionNames.Pages_Reports_Intern_Performance,
                     PermissionNames.Pages_Reports_Intern_Education,
+                    PermissionNames.Pages_Reports_Intern_Education_Export,
                     #endregion
 
                     #region NCC Fake CV
@@ -953,9 +957,11 @@ namespace TalentV2.Authorization
                     #region Tab Report
                     PermissionNames.TabReport,
                     PermissionNames.Pages_Reports_Overview,
+                    PermissionNames.Pages_Reports_Overview_Export,
                     PermissionNames.Pages_Reports_Staff_Performance,
                     PermissionNames.Pages_Reports_Intern_Performance,
                     PermissionNames.Pages_Reports_Intern_Education,
+                    PermissionNames.Pages_Reports_Intern_Education_Export,
                     #endregion
 
                     #region NCC Fake CV
@@ -1446,9 +1452,11 @@ namespace TalentV2.Authorization
                 #region Tab Report
                 new SystemPermission {Name = PermissionNames.TabReport, DisplayName = "Tab Report", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Reports_Overview, DisplayName = "View Report Overview", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_Reports_Overview_Export, DisplayName = "View Report Overview Export", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Reports_Staff_Performance, DisplayName = "View Report Staff Perfomance", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Reports_Intern_Performance, DisplayName = "View Report Intern Perfomance", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Reports_Intern_Education, DisplayName = "View Report Intern Education", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_Reports_Intern_Education_Export, DisplayName = "View Report Intern Education Export", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 #endregion
                 #region NCC Fake CVs
                 new SystemPermission{ Name =  PermissionNames.TabFakeCV, MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant, DisplayName = "Tab Fake CV Employee" },
@@ -2153,9 +2161,11 @@ namespace TalentV2.Authorization
                     Children = new List<SystemPermission>
                     {
                         new SystemPermission {Name = PermissionNames.Pages_Reports_Overview, DisplayName = "View Report Overview", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                        new SystemPermission {Name = PermissionNames.Pages_Reports_Overview_Export, DisplayName = "View Report Overview Export", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                         new SystemPermission {Name = PermissionNames.Pages_Reports_Staff_Performance, DisplayName = "View Report Staff Perfomance", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                         new SystemPermission {Name = PermissionNames.Pages_Reports_Intern_Performance, DisplayName = "View Report Intern Perfomance", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                         new SystemPermission {Name = PermissionNames.Pages_Reports_Intern_Education, DisplayName = "View Report Intern Education", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                        new SystemPermission {Name = PermissionNames.Pages_Reports_Intern_Education_Export, DisplayName = "View Report Intern Education Export", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                     }
                 },
                 #endregion 

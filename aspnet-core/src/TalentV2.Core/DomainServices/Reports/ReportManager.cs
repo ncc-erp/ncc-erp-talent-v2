@@ -1,8 +1,14 @@
 ﻿using Abp.Collections.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.Style;
+using OfficeOpenXml.Table;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -371,7 +377,185 @@ namespace TalentV2.DomainServices.Reports
 
             return result;
         }
+        public async Task<FileContentResult> ExportOverviewHiring(ExportChartInput input)
+        {
+            var noData = "NoData";
+            var percentDefault = 0;
+            var pieChartCvSource = new Chart();
+            var pieChartStatusStatistics = new Chart();
+            pieChartCvSource.ModelCharts = new List<ModelChart>();
+            pieChartStatusStatistics.ModelCharts = new List<ModelChart>();     
+            foreach (var branch in input.Branchs)
+            {
+                var overviewHiring = await GetOverviewHiring(input.FromDate.Value, input.ToDate.Value, input.userType, branch.id);
+                var subPositionStatistics = overviewHiring?.SubPositionStatistics.FirstOrDefault();
+                var cvSourceStatistics = subPositionStatistics?.CVSourceStatistics.ToList();
+                var totalOverviewHiring = overviewHiring.TotalOverviewHiring.TotalCVSources;
+                var sumtotalOverviewHiring = totalOverviewHiring.Sum();
+                var templatesCvSource = cvSourceStatistics?.Select(s => new Templates
+                {
+                    Key = s.Name,
+                    Percent = sumtotalOverviewHiring > percentDefault ? totalOverviewHiring[cvSourceStatistics.IndexOf(s)] / (float)sumtotalOverviewHiring : percentDefault,
+                }).ToList();
+                pieChartCvSource.ModelCharts.Add(new ModelChart
+                {
+                    BranchName = branch.displayName,
+                    Temaplates = templatesCvSource ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } },
+                });
 
+                var statusStatistics = subPositionStatistics?.StatusStatistics.ToList();
+                var totalStatus = overviewHiring.TotalOverviewHiring.TotalCVSources;
+                var sumtotalStatus = totalStatus.Sum();
+                var templatesStatistics = statusStatistics?.Select(s => new Templates
+                {
+                    Key = s.Name,
+                    Percent = sumtotalStatus > percentDefault ? (totalStatus[statusStatistics.IndexOf(s)] / (float)sumtotalStatus) : percentDefault
+                }).ToList();
+                pieChartStatusStatistics.ModelCharts.Add(new ModelChart
+                {
+                    BranchName = branch.displayName,
+                    Temaplates = templatesStatistics ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } },
+                });
+            }
+            pieChartCvSource.NameSheet = "CV Source";
+            var excelBytesCvSources = await AddChart(pieChartCvSource, ChartType.Pie);
+            pieChartStatusStatistics.NameSheet = "Candidate Status";
+            var excelBytesCandidateStatus = await AddChart(pieChartStatusStatistics, ChartType.Pie);
+            var combinedBytes = CombineExcelFiles(excelBytesCvSources, excelBytesCandidateStatus);
+            return new FileContentResult(combinedBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = "exported_data.xlsx"
+            };
+        }
+        public async Task<FileContentResult> ExportInternEducation(ExportChartEducationInput input)
+        {
+            var noData = "NoData";
+            var percentDefault = 0;
+            var pieChart = new Chart();
+            var columnChart = new Chart();
+            pieChart.ModelCharts = new List<ModelChart>();
+            columnChart.ModelCharts = new List<ModelChart>();
+            foreach (var branch in input.Branchs)
+            {
+                var listEducationInternOnboarded = await GetEducationInternOnboarded(input.FromDate.Value, input.ToDate.Value, branch.id);
+                var educationInternOnboardeds = listEducationInternOnboarded?.Educations.ToList();
+                var sumtotalEducationInternOnboarded = educationInternOnboardeds.Select(s => s.TotalCV).ToList().Sum();
+                var pieCharts = educationInternOnboardeds?.Select(s => new Templates
+                {
+                    Key = s.EducationName,
+                    Percent = sumtotalEducationInternOnboarded > percentDefault ? (s.TotalCV / (float)sumtotalEducationInternOnboarded) : percentDefault,
+                }).ToList();
+                pieChart.ModelCharts.Add(new ModelChart
+                {
+                    BranchName = branch.displayName,
+                    Temaplates = pieCharts.Count() <= 0  ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } }: pieCharts,
+                });
+                var listGetEducationPassTest = await GetEducationPassTest(input.FromDate.Value, input.ToDate.Value, branch.id);
+                var educationPassTests = listGetEducationPassTest?.Educations.ToList();
+                var sumtotaleducationPassTests = educationPassTests.Select(s => s.TotalCV).ToList().Sum();
+                var columnCharts = educationPassTests?.Select(s => new Templates
+                {
+                    Key = s.EducationName,
+                    Percent = sumtotaleducationPassTests > percentDefault ? (s.TotalCV / (float)sumtotaleducationPassTests) : percentDefault,
+                }).ToList();
+                columnChart.ModelCharts.Add(new ModelChart
+                {
+                     BranchName = branch.displayName,
+                     Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : columnCharts,
+                });
+            }
+            pieChart.NameSheet = "Education Intern Onboarded";
+            var excelBytesEducationInternOnboarded = await AddChart(pieChart, ChartType.Pie);
+            columnChart.NameSheet = "Education Pass Test";
+            var excelBytesEducationPassTests = await AddChart(columnChart, ChartType.Column);
+            var combinedBytes = CombineExcelFiles(excelBytesEducationInternOnboarded, excelBytesEducationPassTests);
+            return new FileContentResult(combinedBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = "exported_data.xlsx"
+            };
+        }
+        private async Task<byte[]> AddChart(Chart input, ChartType typeChart)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var noData = "NoData";
+                var startRow = 1;
+                var endRow = 0;
+                var startColumn = 1;
+                var endColumn = 2;
+                var columnKey = GetColumnNameFromNumber(startColumn);
+                var columnValue = GetColumnNameFromNumber(endColumn);
+                var worksheet = package.Workbook.Worksheets.Add(input.NameSheet);
+                foreach (var item in input.ModelCharts)
+                {
+                    worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(item?.Temaplates, true, TableStyles.Light9);
+                    worksheet.Cells.AutoFitColumns();
+                    worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    endRow = (startRow + item.Temaplates.Count);
+                    worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"].Style.Numberformat.Format = "0.00%";
+                    var labelsRange = worksheet.Cells[$"{columnKey}{startRow + 1}:{columnKey}{endRow}"];
+                    var chartRange = worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"];
+                    input.Row = startRow - 1;
+                    input.Column = endColumn + 2;
+                    switch (typeChart)
+                    {
+                        case ChartType.Pie:
+                            input.PixelWidth = 400;
+                            input.PixelHeight = 300;
+                            var pieChart = worksheet.Drawings.AddChart(item.BranchName ?? "All Branch", eChartType.Pie);
+                            pieChart.Title.Text = item.BranchName ?? "All Branch";
+                            pieChart.SetSize(input.PixelWidth, input.PixelHeight);
+                            pieChart.SetPosition(input.Row, input.RowOffsetPixels, input.Column, input.ColumnOffsetPixels);
+                            pieChart.Series.Add(chartRange, labelsRange);
+                            break;
+                        case ChartType.Column:
+                            input.PixelWidth = 600;
+                            input.PixelHeight = 300;
+                            var columnChart = worksheet.Drawings.AddChart(item.BranchName ?? "All Branch", eChartType.ColumnClustered3D);
+                            columnChart.Title.Text = item.BranchName ?? "All Branch";
+                            columnChart.SetSize(input.PixelWidth, input.PixelHeight);
+                            columnChart.SetPosition(input.Row, input.RowOffsetPixels, input.Column, input.ColumnOffsetPixels);
+                            columnChart.Series.Add(chartRange, labelsRange);
+                            break;
+                    }
+                    startRow = endRow + 15;
+                }
+                return package.GetAsByteArray();
+            }
+        }
+        private string GetColumnNameFromNumber(int columnNumber)
+        {
+            int dividend = columnNumber;
+            string columnName = string.Empty;
+            int modulo;
+
+            while (dividend > 0)
+            {
+                modulo = (dividend - 1) % 26;
+                columnName = Convert.ToChar(65 + modulo) + columnName;
+                dividend = (int)((dividend - modulo) / 26);
+            }
+
+            return columnName;
+        }
+        public byte[] CombineExcelFiles(byte[] excelBytes1, byte[] excelBytes2)
+        {
+            using (var package1 = new ExcelPackage(new MemoryStream(excelBytes1)))
+            using (var package2 = new ExcelPackage(new MemoryStream(excelBytes2)))
+            {
+                var sheetsFromPackage2 = package2.Workbook.Worksheets.ToList();
+                var combinedPackage = new ExcelPackage();
+                foreach (var sheet in package1.Workbook.Worksheets)
+                {
+                    var newSheet = combinedPackage.Workbook.Worksheets.Add(sheet.Name, sheet);
+                }
+                foreach (var sheet in sheetsFromPackage2)
+                {
+                    var newSheet = combinedPackage.Workbook.Worksheets.Add(sheet.Name, sheet);
+                }
+                return combinedPackage.GetAsByteArray();
+            }
+        }
         private async Task GetBranchInfo<T>(T dto, long? branchId) where T : class
         {
             Type dtoType = typeof(T);

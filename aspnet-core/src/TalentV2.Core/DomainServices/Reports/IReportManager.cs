@@ -1,4 +1,5 @@
 ﻿using Abp.Domain.Services;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace TalentV2.DomainServices.Reports
 {
     public interface IReportManager : IDomainService
     {
+        Task<FileContentResult> ExportOverviewHiring(ExportChartInput input);
+        Task<FileContentResult> ExportInternEducation(ExportChartEducationInput input);
         Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId);
         Task<CVSourceStatisticDto> GetPerformanceCVSource(DateTime fd, DateTime td, UserType userType, long? branchId);
         Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassTest(DateTime fd, DateTime td, long? branchId);
