@@ -55,7 +55,7 @@ export class EducationTypesComponent extends PagedListingComponentBase<Education
     });
 
     dialogRef.onClose.subscribe((res: ApiResponse<EducationType>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res) {
         const index = this.educationTypes.findIndex((x) => x.id == res.result.id);
         this.educationTypes[index] = res.result;
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.name);

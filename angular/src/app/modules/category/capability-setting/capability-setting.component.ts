@@ -84,6 +84,7 @@ export class CapabilitySettingComponent extends PagedListingComponentBase<Capabi
     });
 
     dialogRef.onClose.subscribe((res: ApiResponse<CapabilityWithSetting>) => {
+      if(!res) return; 
       if (dialogConfig.action === ActionEnum.UPDATE) {
         this.getAll(this.GET_FIRST_PAGE);
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.guideLine);
