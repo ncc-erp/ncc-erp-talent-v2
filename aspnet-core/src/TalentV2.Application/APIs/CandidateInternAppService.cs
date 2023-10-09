@@ -306,6 +306,7 @@ namespace TalentV2.APIs
             return await _candidateManager.UpdateInterviewed(input);
         }
         [HttpPost]
+        [AbpAuthorize(PermissionNames.Pages_CandidateIntern_Export)]
         public async Task<IActionResult> ExportInfo(ExportInput input)
         {
             return await _candidateManager.ExportInfo(input);

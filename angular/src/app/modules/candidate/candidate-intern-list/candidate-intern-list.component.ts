@@ -324,9 +324,6 @@ export class CandidateInternListComponent
     );
     this.getDataPage(this.GET_FIRST_PAGE);
   }
-  isShowExportBtn(){
-    return this.isGranted(this.PS.Pages_CandidateIntern_Create);
-  }
 
   showExportDialog(userType: number): void {
     let createExportCandidate: BsModalRef;

@@ -173,6 +173,7 @@ namespace TalentV2.Authorization
         public const string Pages_CandidateStaff = "Pages.CandidateStaff";
         public const string Pages_CandidateStaff_ViewList = "Pages.CandidateStaff.View_List";
         public const string Pages_CandidateStaff_Create = "Pages.CandidateStaff.Create";
+        public const string Pages_CandidateStaff_Export = "Pages.CandidateStaff.Export";
         public const string Pages_CandidateStaff_Clone = "Pages.CandidateStaff.Clone";
         public const string Pages_CandidateStaff_Delete = "Pages.CandidateStaff.Delete";
         public const string Pages_CandidateStaff_EditNote = "Pages.CandidateStaff.EditNote";
@@ -224,6 +225,7 @@ namespace TalentV2.Authorization
         public const string Pages_CandidateIntern = "Pages.CandidateIntern";
         public const string Pages_CandidateIntern_ViewList = "Pages.CandidateIntern.View_List";
         public const string Pages_CandidateIntern_Create = "Pages.CandidateIntern.Create";
+        public const string Pages_CandidateIntern_Export = "Pages.CandidateIntern.Export";
         public const string Pages_CandidateIntern_Clone = "Pages.CandidateIntern.Clone";
         public const string Pages_CandidateIntern_Delete = "Pages.CandidateIntern.Delete";
         public const string Pages_CandidateIntern_EditNote = "Pages.CandidateIntern.EditNote";
@@ -542,6 +544,7 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_CandidateIntern,
                     PermissionNames.Pages_CandidateIntern_ViewList,
                     PermissionNames.Pages_CandidateIntern_Create,
+                    PermissionNames.Pages_CandidateIntern_Export,
                     PermissionNames.Pages_CandidateIntern_Delete,
                     PermissionNames.Pages_CandidateIntern_EditNote,
                     PermissionNames.Pages_CandidateIntern_ViewDetail,
@@ -579,6 +582,7 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_CandidateStaff,
                     PermissionNames.Pages_CandidateStaff_ViewList,
                     PermissionNames.Pages_CandidateStaff_Create,
+                    PermissionNames.Pages_CandidateStaff_Export,
                     PermissionNames.Pages_CandidateStaff_Delete,
                     PermissionNames.Pages_CandidateStaff_EditNote,
                     PermissionNames.Pages_CandidateStaff_ViewDetail,
@@ -831,6 +835,7 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_CandidateIntern,
                     PermissionNames.Pages_CandidateIntern_ViewList,
                     PermissionNames.Pages_CandidateIntern_Create,
+                    PermissionNames.Pages_CandidateIntern_Export,
                     PermissionNames.Pages_CandidateIntern_Clone,
                     PermissionNames.Pages_CandidateIntern_Delete,
                     PermissionNames.Pages_CandidateIntern_EditNote,
@@ -869,6 +874,7 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_CandidateStaff,
                     PermissionNames.Pages_CandidateStaff_ViewList,
                     PermissionNames.Pages_CandidateStaff_Create,
+                    PermissionNames.Pages_CandidateStaff_Export,
                     PermissionNames.Pages_CandidateStaff_Clone,
                     PermissionNames.Pages_CandidateStaff_Delete,
                     PermissionNames.Pages_CandidateStaff_EditNote,
@@ -1318,6 +1324,7 @@ namespace TalentV2.Authorization
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern, DisplayName = "Pages Candidate Intern",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_ViewList, DisplayName = "View List Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_Create, DisplayName = "Create Candidate Intern",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
+                 new SystemPermission { Name = PermissionNames.Pages_CandidateIntern_Export, DisplayName = "Export Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_Delete, DisplayName = "Delete Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_EditNote, DisplayName = "Edit Note Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_ViewDetail,DisplayName = "View Detail Intern",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
@@ -1361,6 +1368,7 @@ namespace TalentV2.Authorization
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff, DisplayName = "Pages Candidate Staff",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_ViewList, DisplayName = "View List Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_Create, DisplayName = "Create Candidate Staff",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
+                new SystemPermission { Name = PermissionNames.Pages_CandidateStaff_Export, DisplayName = "Export Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_Delete, DisplayName = "Delete Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_EditNote, DisplayName = "Edit Note Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_ViewDetail,DisplayName = "View Detail Staff",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
@@ -1868,6 +1876,7 @@ namespace TalentV2.Authorization
                             {
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_ViewList, DisplayName = "View List Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_Create, DisplayName = "Create Candidate Staff",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
+                                new SystemPermission { Name = PermissionNames.Pages_CandidateStaff_Export, DisplayName = "Export Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_Clone, DisplayName = "Clone Candidate Staff",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_Delete, DisplayName = "Delete Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_EditNote, DisplayName = "Edit Note Candidate Staff", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
@@ -1966,6 +1975,7 @@ namespace TalentV2.Authorization
                             {
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_ViewList, DisplayName = "View List Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_Create, DisplayName = "Create Candidate Intern",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
+                                new SystemPermission { Name = PermissionNames.Pages_CandidateIntern_Export, DisplayName = "Export Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_Clone, DisplayName = "Clone Candidate Intern",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_Delete, DisplayName = "Delete Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },
                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_EditNote, DisplayName = "Edit Note Candidate Intern", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant },

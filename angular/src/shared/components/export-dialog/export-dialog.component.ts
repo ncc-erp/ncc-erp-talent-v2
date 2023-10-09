@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
-import  { ExportDialogService } from 'export-dialog/export-dialog.service'
+import  { ExportDialogService } from '../../../app/core/services/export/export-dialog.service'
 @Component({
   selector: "talent-export-dialog",
   templateUrl: "./export-dialog.component.html",

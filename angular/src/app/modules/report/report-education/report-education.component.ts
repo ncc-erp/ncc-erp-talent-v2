@@ -12,9 +12,9 @@ import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 import { forkJoin } from 'rxjs';
 import { EducationStatistic } from './../../../core/models/report/report-education.model';
 import { ReportInternService } from './../../../core/services/report/report-intern.service';
-import {ExportDialogComponent} from 'export-dialog/export-dialog.component';
+import {ExportDialogComponent} from '../../../../shared/components/export-dialog/export-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
-import {ExportDialogService} from 'export-dialog/export-dialog.service';
+import {ExportDialogService} from '../../../core/services/export/export-dialog.service';
 
 @Component({
   selector: 'talent-report-education',
@@ -244,15 +244,11 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
     };
   }
 
-  isShowExportBtn(){
-    return this.isGranted(this.PS.Pages_Reports_Intern_Education_Export);
-  }
-
   exportInternEducation() {
     const dialogConfig = {
       hasBackdrop: false,
       position: {
-        top: "48em",
+        top: "40%",
         right: "50px",
       },
       panelClass: "custom-dialog",

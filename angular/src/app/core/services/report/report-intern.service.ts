@@ -39,6 +39,6 @@ export class ReportInternService extends BaseApiService {
   }
   
   exportInternEducation(payload: {fromDate: string, toDate: string,branchs?: any[] }): Observable<Blob> {
-    return this.createExport(payload, '/ExportInternEducation');
+    return this.generateExport(payload, '/ExportInternEducation');
   }
 }

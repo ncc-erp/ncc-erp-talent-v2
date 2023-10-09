@@ -105,7 +105,7 @@ export abstract class BaseApiService {
       );
   }
 
-  createExport(item: any, subUrl: string = null): Observable<any> {
+  generateExport(item: any, subUrl: string = null): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });

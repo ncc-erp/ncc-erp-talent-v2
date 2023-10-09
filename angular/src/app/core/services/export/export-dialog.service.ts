@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BaseApiService } from '../app/core/services/apis/base-api.service';
 import {HttpClient} from '@angular/common/http';
-import {ReportOverviewService } from '../app/core/services/report/report-overview.service';
-import {ReportInternService } from '../app/core/services/report/report-intern.service';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
-import {UserType} from '@shared/AppEnums';
 import {takeUntil} from 'rxjs/operators';
+import {UserType} from '../../../../shared/AppEnums';
+import {BaseApiService } from '../apis/base-api.service';
+import {ReportOverviewService} from '../report/report-overview.service';
+import {ReportInternService } from '../report/report-intern.service';
+
 interface sendataIntern {
   fromDate: string,
   toDate: string,
@@ -26,6 +27,7 @@ interface sendataOverview {
 @Injectable({
   providedIn: 'root'
 })
+
 export class ExportDialogService extends BaseApiService {
   private cancelExport$ = new Subject<void>(); 
   private downloadStatusSubject = new BehaviorSubject<boolean>(false);

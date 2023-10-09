@@ -265,10 +265,6 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
     this.getDataPage(this.GET_FIRST_PAGE);
   }
 
-  isShowExportBtn(){
-    return this.isGranted(this.PS.Pages_CandidateIntern_Create);
-  }
-
   showExportDialog(userType: number): void {
     let createExportCandidate: BsModalRef;
    userType = UserType.STAFF
