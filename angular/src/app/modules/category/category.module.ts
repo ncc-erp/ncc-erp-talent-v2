@@ -32,6 +32,7 @@ import { PostDialogComponent } from './posts/post-dialog/post-dialog.component';
 import { PostDetailComponent } from './posts/post-detail/post-detail.component'
 import { ScoreSettingComponent } from './score-setting/score-setting.component';
 import { DialogScoreSettingComponent } from './score-setting/dialog-score-setting/dialog-score-setting.component';
+import {FormsModule} from '@angular/forms';
 
 const dialogComponents = [
   EducationTypesDialogComponent,
@@ -73,7 +74,8 @@ const dialogComponents = [
   imports: [
     CommonModule,
     CategoryRoutingModule,
-    SharedModule
+    SharedModule,
+    FormsModule 
   ]
 })
 export class CategoryModule { }

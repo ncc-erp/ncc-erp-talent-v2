@@ -53,7 +53,7 @@ export class CvSourcesComponent extends PagedListingComponentBase<CVSource> impl
     });
 
     dialogRef.onClose.subscribe((res: ApiResponse<CVSource>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res) {
         const index = this.cvSources.findIndex((x) => x.id == res.result.id);
         this.cvSources[index] = res.result;
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.name);

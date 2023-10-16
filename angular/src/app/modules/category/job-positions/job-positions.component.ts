@@ -52,7 +52,7 @@ export class JobPositionsComponent extends PagedListingComponentBase<JobPosition
     });
 
     dialogRef.onClose.subscribe((res: ApiResponse<JobPosition>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res) {
         const index = this.jobPositions.findIndex((x) => x.id == res.result.id);
         this.jobPositions[index] = res.result;
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.name);

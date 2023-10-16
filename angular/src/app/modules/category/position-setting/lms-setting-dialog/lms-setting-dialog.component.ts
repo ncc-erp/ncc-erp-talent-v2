@@ -64,7 +64,7 @@ export class LmsSettingDialogComponent extends AppComponentBase implements OnIni
   }
 
   private initForm() {
-    const lmsCourse = this._utilities.catLmsCourse.find(item => item.id === this.positionSettingUpdate.lmsCourseId);
+    const lmsCourse = this._utilities.catLmsCourse?.find(item => item.id === this.positionSettingUpdate.lmsCourseId);
 
     this.form = this._fb.group({
       lmsCourse: [lmsCourse || '', [Validators.required]],
