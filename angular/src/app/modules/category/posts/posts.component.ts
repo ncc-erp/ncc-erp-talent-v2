@@ -36,7 +36,7 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
   defaultOptionTime: string = CreationTimeEnum.ALL;
   searchWithCreationTime: TalentDateTime;
   public posts: Post[] = [];
-    private dialogRef: DynamicDialogRef;
+  private dialogRef: DynamicDialogRef;
   keyword = '';
 
   constructor(
@@ -71,7 +71,7 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
   }
 
   openDialog(obj: Post, dialogAction: ActionEnum) {
-      const dialogConfig  = { post: obj, action: dialogAction };    
+    const dialogConfig  = { post: obj, action: dialogAction };    
     const dialogRef = this.dialogService.open(PostDialogComponent, {
       header: `${dialogConfig.action} Post`,
       width: "40%",
@@ -93,7 +93,6 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
     });
   }
 
-  
   protected list(
     request: PagedRolesRequestDto,
     pageNumber: number,
@@ -155,7 +154,6 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
         command: () => {
           this.openMetadata(obj);
         },
-        visible:this.permission.isGranted(this.PS.Pages_Users_ResetPassword)
       },]
     }]
   }
