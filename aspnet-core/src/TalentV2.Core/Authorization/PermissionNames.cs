@@ -1936,6 +1936,7 @@ namespace TalentV2.Authorization
                                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_ViewDetail_RequestCV_EditInterviewLevel, DisplayName = "Edit Interview Level", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_ViewDetail_RequestCV_EditApplicationStatus, DisplayName = "Edit Application Status", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateStaff_ViewDetail_RequestCV_EditFactorCapabilityResult, DisplayName = "Edit Factor", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                                new SystemPermission{ Name = PermissionNames.Pages_ScoreSettings_ViewList, DisplayName = "View List Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
 
                                             }
                                         },
@@ -2034,6 +2035,7 @@ namespace TalentV2.Authorization
                                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_EditInterviewLevel, DisplayName = "Edit Interview Level", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_EditApplicationStatus, DisplayName = "Edit Application Status", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                                 new SystemPermission{ Name = PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_EditFactorCapabilityResult, DisplayName = "Edit Factor", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                                new SystemPermission{ Name = PermissionNames.Pages_ScoreSettings_ViewList, DisplayName = "View List Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                             }
                                         },
                                         #endregion
