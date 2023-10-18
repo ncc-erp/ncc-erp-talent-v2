@@ -68,9 +68,10 @@
         </td>
         <td class="text-center w-150px">
           <div *ngIf="item.scoreRanges.length">
-            <button (click)="openDialog(DIALOG_ACTION.UPDATE ,item, item.scoreRanges[0])" pButton pRipple
+            <button *ngIf="permission.isGranted(PS.Pages_ScoreSettings_Edit)" (click)="openDialog(DIALOG_ACTION.UPDATE ,item, item.scoreRanges[0])" pButton pRipple
               title="{{ 'Edit' | localize }}" icon="pi pi-pencil" class="p-button-sm p-button-secondary mr-1"></button>
-            <button (click)="delete(item.scoreRanges[0])" pButton pRipple class="p-button-sm p-button-danger"
+            <button
+            *ngIf="permission.isGranted(PS.Pages_ScoreSettings_Delete)" (click)="delete(item.scoreRanges[0])" pButton pRipple class="p-button-sm p-button-danger"
               title="{{ 'Delete' | localize }}" icon="pi pi-trash">
             </button>
           </div>
@@ -90,10 +91,10 @@
           </td>
           <td class="text-center">
             <div *ngIf="item.scoreRanges.length">
-              <button pButton pRipple title="{{ 'Edit' | localize }}" icon="pi pi-pencil"
+              <button *ngIf="permission.isGranted(PS.Pages_ScoreSettings_Edit)" pButton pRipple title="{{ 'Edit' | localize }}" icon="pi pi-pencil"
                 class="p-button-sm p-button-secondary mr-1"
                 (click)="openDialog(DIALOG_ACTION.UPDATE ,item,scoreRange)"></button>
-              <button (click)="delete(scoreRange,item)" pButton pRipple class="p-button-sm p-button-danger"
+              <button *ngIf="permission.isGranted(PS.Pages_ScoreSettings_Delete)" (click)="delete(scoreRange,item)" pButton pRipple class="p-button-sm p-button-danger"
                 title="{{ 'Delete' | localize }}" icon="pi pi-trash">
               </button>
             </div>

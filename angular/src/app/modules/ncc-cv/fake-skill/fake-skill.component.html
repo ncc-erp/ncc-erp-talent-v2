@@ -70,7 +70,8 @@
         <td>{{ item.name }}</td>
         <td>{{ item.groupSkillName }}</td>
         <td class="text-break-word">{{ item.description }}</td>
-        <td class="text-center">
+        <td>
+          <div class="d-flex justify-content-center">
           <p-button
             *ngIf="permission.isGranted(PS.FakeSkill_Edit)"
             title="{{ 'Edit' | localize }}"
@@ -85,6 +86,7 @@
             styleClass="p-button-sm p-button-danger"
             (click)="delete(item)"
           ></p-button>
+        </div>
         </td>
       </tr>
     </ng-template>
