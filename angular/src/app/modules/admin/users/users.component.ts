@@ -19,7 +19,7 @@ import { ResetPasswordDialogComponent } from './reset-password/reset-password.co
 import { select, Store } from '@ngrx/store';
 import { UserModel } from '@app/store/models/user.model';
 import { retrievedUserList } from '@app/store/actions/user.action';
-import { LazyLoadEvent } from 'primeng/api';
+import { LazyLoadEvent, MenuItem } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DefaultRoute } from '@shared/AppEnums';
 
@@ -163,6 +163,35 @@ export class UsersComponent extends PagedListingComponentBase<UserDto> {
       this.refresh();
     });
   }
+
+  public getListItem(user: UserDto): MenuItem[] {
+    return [{
+      label: 'Action',
+      items: [{
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => {
+          this.editUser(user);
+        },
+        visible: this.permission.isGranted(this.PS.Pages_Users_Edit)
+      },{
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => {
+          this.delete(user);
+        },
+        visible: this.permission.isGranted(this.PS.Pages_Users_Delete)
+      }, {
+        label: 'ResetPassword',
+        icon: 'fas fa-lock',
+        command: () => {
+          this.resetPassword(user);
+        },
+        visible:this.permission.isGranted(this.PS.Pages_Users_ResetPassword)
+      },]
+    }]
+  }
+
 
   private getBreadcrumbConfig() {
     return {

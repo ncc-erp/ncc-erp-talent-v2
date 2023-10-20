@@ -86,26 +86,20 @@
             <td><a [href]="post.applyCvLink">{{ post.applyCvLink }}</a></td>
             <td class="text-center">{{ post.applyNumber }}</td>
             <td class="text-center">
-              <p-button
-                *ngIf="permission.isGranted(PS.Pages_Posts_Edit)"
-                title="{{ 'Edit' | localize }}"
-                icon="pi pi-pencil"
-                styleClass="p-button-sm p-button-secondary mr-1"
-                (click)="openDialog(post, DIALOG_ACTION.UPDATE)"
-              ></p-button>
-              <p-button
-                *ngIf="permission.isGranted(PS.Pages_Posts_Delete)"
-                title="{{ 'Delete' | localize }}"
-                icon="pi pi-trash"
-                styleClass="p-button-sm p-button-danger mr-1"
-                (click)="delete(post)"
-              ></p-button>
-              <p-button
-                title="{{ 'Metadata' | localize }}"
-                icon="pi pi-eye"
-                styleClass="p-button-sm"
-                (click)="openMetadata(post)"
-            ></p-button>
+            <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-bars"
+            (click)="menu.toggle($event)"
+          ></button>
+          <p-menu
+            #menu
+            [popup]="true"
+            appendTo="body"
+            [model]="getListItem(post)"
+          >
+        </p-menu>
             </td>
           </tr>
         </ng-template>
