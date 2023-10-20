@@ -10,6 +10,7 @@ import { BaseApiService } from '../apis/base-api.service';
 import { ApiResponse } from './../../../../shared/paged-listing-component-base';
 import { CandidateApplyHistory } from './../../models/candidate/candidate-apply-history.model';
 import { CatalogModel } from './../../models/common/common.dto';
+import {UserType} from '@shared/AppEnums';
 
 @Injectable({
   providedIn: 'root'
@@ -180,6 +181,13 @@ export class CandidateInternService extends BaseApiService {
 
   cloneCandidateByCvId(id: number): Observable<ApiResponse<string>> {
     return this.get(`/CloneCandidateByCvId?cvId=${id}`);
+  }
+  exportInfomation(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
+    return this.generateExport(payload, '/ExportInfo');
+  }
+
+  exportReport(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
+    return this.generateExport(payload, '/ExportOnboard');
   }
 
 }

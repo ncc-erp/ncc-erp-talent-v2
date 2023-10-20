@@ -1,6 +1,15 @@
 <talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig">
 </talent-section-breadcrumb>
 
+<div class="btexport">
+  <button class="btn btn-success ml-2"
+  *ngIf="permission.isGranted(PS.Pages_Reports_Overview_Export)"
+  (click)="exporOverviewHiring()"  >
+    <i class="pi pi-download fa-download mr-1"></i>
+    Export
+  </button>
+  </div>
+
 <section class="section-table" id="staff-recruit-overview">
   <div class="card">
     <div class="card-header">
