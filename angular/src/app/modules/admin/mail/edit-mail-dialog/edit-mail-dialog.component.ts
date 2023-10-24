@@ -42,6 +42,29 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
     )
   }
 
+  addProperty(property: string) {  
+    const selectedText  = window.getSelection();
+    const selectedRange  = selectedText .getRangeAt(0);
+
+    const startContainer  = selectedRange .startContainer;
+    const selectedTextContent  = startContainer .textContent;
+  
+    const startIndex = selectedTextContent .lastIndexOf('{{', selectedRange .startOffset);
+    const endIndex = selectedTextContent .indexOf('}}', selectedRange .startOffset);
+
+    if (startIndex >= 0 && endIndex >= 0) {
+      const newText = selectedTextContent .substring(0, startIndex) + `{{${property}}}` + selectedTextContent .substring(endIndex + 2);
+      startContainer .textContent = newText;
+    } else {
+      const propertyNode = document.createTextNode(`{{${property}}}`);  
+      selectedRange .insertNode(propertyNode);
+      selectedRange .setStartAfter(propertyNode);
+      selectedRange .setEndAfter(propertyNode);  
+      selectedText .removeAllRanges();
+      selectedText .addRange(selectedRange );
+    }
+  }
+
   save() {
     if(this.templateId) {
       this.handleSaveTemplate();
