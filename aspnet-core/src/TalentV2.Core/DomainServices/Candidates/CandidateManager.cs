@@ -1,6 +1,7 @@
 ﻿using Abp.Authorization.Users;
 using Abp.Collections.Extensions;
 using Abp.Extensions;
+using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -1091,7 +1092,7 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<ValidCandidateDto> ValidPhone(string phone, long? cvId)
         {
-                if (string.IsNullOrEmpty(phone))
+            if (string.IsNullOrEmpty(phone))
             {
                 return null;
             }
@@ -1473,6 +1474,8 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<long> CloneCandidateByCvId(long cvId)
         {
+            var user = AbpSession.GetUserId();
+            var now = DateTimeUtils.GetNow();
             var oldCv = await WorkScope.GetAll<CV>()
                 .Where(q => q.Id == cvId)
                 .FirstOrDefaultAsync();
@@ -1484,6 +1487,13 @@ namespace TalentV2.DomainServices.Candidates
                 .Where(q => q.CVId == cvId)
                 .Select(q => q.EducationId)
                 .ToListAsync();
+
+            if (oldCv != null)
+            {
+                oldCv.CreationTime = now;
+                oldCv.CreatorUserId = user;
+                oldCv.DeleterUserId = null;
+            }
 
             oldCv.Id = 0;
 
