@@ -1488,13 +1488,9 @@ namespace TalentV2.DomainServices.Candidates
                 .Select(q => q.EducationId)
                 .ToListAsync();
 
-            if (oldCv != null)
-            {
-                oldCv.CreationTime = now;
-                oldCv.CreatorUserId = user;
-                oldCv.DeleterUserId = null;
-            }
-
+            oldCv.CreationTime = now;
+            oldCv.CreatorUserId = user;
+            oldCv.DeleterUserId = null;
             oldCv.Id = 0;
 
             if (!cvSkills.IsEmpty())
