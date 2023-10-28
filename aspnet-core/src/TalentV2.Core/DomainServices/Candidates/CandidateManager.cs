@@ -1474,8 +1474,6 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<long> CloneCandidateByCvId(long cvId)
         {
-            var user = AbpSession.GetUserId();
-            var now = DateTimeUtils.GetNow();
             var oldCv = await WorkScope.GetAll<CV>()
                 .Where(q => q.Id == cvId)
                 .FirstOrDefaultAsync();
@@ -1488,9 +1486,6 @@ namespace TalentV2.DomainServices.Candidates
                 .Select(q => q.EducationId)
                 .ToListAsync();
 
-            oldCv.CreationTime = now;
-            oldCv.CreatorUserId = user;
-            oldCv.DeleterUserId = null;
             oldCv.Id = 0;
 
             if (!cvSkills.IsEmpty())
@@ -1521,6 +1516,11 @@ namespace TalentV2.DomainServices.Candidates
                 });
                 oldCv.CVEducations = newCVEducations;
             }
+            var user = AbpSession.GetUserId();
+            var now = DateTimeUtils.GetNow();
+            oldCv.CreationTime = now;
+            oldCv.CreatorUserId = null;
+            oldCv.DeleterUserId = null;
             var newCv = await WorkScope.InsertAsync(oldCv);
             newCv.CVStatus = CVStatus.New;
             newCv.isClone = true;
