@@ -1516,9 +1516,7 @@ namespace TalentV2.DomainServices.Candidates
                 });
                 oldCv.CVEducations = newCVEducations;
             }
-            var user = AbpSession.GetUserId();
-            var now = DateTimeUtils.GetNow();
-            oldCv.CreationTime = now;
+            oldCv.CreationTime = DateTimeUtils.GetNow();
             oldCv.CreatorUserId = null;
             oldCv.DeleterUserId = null;
             var newCv = await WorkScope.InsertAsync(oldCv);
