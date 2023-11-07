@@ -111,6 +111,7 @@ export const PERMISSIONS_CONSTANT = {
     Pages_CandidateStaff: "Pages.CandidateStaff",
     Pages_CandidateStaff_ViewList: "Pages.CandidateStaff.View_List",
     Pages_CandidateStaff_Create: "Pages.CandidateStaff.Create",
+    Pages_CandidateStaff_Export : "Pages.CandidateStaff.Export",
     Pages_CandidateStaff_Clone: "Pages.CandidateStaff.Clone",
     Pages_CandidateStaff_Delete: "Pages.CandidateStaff.Delete",
     Pages_CandidateStaff_EditNote: "Pages.CandidateStaff.EditNote",
@@ -154,6 +155,7 @@ export const PERMISSIONS_CONSTANT = {
     Pages_CandidateIntern: "Pages.CandidateIntern",
     Pages_CandidateIntern_ViewList: "Pages.CandidateIntern.View_List",
     Pages_CandidateIntern_Create: "Pages.CandidateIntern.Create",
+    Pages_CandidateIntern_Export: "Pages.CandidateIntern.Export",
     Pages_CandidateIntern_Clone: "Pages.CandidateIntern.Clone",
     Pages_CandidateIntern_EditNote: "Pages.CandidateIntern.EditNote",
     Pages_CandidateIntern_Delete: "Pages.CandidateIntern.Delete",
@@ -233,9 +235,11 @@ export const PERMISSIONS_CONSTANT = {
 
     TabReport: "Reports",
     Pages_Reports_Overview: "Pages.Reports.Overview",
+    Pages_Reports_Overview_Export: "Pages.Reports.Overview.Export",
     Pages_Reports_Staff_Performance: "Pages.Report.Staff.Performance",
     Pages_Reports_Intern_Performance: "Pages.Report.Intern.Performance",
     Pages_Reports_Intern_Education: "Pages.Report.Intern.Education",
+    Pages_Reports_Intern_Education_Export: "Pages.Report.Intern.Education.Export",
 
     TabFakeCV: "Pages Fake CV Employee",
     MyProfile: "MyProfile",

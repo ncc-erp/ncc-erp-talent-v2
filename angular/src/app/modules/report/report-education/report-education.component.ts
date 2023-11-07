@@ -3,7 +3,7 @@ import { Branch } from '@app/core/models/categories/branch.model';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { DateFormat } from '@shared/AppConsts';
-import { CreationTimeEnum, DefaultRoute } from '@shared/AppEnums';
+import { CreationTimeEnum, DefaultRoute, ToastMessageType } from '@shared/AppEnums';
 import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
 import { NccAppComponentBase } from '@shared/ncc-component-base';
 import { ApiResponse } from '@shared/paged-listing-component-base';
@@ -12,6 +12,9 @@ import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 import { forkJoin } from 'rxjs';
 import { EducationStatistic } from './../../../core/models/report/report-education.model';
 import { ReportInternService } from './../../../core/services/report/report-intern.service';
+import {ExportDialogComponent} from '../../../../shared/components/export-dialog/export-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {ExportDialogService} from '../../../core/services/export/export-dialog.service';
 
 @Component({
   selector: 'talent-report-education',
@@ -38,11 +41,14 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   public chartPlugins = [pluginDataLabels.default];
   public chartOptionsPie: ChartOptions;
   public chartOptionsBar: ChartOptions;
+  isDialogOpen = false;
 
   constructor(
     injector: Injector,
     public _utilities: UtilitiesService,
     private _reportIntern: ReportInternService,
+    public dialogService: MatDialog,
+    private _exportService: ExportDialogService
   ) {
     super(injector);
   }
@@ -238,4 +244,38 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
     };
   }
 
+  exportInternEducation() {
+    const dialogConfig = {
+      hasBackdrop: false,
+      position: {
+        top: "40%",
+        right: "50px",
+      },
+      panelClass: "custom-dialog",
+    };
+    const fd = this.searchWithCreationTime?.fromDate.format(DateFormat.YYYY_MM_DD);
+    const td = this.searchWithCreationTime?.toDate.format(DateFormat.YYYY_MM_DD);
+    const branches = this.filterBranch.map(branch => {
+      return { id: branch.id !== null ? branch.id : "", displayName: branch.displayName };
+    });
+    if (branches.length === 0 ) {
+      this.showToastMessage(ToastMessageType.ERROR, "Please select branch");
+      this.isDialogOpen = false;
+      return;
+    }
+      if (!this.isDialogOpen) {
+      const modalPopup= this.dialogService.open(ExportDialogComponent,dialogConfig)
+      const sendataIntern =
+      {
+        fromDate: fd,
+        toDate: td,
+        branchs: branches,
+      }
+      this._exportService.exportInternEducation(sendataIntern);
+
+      setTimeout(() => {
+        modalPopup.close();
+      }, 5000);
+    }
+  }
 }

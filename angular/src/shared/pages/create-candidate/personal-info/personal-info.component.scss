@@ -13,7 +13,7 @@
 .personal-info,
 .section-action {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: inherit;
 
   &-left {
     flex: 0 0 50%;

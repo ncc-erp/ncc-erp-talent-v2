@@ -29,7 +29,7 @@
 
         <span
         class="text-danger"
-        *ngIf="submitted && formControls.note.errors?.maxlength"
+        *ngIf="submitted && formControls.note?.errors.maxlength"
       >
        Cannot greater than 5000 characters!
       </span>

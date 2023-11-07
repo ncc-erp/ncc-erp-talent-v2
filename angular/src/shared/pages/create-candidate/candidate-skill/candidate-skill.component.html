@@ -46,7 +46,7 @@
           <th class="update-time text-center">
             {{ "Updated Time" | localize }}
           </th>
-          <th class="text-center w-70px action">
+          <th class="text-center w-230px">
             {{ "Action" | localize }}
           </th>
         </tr>
@@ -118,7 +118,8 @@
           </th>
           <th></th>
           <th></th>
-          <th class="text-center w-70px">
+          <th>
+            <div class="d-flex justify-content-center">
             <p-button
               label="{{ 'Save' | localize }}"
               icon="pi pi-check"
@@ -132,6 +133,7 @@
               styleClass="p-button-sm p-button-secondary"
               (onClick)="onCreateCancel()"
             ></p-button>
+          </div>
           </th>
         </tr>
       </ng-template>
@@ -220,7 +222,8 @@
             {{ item.updatedTime | talentDateTime: DATE_FORMAT.DD_MM_YYYY_H_MM }}
           </td>
 
-          <td class="text-center">
+          <td>
+            <div class="d-flex justify-content-center">
             <p-button
               *ngIf="editing"
               pSaveEditableRow
@@ -269,6 +272,7 @@
               styleClass="p-button-sm p-button-danger"
               (onClick)="onDelete(item)"
             ></p-button>
+          </div>
           </td>
         </tr>
       </ng-template>

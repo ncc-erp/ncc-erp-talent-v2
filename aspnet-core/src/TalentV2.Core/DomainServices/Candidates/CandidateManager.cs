@@ -1,9 +1,17 @@
 ﻿using Abp.Authorization.Users;
+using Abp.Collections.Extensions;
+using Abp.Extensions;
+using Abp.Runtime.Session;
 using Abp.UI;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NccCore.Extension;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using OfficeOpenXml.Table;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Roles;
@@ -55,7 +63,7 @@ namespace TalentV2.DomainServices.Candidates
         public async Task<long> CreateCV(CreateCandidateDto input)
         {
             var cv = ObjectMapper.Map<CV>(input);
-            cv.Phone = StringExtensions.ReplaceWhitespace(cv.Phone);
+            cv.Phone = Utils.StringExtensions.ReplaceWhitespace(cv.Phone);
             await WorkScope.InsertAsync<CV>(cv);
             CommonUtils.CheckFormatFile(input.Avatar, FileTypes.IMAGE);
             CommonUtils.CheckFormatFile(input.CV, FileTypes.DOCUMENT);
@@ -257,7 +265,7 @@ namespace TalentV2.DomainServices.Candidates
                 || !personBio.Email.Equals(input.Email);
 
             ObjectMapper.Map<UpdatePersonBioDto, CV>(input, personBio);
-            personBio.Phone = StringExtensions.ReplaceWhitespace(personBio.Phone);
+            personBio.Phone = Utils.StringExtensions.ReplaceWhitespace(personBio.Phone);
             await CurrentUnitOfWork.SaveChangesAsync();
 
             if (isSendNotification)
@@ -1084,7 +1092,7 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<ValidCandidateDto> ValidPhone(string phone, long? cvId)
         {
-                if (string.IsNullOrEmpty(phone))
+            if (string.IsNullOrEmpty(phone))
             {
                 return null;
             }
@@ -1133,6 +1141,178 @@ namespace TalentV2.DomainServices.Candidates
             await CurrentUnitOfWork.SaveChangesAsync();
             return input;
         }
+
+        #region export infomation
+
+        public async Task<FileContentResult> ExportInfo(Dtos.ExportInput input)
+        {
+            var listEmployee = IQGetAllCVs()
+                .Where(q => q.UserType.Equals(input.userType))
+                .WhereIf(input.FromDate.HasValue, q => q.LastModifiedTime.Value.Date >= input.FromDate.Value.Date)
+                .WhereIf(input.ToDate.HasValue, q => q.LastModifiedTime.Value.Date <= input.ToDate.Value.Date)
+                .OrderBy(q => q.FullName)
+                .ToList();
+            var educationCVs = await IQGetEducationCVs().ToListAsync();
+            var requestCvs = await WorkScope.GetAll<RequestCV>().ToListAsync();
+
+            var bulletPoint = "\u002B" + "\x20";
+            var resultsExport = listEmployee
+            .Select((u, index) => new Candidate()
+            {
+                No = index++,
+                Phone = u.Phone,
+                Email = u.Email,
+                Name = u.FullName,
+                Branch = u.BranchName,
+                Sex = u.IsFemale ? "Male" : "Female",
+                Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
+                ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
+                Note = u.Note,
+                CV = CommonUtils.FullFilePath(u.PathLinkCV)
+            })
+            .ToList();
+
+            using (var package = new ExcelPackage())
+            {
+                var startRow = 1;
+                var startColumn = 1;
+                var columnKey = GetColumnNameFromNumber(startColumn);
+                var worksheet = package.Workbook.Worksheets.Add(typeof(Candidate).Name);
+                worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsExport, true, TableStyles.Light9);
+                var row = worksheet.Dimension.Start.Row;
+                resultsExport.ForEach(s =>
+                {
+                    var CVColumn = worksheet.Cells[row++, worksheet.Dimension.End.Column];
+                    if (!string.IsNullOrWhiteSpace(s.CV))
+                    {
+                        CVColumn.Hyperlink = new ExcelHyperLink(s.CV) { Display = "CV link" };
+                        CVColumn.Style.Font.UnderLine = true;
+                        CVColumn.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
+                    }
+                });
+                worksheet.Cells.AutoFitColumns();
+                worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = "Candidate.xlsx"
+                };
+            }
+        }
+        public async Task<FileContentResult> ExportOnboard(Dtos.ExportInput input)
+        {
+
+            var requestCvs = await WorkScope.GetAll<RequestCV>()
+                .Where(t => !t.IsDeleted)
+                .ToListAsync();
+
+            var requestCvsIdOnboarded = requestCvs
+                 .Where(t => t.OnboardDate != null)
+                 .ToList();
+            var listOnboarded = await IQGetAllCVs()
+                .Where(q => q.UserType.Equals(input.userType))
+                .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == RequestCVStatus.Onboarded))
+                .ToListAsync();
+            var resultsOnboarded = listOnboarded
+                .Select((u, index) => new OnBoard()
+                {
+                    No = index++,
+                    Name = u.FullName,
+                    Branch = u.BranchName,
+                    Positon = u.SubPositionName,
+                    Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
+                    Time = requestCvsIdOnboarded.Find(s => s.CVId.Equals(u.Id))?.OnboardDate,
+                    ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
+                    FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
+                })
+                .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
+                .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
+                .OrderBy(q => q.Time)
+                .ToList();
+
+            var requestCvsIdInterviewed = requestCvs
+                .Where(t => t.Interviewed.Equals(true) && t.InterviewTime != null)
+                .Select(t => t.CVId).ToList();
+            var listInterviewed = await IQGetAllCVs()
+                .Where(q => q.UserType.Equals(input.userType))
+                .Where(s => requestCvsIdInterviewed.Contains(s.Id))
+                .ToListAsync();
+            var resultsInterViewed = listInterviewed
+                .Select((u, index) => new InterView()
+                {
+                    No = index + 1,
+                    Name = u.FullName,
+                    Branch = u.BranchName,
+                    Positon = u.SubPositionName,
+                    Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
+                    Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
+                    ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
+                    FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
+                })
+                .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
+                .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
+                .OrderBy(q => q.Time)
+                .ToList();
+
+            using (var package = new ExcelPackage())
+            {
+                var startRow = 1;
+                var startColumn = 1;
+                var columnKey = GetColumnNameFromNumber(startColumn);
+
+                var worksheetOnBoarded = package.Workbook.Worksheets.Add(typeof(OnBoard).Name);
+                worksheetOnBoarded.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
+                worksheetOnBoarded.Cells.AutoFitColumns();
+                worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                var worksheetInterViewed = package.Workbook.Worksheets.Add(typeof(InterView).Name);
+                worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
+                worksheetOnBoarded.Cells.AutoFitColumns();
+                worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                var stream = new MemoryStream();
+                package.SaveAs(stream);
+                return new FileContentResult(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                {
+                    FileDownloadName = input.userType + "Report.xlsx"
+                };
+            }
+        }
+
+        private string GetColumnNameFromNumber(int columnNumber)
+        {
+            int dividend = columnNumber;
+            string columnName = string.Empty;
+            int modulo;
+
+            while (dividend > 0)
+            {
+                modulo = (dividend - 1) % 26;
+                columnName = Convert.ToChar(65 + modulo) + columnName;
+                dividend = (int)((dividend - modulo) / 26);
+            }
+
+            return columnName;
+        }
+        public byte[] CombineExcelFiles(byte[] excelBytes1, byte[] excelBytes2)
+        {
+            using (var package1 = new ExcelPackage(new MemoryStream(excelBytes1)))
+            using (var package2 = new ExcelPackage(new MemoryStream(excelBytes2)))
+            {
+                var sheetsFromPackage2 = package2.Workbook.Worksheets.ToList();
+                var combinedPackage = new ExcelPackage();
+                foreach (var sheet in package1.Workbook.Worksheets)
+                {
+                    var newSheet = combinedPackage.Workbook.Worksheets.Add(sheet.Name, sheet);
+                }
+                foreach (var sheet in sheetsFromPackage2)
+                {
+                    var newSheet = combinedPackage.Workbook.Worksheets.Add(sheet.Name, sheet);
+                }
+                return combinedPackage.GetAsByteArray();
+            }
+        }
+
+        #endregion
 
         #region send mail CV
 
@@ -1227,10 +1407,10 @@ namespace TalentV2.DomainServices.Candidates
                 CourseInstanceId = course.LMSCourseId.Value,
                 EmailAddress = cv.EmailAddress,
                 FullName = cv.Name,
-                Name = StringExtensions.GetNamePerson(cv.Name),
-                Surname = StringExtensions.GetSurnamePerson(cv.Name),
+                Name = Utils.StringExtensions.GetNamePerson(cv.Name),
+                Surname = Utils.StringExtensions.GetSurnamePerson(cv.Name),
                 Password = PasswordUtils.GeneratePassword(6, true),
-                UserName = StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName)
+                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName)
             };
             var newStudent = await _lmsService.CreateAccountStudent(accountStudent);
             if (newStudent == null)
@@ -1336,6 +1516,9 @@ namespace TalentV2.DomainServices.Candidates
                 });
                 oldCv.CVEducations = newCVEducations;
             }
+            oldCv.CreationTime = DateTimeUtils.GetNow();
+            oldCv.CreatorUserId = null;
+            oldCv.DeleterUserId = null;
             var newCv = await WorkScope.InsertAsync(oldCv);
             newCv.CVStatus = CVStatus.New;
             newCv.isClone = true;

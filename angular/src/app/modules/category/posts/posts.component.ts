@@ -19,6 +19,7 @@ import { Post, PostPayloadListData } from '@app/core/models/categories/post.mode
 import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
 import { DateFormat} from '@shared/AppConsts';
 import { PostDetailComponent } from './post-detail/post-detail.component';
+import {MenuItem} from 'primeng/api';
 
 class PagedRolesRequestDto extends PagedRequestDto {
   keyword: string;
@@ -70,7 +71,7 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
   }
 
   openDialog(obj: Post, dialogAction: ActionEnum) {
-    const dialogConfig  = { post: obj, action: dialogAction };
+    const dialogConfig  = { post: obj, action: dialogAction };    
     const dialogRef = this.dialogService.open(PostDialogComponent, {
       header: `${dialogConfig.action} Post`,
       width: "40%",
@@ -91,7 +92,6 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
       this.refresh();
     });
   }
-
 
   protected list(
     request: PagedRolesRequestDto,
@@ -130,11 +130,38 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
         })
     );
   }
+
+  public getListItem( obj: Post): MenuItem[] {
+    return [{
+      label: 'Action',
+      items: [{
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => {
+          this.openDialog(obj, this.DIALOG_ACTION.UPDATE);
+        },
+        visible: this.permission.isGranted(this.PS.Pages_Posts_Edit)
+      },{
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => {
+          this.delete(obj);
+        },
+        visible: this.permission.isGranted(this.PS.Pages_Posts_Delete)
+      }, {
+        label: 'Metadata',
+        icon: 'pi pi-eye',
+        command: () => {
+          this.openMetadata(obj);
+        },
+      },]
+    }]
+  }
   private getBreadcrumbConfig() {
     return {
       menuItem: [{ label: this.l("Categories"), routerLink: DefaultRoute.Category, styleClass: 'menu-item-click' }, { label: this.l("Posts") }],
       homeItem: { icon: "pi pi-home", routerLink: "/" },
     };
   }
-
+ 
 }

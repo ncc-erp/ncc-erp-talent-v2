@@ -1,0 +1,63 @@
+
+.club-bt{
+    display: flex;
+    justify-content: space-between;
+}
+.group {
+    display: grid;
+    margin-left: 30px;
+}
+.grid-item{
+    display: flex;
+}
+.group{
+    margin-bottom: 1rem;
+}
+
+.group-cb{
+    margin: 30px;
+    margin-right: 95px;
+    font-size: 22px;
+}
+.groupcb{
+    margin-bottom: 20px;
+}
+.group-date {
+    margin-left: 70px;
+}
+.p-inputtext{
+    border: 1px solid #ced4da;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0;
+    appearance: none;
+    width: 14rem;
+}
+::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-inner-container {
+    background-color: #007acc; 
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 9999; 
+}
+  
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3); 
+    border-top: 4px solid #3498db; 
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite; 
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

@@ -59,7 +59,7 @@ export class SubPositionComponent extends PagedListingComponentBase<SubPosition>
     });
 
     dialogRef.onClose.subscribe((res: ApiResponse<SubPosition>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res) {
         const index = this.subPositions.findIndex((x) => x.id == res.result.id);
         this.subPositions[index] = res.result;
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.name);

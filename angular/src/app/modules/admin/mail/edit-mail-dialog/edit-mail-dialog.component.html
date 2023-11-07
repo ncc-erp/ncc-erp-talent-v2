@@ -46,6 +46,8 @@
           <div class="row mt-2">
             <div class="col-md-12">
               <p-editor
+                id="numberitiont"
+                #editor 
                 [(ngModel)]="mailInfo.bodyMessage"
                 [style]="{ height: '45vh' }"
               ></p-editor>
@@ -55,7 +57,7 @@
         <td *ngIf="mailInfo?.propertiesSupport?.length">
           <ul class="grid-col-2">
             <li *ngFor="let property of mailInfo.propertiesSupport">
-              {{ property }}
+              <button class="property" (click)="addProperty(property)">  {{ property }}</button>
             </li>
           </ul>
         </td>

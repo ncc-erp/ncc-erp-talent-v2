@@ -143,7 +143,7 @@
           <th>{{ "Branch" | localize }}</th>
           <th>{{ "Roles" | localize }}</th>
           <th>{{ "IsActive" | localize }}</th>
-          <th style="width: 310px">{{ "Actions" | localize }}</th>
+          <th class="w-100px">{{ "Actions" | localize }}</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-user let-i="rowIndex">
@@ -170,34 +170,21 @@
               <label class="custom-control-label"></label>
             </div>
           </td>
-          <td>
+          <td class="text-center" >
             <button
-              *ngIf="permission.isGranted(PS.Pages_Users_Edit)"
-              type="button"
-              class="btn btn-sm bg-secondary"
-              (click)="editUser(user)"
-            >
-              <i class="fas fa-pencil-alt"></i>
-              {{ "Edit" | localize }}
-            </button>
-            <button
-              *ngIf="permission.isGranted(PS.Pages_Users_Delete)"
-              type="button"
-              class="btn btn-sm bg-danger mx-2"
-              (click)="delete(user)"
-            >
-              <i class="fas fa-trash"></i>
-              {{ "Delete" | localize }}
-            </button>
-            <button
-              *ngIf="permission.isGranted(PS.Pages_Users_ResetPassword)"
-              type="button"
-              class="btn btn-sm bg-secondary"
-              (click)="resetPassword(user)"
-            >
-              <i class="fas fa-lock"></i>
-              {{ "ResetPassword" | localize }}
-            </button>
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-bars"
+            (click)="menu.toggle($event)"
+          ></button>
+          <p-menu
+            #menu
+            [popup]="true"
+            appendTo="body"
+            [model]="getListItem(user)"
+          >
+        </p-menu>
           </td>
         </tr>
       </ng-template>
