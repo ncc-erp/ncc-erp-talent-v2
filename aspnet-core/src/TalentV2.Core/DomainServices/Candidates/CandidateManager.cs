@@ -1,6 +1,7 @@
 ﻿using Abp.Authorization.Users;
 using Abp.Collections.Extensions;
 using Abp.Extensions;
+using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -1091,7 +1092,7 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<ValidCandidateDto> ValidPhone(string phone, long? cvId)
         {
-                if (string.IsNullOrEmpty(phone))
+            if (string.IsNullOrEmpty(phone))
             {
                 return null;
             }
@@ -1515,6 +1516,9 @@ namespace TalentV2.DomainServices.Candidates
                 });
                 oldCv.CVEducations = newCVEducations;
             }
+            oldCv.CreationTime = DateTimeUtils.GetNow();
+            oldCv.CreatorUserId = null;
+            oldCv.DeleterUserId = null;
             var newCv = await WorkScope.InsertAsync(oldCv);
             newCv.CVStatus = CVStatus.New;
             newCv.isClone = true;
