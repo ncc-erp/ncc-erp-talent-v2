@@ -1180,22 +1180,17 @@ namespace TalentV2.DomainServices.Candidates
                 var worksheet = package.Workbook.Worksheets.Add(typeof(Candidate).Name);
                 worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsExport, true, TableStyles.Light9);
                 var row = worksheet.Dimension.Start.Row;
-
-
                 resultsExport.ForEach(s =>
                 {
                     var CVColumn = worksheet.Cells[++row, worksheet.Dimension.End.Column];
 
                     if (!string.IsNullOrWhiteSpace(s.CV))
                     {
-                          var name = s.Name;
                             CVColumn.Hyperlink = new ExcelHyperLink(s.CV) { Display = "CV link" };
                             CVColumn.Style.Font.UnderLine = true;
                             CVColumn.Style.Font.Color.SetColor(System.Drawing.Color.Blue);                   
                     }
                 });
-
-
                 worksheet.Cells.AutoFitColumns();
                 worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
