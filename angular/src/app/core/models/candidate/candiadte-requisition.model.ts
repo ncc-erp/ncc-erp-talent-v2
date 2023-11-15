@@ -85,7 +85,6 @@ export class CandidateApplyResultPayload {
   requestCvId: number;
   status: number;
   applyLevel: number;
-  interviewLevel: number;
   finalLevel: number;
   salary: number;
   onboardDate: string;

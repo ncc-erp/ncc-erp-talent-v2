@@ -15,7 +15,6 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public long RequestCvId { get; set; }
         public RequestCVStatus Status { get; set; }
         public Level? ApplyLevel { get; set; }
-        public Level? InterviewLevel { get; set; }
         public Level? FinalLevel { get; set; }
         public float Salary { get; set; }
         public DateTime? OnboardDate { get; set; }
