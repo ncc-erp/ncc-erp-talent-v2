@@ -1182,7 +1182,7 @@ namespace TalentV2.DomainServices.Candidates
                 var row = worksheet.Dimension.Start.Row;
                 resultsExport.ForEach(s =>
                 {
-                    var CVColumn = worksheet.Cells[row++, worksheet.Dimension.End.Column];
+                    var CVColumn = worksheet.Cells[++row, worksheet.Dimension.End.Column];
                     if (!string.IsNullOrWhiteSpace(s.CV))
                     {
                         CVColumn.Hyperlink = new ExcelHyperLink(s.CV) { Display = "CV link" };
