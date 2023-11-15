@@ -1,25 +1,27 @@
-<div class="breadcrumb header ">
-  <div>
-    <talent-section-breadcrumb
-      *ngIf="!isDialogMode"
-      [breadcrumbConfig]="breadcrumbConfig"
->
-</talent-section-breadcrumb>
-
-</div>
-<div class="custom-button">
-  <button class="btn btn-success ml-2"
-  *ngIf="permission.isGranted(PS.Pages_CandidateIntern_Export )"
-  (click)="showExportDialog()" >
-    <i class="pi pi-download fa-download mr-1"></i>
-    Export
-  </button>
-  <button class="btn btn-primary"
-  *ngIf="permission.isGranted(PS.Pages_CandidateIntern_Create)"
-  (click)="createCandidate()">
-    <i class="pi pi-plus fa-square-plus mr-1"></i>Create
-  </button>
-</div>
+<div class="breadcrumb header">
+  <div class="w-100 d-flex justify-content-between">
+    <div>
+      <talent-section-breadcrumb
+        *ngIf="!isDialogMode"
+        [breadcrumbConfig]="breadcrumbConfig"
+      >
+      </talent-section-breadcrumb>
+    
+    </div>
+    <div>
+      <button class="btn btn-success ml-2"
+        *ngIf="permission.isGranted(PS.Pages_CandidateIntern_Export )"
+        (click)="showExportDialog()" >
+        <i class="pi pi-download fa-download mr-1"></i>
+        Export
+      </button>
+      <button class="btn btn-primary"
+        *ngIf="permission.isGranted(PS.Pages_CandidateIntern_Create)"
+        (click)="createCandidate()">
+        <i class="pi pi-plus fa-square-plus mr-1"></i>Create
+      </button>
+    </div>
+  </div>
 </div>
 
 <section class="section-table">
