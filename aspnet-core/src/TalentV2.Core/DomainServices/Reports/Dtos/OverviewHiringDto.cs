@@ -68,8 +68,8 @@ namespace TalentV2.DomainServices.Reports.Dtos
     }
     public class BranchDtoExport
     {
-        public long? id { get; set; }
-        public string displayName { get; set; }
+        public long? Id { get; set; }
+        public string DisplayName { get; set; }
     }
 
     public class ExportChartInput : ExportInput

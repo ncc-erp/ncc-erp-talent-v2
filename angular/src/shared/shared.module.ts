@@ -104,11 +104,11 @@ import { CandidateInfoNewComponent } from './components/candidate-info-new/candi
 import { SectionBreadcrumbComponent } from './components/section-breadcrumb/section-breadcrumb.component';
 import { PositionDropdownComponent } from './components/position-dropdown/position-dropdown.component';
 import { PageErrorComponent } from './pages/page-error/page-error.component';
-import {SafeHtmlPipe} from '@shared/pipes/safe-html.pipe';
+import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 
-import {ExportCandidateComponent} from './components/export-candidate/export-candidate.component'
-import {TabsModule} from "ngx-bootstrap/tabs";
-import {ExportDialogComponent} from './components/export-dialog/export-dialog.component'
+import { ExportCandidateComponent } from './components/export-candidate/export-candidate.component'
+import { TabsModule } from "ngx-bootstrap/tabs";
+import { ExportDialogComponent } from './components/export-dialog/export-dialog.component'
 
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
