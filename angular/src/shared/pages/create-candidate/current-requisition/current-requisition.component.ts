@@ -745,7 +745,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       requestCvId: this.candidateRequisiton.id,
       status: getFormControlValue(this.applyResultForm, 'status'),
       applyLevel: getFormControlValue(this.applyResultForm, 'applyLevel'),
-      interviewLevel: getFormControlValue(this.applyResultForm, 'interviewLevel'),
       finalLevel: getFormControlValue(this.applyResultForm, 'finalLevel'),
       salary: getFormControlValue(this.applyResultForm, 'salary'),
       onboardDate: onboardValue && moment(onboardValue).format(DateFormat.YYYY_MM_DD),
@@ -755,7 +754,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
 
     if (this.userType === UserType.INTERN) {
-      payload.applyLevel = payload.interviewLevel = payload.finalLevel;
+      payload.applyLevel = payload.finalLevel;
     }
     return payload;
   }

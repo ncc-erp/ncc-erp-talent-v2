@@ -52,7 +52,7 @@ export class BranchComponent extends PagedListingComponentBase<Branch> implement
     });
 
     dialogRef.onClose.subscribe((res: ApiResponse<Branch>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res) {
         const index = this.branches.findIndex((x) => x.id == res.result.id);
         this.branches[index] = res.result;
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.displayName);

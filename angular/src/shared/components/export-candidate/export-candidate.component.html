@@ -1,0 +1,46 @@
+<form  #form="ngForm">
+<div class="form-group">
+  <abp-modal-header
+  class="tabset"
+  [title]="'Export Candidate' | localize"
+  (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+
+  <div class="modal-body edit-user-body">
+          <div class="grid-item">
+            <div class="group-cb" >
+              <div class="groupcb">
+                <mat-checkbox id="cbinfomation" [(ngModel)]="infomation" name="cbinfomation">Candidate Infomation</mat-checkbox>
+              </div>
+              <div class="groupcb">
+                <mat-checkbox id="cbreport" [(ngModel)]="report" name="cbreport">Report</mat-checkbox>
+              </div>
+            </div>
+            <div class="group-date">
+            <div class="group">
+              <label for="fromDate">From Date:</label>
+              <input class="p-inputtext" type="month" id="fromDate" [(ngModel)]="fromDate" name="fromDate" [value]="fromDate">
+            </div>
+            <div class="group">
+              <label for="toDate">To Date:</label>
+              <input class="p-inputtext" type="month" id="toDate" [(ngModel)]="toDate" name="toDate" [value]="toDate">
+            </div>
+          </div>
+        </div>
+
+        <div class="club-bt">
+            <button class="btn btn-danger ml-2" (click)="closePopup()"  >
+              <i class="pi pi-times fa-download mr-1"></i>
+              Cancel
+            </button>
+            <button class="btn btn-success ml-2" (click)="exportCandidate()"  >
+              <i class="pi pi-download fa-download mr-1"></i>
+              Export
+            </button>
+            <div *ngIf="loading" class="spinner-container">
+              <div class="spinner"></div>
+            </div>
+        </div>
+  </div>
+</div>
+</form>

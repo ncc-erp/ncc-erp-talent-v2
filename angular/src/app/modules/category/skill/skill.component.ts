@@ -53,7 +53,7 @@ export class SkillComponent extends PagedListingComponentBase<Skill> implements 
     });
 
     this.dialogRef.onClose.subscribe((res: ApiResponse<Skill>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res ) {
         const index = this.skills.findIndex((x) => x.id == res.result.id);
         this.skills[index] = res.result;
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.name);

@@ -59,7 +59,8 @@
       <tr>
         <td class="text-center">{{ i + 1 }}</td>
         <td>{{ item.name }}</td>
-        <td class="text-center">
+        <td>
+          <div class="d-flex justify-content-center">
           <p-button
             *ngIf="permission.isGranted(PS.Pages_Skills_Edit)"
             title="{{ 'Edit' | localize }}"
@@ -74,6 +75,7 @@
             styleClass="p-button-sm p-button-danger"
             (click)="delete(item)"
           ></p-button>
+          </div>
         </td>
       </tr>
     </ng-template>

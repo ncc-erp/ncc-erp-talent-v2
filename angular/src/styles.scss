@@ -159,3 +159,11 @@ body {
 		display: none
   }
 }
+.custom-dialog {
+  mat-dialog-container {
+      padding: 0 !important;
+      border: 1px solid aqua;
+      border-radius: 20px;
+      height: 135px;
+  }
+}

@@ -52,7 +52,7 @@
           <th class="text-center">#</th>
           <th>{{ "RoleName" | localize }}</th>
           <th>{{ "DisplayName" | localize }}</th>
-          <th class="w-200px ">{{ "Actions" | localize }}</th>
+          <th class="w-230px">{{ "Actions" | localize }}</th>
         </tr>
       </ng-template>
 
@@ -62,6 +62,7 @@
           <td>{{ role.name }}</td>
           <td>{{ role.displayName }}</td>
           <td class=>
+            <div class="d-flex justify-content-center">
             <button
               *ngIf="permission.isGranted(PS.Pages_Roles_Edit)"
               type="button"
@@ -80,6 +81,7 @@
               <i class="fas fa-trash"></i>
               {{ "Delete" | localize }}
             </button>
+          </div>
           </td>
         </tr>
       </ng-template>

@@ -81,6 +81,7 @@ export class PositionSettingDialogComponent extends AppComponentBase implements 
     );
   }
   private doSave(res, isClose: boolean) {
+    if(!res.result) return;
     this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS,
       `${res.result.userTypeName} - ${res.result.subPositionName}`);
     if (res.success && isClose) {

@@ -53,6 +53,26 @@ namespace TalentV2.APIs
         public async Task<ReportEducationByBranchDto<ReportEducationHaveCVOnboardDto>> GetEducationInternOnboarded(DateTime fd, DateTime td, long? branchId)
         {
             return await _reportManager.GetEducationInternOnboarded(fd,td,branchId);
+
+        }
+        [HttpGet]
+        public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId)
+        {
+            return await _reportManager.GetEducationPassInterView(fd, td, branchId);
+        }
+
+        [AbpAuthorize(PermissionNames.Pages_Reports_Overview_Export)]
+        [HttpPost]
+        public async Task<FileContentResult> ExportOverviewHiring(ExportChartInput input)
+        {
+            return await _reportManager.ExportOverviewHiring(input);
+        }
+
+        [AbpAuthorize(PermissionNames.Pages_Reports_Intern_Education_Export)]
+        [HttpPost]
+        public async Task<FileContentResult> ExportInternEducation(ExportChartEducationInput input)
+        {
+            return await _reportManager.ExportInternEducation(input);
         }
     }
 }

@@ -105,7 +105,8 @@
             [disabled]="true"
           ></p-colorPicker>
         </td>
-        <td class="text-center">
+        <td>
+          <div  class="d-flex justify-content-center">
           <p-button
             *ngIf="permission.isGranted(PS.Pages_Educations_Edit)"
             title="{{ 'Edit' | localize }}"
@@ -120,6 +121,7 @@
             styleClass="p-button-sm p-button-danger"
             (click)="delete(item)"
           ></p-button>
+          </div>
         </td>
       </tr>
     </ng-template>
