@@ -56,7 +56,7 @@ namespace TalentV2.APIs
 
         }
         [HttpGet]
-        public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassInterViewDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId)
+        public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId)
         {
             return await _reportManager.GetEducationPassInterView(fd, td, branchId);
         }

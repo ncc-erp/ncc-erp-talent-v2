@@ -386,7 +386,7 @@ namespace TalentV2.DomainServices.Reports
             return result;
         }
 
-        public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassInterViewDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId)
+        public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId)
         {
             Expression<Func<RequestCV, bool>> expression = q => (q.LastModificationTime >= fd.Date && q.LastModificationTime <= td.Date) &&
                                                                 (q.Request.UserType == UserType.Intern) &&
@@ -425,7 +425,7 @@ namespace TalentV2.DomainServices.Reports
 
             var report = educations
                 .GroupBy(e => e.Name)
-                .Select(e => new ReportEducationHaveCVPassInterViewDto
+                .Select(e => new ReportEducationHaveCVPassTestDto
                 {
                     EducationId = e.First().Id,
                     EducationName = e.Key,
@@ -434,7 +434,7 @@ namespace TalentV2.DomainServices.Reports
                 })
                 .ToList();
 
-            var result = new ReportEducationByBranchDto<ReportEducationHaveCVPassInterViewDto>();
+            var result = new ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>();
             result.Educations = report;
             await GetBranchInfo(result, branchId);
 
@@ -451,7 +451,7 @@ namespace TalentV2.DomainServices.Reports
             pieChartStatusStatistics.ModelCharts = new List<ModelChart>();     
             foreach (var branch in input.Branchs)
             {
-                var overviewHiring = await GetOverviewHiring(input.FromDate.Value, input.ToDate.Value, input.userType, branch.id);
+                var overviewHiring = await GetOverviewHiring(input.FromDate.Value, input.ToDate.Value, input.userType, branch.Id);
                 var subPositionStatistics = overviewHiring?.SubPositionStatistics.FirstOrDefault();
                 var cvSourceStatistics = subPositionStatistics?.CVSourceStatistics.ToList();
                 var totalOverviewHiring = overviewHiring.TotalOverviewHiring.TotalCVSources;
@@ -463,7 +463,7 @@ namespace TalentV2.DomainServices.Reports
                 }).ToList();
                 pieChartCvSource.ModelCharts.Add(new ModelChart
                 {
-                    BranchName = branch.displayName,
+                    BranchName = branch.DisplayName,
                     Temaplates = templatesCvSource ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } },
                 });
 
@@ -479,7 +479,7 @@ namespace TalentV2.DomainServices.Reports
 
                 pieChartStatusStatistics.ModelCharts.Add(new ModelChart
                 {
-                    BranchName = branch.displayName,
+                    BranchName = branch.DisplayName,
                     Temaplates = templatesStatistics ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } },
                 });
             }
@@ -509,7 +509,7 @@ namespace TalentV2.DomainServices.Reports
 
             foreach (var branch in input.Branchs)
             {
-                var listEducationInternOnboarded = await GetEducationInternOnboarded(input.FromDate.Value, input.ToDate.Value, branch.id);
+                var listEducationInternOnboarded = await GetEducationInternOnboarded(input.FromDate.Value, input.ToDate.Value, branch.Id);
                 var educationInternOnboardeds = listEducationInternOnboarded?.Educations.ToList();
                 var top10EducationInternOnboardeds = educationInternOnboardeds
                   .OrderByDescending(s => s.TotalCV)
@@ -523,10 +523,10 @@ namespace TalentV2.DomainServices.Reports
                 }).ToList();
                 columChartOnbore.ModelCharts.Add(new ModelChart
                 {
-                    BranchName = branch.displayName,
+                    BranchName = branch.DisplayName,
                     Temaplates = pieCharts.Count() <= 0  ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } }: pieCharts,
                 });
-                var listGetEducationPassTest = await GetEducationPassTest(input.FromDate.Value, input.ToDate.Value, branch.id);
+                var listGetEducationPassTest = await GetEducationPassTest(input.FromDate.Value, input.ToDate.Value, branch.Id);
                 var educationPassTests = listGetEducationPassTest?.Educations.ToList();
                 var top10educationPassTests = educationPassTests
                .OrderByDescending(s => s.TotalCV)
@@ -540,11 +540,11 @@ namespace TalentV2.DomainServices.Reports
                 }).ToList();
                 columChartPassTest.ModelCharts.Add(new ModelChart
                 {
-                     BranchName = branch.displayName,
+                     BranchName = branch.DisplayName,
                      Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : columnCharts,
                 });
 
-                var listGetEducationPassInterView = await GetEducationPassInterView(input.FromDate.Value, input.ToDate.Value, branch.id);
+                var listGetEducationPassInterView = await GetEducationPassInterView(input.FromDate.Value, input.ToDate.Value, branch.Id);
                 var educationPassInterView = listGetEducationPassInterView?.Educations.ToList();
                 var sumtotaleducationPassInterView = educationPassInterView.Select(s => s.TotalCV).ToList().Sum();
 
@@ -555,7 +555,7 @@ namespace TalentV2.DomainServices.Reports
                 }).ToList();
                 columChartPassInterView.ModelCharts.Add(new ModelChart
                 {
-                    BranchName = branch.displayName,
+                    BranchName = branch.DisplayName,
                     Temaplates = pieChartPassInterViews.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : pieChartPassInterViews,
                 });
             }
