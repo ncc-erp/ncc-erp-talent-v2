@@ -58,7 +58,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isLoadingCapabilityTable = false;
   isLoadingSendMail = false;
 
-  form: FormGroup;
+    form: FormGroup;
   submitted = false;
   isApplyResultEditing = false;
   isApplyInterviewLevel = false;
@@ -108,7 +108,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.initForm();
     this.getCanRequisitionData();
     this._utilities.loadCatalogForCategories();
-  }
+      }
   ngOnDestroy(): void {
     super.ngOnDestroy();
     if (this.dialogRef) this.dialogRef.close()
@@ -362,19 +362,23 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  saveInterviewLevel() {
+    saveInterviewLevel() {
     this.submitted = true;
     if (this.interviewLevelForm.invalid) return;
     const payload = this.getPayloadApplyInverviewLevel();
-    this._candidate.updateInterviewLevel(payload).subscribe(res => {
-      if (!res) return;
-      if (!res.loading && res.success) {
-        this.onResetInterviewLevelForm();
-        this._candidate.setCurrentReqUpdated(true);
-        this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS);
-        this.adjustInterviewlevel();
-      }
-    })
+    if(payload.interviewLevel !=null){
+      this._candidate.updateInterviewLevel(payload).subscribe(res => {
+        if (!res) return;
+        if (!res.loading && res.success) {
+          this.onResetInterviewLevelForm();
+          this._candidate.setCurrentReqUpdated(true);
+          this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS);
+          this.adjustInterviewlevel();
+        }
+      })
+    }else {
+      this.showToastMessage(ToastMessageType.WARN, 'Interview level cannot be left blank');
+    }
   }
 
   adjustInterviewlevel(){
@@ -509,7 +513,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  onSaveAllCapability() {
+  onSaveAllCapability() { 
     this.isEditingAll = false;
     const payload = [];
     const canCapabilities = this.candidateRequisiton?.capabilityCandidate;
@@ -517,7 +521,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       const { id, score, note } = item;
       payload.push({ id, score, note });
     })
-
+        
     canCapabilities.forEach(item => this.editingRowKey[item.id] = false)
     this.saveManyCapability(payload);
     this.totalScore();
@@ -764,7 +768,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       requestCvId: this.candidateRequisiton.id,
       interviewLevel: getFormControlValue(this.interviewLevelForm, 'interviewLevel'),
     }
-    return payload;
+        return payload;
   }
 
   private handleAddCurrentReq() {
