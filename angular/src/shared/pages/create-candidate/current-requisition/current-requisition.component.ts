@@ -58,7 +58,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isLoadingCapabilityTable = false;
   isLoadingSendMail = false;
 
-    form: FormGroup;
+  form: FormGroup;
   submitted = false;
   isApplyResultEditing = false;
   isApplyInterviewLevel = false;
@@ -108,7 +108,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.initForm();
     this.getCanRequisitionData();
     this._utilities.loadCatalogForCategories();
-      }
+    }
   ngOnDestroy(): void {
     super.ngOnDestroy();
     if (this.dialogRef) this.dialogRef.close()
@@ -362,7 +362,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-    saveInterviewLevel() {
+  saveInterviewLevel() {
     this.submitted = true;
     if (this.interviewLevelForm.invalid) return;
     const payload = this.getPayloadApplyInverviewLevel();
@@ -526,7 +526,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.saveManyCapability(payload);
     this.totalScore();
   }
-
   onCancelAllCapability() {
     this.isEditingAll = false;
     this.candidateRequisiton?.capabilityCandidate.forEach(item => this.onResetCapability(item))
@@ -768,7 +767,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       requestCvId: this.candidateRequisiton.id,
       interviewLevel: getFormControlValue(this.interviewLevelForm, 'interviewLevel'),
     }
-        return payload;
+    return payload;
   }
 
   private handleAddCurrentReq() {
