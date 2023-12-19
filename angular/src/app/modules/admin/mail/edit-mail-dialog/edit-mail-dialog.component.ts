@@ -49,8 +49,7 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
       const selectedRange = selectedText.getRangeAt(0);
       if (parentElement.contains(selectedRange.startContainer)) {
           const selectedTextContent = selectedRange.toString();
-          const isWhitespace = /^\s*$/.test(selectedTextContent);
-          if (isWhitespace) {
+          if (/^\s*$/.test(selectedTextContent)) {
             selectedRange.deleteContents();
           }
           selectedRange.deleteContents();
