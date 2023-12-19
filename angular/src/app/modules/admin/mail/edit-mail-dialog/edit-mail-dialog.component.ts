@@ -48,6 +48,11 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
       const selectedText = document.getSelection();
       const selectedRange = selectedText.getRangeAt(0);
       if (parentElement.contains(selectedRange.startContainer)) {
+          const selectedTextContent = selectedRange.toString();
+          const isWhitespace = /^\s*$/.test(selectedTextContent);
+          if (isWhitespace) {
+            selectedRange.deleteContents();
+          }
           selectedRange.deleteContents();
           const propertyNode = document.createTextNode(`{{${property}}}`);
           selectedRange.insertNode(propertyNode);
@@ -55,9 +60,9 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
           selectedRange.setEndAfter(propertyNode);
           selectedText.removeAllRanges();  
           selectedText.addRange(selectedRange);
+        }
       }
     }
-      }
   
   save() {
     if(this.templateId) {
