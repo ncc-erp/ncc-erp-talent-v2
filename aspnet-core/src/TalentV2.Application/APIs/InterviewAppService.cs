@@ -49,13 +49,14 @@ namespace TalentV2.APIs
             bool isViewAll= PermissionChecker.IsGranted(PermissionNames.Pages_Interviews_ViewList);
 
             var filterStatus = param.FilterItems.FirstOrDefault(s => s.PropertyName == "requestCVStatus");
-            if (filterStatus != null)
+            if (filterStatus != null && filterStatus.Value != null)
             {
-                var status = filterStatus.Value as RequestCVStatus?;
-
-                if (status != RequestCVStatus.FailedInterview)
+                if (Enum.TryParse<RequestCVStatus>(filterStatus.Value.ToString(), out var status))
                 {
-                    query = query.Where(s => s.RequestStatus == StatusRequest.InProgress);
+                    if (status != RequestCVStatus.FailedInterview &&  status != RequestCVStatus.PassedInterview)
+                    {
+                        query = query.Where(s => s.RequestStatus == StatusRequest.InProgress);
+                    }
                 }
             }
 
