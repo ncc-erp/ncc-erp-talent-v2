@@ -36,7 +36,7 @@ export const PERMISSIONS_CONSTANT = {
     Pages_Configurations_EditGoogleClientAppSettings: "Pages.Configurations.EditGoogleClientAppSettings",
     Pages_Configurations_ViewTalentSecretCode: "Pages.Configurations.ViewTalentSecretCode",
     Pages_Configurations_EditTalentSecretCode: "Pages.Configurations.EditTalentSecretCode",
-    Pages_Configurations_ViewTalentContest: "Pages.Configurations.ViewTalentContest",
+    PermissionNames_Pages_Configurations_ConfigureContestUrl: "PermissionNames.Pages_Configurations.ConfigureContestUrl",
     Pages_Configurations_ViewTalentNotifyInterviewSettings: "Pages.Configurations.ViewTalentNotifyInterviewSettings",
     Pages_Configurations_EditTalentNotifyInterviewSettings: "Pages.Configurations.EditTalentNotifyInterviewSettings",
 
