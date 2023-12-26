@@ -1,4 +1,4 @@
-import { DiscordChannelSettings, TalentSecretCode, NoticeInterviewSettingDto, TalentSetContest } from '@app/core/models/configuration/configuration.model';
+import { DiscordChannelSettings, TalentSecretCode, NoticeInterviewSettingDto,TalentContestUrl } from '@app/core/models/configuration/configuration.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { nullToEmpty } from '@app/core/helpers/utils.helper';
@@ -90,8 +90,8 @@ export class ConfigurationService extends BaseApiService {
     return this.get(`/CheckConnectToHRM`);
   }
 
-  getTalentSetContest(): Observable<ApiResponse<TalentSetContest>> {
-    return this.get("/GetTalentContest");
+  getContestUrl(): Observable<ApiResponse<TalentContestUrl>> {
+    return this.get("/GetContestUrl");
   }
   
 }

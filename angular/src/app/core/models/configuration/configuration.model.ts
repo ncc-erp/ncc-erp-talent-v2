@@ -38,8 +38,8 @@ export class EmailSetting {
 export class TalentSecretCode {
   secretCode: string;
 }
-export class TalentSetContest {
-  setContest : string;
+export class TalentContestUrl {
+  contestUrl : string;
 }
 
 export class DiscordChannelSettings {
