@@ -10,4 +10,9 @@ namespace TalentV2.Configuration.Dto
     {
         public string SecretCode { get; set; }
     }
+
+    public class SetContestDto
+    {
+        public string SetContest { get; set; }
+    }
 }

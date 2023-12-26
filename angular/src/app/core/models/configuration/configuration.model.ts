@@ -38,6 +38,9 @@ export class EmailSetting {
 export class TalentSecretCode {
   secretCode: string;
 }
+export class TalentSetContest {
+  setContest : string;
+}
 
 export class DiscordChannelSettings {
   channelHRITId: string;

@@ -55,6 +55,12 @@ namespace TalentV2.Configuration
                     _defaultValue.TalentSecurityCode,
                     scopes:SettingScopes.Application| SettingScopes.Tenant
                 ),
+                 new SettingDefinition
+                (
+                    AppSettingNames.TalentSetContest,
+                    _defaultValue.TalentSetContest,
+                    scopes:SettingScopes.Application| SettingScopes.Tenant
+                ),
                 #endregion 
 
                 #region NotifyInterViewing

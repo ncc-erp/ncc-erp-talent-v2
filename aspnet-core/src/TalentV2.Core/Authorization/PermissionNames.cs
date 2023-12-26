@@ -58,6 +58,7 @@ namespace TalentV2.Authorization
         public const string Pages_Configurations_EditTalentSecretCode = "Pages.Configurations.EditTalentSecretCode";
         public const string Pages_Configurations_ViewTalentNotifyInterviewSettings = "Pages.Configurations.ViewTalentNotifyInterviewSettings";
         public const string Pages_Configurations_EditTalentNotifyInterviewSettings = "Pages.Configurations.EditTalentNotifyInterviewSettings";
+        public const string Pages_Configurations_ViewTalentContest = "Pages.Configurations.ViewTalentContest";
         #endregion
 
         public const string TabCategory = "Category";
@@ -440,6 +441,7 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_Configurations_EditTalentSecretCode,
                     PermissionNames.Pages_Configurations_ViewTalentNotifyInterviewSettings,
                     PermissionNames.Pages_Configurations_EditTalentNotifyInterviewSettings,
+                    PermissionNames.Pages_Configurations_ViewTalentContest,
                     //Mails
                     PermissionNames.Pages_Mails,
                     PermissionNames.Pages_Mails_ViewList,
@@ -1219,6 +1221,7 @@ namespace TalentV2.Authorization
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditTalentSecretCode, DisplayName = "Edit Talent Secret Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentNotifyInterviewSettings, DisplayName = "View Talent Notify Interview Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditTalentNotifyInterviewSettings, DisplayName = "Edit Talent Notify Interview Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentContest, DisplayName = "View Talent Contest Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 //Mail
                 new SystemPermission {Name = PermissionNames.Pages_Mails, DisplayName = "Page Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Mails_ViewList, DisplayName = "View List Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
@@ -1611,7 +1614,7 @@ namespace TalentV2.Authorization
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditTalentSecretCode, DisplayName = "Edit Talent Secret Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentNotifyInterviewSettings, DisplayName = "View Talent Notify Interview Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditTalentNotifyInterviewSettings, DisplayName = "Edit Talent Notify Interview Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
-
+                      new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentContest, DisplayName = "View Talent Contest Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                             }
                         },
                         #endregion

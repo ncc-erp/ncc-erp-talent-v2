@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
-import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode } from '@app/core/models/configuration/configuration.model';
+import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentSetContest } from '@app/core/models/configuration/configuration.model';
 import { MESSAGE } from '@shared/AppConsts';
 import { DefaultRoute, ToastMessageType } from '@shared/AppEnums';
 import { NccAppComponentBase } from '@shared/ncc-component-base';
@@ -15,7 +15,8 @@ enum SETTING_TYPE {
   EMAIL = 'email',
   GOOGLE_LOGIN = 'google',
   TALENT = 'talent',
-  NOTIFYINTERVIEWER = 'notifyinterviewer'
+  NOTIFYINTERVIEWER = 'notifyinterviewer',
+  CONTEST = 'contest',
 }
 @Component({
   selector: 'talent-configurations',
@@ -32,6 +33,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   emailSetting: EmailSetting;
   lmsSetting: LMSSetting;
   talentSecretCode: TalentSecretCode;
+  talentSetContests: TalentSetContest;
   noticeTimerInterviewer: NoticeInterviewSettingDto;
   public hrmResult: GetResultConnectDto = {} as GetResultConnectDto;
   public lmsResult: GetResultConnectDto = {} as GetResultConnectDto;
@@ -43,7 +45,8 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     email: false,
     google: false,
     talent: false,
-    notifyinterviewer: false
+    notifyinterviewer: false,
+    contest: false
   }
 
   originalData = {
@@ -54,7 +57,8 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     email: null,
     google: null,
     talent: null,
-    notifyinterviewer: null
+    notifyinterviewer: null,
+    contest: null
   }
 
   public isPanelCollapse = {
@@ -65,6 +69,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     emailSetting: false,
     googleClientAppSetting: false,
     talentSecretCode: false,
+    talentSetContests: false,
     noticeTimerInterviewer: false
   }
   constructor(
@@ -101,6 +106,8 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
         return this.talentSecretCode = { ...this.originalData[settingType] };
       case SETTING_TYPE.NOTIFYINTERVIEWER:
         return this.noticeTimerInterviewer = { ...this.originalData[settingType] };
+        case SETTING_TYPE.CONTEST:
+        return this.talentSetContests = { ...this.originalData[settingType] };
       default: return;
     }
   }
@@ -226,6 +233,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     this.geLMSSetting();
     this.getTalentSecretCode();
     this.getNotifyInterViewerTimerSetting();
+    this.getTalentSetContest();
   }
 
   private getEmailsetting() {
@@ -278,6 +286,19 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
         if (res.success) {
           this.hrmSetting = res.result;
           this.originalData.hrm = _.cloneDeep(res.result);
+        }
+      })
+    );
+  }
+
+  private getTalentSetContest() {
+     if (!this.isGranted(this.PS.Pages_Configurations_ViewTalentContest)) return;
+    this.subs.add(
+      this._configuration.getTalentSetContest().subscribe(res => {
+        this.isLoading = res.loading;
+        if (res.success) {
+          this.talentSetContests = res.result;
+          this.originalData.contest = _.cloneDeep(res.result);
         }
       })
     );

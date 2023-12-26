@@ -27,7 +27,7 @@ namespace TalentV2.Configuration
             _appConfiguration = appConfiguration;
             _lMSService = lMSService;
             _hrmService = hrmService;
-        }
+                    }
         [AbpAuthorize]
         public async Task ChangeUiTheme(ChangeUiThemeInput input)
         {
@@ -255,5 +255,16 @@ namespace TalentV2.Configuration
         {
             return _lMSService.CheckConnectToLMS();
         }
+
+        [HttpGet]
+        [AbpAuthorize(PermissionNames.Pages_Configurations_ViewTalentContest)]
+        public async Task<SetContestDto> GetTalentContest()
+        {
+            return new SetContestDto
+            {
+                SetContest = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentSetContest)
+            };
+        }
+
     }
 }
