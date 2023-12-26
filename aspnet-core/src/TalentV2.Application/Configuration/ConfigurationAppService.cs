@@ -262,7 +262,7 @@ namespace TalentV2.Configuration
         {
             return new ContestUrlDto
             {
-                ContestUrl = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentSetContest)
+                ContestUrl = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentContestUrl)
             };
         }
 

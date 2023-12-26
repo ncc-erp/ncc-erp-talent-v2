@@ -1395,7 +1395,7 @@ namespace TalentV2.DomainServices.Candidates
                     BranchDisplayName = s.Branch.DisplayName ?? s.Branch.Name
                 }).FirstOrDefault();
 
-            var urlContest = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentSetContest);
+            var urlContest = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentContestUrl);
 
             var course = WorkScope.GetAll<PositionSetting>()
                 .Where(q => q.UserType == cv.UserType && q.SubPositionId == cv.SubPositionId)

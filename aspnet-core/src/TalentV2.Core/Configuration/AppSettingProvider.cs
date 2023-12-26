@@ -57,8 +57,8 @@ namespace TalentV2.Configuration
                 ),
                  new SettingDefinition
                 (
-                    AppSettingNames.TalentSetContest,
-                    _defaultValue.TalentSetContest,
+                    AppSettingNames.TalentContestUrl,
+                    _defaultValue.TalentContestUrl,
                     scopes:SettingScopes.Application| SettingScopes.Tenant
                 ),
                 #endregion 
