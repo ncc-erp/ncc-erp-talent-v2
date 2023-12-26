@@ -1179,7 +1179,7 @@ namespace TalentV2.DomainServices.Candidates
                 var startColumn = 1;    
                 var columnKey = GetColumnNameFromNumber(startColumn);
                 var worksheet = package.Workbook.Worksheets.Add(typeof(Candidate).Name);
-                                worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsExport, true, TableStyles.Light9);
+                worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsExport, true, TableStyles.Light9);
                 var row = worksheet.Dimension.Start.Row;
                 resultsExport.ForEach(s =>
                 {
@@ -1261,7 +1261,7 @@ namespace TalentV2.DomainServices.Candidates
                 var columnKey = GetColumnNameFromNumber(startColumn);
 
                 var worksheetOnBoarded = package.Workbook.Worksheets.Add(typeof(OnBoard).Name);
-                                worksheetOnBoarded.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
+                worksheetOnBoarded.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
                 worksheetOnBoarded.Cells.AutoFitColumns();
                 worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 

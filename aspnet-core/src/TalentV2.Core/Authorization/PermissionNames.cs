@@ -1614,7 +1614,7 @@ namespace TalentV2.Authorization
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditTalentSecretCode, DisplayName = "Edit Talent Secret Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentNotifyInterviewSettings, DisplayName = "View Talent Notify Interview Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditTalentNotifyInterviewSettings, DisplayName = "Edit Talent Notify Interview Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
-                      new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentContest, DisplayName = "View Talent Contest Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewTalentContest, DisplayName = "View Talent Contest Code", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                             }
                         },
                         #endregion
