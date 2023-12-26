@@ -255,5 +255,15 @@ namespace TalentV2.Configuration
         {
             return _lMSService.CheckConnectToLMS();
         }
+
+        [HttpGet]
+        [AbpAuthorize(PermissionNames.PermissionNames_Pages_Configurations_ConfigureContestUrl)]
+        public async Task<ContestUrlDto> GetContestUrl()
+        {
+            return new ContestUrlDto
+            {
+                ContestUrl = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentContestUrl)
+            };
+        }
     }
 }

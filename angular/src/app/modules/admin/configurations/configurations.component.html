@@ -423,6 +423,45 @@
     </p-panel>
   </div>
 
+  <div class="panel panel--hrm-setting" *ngIf="talentContestUrl">
+    <p-panel
+      [toggleable]="true"
+      [(collapsed)]="isPanelCollapse.talentContestUrl"
+    >
+    <ng-template pTemplate="header">
+      <div class="d-flex align-items-center">
+        <span class="panel-title">
+          {{ "Contest Setting" | localize }}
+        </span>
+        <div class="action d-flex justify-content-around"
+             *ngIf="!isPanelCollapse.talentContestUrl">
+          <p-button class="mr-2"
+                    icon="pi pi-sync"
+                    pTooltip="Check connection."
+                    styleClass="p-button-sm ml-4"
+                    (onClick)="testHRMConnection()"></p-button>
+        </div>
+      </div>
+    </ng-template>
+      <div class="panel-body">
+        <div class="group-item">
+          <label for="hrmUri" class="label-title">
+            {{ "Contest" | localize }}</label
+          >
+          <input
+            type="text"
+            id="hrmUri"
+            pInputText
+            class="w-100 p-0"
+            [(ngModel)]="talentContestUrl.contestUrl"
+            [readonly]="!isEditing.contest"
+          />
+        </div>
+
+      </div>
+    </p-panel>
+  </div>
+
   <div class="panel panel--email-setting" *ngIf="emailSetting">
     <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.emailSetting">
       <ng-template pTemplate="header">
