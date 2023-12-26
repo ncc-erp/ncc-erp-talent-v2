@@ -52,13 +52,19 @@ namespace TalentV2.DomainServices.Reports
             var cvStatistics = await GetDicSubPositionIdToStatisticQuantityCV(fd,td,userType,branchId);
 
             var cvsources = await WorkScope.GetAll<CVSource>().OrderBy(s => s.Name).ToListAsync();
-
-            var qstatisticBySubPostion = IQStatisticRequestCVHistory(fd, td, userType, branchId, cvsources);
+            var qstatisticIQCVSources = IQStatisticCVSources(fd, td, userType, branchId, cvsources);
+            var qstatisticBySubPostion = IQStatisticRequestCVHistory(fd, td, userType, branchId);
 
             var statisticBySubPosition = qstatisticBySubPostion.ToDictionary
                 (
                     x => x.SubPositionId,
-                    x => new { x.CVSourceStatistics, x.StatusStatistics}
+                    x => new {x.StatusStatistics}
+                );
+
+            var statisticCVSources = qstatisticIQCVSources.ToDictionary
+                (
+                    x => x.SubPositionId,
+                    x => new { x.CVSourceStatistics }
                 );
 
             var listKeyHaveZeroValue = new List<long>();
@@ -79,8 +85,8 @@ namespace TalentV2.DomainServices.Reports
                     continue;
                 }
 
-                positionStatistic.CVSourceStatistics = statisticBySubPosition.ContainsKey(subPositionId) ?
-                                                        statisticBySubPosition[subPositionId].CVSourceStatistics :
+                positionStatistic.CVSourceStatistics = statisticCVSources.ContainsKey(subPositionId) ?
+                                                        statisticCVSources[subPositionId].CVSourceStatistics :
                                                           GetCVSourcesZero(cvsources);
 
                 positionStatistic.QuantityContacting = cvStatistics[subPositionId].QuantityContacting;
@@ -145,12 +151,54 @@ namespace TalentV2.DomainServices.Reports
             }
             return list;
         }
+
+        private IEnumerable<StaticCVSourcesDto> IQStatisticCVSources(
+          DateTime fd,
+          DateTime td,
+          UserType? userType,
+          long? branchId,
+          List<CVSource> cvsources
+          )
+         {
+            Expression<Func<CV, bool>> predic = q => (q.CreationTime.Date >= fd.Date && q.CreationTime.Date <= td.Date) &&
+                                                                         (userType.HasValue ? q.UserType == userType : true) &&
+                                                                         (!q.IsDeleted && !q.IsDeleted && !q.IsDeleted) &&
+                                                                         (branchId.HasValue ? q.BranchId == branchId.Value : true);
+
+            var requestCVSources = WorkScope.GetAll<CV>()
+            .Where(predic)
+            .Select(s => new
+            {
+                s.Id,
+                s.BranchId,
+                s.SubPositionId,
+                s.CVSourceId
+            })
+            .ToList();
+            var qstatisticByPostion = from r in requestCVSources
+                                      group r by r.SubPositionId into gr
+                                      select new StaticCVSourcesDto
+                                      {
+                                          SubPositionId = gr.Key,
+                                          CVSourceStatistics = (from cs in cvsources
+                                                                join rqc in gr on cs.Id equals rqc.CVSourceId into rc
+                                                                from rsk in rc.DefaultIfEmpty()
+                                                                group rsk by new { cs.Id, cs.Name } into lk
+                                                                select new CVSourceStatistic
+                                                                {
+                                                                    Id = lk.Key.Id,
+                                                                    Name = lk.Key.Name,
+                                                                    TotalCV = lk.Where(s => s != null).Select(s => s.Id).Distinct().Count()
+                                                                }).ToList(),
+                                      };
+            return qstatisticByPostion;
+        }
+
         private IEnumerable<StatisticRequestCVHistory> IQStatisticRequestCVHistory(
             DateTime fd, 
             DateTime td, 
             UserType? userType, 
-            long? branchId, 
-            List<CVSource> cvsources)
+            long? branchId)
         {
             Expression<Func<RequestCVStatusHistory, bool>> predic = q => (q.TimeAt.Date >= fd.Date && q.TimeAt.Date <= td.Date) &&
                                                                          (userType.HasValue ? q.RequestCV.CV.UserType == userType : true) &&
@@ -167,7 +215,6 @@ namespace TalentV2.DomainServices.Reports
                 s.RequestCV.CV.SubPositionId,
                 s.RequestCV.CV.SubPosition.Name,
                 s.RequestCV.CVId,
-                s.RequestCV.CV.CVSourceId
             })
             .ToList();
             var qstatisticByPostion = from r in requestCVStatusHistory
@@ -175,17 +222,6 @@ namespace TalentV2.DomainServices.Reports
                                       select new StatisticRequestCVHistory
                                       {
                                           SubPositionId = gr.Key,
-                                          CVSourceStatistics = (from cs in cvsources
-                                                                join rqc in gr on cs.Id equals rqc.CVSourceId into rc
-                                                                from rsk in rc.DefaultIfEmpty()
-                                                                group rsk by new { cs.Id, cs.Name } into lk
-                                                                select new CVSourceStatistic
-                                                                {
-                                                                    Id = lk.Key.Id,
-                                                                    Name = lk.Key.Name,
-                                                                    TotalCV = lk.Where(s => s != null).Select(s => s.CVId).Distinct().Count()
-                                                                }).ToList(),
-
                                           StatusStatistics = (from s in CommonUtils.ListRequestCVStatus
                                                               join rqc in gr on s.Id equals rqc.Status.GetHashCode() into rs
                                                               from rsk in rs.DefaultIfEmpty()
