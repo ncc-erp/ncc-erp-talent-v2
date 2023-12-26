@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Roles;
+using TalentV2.Configuration;
 using TalentV2.Constants.Const;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
@@ -1394,6 +1395,8 @@ namespace TalentV2.DomainServices.Candidates
                     BranchDisplayName = s.Branch.DisplayName ?? s.Branch.Name
                 }).FirstOrDefault();
 
+            var urlContest = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentContestUrl);
+
             var course = WorkScope.GetAll<PositionSetting>()
                 .Where(q => q.UserType == cv.UserType && q.SubPositionId == cv.SubPositionId)
                 .Select(s => new { s.LMSCourseId, s.LMSCourseName })
@@ -1417,7 +1420,7 @@ namespace TalentV2.DomainServices.Candidates
                 throw new UserFriendlyException("Create Account From LMS Failed! Please again.");
 
             var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, newStudent.Password, course.LMSCourseName, newStudent.CourseInstanceId);
+            requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, course.LMSCourseName, urlContest);
             CurrentUnitOfWork.SaveChanges();
 
             return requestCV.LMSInfo;

@@ -92,6 +92,7 @@ namespace TalentV2
                 appSettingProviderDefaultValue.TimesheetSecurityCodeSetting = appSettingValueProvider.GetValue<string>(AppSettingNames.TimesheetSecurityCodeSetting);
                 appSettingProviderDefaultValue.TimesheetURLSetting = appSettingValueProvider.GetValue<string>(AppSettingNames.TimesheetURLSetting);
                 appSettingProviderDefaultValue.UiTheme = appSettingValueProvider.GetValue<string>(AppSettingNames.UiTheme);
+                appSettingProviderDefaultValue.TalentContestUrl = appSettingValueProvider.GetValue<string>(AppSettingNames.TalentContestUrl);
             }
             Configuration.Settings.Providers.Add<AppSettingProvider>();
         }

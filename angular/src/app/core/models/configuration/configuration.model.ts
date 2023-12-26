@@ -39,6 +39,10 @@ export class TalentSecretCode {
   secretCode: string;
 }
 
+export class TalentContestUrl {
+  contestUrl : string;
+}
+
 export class DiscordChannelSettings {
   channelHRITId: string;
   komuResourceRequestInternChannelId: string;

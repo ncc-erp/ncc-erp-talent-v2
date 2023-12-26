@@ -35,5 +35,7 @@
 
         public const string GoogleClientAppEnable = "App.GoogleClientAppEnable";
         public const string EnableNormalLogin = "App.EnableNormalLogin";
+
+        public const string TalentContestUrl = "App.TalentContestUrl";
     }
 }
