@@ -27,6 +27,6 @@ namespace TalentV2.Configuration
         public string NoticeInterviewResultChannel { get; set; }
         public string GoogleClientAppEnable { get; set; }
         public string EnableNormalLogin { get; set; }
-        public string TalentSetContest { get; set;}
+        public string TalentContestUrl { get; set;}
     }
 }
