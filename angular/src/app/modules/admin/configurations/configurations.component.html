@@ -423,10 +423,10 @@
     </p-panel>
   </div>
 
-  <div class="panel panel--hrm-setting" *ngIf="talentSetContests">
+  <div class="panel panel--hrm-setting" *ngIf="talentContestUrl">
     <p-panel
       [toggleable]="true"
-      [(collapsed)]="isPanelCollapse.talentSetContests"
+      [(collapsed)]="isPanelCollapse.talentContestUrl"
     >
     <ng-template pTemplate="header">
       <div class="d-flex align-items-center">
@@ -434,7 +434,7 @@
           {{ "Contest Setting" | localize }}
         </span>
         <div class="action d-flex justify-content-around"
-             *ngIf="!isPanelCollapse.talentSetContests">
+             *ngIf="!isPanelCollapse.talentContestUrl">
           <p-button class="mr-2"
                     icon="pi pi-sync"
                     pTooltip="Check connection."
@@ -453,7 +453,7 @@
             id="hrmUri"
             pInputText
             class="w-100 p-0"
-            [(ngModel)]="talentSetContests.setContest"
+            [(ngModel)]="talentContestUrl.contestUrl"
             [readonly]="!isEditing.contest"
           />
         </div>

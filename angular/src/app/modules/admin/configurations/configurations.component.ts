@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
-import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentSetContest } from '@app/core/models/configuration/configuration.model';
+import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentContestUrl } from '@app/core/models/configuration/configuration.model';
 import { MESSAGE } from '@shared/AppConsts';
 import { DefaultRoute, ToastMessageType } from '@shared/AppEnums';
 import { NccAppComponentBase } from '@shared/ncc-component-base';
@@ -33,7 +33,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   emailSetting: EmailSetting;
   lmsSetting: LMSSetting;
   talentSecretCode: TalentSecretCode;
-  talentSetContests: TalentSetContest;
+  talentContestUrl: TalentContestUrl;
   noticeTimerInterviewer: NoticeInterviewSettingDto;
   public hrmResult: GetResultConnectDto = {} as GetResultConnectDto;
   public lmsResult: GetResultConnectDto = {} as GetResultConnectDto;
@@ -69,7 +69,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     emailSetting: false,
     googleClientAppSetting: false,
     talentSecretCode: false,
-    talentSetContests: false,
+    talentContestUrl: false,
     noticeTimerInterviewer: false
   }
   constructor(
@@ -107,7 +107,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
       case SETTING_TYPE.NOTIFYINTERVIEWER:
         return this.noticeTimerInterviewer = { ...this.originalData[settingType] };
         case SETTING_TYPE.CONTEST:
-        return this.talentSetContests = { ...this.originalData[settingType] };
+        return this.talentContestUrl = { ...this.originalData[settingType] };
       default: return;
     }
   }
@@ -233,7 +233,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     this.geLMSSetting();
     this.getTalentSecretCode();
     this.getNotifyInterViewerTimerSetting();
-    this.getTalentSetContest();
+    this.getContestUrl();
   }
 
   private getEmailsetting() {
@@ -291,13 +291,13 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     );
   }
 
-  private getTalentSetContest() {
-     if (!this.isGranted(this.PS.Pages_Configurations_ViewTalentContest)) return;
+  private getContestUrl() {
+     if (!this.isGranted(this.PS.PermissionNames_Pages_Configurations_ConfigureContestUrl)) return;
     this.subs.add(
-      this._configuration.getTalentSetContest().subscribe(res => {
+      this._configuration.getContestUrl().subscribe(res => {
         this.isLoading = res.loading;
         if (res.success) {
-          this.talentSetContests = res.result;
+          this.talentContestUrl = res.result;
           this.originalData.contest = _.cloneDeep(res.result);
         }
       })
