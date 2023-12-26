@@ -17,7 +17,7 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
   templateId: number;
   isSaving: boolean = false;
   items: number[] = [0];
-  
+
   constructor(
     injector: Injector,
     public ref: DynamicDialogRef,
@@ -48,15 +48,11 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
       const selectedText = document.getSelection();
       const selectedRange = selectedText.getRangeAt(0);
       if (parentElement.contains(selectedRange.startContainer)) {
-        const startContainer = selectedRange.startContainer;
-        const selectedTextContent = startContainer.textContent;
-        const startIndex = selectedTextContent.lastIndexOf('{{', selectedRange.startOffset);
-        const endIndex = selectedTextContent.indexOf('}}', selectedRange.startOffset);
-    
-        if (startIndex >= 0 && endIndex >= 0) {
-          const newText = selectedTextContent.substring(0, startIndex) + `{{${property}}}` + selectedTextContent.substring(endIndex + 2);
-          startContainer.textContent = newText;
-        } else {
+          const selectedTextContent = selectedRange.toString();
+          if (/^\s*$/.test(selectedTextContent)) {
+            selectedRange.deleteContents();
+          }
+          selectedRange.deleteContents();
           const propertyNode = document.createTextNode(`{{${property}}}`);
           selectedRange.insertNode(propertyNode);
           selectedRange.setStartAfter(propertyNode);
@@ -66,7 +62,6 @@ export class EditMailDialogComponent extends AppComponentBase implements OnInit 
         }
       }
     }
-  }
   
   save() {
     if(this.templateId) {
