@@ -12,7 +12,7 @@ namespace TalentV2.Notifications.Templates
 {
     public static class TemplateHelper
     {
-                public static string AcceptedOfferTemplate(CandidateOfferAcceptedTemplate input, bool isFirstAcceptedOffer = true) =>
+        public static string AcceptedOfferTemplate(CandidateOfferAcceptedTemplate input, bool isFirstAcceptedOffer = true) =>
         $"#{input.CVId} **{input.FullName}** " +
             $"will onboard on {(!string.IsNullOrEmpty(input.OnboardDate) ? ("**" + input.OnboardDate + "**") : "")} with following info {(isFirstAcceptedOffer ? "" : "**[UPDATE]**")}: \n" +
             $"```"+

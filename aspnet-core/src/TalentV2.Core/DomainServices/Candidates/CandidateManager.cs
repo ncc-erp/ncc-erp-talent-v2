@@ -44,16 +44,15 @@ namespace TalentV2.DomainServices.Candidates
         private readonly LMSService _lmsService;
 
         private readonly IKomuNotification _komuNotification;
+
         private readonly HRMService _hrmService;
-        private static IConfiguration _appConfiguration;
 
         public CandidateManager(
             IFileCandidateService fileCandidate,
             IMailService mailService,
             LMSService lmsService,
             IKomuNotification komuNotification,
-            HRMService hrmService,
-            IConfiguration appConfiguration
+            HRMService hrmService
         )
         {
             _fileCandidate = fileCandidate;
@@ -61,7 +60,6 @@ namespace TalentV2.DomainServices.Candidates
             _lmsService = lmsService;
             _komuNotification = komuNotification;
             _hrmService = hrmService;
-            _appConfiguration = appConfiguration;
         }
 
         public async Task<long> CreateCV(CreateCandidateDto input)
@@ -1158,20 +1156,19 @@ namespace TalentV2.DomainServices.Candidates
                 .ToList();
             var educationCVs = await IQGetEducationCVs().ToListAsync();
             var requestCvs = await WorkScope.GetAll<RequestCV>().ToListAsync();
-            
-              var bulletPoint = "\u002B" + "\x20";
+            var bulletPoint = "\u002B" + "\x20";
             var resultsExport = listEmployee
             .Select((u, index) => new Candidate() 
             {
                 No = index++,
-Phone = u.Phone,
+                Phone = u.Phone,
                 Email = u.Email,
                 Name = u.FullName,
-Branch = u.BranchName,
+                Branch = u.BranchName,
                 Sex = u.IsFemale ? "Male" : "Female",
-                                Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
-                                ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
-                                Note = u.Note,
+                Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
+                ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
+                Note = u.Note,
                 CV = CommonUtils.FullFilePath(u.PathLinkCV)
             })
             .ToList();
@@ -1184,7 +1181,7 @@ Branch = u.BranchName,
                 var worksheet = package.Workbook.Worksheets.Add(typeof(Candidate).Name);
                                 worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsExport, true, TableStyles.Light9);
                 var row = worksheet.Dimension.Start.Row;
-                resultsExport.ForEach(s =>   
+                resultsExport.ForEach(s =>
                 {
                     var CVColumn = worksheet.Cells[++row, worksheet.Dimension.End.Column];
                     if (!string.IsNullOrWhiteSpace(s.CV))
@@ -1221,7 +1218,7 @@ Branch = u.BranchName,
                 {
                     No = index++,
                     Name = u.FullName,
-                                        Branch = u.BranchName,
+                    Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
                     Time = requestCvsIdOnboarded.Find(s => s.CVId.Equals(u.Id))?.OnboardDate,
@@ -1245,7 +1242,7 @@ Branch = u.BranchName,
                 {
                     No = index + 1,
                     Name = u.FullName,
-                                        Branch = u.BranchName,
+                    Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
                     Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
@@ -1269,7 +1266,7 @@ Branch = u.BranchName,
                 worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var worksheetInterViewed = package.Workbook.Worksheets.Add(typeof(InterView).Name);
-                                worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
+                worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
                 worksheetOnBoarded.Cells.AutoFitColumns();
                 worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -1409,7 +1406,7 @@ Branch = u.BranchName,
                 throw new UserFriendlyException($"Not Found Course With UserType: {CommonUtils.GetEnumName(cv.UserType)} and SubPosition {cv.SubPositionName}");
 
             var accountStudent = new StudentDto
-            {   
+            {
                 CourseInstanceId = course.LMSCourseId.Value,
                 EmailAddress = cv.EmailAddress,
                 FullName = cv.Name,
@@ -1422,8 +1419,8 @@ Branch = u.BranchName,
             if (newStudent == null)
                 throw new UserFriendlyException("Create Account From LMS Failed! Please again.");
 
-                    var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, newStudent.Password, course.LMSCourseName, newStudent.CourseInstanceId, urlContest);
+            var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
+            requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, course.LMSCourseName, urlContest);
             CurrentUnitOfWork.SaveChanges();
 
             return requestCV.LMSInfo;
