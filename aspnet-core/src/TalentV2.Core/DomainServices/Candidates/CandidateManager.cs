@@ -1415,15 +1415,22 @@ namespace TalentV2.DomainServices.Candidates
                 Password = PasswordUtils.GeneratePassword(6, true),
                 UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName)
             };
+            var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
+            if (cv.UserType == UserType.Intern)
+            {
             var newStudent = await _lmsService.CreateAccountStudent(accountStudent);
             if (newStudent == null)
                 throw new UserFriendlyException("Create Account From LMS Failed! Please again.");
 
-            var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, course.LMSCourseName, urlContest);
+            requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, newStudent.Password, course.LMSCourseName, newStudent.CourseInstanceId);
             CurrentUnitOfWork.SaveChanges();
-
             return requestCV.LMSInfo;
+            }
+            else
+            {
+                requestCV.LMSInfo = TemplateHelper.ContestUrl(accountStudent.UserName, urlContest);
+                return requestCV.LMSInfo;
+            }
         }
 
         public async Task<ControlSendMail> CheckAllowSendMail(

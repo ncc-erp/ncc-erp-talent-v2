@@ -181,6 +181,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
     this.handleSendMail();
   }
+  
+  getButtonLabel(userType: UserType): string {
+    return userType === UserType.INTERN ? 'Create LMS Account' : 'Create Contest';
+  }
 
   toggleEditingApplyResult() {
     this.isApplyResultEditing = !this.isApplyResultEditing;

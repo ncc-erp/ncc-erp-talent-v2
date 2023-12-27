@@ -40,12 +40,23 @@ namespace TalentV2.Utils
             var surname = GetSurnamePerson(textNotUnicode);
 
             var name = GetNamePerson(textNotUnicode);
-            var usName = name + "." + ReplaceWhitespace(surname) + "."
-                + ReplaceWhitespace(position) + "."
-                + userType + "."
-                + GetBranchName(branch) + "."
-                + UsernameUntils.GenerateUsername(3, true);
-            return ReplaceSpecialCharacters(usName);
+
+            if (userType == "Intern")
+            {
+                var usName = name + "." + ReplaceWhitespace(surname) + "."
+                    + ReplaceWhitespace(position) + "."
+                    + userType + "."
+                    + GetBranchName(branch) + "."
+                    + UsernameUntils.GenerateUsername(3, true);
+                return ReplaceSpecialCharacters(usName);
+            };
+            var usNameStaffContest = name + "_" + ReplaceWhitespace(surname) + "_"
+                    + ReplaceWhitespace(position) + "_"
+                    + userType + "_"
+                    + GetBranchName(branch) + "_"
+                    + UsernameUntils.GenerateUsername(3, true);
+            return ReplaceSpecialCharacters(usNameStaffContest);
+
         }
 
         public static string ReplaceSpecialCharacters(string input) => Regex.Replace(input, "/", "_");
