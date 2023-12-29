@@ -1,5 +1,6 @@
 <talent-section-breadcrumb
   [breadcrumbConfig]="breadcrumbConfig"
+  [isShowBtn]="permission.isGranted(PS.Pages_Branches_Create)"
   (onBtnClick)="openDialog(null, DIALOG_ACTION.CREATE)"
 >
 </talent-section-breadcrumb>
