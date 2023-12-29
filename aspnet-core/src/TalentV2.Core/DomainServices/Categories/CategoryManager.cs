@@ -19,6 +19,7 @@ using TalentV2.DomainServices.Posts;
 using Microsoft.AspNetCore.Mvc;
 using TalentV2.Authorization.Roles;
 using TalentV2.DomainServices.Users.Dtos;
+using static TalentV2.DomainServices.Categories.Dtos.CandidateLanguageDto;
 
 namespace TalentV2.DomainServices.Categories
 {
@@ -766,5 +767,52 @@ namespace TalentV2.DomainServices.Categories
                 return null;
             }
         }
+
+        #region CandidateLanguage
+        public IQueryable<CandidateLanguageDto> IQGetAllLanguage()
+        {
+            var branches = from b in WorkScope.GetAll<CandidateLanguage>()
+                           select new CandidateLanguageDto
+                           {
+                               Id = b.Id,
+                               Name = b.Name,
+                               ColorCode = b.ColorCode,
+                               Alias = b.Alias,
+                           };
+            return branches;
+        }
+        public async Task<CandidateLanguageDto> CreateLanguage(CreateLanguageDto inputLanguage)
+        {
+            await CheckDuplicateNameCategory<CandidateLanguage>(inputLanguage.Name);
+            var language = ObjectMapper.Map<CandidateLanguage>(inputLanguage);
+            var id = await WorkScope.InsertAndGetIdAsync<CandidateLanguage>(language);
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return await IQGetAllLanguage()
+                .Where(q => q.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<CandidateLanguageDto> UpdateLanguage(UpdateLanguageDto inputLanguage)
+        {
+            await CheckDuplicateNameCategory<CandidateLanguage>(inputLanguage.Name, inputLanguage.Id);
+            var branch = await WorkScope.GetAsync<CandidateLanguage>(inputLanguage.Id);
+            ObjectMapper.Map<UpdateLanguageDto, CandidateLanguage>(inputLanguage, branch);
+            await WorkScope.UpdateAsync(branch);
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return await IQGetAllLanguage()
+                    .Where(q => q.Id == branch.Id)
+                    .FirstOrDefaultAsync();
+        }
+
+        public async Task DeleteLanguage(long Id)
+        {
+            var isExisted = await WorkScope.GetAll<CandidateLanguage>()
+                .Where(q => q.Id == Id)
+                .AnyAsync();
+            if (isExisted)
+                throw new UserFriendlyException($"Not Deleted, Language already exists somewhere");
+            await WorkScope.DeleteAsync<CandidateLanguage>(Id);
+        }
+        #endregion
     }
 }

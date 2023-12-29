@@ -7,7 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
+using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.Entities;
+using static TalentV2.DomainServices.Categories.Dtos.CandidateLanguageDto;
 
 namespace TalentV2.DomainServices.Candidates.Dtos
 {
@@ -33,5 +35,6 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string LinkCv { get; set; }  
         public string AvatarCv { get; set; }
         public long? ApplyId { get; set; }
+        public string CandidateLanguage { get; set; }
     }
 }

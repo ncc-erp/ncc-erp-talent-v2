@@ -36,6 +36,7 @@ export class MultiSelectHRadioComponent implements OnInit {
       { label: SearchType.AND.toUpperCase(), value: SearchType.AND }
     ]
   }
+  @Input() disabled :boolean = false
 
   @Output() onChange = new EventEmitter<any>();
   @Output() onSearchTypeChange = new EventEmitter<string>();
