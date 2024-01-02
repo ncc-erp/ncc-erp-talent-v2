@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TalentV2.Constants.Enum;
 
 namespace TalentV2.Utils
 {
@@ -41,7 +42,7 @@ namespace TalentV2.Utils
 
             var name = GetNamePerson(textNotUnicode);
 
-            if (userType == "Intern")
+            if (userType == UserType.Intern.ToString())
             {
                 var usName = name + "." + ReplaceWhitespace(surname) + "."
                     + ReplaceWhitespace(position) + "."
