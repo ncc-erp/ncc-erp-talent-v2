@@ -616,7 +616,7 @@
                           PS.Pages_CandidateIntern_ViewDetail_RequestCV_CreateAccountLMS,
                           PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS
                         )
-                      " label="Create LMS Account" styleClass="p-button-sm p-button-outlined ml-4"
+                      " [label]="getButtonLabel(userType)" styleClass="p-button-sm p-button-outlined ml-4"
                       (onClick)="createLMSAccount()"></p-button>
                   </div>
 
