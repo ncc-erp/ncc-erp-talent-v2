@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TalentV2.Constants.Enum;
 
 namespace TalentV2.Utils
 {
@@ -34,18 +35,29 @@ namespace TalentV2.Utils
             return surname.Trim();
         }
 
-        public static string GetAccountUserLMS(string fullName, string userType, string position, string branch)
+        public static string GetAccountUserLMS(string fullName, string userType, string subposition, string branch, string position)
         {
             var textNotUnicode = RemoveSign4VietnameseString(fullName);
             var surname = GetSurnamePerson(textNotUnicode);
 
             var name = GetNamePerson(textNotUnicode);
-            var usName = name + "." + ReplaceWhitespace(surname) + "."
-                + ReplaceWhitespace(position) + "."
-                + userType + "."
-                + GetBranchName(branch) + "."
-                + UsernameUntils.GenerateUsername(3, true);
-            return ReplaceSpecialCharacters(usName);
+
+            if (userType == UserType.Intern.ToString() || (userType == UserType.Staff.ToString() && position.Equals("Tester", StringComparison.OrdinalIgnoreCase)))
+            {
+                var usName = name + "." + ReplaceWhitespace(surname) + "."
+                    + ReplaceWhitespace(subposition) + "."
+                    + userType + "."
+                    + GetBranchName(branch) + "."
+                    + UsernameUntils.GenerateUsername(3, true);
+                return ReplaceSpecialCharacters(usName);
+            };
+            var usNameStaffContest = name + "_" + ReplaceWhitespace(surname) + "_"
+                    + ReplaceWhitespace(subposition) + "_"
+                    + userType + "_"
+                    + GetBranchName(branch) + "_"
+                    + UsernameUntils.GenerateUsername(3, true);
+            return ReplaceSpecialCharacters(usNameStaffContest);
+
         }
 
         public static string ReplaceSpecialCharacters(string input) => Regex.Replace(input, "/", "_");
