@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Abp.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NccCore.Extension;
 using NccCore.Paging;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TalentV2.Authorization;
 using TalentV2.DomainServices.Categories;
 using TalentV2.DomainServices.Categories.Dtos;
 using static TalentV2.DomainServices.Categories.Dtos.CandidateLanguageDto;
@@ -28,6 +30,7 @@ namespace TalentV2.APIs
             return await query.GetGridResult(query, param);
         }
         [HttpPost]
+        [AbpAuthorize(PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create)]
         public async Task<CandidateLanguageDto> Create(CreateLanguageDto input)
         {
             return await _categoryManager.CreateLanguage(input);

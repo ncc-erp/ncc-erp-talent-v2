@@ -169,6 +169,10 @@ namespace TalentV2.Authorization
         public const string Pages_ScoreSettings_Delete = "Pages.ScoreSettings.Delete";
         #endregion
 
+        #region Page Language
+        public const string Pages_CreateLanguage_ViewDetail_Languages_Create = "Pages.CreateLanguage.ViewDetail.Languages.Create";
+        #endregion
+
         public const string TabCandidate = "Candidate";
         #region Page Candidate Staff
         public const string Pages_CandidateStaff = "Pages.CandidateStaff";
@@ -533,6 +537,8 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_ScoreSettings_Delete,
                     PermissionNames.Pages_ScoreSettings_Edit,
                     PermissionNames.Pages_ScoreSettings_ViewList,
+                    // Language
+                      PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create,
                     #endregion
 
                     #region Page ApplyCV
@@ -824,6 +830,8 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_PositionSettings_Create,
                     PermissionNames.Pages_PositionSettings_Edit,
                     PermissionNames.Pages_PositionSettings_Delete,
+                     // Language
+                      PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create,
                     #endregion
 
                     #region Page ApplyCV
@@ -1314,6 +1322,8 @@ namespace TalentV2.Authorization
                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Edit, DisplayName = "Edit Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Delete, DisplayName = "Delete Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 
+                //Language
+                new SystemPermission{ Name = PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create, DisplayName = "Create Language",  MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 #endregion
 
                 #region Page ApplyCV
@@ -1827,6 +1837,7 @@ namespace TalentV2.Authorization
                             }
                         },
                         #endregion
+
                         #region Pages ScoreSettings
                         new SystemPermission
                         {
@@ -1841,8 +1852,21 @@ namespace TalentV2.Authorization
                                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Edit, DisplayName = "Edit Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
 
                             }
-                        }
-                        #endregion
+                        },
+                          #endregion
+                         #region Pages Languega
+                        new SystemPermission
+                        {
+                            Name = PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create,
+                            DisplayName = "Page Languagr",
+                            MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant,
+                            Children = new List<SystemPermission>
+                            {
+                              new SystemPermission{ Name = PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create, DisplayName = "Create Language",  MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+
+                            }
+                        },
+                          #endregion
                     }
                 },
                 #endregion

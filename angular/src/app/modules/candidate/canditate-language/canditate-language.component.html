@@ -1,6 +1,6 @@
 <talent-section-breadcrumb
   [breadcrumbConfig]="breadcrumbConfig"
-  [isShowBtn]="permission.isGranted(PS.Pages_Branches_Create)"
+  [isShowBtn]="permission.isGranted(PS.Pages_CreateLanguage_ViewDetail_Languages_Create)"
   (onBtnClick)="openDialog(null, DIALOG_ACTION.CREATE)"
 >
 </talent-section-breadcrumb>
@@ -12,7 +12,7 @@
         <div class="p-inputgroup">
           <button
             type="button"
-            pButton
+            pButton         
             pRipple
             icon="pi pi-search"
             (click)="getDataPage(GET_FIRST_PAGE)"
