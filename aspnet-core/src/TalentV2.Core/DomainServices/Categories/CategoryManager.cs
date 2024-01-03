@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using TalentV2.Authorization.Roles;
 using TalentV2.DomainServices.Users.Dtos;
 using static TalentV2.DomainServices.Categories.Dtos.CandidateLanguageDto;
+using Newtonsoft.Json.Linq;
 
 namespace TalentV2.DomainServices.Categories
 {
@@ -778,6 +779,7 @@ namespace TalentV2.DomainServices.Categories
                                Name = b.Name,
                                ColorCode = b.ColorCode,
                                Alias = b.Alias,
+                               Note = b.Note,
                            };
             return branches;
         }
@@ -806,13 +808,8 @@ namespace TalentV2.DomainServices.Categories
 
         public async Task DeleteLanguage(long Id)
         {
-            var isExisted = await WorkScope.GetAll<CandidateLanguage>()
-                .Where(q => q.Id == Id)
-                .AnyAsync();
-            if (isExisted)
-                throw new UserFriendlyException($"Not Deleted, Language already exists somewhere");
-            await WorkScope.DeleteAsync<CandidateLanguage>(Id);
-        }
+                await WorkScope.DeleteAsync<CandidateLanguage>(Id);
+        }          
         #endregion
     }
 }

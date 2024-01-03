@@ -43,10 +43,10 @@ namespace TalentV2.APIs
         }
 
         [HttpDelete]
-
-        public async Task Delete(long Id)
+        public async Task<string> Delete(long Id)
         {
             await _categoryManager.DeleteLanguage(Id);
+            return "Deleted Successfully";
         }
         [HttpGet]
         public async Task<List<CandidateLanguageDto>> GetAll()

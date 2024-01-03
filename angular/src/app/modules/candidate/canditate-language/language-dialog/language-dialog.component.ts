@@ -50,14 +50,17 @@ export class LanguageDialogComponent extends AppComponentBase implements OnInit 
         isUpdate ? this.candidateLanguagesConfigDiaLog.candidateLanguage.alias : '',
         [Validators.required]
       ],
+      note: [
+        isUpdate ? this.candidateLanguagesConfigDiaLog.candidateLanguage.note : '',
+      ],
       colorCode: [hexColor, [Validators.required]],
       colorCodeIp: [hexColor, [Validators.required]]
     });
   }
 
   eventHandler(event) {
-    if((event.keyCode === 9 || event.keyCode === 13) && !getFormControlValue(this.form, 'displayName')){
-      this.formControls.displayName.patchValue(event.target.value);
+    if((event.keyCode === 9 || event.keyCode === 13) && !getFormControlValue(this.form,'name')){
+      this.formControls.name.patchValue(event.target.value);
     }
   }
   private resetForm() {
@@ -84,7 +87,7 @@ export class LanguageDialogComponent extends AppComponentBase implements OnInit 
     );
   }
   private doSave(res,isClose:boolean) {
-    this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS, res.result.displayName);
+    this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS, res.result.name);
     if(res.success && isClose){
       this.checkAndClosePopup(res);
       return;
@@ -103,7 +106,8 @@ export class LanguageDialogComponent extends AppComponentBase implements OnInit 
       id: action === ActionEnum.UPDATE ? this.candidateLanguagesConfigDiaLog.candidateLanguage.id : 0,
       name: getFormControlValue(this.form, 'name'),
       colorCode: getFormControlValue(this.form, 'colorCode'),
-      alias:getFormControlValue(this.form, 'alias')
+      alias:getFormControlValue(this.form, 'alias'),
+      note:getFormControlValue(this.form,'note')
     };
     this.handleSave(payload, action, isClose);
   }

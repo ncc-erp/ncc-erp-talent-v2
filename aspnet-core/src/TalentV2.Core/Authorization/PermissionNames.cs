@@ -1858,7 +1858,7 @@ namespace TalentV2.Authorization
                         new SystemPermission
                         {
                             Name = PermissionNames.Pages_CreateLanguage_ViewDetail_Languages_Create,
-                            DisplayName = "Page Languagr",
+                            DisplayName = "Page Language",
                             MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant,
                             Children = new List<SystemPermission>
                             {

@@ -434,12 +434,16 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
   private updateCandidateInfoData(candidate: Candidate) {
     const jsonArray = JSON.parse(candidate.candidateLanguage);
-    const json = jsonArray?.map(item => (item.id )
-    )
+    const json = jsonArray?.map(item => (item.id ))
+    const catalogIds = this.catalogConfig.catalogList.map(item => item.id);
+    const filteredJson = jsonArray
+      ?.map(item => item.id)
+      ?.filter(id => catalogIds.includes(id));
+
     this.form.patchValue({
       ...candidate,
       dob: candidate.dob ? new Date(candidate.dob) : null,
-      candidateLanguage:json
+      candidateLanguage:filteredJson
     })
 
     this.originalFormData = this.form.getRawValue();

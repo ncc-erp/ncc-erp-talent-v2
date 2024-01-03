@@ -14,6 +14,7 @@ namespace TalentV2.DomainServices.Categories.Dtos
         [ApplySearchAttribute]
         public string ColorCode { get; set; }
         public string Alias { get; set; }
+        public string Note { get; set; }
 
         [AutoMapTo(typeof(CandidateLanguage))]
         public class CreateLanguageDto : CandidateLanguageDto
