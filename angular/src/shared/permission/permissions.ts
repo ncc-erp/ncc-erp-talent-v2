@@ -99,6 +99,8 @@ export const PERMISSIONS_CONSTANT = {
     Pages_ScoreSettings_Edit: "Pages.ScoreSettings.Edit",
     Pages_ScoreSettings_Delete: "Pages.ScoreSettings.Delete",
 
+    Pages_CreateLanguage_ViewDetail_Languages_Create:"Pages.CreateLanguage.ViewDetail.Languages.Create",
+
     Pages_Posts: "Pages.Posts",
     Pages_Posts_ViewList: "Pages.Posts.View_List",
     Pages_Posts_Create: "Pages.Posts.Create",

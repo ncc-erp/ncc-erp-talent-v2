@@ -1,0 +1,66 @@
+<form [formGroup]="form">
+  <div class="form-group row">
+    <div class="col-md-12">
+      <label> {{ "Name" | localize }} <span class="text-danger">*</span></label>
+      <input
+        talentAutoFocus
+        type="text"
+        class="form-control"
+        formControlName="name"
+      />
+      <span
+        *ngIf="submitted && formControls.name.errors?.required"
+        class="text-danger"
+      >
+        Name is required!
+      </span>
+    </div>
+    <div class="col-md-12">
+      <label> {{ "Alias" | localize }} <span class="text-danger">*</span></label>
+      <input
+        talentAutoFocus
+        type="text"
+        class="form-control"
+        formControlName="alias"
+      />
+      <span
+        *ngIf="submitted && formControls.alias.errors?.required"
+        class="text-danger"
+      >
+      Alias is required!
+      </span>
+    </div>
+    <div class="col-md-12 pt-3">
+      <label>
+        {{ "Color" | localize }}
+        <span class="text-danger">*</span></label
+      >
+      <div class="group-color">
+        <div class="d-flex w-100 align-items-center">
+          <input
+            type="text"
+            class="form-control mr-3"
+            formControlName="colorCodeIp"
+            [value]="formControls.colorCode.value"
+          />
+          <p-colorPicker formControlName="colorCode"></p-colorPicker>
+        </div>
+
+        <div
+          class="text-danger"
+          *ngIf="submitted && formControls.colorCodeIp.errors?.required"
+        >
+          Color is required
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <talent-dialog-action-toolbar
+    [dialogRef]="ref"
+    [disabledSaveBtn]="isLoading"
+    [showButtonSaveCloseActionCreate]="action"
+    [showButtonSaveClose]="true"
+    (onSave)="onSave($event)"
+  ></talent-dialog-action-toolbar>
+</form>

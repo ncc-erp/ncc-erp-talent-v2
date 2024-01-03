@@ -23,6 +23,7 @@ import { CVSource } from "../models/categories/cv-source.model";
 import { EducationType } from "../models/categories/education-type.model";
 import { CatalogModel, LevelInfo, PositionCatalog } from "../models/common/common.dto";
 import { Skill } from "./../models/categories/skill.model";
+import { CandidateLanguage } from "../models/candidate/candidate-language.model";
 import {
   InternSalaryCatalog,
   UserCatalog
@@ -38,6 +39,7 @@ import { EducationService } from './categories/education.service';
 import { JobPositionService } from "./categories/job-position.service";
 import { SkillService } from "./categories/skill.service";
 import { CommonService } from "./common.service";
+import { CandidateLanguageService } from "./candidate/candidate-language.service";
 
 @Injectable({
   providedIn: "root",
@@ -57,7 +59,8 @@ export class UtilitiesService {
     private _candidateIntern: CandidateInternService,
     private _candidateInterview: CandidateInterviewService,
     private _positionSetting: PositionSettingService,
-    private _commonEmployee: CommonEmployeeService
+    private _commonEmployee: CommonEmployeeService,
+    private _candidatelanguage: CandidateLanguageService,
   ) { }
 
   catEducation: Education[];
@@ -67,6 +70,7 @@ export class UtilitiesService {
   catPosition: PositionCatalog[];
   catUserType: CatalogModel[];
   catBranch: Branch[];
+  catLanguages: CandidateLanguage[];
   catSkill: Skill[];
   catReqCvStatus: CatalogModel[];
   catProcessCvStatus: CatalogModel[] = PROCESS_STATUS;
@@ -150,6 +154,7 @@ export class UtilitiesService {
       this._common.getDropdownPositions().toPromise(),
       this._common.getLevelFinalIntern().toPromise(),
       this._common.getLevelFinalStaff().toPromise(),
+      this._candidatelanguage.getAll().toPromise(),
     ];
     return await Promise.all(promises).then((res) => {
       this.catBranch = res[0].result;
@@ -174,6 +179,7 @@ export class UtilitiesService {
       this.catPosition = res[19].result;
       this.catLevelFinalIntern = res[20].result;
       this.catLevelFinalStaff = res[21].result;
+      this.catLanguages = res[22].result;
     });
   }
 

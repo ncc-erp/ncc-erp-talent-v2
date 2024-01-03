@@ -52,6 +52,7 @@ namespace TalentV2.EntityFrameworkCore
         public DbSet<Versions> Versions { get; set; }
         public DbSet<EmployeePosition> EmployeePositions { get; set; }
         public DbSet<FakeSkill> FakeSkills { get; set; }
+        public DbSet<CandidateLanguage> CandidateLanguages { get; set; }
         #endregion
         public TalentV2DbContext(DbContextOptions<TalentV2DbContext> options)
             : base(options)

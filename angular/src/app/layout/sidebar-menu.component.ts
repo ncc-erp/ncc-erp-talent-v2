@@ -122,6 +122,11 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     PERMISSIONS_CONSTANT.Pages_Branches
                 ),
                 new MenuItem(
+                    'Languge',
+                    '/app/categories/language',
+                    'fa fa-language',
+                ),
+                new MenuItem(
                     'Capabilities',
                     '/app/categories/capabilities',
                     'fas fa-star',

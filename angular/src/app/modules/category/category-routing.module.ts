@@ -18,6 +18,7 @@ import { SubPositionComponent } from './sub-position/sub-position.component';
 import { PostsComponent } from "./posts/posts.component";
 import {ScoreSettingComponent} from "./score-setting/score-setting.component";
 import { CandidateLevelResolver } from "@app/core/resolver/candidate-level.resolver";
+import {CanditateLanguageComponent} from "../candidate/canditate-language/canditate-language.component";
 
 const routes: Routes = [
   {
@@ -54,6 +55,10 @@ const routes: Routes = [
         path: "branches",
         component: BranchComponent,
         data: { permission: PERMISSIONS_CONSTANT.Pages_Branches },
+      },
+      {
+        path: "language",
+        component: CanditateLanguageComponent,
       },
       {
         path: "job-positions",
