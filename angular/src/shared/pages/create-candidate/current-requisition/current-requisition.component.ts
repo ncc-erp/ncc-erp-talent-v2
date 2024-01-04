@@ -221,9 +221,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   createLMSAccount() {
     this.confirmationService.confirm({
-      message: ` <div>Create account for <strong>${this.candidateRequisiton.cvName} </strong>
-        in <span class=text-success>LMS tool ?</span></div>`,
-      header: 'Create LMS account',
+      message: ` <div>${this.userType === UserType.INTERN ? 'Create account for':'Create Url ConText for'} <strong>${this.candidateRequisiton.cvName} </strong>
+        in <span class=text-success>${this.userType === UserType.INTERN ? 'LMS tool ?':'Url ConText'}</span></div>`,
+      header: this.userType === UserType.INTERN ? 'Create LMS account':'Create ConText',
       icon: 'pi pi-exclamation-circle',
       accept: () => {
         this.subs.add(
@@ -233,7 +233,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
             if (!res.loading && res.success) {
               this.applyResultForm.get('lmsInfo').setValue(res.result);
               this.originalApprResultFormData = this.applyResultForm.getRawValue();
-              this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS, 'LMS Account');
+              this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS, this.userType === UserType.INTERN ? 'LMS Account':'URL ConText');
             }
           })
         );
