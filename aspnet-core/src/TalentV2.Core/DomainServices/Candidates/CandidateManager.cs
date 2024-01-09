@@ -1381,9 +1381,9 @@ namespace TalentV2.DomainServices.Candidates
             };
         }
 
-        public async Task<string> CreateAccountStudent(long cvId, long requestCVId)
+        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, long createAccoutId)
         {
-            var cv = WorkScope.GetAll<CV>().Include(s => s.SubPosition.Position)
+            var cv = WorkScope.GetAll<CV>()
                 .Where(q => q.Id == cvId)
                 .Select(s => new
                 {
@@ -1393,7 +1393,6 @@ namespace TalentV2.DomainServices.Candidates
                     SubPositionId = s.SubPositionId,
                     EmailAddress = s.Email,
                     BranchDisplayName = s.Branch.DisplayName ?? s.Branch.Name,
-                    Position = s.SubPosition.Position.Name
                 }).FirstOrDefault();
 
             var urlContest = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentContestUrl);
@@ -1404,21 +1403,21 @@ namespace TalentV2.DomainServices.Candidates
                 Name = Utils.StringExtensions.GetNamePerson(cv.Name),
                 Surname = Utils.StringExtensions.GetSurnamePerson(cv.Name),
                 Password = PasswordUtils.GeneratePassword(6, true),
-                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName,cv.Position)
+                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName, createAccoutId)
             };
             var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            if (cv.UserType == UserType.Intern ||( cv.UserType == UserType.Staff && cv.Position.Equals("Tester", StringComparison.OrdinalIgnoreCase)))
+            if (createAccoutId == 0)
             {
                 var course = WorkScope.GetAll<PositionSetting>()
                 .Where(q => q.UserType == cv.UserType && q.SubPositionId == cv.SubPositionId)
                 .Select(s => new { s.LMSCourseId, s.LMSCourseName })
                 .FirstOrDefault();
 
-              if (course == null || !course.LMSCourseId.HasValue)
-                throw new UserFriendlyException($"Not Found Course With UserType: {CommonUtils.GetEnumName(cv.UserType)} and SubPosition {cv.SubPositionName}");
+               if (course == null || !course.LMSCourseId.HasValue)
+                 throw new UserFriendlyException($"Not Found Course With UserType: {CommonUtils.GetEnumName(cv.UserType)} and SubPosition {cv.SubPositionName}");
                 accountStudent.CourseInstanceId = course.LMSCourseId.Value;
 
-              var newStudent = await _lmsService.CreateAccountStudent(accountStudent);
+               var newStudent = await _lmsService.CreateAccountStudent(accountStudent);
                 if (newStudent == null)
                     throw new UserFriendlyException("Create Account From LMS Failed! Please again.");
                 requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, newStudent.Password, course.LMSCourseName, newStudent.CourseInstanceId);

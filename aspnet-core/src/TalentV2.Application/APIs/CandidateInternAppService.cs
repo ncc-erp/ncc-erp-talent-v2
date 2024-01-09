@@ -274,9 +274,9 @@ namespace TalentV2.APIs
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_CreateAccountLMS)]
-        public async Task<string> CreateAccountStudent(long cvId, long requestCVId)
+        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, long createAccoutId)
         {
-            return await _candidateManager.CreateAccountStudent(cvId, requestCVId);
+            return await _candidateManager.CreateAccountStudent(cvId, requestCVId, createAccoutId);
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_CandidateIntern_EditNote)]
