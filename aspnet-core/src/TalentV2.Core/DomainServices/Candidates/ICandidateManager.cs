@@ -66,15 +66,15 @@ namespace TalentV2.DomainServices.Candidates
 
         Task<FileContentResult> ExportInfo(ExportInput input);
         Task<FileContentResult> ExportOnboard(ExportInput input);
-
+        
         #endregion
 
         #region send mail CV
         Task<MailPreviewInfoDto> PreviewBeforeSendMailCV(long cvId);
-        Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long cvId);
+                Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long cvId);
         Task<MailDetailDto> SendMailCV(long cvId, MailPreviewInfoDto message);
         Task<MailDetailDto> SendMailRequestCV(long cvId, MailPreviewInfoDto message);
-        Task<string> CreateAccountStudent(long cvId, long requestCVId);
+        Task<string> CreateAccountStudent(long cvId, long requestCVId, long createAccoutId);
 
         #endregion
     }

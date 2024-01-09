@@ -1338,14 +1338,14 @@ namespace TalentV2.DomainServices.Candidates
             CurrentUnitOfWork.SaveChanges();
 
             var controlSendMail = await CheckAllowSendMail(cvId: cvId);
-            return new MailDetailDto
+                        return new MailDetailDto
             {
                 MailStatusHistories = await _mailService.GetMailStatusHistoryByCVId(cvId),
                 IsAllowSendMail = controlSendMail == ControlSendMail.DENY ? false : true,
                 IsSentMailStatus = controlSendMail == ControlSendMail.WARN ? true : false
             };
         }
-
+        
         public async Task<MailDetailDto> SendMailRequestCV(long requestCVId, MailPreviewInfoDto message)
         {
             if (await CheckAllowSendMail(requestCVId: requestCVId) == ControlSendMail.DENY)
@@ -1381,7 +1381,7 @@ namespace TalentV2.DomainServices.Candidates
             };
         }
 
-        public async Task<string> CreateAccountStudent(long cvId, long requestCVId)
+        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, long createAccoutId)
         {
             var cv = WorkScope.GetAll<CV>().Include(s => s.SubPosition.Position)
                 .Where(q => q.Id == cvId)
@@ -1401,13 +1401,13 @@ namespace TalentV2.DomainServices.Candidates
             {
                 EmailAddress = cv.EmailAddress,
                 FullName = cv.Name,
-                Name = Utils.StringExtensions.GetNamePerson(cv.Name),
+                Name = Utils.StringExtensions.GetNamePerson(cv.Name),  
                 Surname = Utils.StringExtensions.GetSurnamePerson(cv.Name),
                 Password = PasswordUtils.GeneratePassword(6, true),
                 UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName,cv.Position)
             };
             var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            if (cv.UserType == UserType.Intern ||( cv.UserType == UserType.Staff && cv.Position.Equals("Tester", StringComparison.OrdinalIgnoreCase)))
+            if (createAccoutId == 0)
             {
                 var course = WorkScope.GetAll<PositionSetting>()
                 .Where(q => q.UserType == cv.UserType && q.SubPositionId == cv.SubPositionId)
@@ -1435,17 +1435,17 @@ namespace TalentV2.DomainServices.Candidates
         public async Task<ControlSendMail> CheckAllowSendMail(
             long cvId = default,
             long requestCVId = default
-        )
-        {
+         )
+         {
             if (cvId != default)
             {
-                return await CheckAllowSendMailFailedCV(cvId);
-            }
+                    return await CheckAllowSendMailFailedCV(cvId);
+            } 
             else if (requestCVId != default)
             {
                 return await CheckAllowSendMailRequestCV(requestCVId);
             }
-            throw new NotImplementedException("Logic isn't implemented.");
+                      throw new NotImplementedException("Logic isn't implemented.");
         }
 
         private async Task<ControlSendMail> CheckAllowSendMailFailedCV(long cvId)
@@ -1552,5 +1552,5 @@ namespace TalentV2.DomainServices.Candidates
             return await GetInterviewedByRequestCVId(applicationResult.Id);
         }
         #endregion send mail CV
-    }
+            }
 }

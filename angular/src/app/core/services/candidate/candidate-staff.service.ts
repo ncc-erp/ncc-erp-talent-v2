@@ -99,8 +99,8 @@ export class CandidateStaffService extends BaseApiService {
   sendMailCV(payload: MailPreviewInfo, cvId: number): Observable<ApiResponse<MailDetail>> {
     return this.create(payload, `/SendMailCV?cvId=${cvId}`);
   }
-
-  sendMailRequestCV(payload: MailPreviewInfo, requestCvId: number): Observable<ApiResponse<MailDetail>> {
+  
+    sendMailRequestCV(payload: MailPreviewInfo, requestCvId: number): Observable<ApiResponse<MailDetail>> {
     return this.create(payload, `/SendMailRequestCV?requestCVId=${requestCvId}`);
   }
 
@@ -174,8 +174,8 @@ export class CandidateStaffService extends BaseApiService {
     return cvId ? this.get(`/ValidPhone?phone=${phone}&cvId=${cvId}`) : this.get("/ValidPhone?phone=" + phone);
   }
 
-  createLMSAccount(cvId: number, requestCvId: number): Observable<ApiResponse<string>> {
-    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}`);
+  createAccount(cvId: number, requestCvId: number, createAccoutId:number): Observable<ApiResponse<string>> {
+    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}&createAccoutId=${createAccoutId}`);
   }
 
   updateCandidateNote(payload: { cvId: number, note: string }): Observable<ApiResponse<{ cvId: number, note: string }>> {
