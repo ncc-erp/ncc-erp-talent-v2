@@ -86,7 +86,7 @@ export class CandidateInternService extends BaseApiService {
     return this.create(payload, '/CreateCVSkill');
   }
 
-  createReqCV(payload: { cvId: number, requestId: number }): Observable<ApiResponse<CandidateRequisiton>> {
+  createReqCV(payload: { cvId: number, requestId: number, presentrequestId: number }): Observable<ApiResponse<CandidateRequisiton>> {
     return this.create(payload, '/CreateRequestCV');
   }
 

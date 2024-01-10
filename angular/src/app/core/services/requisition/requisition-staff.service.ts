@@ -72,8 +72,8 @@ export class RequisitionStaffService extends BaseApiService {
     return this.get("/GetCVIdsByReqquestId?requestId=" + requestId);
   }
 
-  createRequestCV(requestId: number, cvId: number ): Observable<ApiResponse<RequisitionStaffCreateResponse>> {
-    return this.get(`/CreateRequestCV?requestId=${requestId}&cvId=${cvId}`);
+  createRequestCV(requestId: number, cvId: number, presentrequestId: number ): Observable<ApiResponse<RequisitionStaffCreateResponse>> {
+    return this.get(`/CreateRequestCV?requestId=${requestId}&cvId=${cvId}&presentrequestId=${presentrequestId}`);
   }
 
   deleteRequestCV(

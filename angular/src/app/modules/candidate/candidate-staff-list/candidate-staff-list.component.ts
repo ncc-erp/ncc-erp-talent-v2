@@ -166,7 +166,7 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
 
   onReqSeletedCandidate(entity: CandidateStaff) {
     this.subs.add(
-      this._reqStaff.createRequestCV(this.requisitionStaffId, entity.id).subscribe(res => {
+      this._reqStaff.createRequestCV(this.requisitionStaffId, entity.id,entity.requisitionInfos[0].id).subscribe(res => {
         this.isLoading = res.loading;
         if (!res.loading && res.success) {
           const index = this.candStaffs.findIndex(item => item === entity);

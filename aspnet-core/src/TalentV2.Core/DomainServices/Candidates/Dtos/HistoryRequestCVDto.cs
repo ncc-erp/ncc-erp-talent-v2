@@ -20,4 +20,10 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public RequestCVStatus? FromStatus { get; set; }
         public RequestCVStatus ToStatus { get; set; }
     }
+    public class CVCapabilityResultDto
+    {
+        public long CapabilityId { get; set; }
+        public int Score { get; set; }
+        public string Note { get; set; }
+    }
 }

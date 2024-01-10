@@ -203,7 +203,7 @@ export class CandidateInternListComponent
   onReqSeletedCandidate(entity: CandidateIntern) {
     this.subs.add(
       this._reqIntern
-        .createRequestCV(this.requisitionInternId, entity.id)
+        .createRequestCV(this.requisitionInternId, entity.id,entity.requisitionInfos[0].id)
         .subscribe((res) => {
           this.isLoading = res.loading;
           if (!res.loading && res.success) {

@@ -775,6 +775,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private handleAddCurrentReq() {
+  const presentrequestId= this.candidateRequisiton?.currentRequisition.id
+    
     const requisitionComponent = this.userType === UserType.INTERN ? RequisitionInternComponent : RequisitionStaffComponent
     const subHeader = this.userType === UserType.INTERN ? 'Intern' : 'Staff'
     const dialogRef = this._dialog.open(requisitionComponent, {
@@ -786,8 +788,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     });
 
     dialogRef.onClose.subscribe((entity: RequisitionStaff) => {
-       if (entity?.id) {
-        const payload = { cvId: this.candidateId, requestId: entity.id }
+      if (entity?.id) {
+        const payload = { cvId: this.candidateId, requestId: entity.id, presentrequestId:presentrequestId }
           this.subs.add(
             this._candidate.createReqCV(payload).subscribe(res => {
               if (!res.loading && res.success) {

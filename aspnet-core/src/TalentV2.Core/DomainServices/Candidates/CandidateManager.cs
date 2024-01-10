@@ -286,16 +286,20 @@ namespace TalentV2.DomainServices.Candidates
                 return default;
 
             var request = await WorkScope.GetAll<Request>()
-                .Where(q => q.Id == input.RequestId)
-                .Select(s => new
-                {
-                    s.UserType,
-                    s.SubPositionId
-                })
-                .FirstOrDefaultAsync();
+             .Where(q => q.Id == input.RequestId)
+             .Select(s => new
+             {
+                 s.UserType,
+                 s.SubPositionId
+             })
+             .FirstOrDefaultAsync();
+
+            var cvRequestCVs = await WorkScope.GetAll<RequestCV>()
+            .Where(q => q.RequestId == input.PresentrequestId && q.CVId == input.CvId && q.IsDeleted == false)
+            .Select(q => q.Id)
+           .FirstOrDefaultAsync();
 
             var cv = await WorkScope.GetAsync<CV>(input.CvId);
-
             var requestCVStatus = input.RequestCVStatus.HasValue ? input.RequestCVStatus.Value : RequestCVStatus.AddedCV;
             var requestCv = new RequestCV
             {
@@ -303,12 +307,18 @@ namespace TalentV2.DomainServices.Candidates
                 CVId = input.CvId,
                 Status = requestCVStatus
             };
-
             var requestCvId = await WorkScope.InsertAndGetIdAsync(requestCv);
 
             await CurrentUnitOfWork.SaveChangesAsync();
+            var cvCapabilityResul = await WorkScope.GetAll<RequestCVCapabilityResult>()
+                    .Where(q => q.RequestCVId == cvRequestCVs && q.IsDeleted == false)
+                    .Select(q => new CVCapabilityResultDto{
+                        CapabilityId = q.CapabilityId,
+                        Score = q.Score,
+                        Note = q.Note,
+                    }).ToListAsync();
 
-            await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
+            await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId, cvCapabilityResul);
 
             await CreateRequestCVHistory(new HistoryRequestCVDto
             {
@@ -325,7 +335,7 @@ namespace TalentV2.DomainServices.Candidates
             return input.CvId;
         }
 
-        private async Task AddRequestCVCapabilityResult(long requestCvId, UserType userType, long subPositionId)
+        private async Task AddRequestCVCapabilityResult(long requestCvId, UserType userType, long subPositionId, List<CVCapabilityResultDto> cvCapabilityResul)
         {
             var capabilitySettings = await WorkScope.GetAll<CapabilitySetting>()
                 .Where(q => q.UserType == userType && q.SubPositionId == subPositionId && q.IsDeleted == false)
@@ -343,6 +353,14 @@ namespace TalentV2.DomainServices.Candidates
                     CapabilityId = item.CapabilityId,
                     Factor = item.Factor
                 };
+                foreach (var id in cvCapabilityResul)
+                {
+                    if (id.CapabilityId == item.CapabilityId)
+                    {
+                        capabilityResult.Score = id.Score;
+                        capabilityResult.Note = id.Note;
+                    }
+                }       
                 await WorkScope.InsertAsync(capabilityResult);
             }
             await CurrentUnitOfWork.SaveChangesAsync();

@@ -62,8 +62,8 @@ export class RequisitionInternService extends BaseApiService {
     return this.get("/GetCVIdsByReqquestId?requestId=" + requestId);
   }
 
-  createRequestCV(requestId: number, cvId: number): Observable<ApiResponse<RequisitionInternCreateResponse>> {
-    return this.get(`/CreateRequestCV?requestId=${requestId}&cvId=${cvId}`);
+  createRequestCV(requestId: number, cvId: number, presentrequestId: number): Observable<ApiResponse<RequisitionInternCreateResponse>> {
+    return this.get(`/CreateRequestCV?requestId=${requestId}&cvId=${cvId}&presentrequestId=${presentrequestId}`);
   }
 
   closeAndCloneRequest(payload: PayloadRequisition): Observable<ApiResponse<RequisitionIntern>> {

@@ -79,12 +79,13 @@ namespace TalentV2.APIs
 
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_RequisitionIntern_AddCV)]
-        public async Task<object> CreateRequestCV(long requestId, long cvId)
+        public async Task<object> CreateRequestCV(long requestId, long cvId,long presentrequestId)
         {
             var result = await _candidateManager.CreateRequestCV(new CandidateRequestDto
             {
                 CvId = cvId,
                 RequestId = requestId,
+                PresentrequestId = presentrequestId
             });
             var cv = await _candidateManager
                 .IQGetAllCVs()
