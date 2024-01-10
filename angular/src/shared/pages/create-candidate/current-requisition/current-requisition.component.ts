@@ -710,7 +710,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   getDefaultcreateAccout(): number {
-    if (this.userType === 0) {
+    if (this.userType === UserType.INTERN) {
       return 0;
     } else {
       return 1;
