@@ -174,8 +174,8 @@ export class CandidateStaffService extends BaseApiService {
     return cvId ? this.get(`/ValidPhone?phone=${phone}&cvId=${cvId}`) : this.get("/ValidPhone?phone=" + phone);
   }
 
-  createAccount(cvId: number, requestCvId: number, createAccoutId:number): Observable<ApiResponse<string>> {
-    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}&createAccoutId=${createAccoutId}`);
+  createAccount(cvId: number, requestCvId: number, accoutId:number): Observable<ApiResponse<string>> {
+    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}&accoutId=${accoutId}`);
   }
 
   updateCandidateNote(payload: { cvId: number, note: string }): Observable<ApiResponse<{ cvId: number, note: string }>> {

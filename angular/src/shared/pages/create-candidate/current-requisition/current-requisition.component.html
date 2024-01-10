@@ -660,7 +660,7 @@
                         )
                       ">
                         <p-dropdown 
-                         inputId="createdBy"
+                         formControlName="createAccout"
                          [options]="createAccout"
                          placeholder="All"
                          optionLabel="name"
@@ -682,7 +682,7 @@
                       PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS
                     )
                   "  label="Create Account" styleClass="p-button-sm p-button-outlined ml-4"
-                      (onClick)="createLMSAccount()" [disabled]="!isItemSelected"></p-button>
+                      (onClick)="createLMSAccount()"></p-button>
                     </div>
                   </div>
 

@@ -1381,7 +1381,7 @@ namespace TalentV2.DomainServices.Candidates
             };
         }
 
-        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, long createAccoutId)
+        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, long accoutId)
         {
             var cv = WorkScope.GetAll<CV>()
                 .Where(q => q.Id == cvId)
@@ -1403,10 +1403,10 @@ namespace TalentV2.DomainServices.Candidates
                 Name = Utils.StringExtensions.GetNamePerson(cv.Name),
                 Surname = Utils.StringExtensions.GetSurnamePerson(cv.Name),
                 Password = PasswordUtils.GeneratePassword(6, true),
-                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName, createAccoutId)
+                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName, accoutId)
             };
             var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            if (createAccoutId == 0)
+            if (accoutId == 0)
             {
                 var course = WorkScope.GetAll<PositionSetting>()
                 .Where(q => q.UserType == cv.UserType && q.SubPositionId == cv.SubPositionId)
