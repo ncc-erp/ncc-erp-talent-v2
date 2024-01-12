@@ -356,14 +356,14 @@ namespace TalentV2.DomainServices.Candidates
             await CurrentUnitOfWork.SaveChangesAsync();
             if (currentRequestCV != null)
             {
-            var cvCapabilityResul = await WorkScope.GetAll<RequestCVCapabilityResult>()
+            var cvCapabilityResult = await WorkScope.GetAll<RequestCVCapabilityResult>()
                     .Where(q => q.RequestCVId == currentRequestCV.Id)
                     .Select(q => new CVCapabilityResultDto{
                         CapabilityId = q.CapabilityId,
                         Score = q.Score,
                         Note = q.Note,
                     }).ToListAsync();
-             await KeepRequestCVCapabilityResults(requestCvId, request.UserType, request.SubPositionId, cvCapabilityResul);
+             await KeepRequestCVCapabilityResults(requestCvId, request.UserType, request.SubPositionId, cvCapabilityResult);
              return input.CvId;
             }
             await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
@@ -383,7 +383,7 @@ namespace TalentV2.DomainServices.Candidates
             return input.CvId;
         }
 
-        private async Task KeepRequestCVCapabilityResults(long requestCvId, UserType userType, long subPositionId, List<CVCapabilityResultDto> cvCapabilityResul)
+        private async Task KeepRequestCVCapabilityResults(long requestCvId, UserType userType, long subPositionId, List<CVCapabilityResultDto> cvCapabilityResult)
         {
             var capabilitySettings = await WorkScope.GetAll<CapabilitySetting>()
                 .Where(q => q.UserType == userType && q.SubPositionId == subPositionId && q.IsDeleted == false)
@@ -401,12 +401,12 @@ namespace TalentV2.DomainServices.Candidates
                     CapabilityId = item.CapabilityId,
                     Factor = item.Factor
                 };
-                foreach (var id in cvCapabilityResul)
+                foreach (var capability in cvCapabilityResult)
                 {
-                    if (id.CapabilityId == item.CapabilityId)
+                    if (capability.CapabilityId == item.CapabilityId)
                     {
-                        capabilityResult.Score = id.Score;
-                        capabilityResult.Note = id.Note;
+                        capabilityResult.Score = capability.Score;
+                        capabilityResult.Note = capability.Note;
                     }
                 }       
                 await WorkScope.InsertAsync(capabilityResult);
