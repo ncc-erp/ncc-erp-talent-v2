@@ -7,11 +7,13 @@ import { FILTER_TIME, DateFormat, MESSAGE } from '@shared/AppConsts';
 import { API_RESPONSE_STATUS, COMPARISION_OPERATOR, CreationTimeEnum, DefaultRoute, SearchType, SortType, ToastMessageType, UserType, CANDIDATE_DETAILT_TAB_DEFAULT } from '@shared/AppEnums';
 import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
 import { Filter, PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
-import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CandidateStaff } from '../../../core/models/candidate/candidate.model';
 import { RequisitionStaffService } from '@app/core/services/requisition/requisition-staff.service';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-import {ExportCandidateComponent} from '@shared/components/export-candidate/export-candidate.component';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ExportCandidateComponent } from '@shared/components/export-candidate/export-candidate.component';
+import { PresenForHrComponent } from '@shared/pages/create-candidate/current-requisition/presen-ForHr/Presen-ForHr.component';
+import { RequisitionDialog } from '@app/core/models/requisition/requisition.model';
 
 @Component({
   selector: 'talent-candidate-staff-list',
@@ -62,7 +64,8 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
     public _utilities: UtilitiesService,
     public _candidateStaff: CandidateStaffService,
     private _reqStaff: RequisitionStaffService,
-    private _modalService: BsModalService
+    private _modalService: BsModalService,
+    private _dialog: DialogService
   ) {
     super(injector);
   }
@@ -165,8 +168,23 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
   }
 
   onReqSeletedCandidate(entity: CandidateStaff) {
-    this.subs.add(
-      this._reqStaff.createRequestCV(this.requisitionStaffId, entity.id,entity.requisitionInfos[0].id).subscribe(res => {
+    const dialogRef = this._dialog.open(PresenForHrComponent, {
+      showHeader: false,
+      width: '25%',
+      contentStyle: { 'background-color': 'rgba(242,245,245)', overflow: 'visible' },
+      baseZIndex: 10000,
+      data: entity
+    });
+    dialogRef.onClose.subscribe((ref: { presenForHr: boolean}) => {
+      if (ref) {
+        const payload : RequisitionDialog = { 
+          cvId: entity.id,
+          requestId: this.requisitionStaffId, 
+          currentRequestId: entity.requisitionInfos[0]?.id || null ,
+          presenForHr: ref.presenForHr.toString() 
+        }
+      this.subs.add(
+      this._reqStaff.createRequestCV(payload).subscribe(res => {
         this.isLoading = res.loading;
         if (!res.loading && res.success) {
           const index = this.candStaffs.findIndex(item => item === entity);
@@ -176,6 +194,7 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
         }
       })
     );
+    }})
   }
 
   protected list(request: PagedRequestDto, pageNumber: number, finishedCallback: Function): void {

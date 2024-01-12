@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewed, CandidateInterviewedPayload, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CatalogModel } from '@app/core/models/common/common.dto';
-import { RequisitionStaff } from '@app/core/models/requisition/requisition.model';
+import { RequisitionDialog, RequisitionStaff } from '@app/core/models/requisition/requisition.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
 import { UtilitiesService } from '@app/core/services/utilities.service';
@@ -245,7 +245,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     if (!this.candidateRequisiton?.currentRequisition) {
       this.handleAddCurrentReq();
       return;
-    }
+      }
 
     this.confirmationService.confirm({
       message: `A requisition exists, do you want to add new?`,
@@ -775,8 +775,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private handleAddCurrentReq() {
-  const presentrequestId= this.candidateRequisiton?.currentRequisition.id
-    
+    const presentrequestId= this.candidateRequisiton?.currentRequisition.id
     const requisitionComponent = this.userType === UserType.INTERN ? RequisitionInternComponent : RequisitionStaffComponent
     const subHeader = this.userType === UserType.INTERN ? 'Intern' : 'Staff'
     const dialogRef = this._dialog.open(requisitionComponent, {
@@ -788,8 +787,15 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     });
 
     dialogRef.onClose.subscribe((entity: RequisitionStaff) => {
+      const isHiddenpresenForHr = localStorage.getItem('presenForHr');
+      
       if (entity?.id) {
-        const payload = { cvId: this.candidateId, requestId: entity.id, presentrequestId:presentrequestId }
+        const payload : RequisitionDialog = { 
+          cvId: this.candidateId,
+          requestId: entity.id, 
+          currentRequestId: presentrequestId ,
+          presenForHr: isHiddenpresenForHr 
+        }
           this.subs.add(
             this._candidate.createReqCV(payload).subscribe(res => {
               if (!res.loading && res.success) {

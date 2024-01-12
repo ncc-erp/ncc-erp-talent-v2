@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { BaseApiService } from '../apis/base-api.service';
 import { ApiResponse, PagedResult } from './../../../../shared/paged-listing-component-base';
-import { RequisitionIntern, RequisitonCandidate, RequisitionCloseAndClone, PayloadRequisition, RequisitionInternCreateResponse, CloseCloneAllRequestInternPayload, RequisitionPagedResult } from './../../models/requisition/requisition.model';
+import { RequisitionIntern, RequisitonCandidate, RequisitionCloseAndClone, PayloadRequisition, RequisitionInternCreateResponse, CloseCloneAllRequestInternPayload, RequisitionPagedResult, RequisitionDialog } from './../../models/requisition/requisition.model';
 
 @Injectable({
   providedIn: 'root'
@@ -62,10 +62,10 @@ export class RequisitionInternService extends BaseApiService {
     return this.get("/GetCVIdsByReqquestId?requestId=" + requestId);
   }
 
-  createRequestCV(requestId: number, cvId: number, presentrequestId: number): Observable<ApiResponse<RequisitionInternCreateResponse>> {
-    return this.get(`/CreateRequestCV?requestId=${requestId}&cvId=${cvId}&presentrequestId=${presentrequestId}`);
+  createRequestCV(payload: RequisitionDialog): Observable<ApiResponse<RequisitionInternCreateResponse>> {
+    return this.create(payload, '/CreateRequestCV');
   }
-
+  
   closeAndCloneRequest(payload: PayloadRequisition): Observable<ApiResponse<RequisitionIntern>> {
     return this.create(payload, '/CloseAndCloneRequest');
   }
