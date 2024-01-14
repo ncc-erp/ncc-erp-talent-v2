@@ -1,4 +1,4 @@
-import { RequisitionInfo } from "./../../../core/models/requisition/requisition.model";
+import { RequisitionPayload, RequisitionInfo } from "./../../../core/models/requisition/requisition.model";
 import { Component, Injector, OnInit, Optional } from "@angular/core";
 import { Router } from "@angular/router";
 import { checkNumber, copyObject } from "@app/core/helpers/utils.helper";
@@ -25,11 +25,12 @@ import {
   PagedListingComponentBase,
   PagedRequestDto,
 } from "@shared/paged-listing-component-base";
-import { DynamicDialogConfig, DynamicDialogRef } from "primeng/dynamicdialog";
+import { DialogService, DynamicDialogConfig, DynamicDialogRef } from "primeng/dynamicdialog";
 import { CandidateInternService } from "./../../../core/services/candidate/candidate-intern.service";
 import { RequisitionInternService } from "./../../../core/services/requisition/requisition-intern.service";
-import {BsModalRef, BsModalService} from "ngx-bootstrap/modal";
-import {ExportCandidateComponent} from "@shared/components/export-candidate/export-candidate.component";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import { ExportCandidateComponent } from "@shared/components/export-candidate/export-candidate.component";
+import { ConfirmPresentForHr } from "@shared/pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component";
 
 @Component({
   selector: "talent-candidate-intern-list",
@@ -85,7 +86,8 @@ export class CandidateInternListComponent
     public _candidateIntern: CandidateInternService,
     private _reqIntern: RequisitionInternService,
     public _router: Router,
-    private _modalService: BsModalService
+    private _modalService: BsModalService,
+    private _dialog: DialogService
   ) {
     super(injector);
   }
@@ -94,7 +96,7 @@ export class CandidateInternListComponent
     localStorage.removeItem('idApplyCV')
     this.searchText = "";
     this.searchDetail.creatorUserId =
-      this._utilities.catCanInternCreatedBy[0]?.id;
+    this._utilities.catCanInternCreatedBy[0]?.id;
     this.isDialogMode = !!this.config?.data?.dialogMode;
     this.requisitionInternId = this.config?.data?.reqInternId;
     this.internIdsInReqList = copyObject(this.config?.data?.selectedIds);
@@ -201,22 +203,41 @@ export class CandidateInternListComponent
   }
 
   onReqSeletedCandidate(entity: CandidateIntern) {
-    this.subs.add(
-      this._reqIntern
-        .createRequestCV(this.requisitionInternId, entity.id)
-        .subscribe((res) => {
-          this.isLoading = res.loading;
-          if (!res.loading && res.success) {
-            const index = this.candInterns.findIndex((item) => item === entity);
-            this.candInterns[index] = res.result.cv;
-            this._reqIntern.setCurrentReqIntern(res.result.requisition);
-            this.showToastMessage(
-              ToastMessageType.SUCCESS,
-              `Added cancidate ${entity.fullName}`
-            );
-          }
-        })
-    );
+    const dialogRef = this._dialog.open(ConfirmPresentForHr, {
+      showHeader: false,
+      width: '25%',
+      contentStyle: { 'background-color': 'rgba(242,245,245)', overflow: 'visible' },
+      baseZIndex: 10000,
+      data: entity
+    });
+    dialogRef.onClose.subscribe((ref: { presentForHr: boolean}) => {
+      if (ref) {
+      const payload : RequisitionPayload = { 
+        cvId: entity.id,
+        requestId: this.requisitionInternId, 
+        currentRequestId: entity.requisitionInfos[0]?.id || null ,
+        presentForHr: ref.presentForHr.toString() 
+      }
+
+        this.subs.add(
+          this._reqIntern
+            .createRequestCV(payload)
+            .subscribe((res) => {
+              this.isLoading = res.loading;
+              if (!res.loading && res.success) {
+                const index = this.candInterns.findIndex((item) => item === entity);
+                this.candInterns[index] = res.result.cv;
+                this._reqIntern.setCurrentReqIntern(res.result.requisition);
+                this.showToastMessage(
+                  ToastMessageType.SUCCESS,
+                  `Added cancidate ${entity.fullName}`
+                );
+                this.ref.close(entity)
+              }
+            })
+        );
+      }
+    });
   }
 
   protected list(
