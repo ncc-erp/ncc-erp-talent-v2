@@ -498,29 +498,53 @@
                 <div class="group-item" *ngIf="userType !== USER_TYPE.INTERN">
                   <span for="percentage" class="lb-item">
                     {{ "Percentage" | localize }}
+                    <div *ngIf="
+                       applyResultFormControls.percentage?.errors?.required
+                      " class="text-danger">*
+                    </div>
                   </span>
                   <div class="input-item">
                     <select class="selectpercentage" formControlName="percentage">
                       <option value="85%">85%</option>
                       <option value="100%">100%</option>
                     </select>
+                    <div class="text-error text-danger" *ngIf="
+                    submitted &&
+                    applyResultFormControls.percentage?.errors?.required
+                  ">
+                  Percentage is required
+                </div>
                   </div>
                 </div>
 
                 <div class="group-item" *ngIf="userType !== USER_TYPE.INTERN">
                   <span for="applyLevel" class="lb-item">
                     {{ "Apply Level" | localize }}
+                    <div *ngIf="
+                       applyResultFormControls.applyLevel?.errors?.required
+                      " class="text-danger">*
+                    </div>
                   </span>
                   <div class="input-item">
                     <p-dropdown inputId="applyLevel" [options]="_utilities.catStaffLeveL" placeholder="Select level"
-                      formControlName="applyLevel" optionLabel="standardName" optionValue="id" styleClass="w-100">
+                    formControlName="applyLevel" optionLabel="standardName" optionValue="id" styleClass="w-100">
                     </p-dropdown>
+                    <div class="text-error text-danger" *ngIf="
+                    submitted &&
+                    applyResultFormControls.applyLevel?.errors?.required
+                  ">
+                  ApplyLevel is required
+                </div>
                   </div>
                 </div>
 
                 <div class="group-item">
                   <span for="finalLevel" class="lb-item">
                     {{ "Final Level" | localize }}
+                    <div *ngIf="
+                       applyResultFormControls.finalLevel?.errors?.required
+                      " class="text-danger">*
+                    </div>
                   </span>
                   <div class="input-item">
                     <p-dropdown inputId="finalLevel" [options]="
@@ -530,6 +554,12 @@
                       " formControlName="finalLevel" placeholder="Select level" optionLabel="standardName"
                       optionValue="id" styleClass="w-100" (onChange)="onApplyResultFinalLevelChange($event.value)">
                     </p-dropdown>
+                    <div class="text-error text-danger" *ngIf="
+                    submitted &&
+                    applyResultFormControls.finalLevel?.errors?.required
+                  ">
+                  FinalLevel is required
+                </div>
                   </div>
                 </div>
 
@@ -542,11 +572,21 @@
                   ">
                   <span for="salary" class="lb-item">
                     {{ "Salary" | localize }}
+                    <div *ngIf="
+                        applyResultFormControls.salary?.errors?.required
+                      " class="text-danger">*
+                    </div>
                   </span>
                   <div class="input-item">
                     <p-inputNumber inputId="salary" styleClass="w-100" formControlName="salary">
                     </p-inputNumber>
-                  </div>
+                    <div class="text-error text-danger" *ngIf="
+                    submitted &&
+                    applyResultFormControls.salary?.errors?.required
+                  ">
+                  Salary is required
+                </div>
+                </div>
                 </div>
 
                 <div class="group-item">
@@ -607,8 +647,10 @@
               <div class="grid-item grid-item--lms">
                 <div class="editor w-100">
                   <div class="mb-3">
-                    <span for="lmsEditor"> {{ "LMS Info" | localize }}</span>
-                    <p-button *ngIf="
+                    <div class="d-flex">
+                      <span class="mt-2 mr-2" for="lmsEditor"> {{ "Create" | localize }}</span>
+                      <div class="w-50" 
+                      *ngIf="
                         candidateRequisiton?.applicationResult.status ===
                           REQUEST_CV_STATUS.ScheduledTest &&
                         validPermissionUserType(
@@ -616,8 +658,32 @@
                           PS.Pages_CandidateIntern_ViewDetail_RequestCV_CreateAccountLMS,
                           PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS
                         )
-                      " [label]="getButtonLabel(userType)" styleClass="p-button-sm p-button-outlined ml-4"
+                      ">
+                        <p-dropdown 
+                         formControlName="createAccout"
+                         [options]="createAccout"
+                         placeholder="All"
+                         optionLabel="name"
+                         optionValue="id"
+                         styleClass="w-100"
+                         [filter]="true"
+                         filterBy="name"
+                         [showClear]="true"
+                         (onChange)="onDropdownChange($event)"
+                         >
+                        </p-dropdown>
+                      </div>
+                     <p-button *ngIf="
+                    candidateRequisiton?.applicationResult.status ===
+                      REQUEST_CV_STATUS.ScheduledTest &&
+                    validPermissionUserType(
+                      userType,
+                      PS.Pages_CandidateIntern_ViewDetail_RequestCV_CreateAccountLMS,
+                      PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS
+                    )
+                  "  label="Create Account" styleClass="p-button-sm p-button-outlined ml-4"
                       (onClick)="createLMSAccount()"></p-button>
+                    </div>
                   </div>
 
                   <p-editor inputId="lmsEditor" formControlName="lmsInfo" [readonly]="

@@ -35,28 +35,24 @@ namespace TalentV2.Utils
             return surname.Trim();
         }
 
-        public static string GetAccountUserLMS(string fullName, string userType, string subposition, string branch, string position)
+        public static string GetAccountUserLMS(string fullName, string userType, string subposition, string branch, StatusCreateAccount statusCreateAccount)
         {
             var textNotUnicode = RemoveSign4VietnameseString(fullName);
             var surname = GetSurnamePerson(textNotUnicode);
 
             var name = GetNamePerson(textNotUnicode);
 
-            if (userType == UserType.Intern.ToString() || (userType == UserType.Staff.ToString() && position.Equals("Tester", StringComparison.OrdinalIgnoreCase)))
+            var usName = name + "." + ReplaceWhitespace(surname) + "."
+                   + ReplaceWhitespace(subposition) + "."
+                   + userType + "."
+                   + GetBranchName(branch) + "."
+                   + UsernameUntils.GenerateUsername(3, true);
+
+            if (statusCreateAccount == StatusCreateAccount.CREATE_URL_CONTEST)
             {
-                var usName = name + "." + ReplaceWhitespace(surname) + "."
-                    + ReplaceWhitespace(subposition) + "."
-                    + userType + "."
-                    + GetBranchName(branch) + "."
-                    + UsernameUntils.GenerateUsername(3, true);
                 return ReplaceSpecialCharacters(usName);
             };
-            var usNameStaffContest = name + "_" + ReplaceWhitespace(surname) + "_"
-                    + ReplaceWhitespace(subposition) + "_"
-                    + userType + "_"
-                    + GetBranchName(branch) + "_"
-                    + UsernameUntils.GenerateUsername(3, true);
-            return ReplaceSpecialCharacters(usNameStaffContest);
+            return ReplaceSpecialCharacters(usName.Replace('.', '_'));
 
         }
 

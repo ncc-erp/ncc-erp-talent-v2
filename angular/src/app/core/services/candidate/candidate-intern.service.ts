@@ -10,7 +10,7 @@ import { BaseApiService } from '../apis/base-api.service';
 import { ApiResponse } from './../../../../shared/paged-listing-component-base';
 import { CandidateApplyHistory } from './../../models/candidate/candidate-apply-history.model';
 import { CatalogModel } from './../../models/common/common.dto';
-import {UserType} from '@shared/AppEnums';
+import { StatusCreateAccount, UserType} from '@shared/AppEnums';
 
 @Injectable({
   providedIn: 'root'
@@ -171,8 +171,8 @@ export class CandidateInternService extends BaseApiService {
     return cvId ? this.get(`/ValidPhone?phone=${phone}&cvId=${cvId}`) : this.get("/ValidPhone?phone=" + phone);
   }
 
-  createLMSAccount(cvId: number, requestCvId: number): Observable<ApiResponse<string>> {
-    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}`);
+  createAccount(cvId: number, requestCvId: number, statusCreateAccount: StatusCreateAccount): Observable<ApiResponse<string>> {
+    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}&statusCreateAccount=${statusCreateAccount}`);
   }
 
   updateCandidateNote(payload: { cvId: number, note: string }): Observable<ApiResponse<{ cvId: number, note: string }>> {
