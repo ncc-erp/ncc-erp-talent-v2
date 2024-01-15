@@ -67,7 +67,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isInterviewed;
   visible: boolean;
   position: string;
-
   optionFailInternLevel = [
     {
       defaultName: "Fail",
@@ -786,14 +785,13 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       data: { dialogMode: ActionEnum.SELECT },
     });
 
-    dialogRef.onClose.subscribe((entity: RequisitionStaff) => {
-      const isHiddenPresentForHr = localStorage.getItem('presentForHr');
-      if (entity?.id) {
+    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean,entity: RequisitionStaff}) => {
+      if (res?.entity.id) {
         const payload : RequisitionPayload = { 
           cvId: this.candidateId,
-          requestId: entity.id, 
+          requestId: res.entity.id, 
           currentRequestId: presentrequestId ,
-          presentForHr: isHiddenPresentForHr 
+          isPresentForHr: res.isPresentForHr 
         }
           this.subs.add(
             this._candidate.createReqCV(payload).subscribe(res => {

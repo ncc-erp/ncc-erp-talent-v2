@@ -95,11 +95,9 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
       baseZIndex: 10000,
       data: entity
     });
-    dialogRef.onClose.subscribe((res: { presentForHr: boolean}) => {
+    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean}) => {
       if (res) {
-       localStorage.setItem('presentForHr', res.presentForHr?.toString());
-       this.ref.close(entity)
-       localStorage.removeItem('presentForHr')
+       this.ref.close({ entity, ...res });
       }
     });
   }

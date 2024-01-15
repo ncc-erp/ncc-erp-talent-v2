@@ -322,7 +322,7 @@ namespace TalentV2.DomainServices.Candidates
                 CVId = input.CvId,
                 Status = requestCVStatus
             };
-            if (input.PresentForHr == "true")
+            if (input.IsPresentForHr == true)
             {
                 var currentRequestCVInterview = await WorkScope.GetAll<RequestCVInterview>()
                   .Where(q => q.RequestCVId == currentRequestCV.Id)
@@ -393,6 +393,7 @@ namespace TalentV2.DomainServices.Candidates
                     s.Factor
                 })
                 .ToListAsync();
+            var capabilityResults = new List<RequestCVCapabilityResult>();
             foreach (var item in capabilitySettings)
             {
                 var capabilityResult = new RequestCVCapabilityResult
@@ -408,9 +409,10 @@ namespace TalentV2.DomainServices.Candidates
                         capabilityResult.Score = capability.Score;
                         capabilityResult.Note = capability.Note;
                     }
-                }       
-                await WorkScope.InsertAsync(capabilityResult);
+                }
+                capabilityResults.Add(capabilityResult);
             }
+            await WorkScope.InsertRangeAsync(capabilityResults);
             await CurrentUnitOfWork.SaveChangesAsync();
         }
 

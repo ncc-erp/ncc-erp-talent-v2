@@ -100,11 +100,9 @@ export class RequisitionInternComponent extends PagedListingComponentBase<Requis
       baseZIndex: 10000,
       data: entity
     });
-    dialogRef.onClose.subscribe((res: { presentForHr: boolean}) => {
+    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean}) => {
       if (res) {
-       localStorage.setItem('presentForHr', res.presentForHr?.toString());
-       this.ref.close(entity)
-       localStorage.removeItem('presentForHr')
+       this.ref.close({ entity, ...res });
       }
     });
   }
@@ -178,7 +176,6 @@ export class RequisitionInternComponent extends PagedListingComponentBase<Requis
       baseZIndex: 5000,
       data: null,
     });
-
     dialogRef.onClose.subscribe((res: boolean) => res && this.onGetDataChange());
   }
 

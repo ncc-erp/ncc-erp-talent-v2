@@ -10,7 +10,7 @@ import {DynamicDialogConfig, DynamicDialogRef} from 'primeng/dynamicdialog';
 })
 export class ConfirmPresentForHr extends AppComponentBase implements OnInit {
 
-  presentForHr:boolean = false;
+  isPresentForHr:boolean = false;
 
   constructor(
     injector: Injector,
@@ -24,7 +24,7 @@ export class ConfirmPresentForHr extends AppComponentBase implements OnInit {
   }
   Save(){
     this.dialogRef.close({
-      presentForHr: this.presentForHr 
+      isPresentForHr: this.isPresentForHr 
     });
   }
 }

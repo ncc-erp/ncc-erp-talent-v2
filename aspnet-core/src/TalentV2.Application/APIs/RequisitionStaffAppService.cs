@@ -84,7 +84,7 @@ namespace TalentV2.APIs
                 CvId = input.CvId,
                 RequestId = input.RequestId,
                 CurrentRequestId = input.CurrentRequestId,
-                PresentForHr = input.PresentForHr,
+                IsPresentForHr = input.IsPresentForHr,
             });
             var cv = await _candidateManager
                 .IQGetAllCVs()

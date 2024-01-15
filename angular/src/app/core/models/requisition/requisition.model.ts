@@ -170,5 +170,5 @@ export class RequisitionPayload{
   cvId: number;
   requestId: number;
   currentRequestId: number;
-  presentForHr: string;
+  isPresentForHr: boolean;
 }

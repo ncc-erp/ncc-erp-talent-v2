@@ -210,13 +210,13 @@ export class CandidateInternListComponent
       baseZIndex: 10000,
       data: entity
     });
-    dialogRef.onClose.subscribe((ref: { presentForHr: boolean}) => {
+    dialogRef.onClose.subscribe((ref: { isPresentForHr: boolean}) => {
       if (ref) {
       const payload : RequisitionPayload = { 
         cvId: entity.id,
         requestId: this.requisitionInternId, 
         currentRequestId: entity.requisitionInfos[0]?.id || null ,
-        presentForHr: ref.presentForHr.toString() 
+        isPresentForHr: ref.isPresentForHr 
       }
 
         this.subs.add(
