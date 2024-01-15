@@ -206,3 +206,8 @@ export enum MAIL_TYPE {
     InviteTest = 5,
     ResultTest = 6
 }
+
+export enum StatusCreateAccount {
+    CREATE_LMS_ACCOUT = 0,
+    CREATE_URL_CONTEST = 1
+}
