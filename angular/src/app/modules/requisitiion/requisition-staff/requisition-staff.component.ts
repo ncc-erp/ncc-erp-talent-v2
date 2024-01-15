@@ -11,6 +11,7 @@ import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dy
 import { RequisitionStaffService } from './../../../core/services/requisition/requisition-staff.service';
 import { CandidateStaffListComponent } from './../../candidate/candidate-staff-list/candidate-staff-list.component';
 import { RequisitionStaffDialogComponent } from './requisition-staff-dialog/requisition-staff-dialog.component';
+import { ConfirmPresentForHr } from '@shared/pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component';
 
 @Component({
   selector: 'talent-requisition-staff',
@@ -87,7 +88,18 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
   }
 
   onCandidateSelectedRequisiton(entity: RequisitionStaff) {
-    this.ref.close(entity)
+    const dialogRef = this._dialog.open(ConfirmPresentForHr, {
+      showHeader: false,
+      width: '25%',
+      contentStyle: { 'background-color': 'rgba(242,245,245)', overflow: 'visible' },
+      baseZIndex: 10000,
+      data: entity
+    });
+    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean}) => {
+      if (res) {
+       this.ref.close({ entity, ...res });
+      }
+    });
   }
 
   onPositionSelect(subPositionId: number) {

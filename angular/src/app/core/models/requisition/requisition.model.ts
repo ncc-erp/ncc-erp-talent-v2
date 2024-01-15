@@ -165,3 +165,10 @@ export class CloseCloneAllRequestIntern {
 export interface RequisitionPagedResult extends PagedResult {
   totalQuantity: number;
 }
+
+export class RequisitionPayload{
+  cvId: number;
+  requestId: number;
+  currentRequestId: number;
+  isPresentForHr: boolean;
+}

@@ -9,6 +9,7 @@ import {
   RequisitionStaff,
   RequisitonCandidate,
   RequisitionPagedResult,
+  RequisitionPayload,
 } from "@app/core/models/requisition/requisition.model";
 import { ApiResponse, PagedRequestDto } from "@shared/paged-listing-component-base";
 import { Observable, of } from "rxjs";
@@ -72,8 +73,8 @@ export class RequisitionStaffService extends BaseApiService {
     return this.get("/GetCVIdsByReqquestId?requestId=" + requestId);
   }
 
-  createRequestCV(requestId: number, cvId: number ): Observable<ApiResponse<RequisitionStaffCreateResponse>> {
-    return this.get(`/CreateRequestCV?requestId=${requestId}&cvId=${cvId}`);
+  createRequestCV(payload: RequisitionPayload): Observable<ApiResponse<RequisitionStaffCreateResponse>> {
+    return this.create(payload, '/CreateRequestCV');
   }
 
   deleteRequestCV(
