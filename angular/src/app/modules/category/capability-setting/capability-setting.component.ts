@@ -15,6 +15,7 @@ import {
   PagedRequestDto
 } from "@shared/paged-listing-component-base";
 import { CapabilityWithSetting } from '@app/core/models/categories/capabilities-setting.model';
+import { DataSharingService } from '@app/core/services/categories/data-sharing-capabillity.service';
 
 @Component({
   selector: 'talent-capability-setting',
@@ -44,6 +45,7 @@ export class CapabilitySettingComponent extends PagedListingComponentBase<Capabi
     public _utilities: UtilitiesService,
     private _capabilitySetting: CapabilitySettingService,
     private _confirmation: ConfirmationService,
+    private dataSharingService: DataSharingService
   ) {
     super(injector);
   }
@@ -82,11 +84,14 @@ export class CapabilitySettingComponent extends PagedListingComponentBase<Capabi
       baseZIndex: 10000,
       data: dialogConfig,
     });
-
     dialogRef.onClose.subscribe((res: ApiResponse<CapabilityWithSetting>) => {
       if(!res) return; 
       if (dialogConfig.action === ActionEnum.UPDATE) {
-        this.getAll(this.GET_FIRST_PAGE);
+        this.dataSharingService.guideLine$.subscribe(payload => {
+          if(capWithSetting.id === payload?.id && capWithSetting.capabilityId === payload.capabilityId){
+            capWithSetting.guideLine= payload.guideLine
+          }
+        })
         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.guideLine);
         return;
       }

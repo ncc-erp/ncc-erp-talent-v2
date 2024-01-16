@@ -8,6 +8,7 @@ import { ActionEnum } from '../../../../../shared/AppEnums';
 import { MESSAGE } from '../../../../../shared/AppConsts';
 import { CapabilitySetting, CapabilitySettingConfigDiaLog, CapabilitySettingPayload } from '@app/core/models/categories/capabilities-setting.model';
 import { CapabilitySettingService } from '@app/core/services/categories/capability-setting.service';
+import { DataSharingService } from '@app/core/services/categories/data-sharing-capabillity.service';
 
 @Component({
   selector: 'talent-edit-guideline-dialog',
@@ -26,7 +27,8 @@ export class EditGuideLineDialogComponent extends AppComponentBase implements On
     public config: DynamicDialogConfig,
     private injector: Injector,
     private _fb: FormBuilder,
-    private _capabilitySetting: CapabilitySettingService
+    private _capabilitySetting: CapabilitySettingService,
+    private dataSharingService: DataSharingService
   ) {
     super(injector);
   }
@@ -95,7 +97,8 @@ export class EditGuideLineDialogComponent extends AppComponentBase implements On
 
     this.subs.add(
       this._capabilitySetting.update(payload).subscribe(res => {
-        this.isLoading = res.loading;
+        this.isLoading = res.loading;      
+         this.dataSharingService.updatePayload(payload);
         this.checkAndClosePopup(res)
       })
     );
