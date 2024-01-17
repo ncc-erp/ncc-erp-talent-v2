@@ -71,8 +71,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isInterviewed;
   visible: boolean;
   position: string;
-  createAccoutId: number;
-  statusEnum = StatusCreateAccount;
+  createAccoutStatusId: number;
   optionFailInternLevel = [
     {
       defaultName: "Fail",
@@ -161,8 +160,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     );
   }
 
-  onDropdownChange(createAccoutId: any) {
-    this.createAccoutId = createAccoutId.value;
+  onDropdownChange(createAccout: any) {
+    this.createAccoutStatusId = createAccout.value;
   }
 
   onInterviewerChange(id: number) {
