@@ -350,11 +350,11 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   onRequestStatusChange(id: number) {
-    this.ValidateRequestCVLevel(id)
-    this.ValidateStaffRequestCVStatus(id);
+    this.validateRequestCVLevel(id)
+    this.validateStaffRequestCVStatus(id);
   }
 
-  ValidateRequestCVLevel(id: number)
+  validateRequestCVLevel(id: number)
   {
     const onboardDate = this.applyResultForm.get('onboardDate');
     const hasRequired = onboardDate.hasValidator(Validators.required);
@@ -368,7 +368,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
   }
 
-  ValidateStaffRequestCVStatus(id: number){
+  validateStaffRequestCVStatus(id: number){
     const applyLevel = this.applyResultForm.get('applyLevel');
     const finalLevel = this.applyResultForm.get('finalLevel');
     const salary = this.applyResultForm.get('salary');
@@ -695,7 +695,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
 
     this.interviewLevelForm.get('interviewLevel').valueChanges.subscribe(interviewLevel => {
-      this.ValidateRequestCVLevel(interviewLevel);
+      this.validateRequestCVLevel(interviewLevel);
     })
 
     this.requisitonForm.disable();
