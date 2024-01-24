@@ -117,6 +117,10 @@ export class CandidateStaffService extends BaseApiService {
     return this.create(payload, '/UpdateFileAvatar');
   }
 
+  updateVoiceInterview(payload: FormData): Observable<ApiResponse<string>> {
+    return this.create(payload, '/UpdateVoiceInterview');
+  }
+
   updateInterviewTime(payload: { requestCVId: number, interviewTime: string }) {
     return this.update(payload, '/UpdateInterviewTime');
   }

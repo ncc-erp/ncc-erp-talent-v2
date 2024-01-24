@@ -14,7 +14,8 @@ namespace TalentV2.Constants.Dictionary
             new Dictionary<string, string[]>()
             {
                 {"IMAGE", new string[] { "jpeg", "png", "svg", "jpg"} },
-                {"DOCUMENT", new string[]{ "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt"} }
+                {"DOCUMENT", new string[]{ "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt"} },
+                {"VOICEINTERVIEW", new string[]{ "mp3", "mp4", "avi", "mkv"} }
             };
         public static readonly Dictionary<MailFuncEnum, MailInfo> SeedMailDic = new Dictionary<MailFuncEnum, MailInfo>()
         {

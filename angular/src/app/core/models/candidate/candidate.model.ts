@@ -11,6 +11,7 @@ export class CandidateInfo {
   email: string;
   avatar: string;
   linkCV: string;
+  linkVoiceInterview: string;
   isFemale: boolean;
   userType: number;
   userTypeName: string;

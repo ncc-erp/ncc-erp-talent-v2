@@ -10,5 +10,6 @@ namespace TalentV2.Constants.Const
     {
         public const string IMAGE = "IMAGE";
         public const string DOCUMENT = "DOCUMENT";
+        public const string VOICEINTERVIEW = "VOICEINTERVIEW";
     }
 }

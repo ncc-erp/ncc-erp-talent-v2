@@ -232,6 +232,12 @@ namespace TalentV2.APIs
         {
             return await _candidateManager.UpdateCV(input);
         }
+        [HttpPost]
+        [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_PersonInfo_Edit)]
+        public async Task<string> UpdateVoiceInterview([FromForm] UpdateFileVoiceInterviewDto input)
+        {
+            return await _candidateManager.UpdateVoiceInterview(input);
+        }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV)]
         public async Task<List<HistoryCandidateDto>> GetHistoryCV(long cvId)

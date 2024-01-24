@@ -11,5 +11,6 @@ namespace TalentV2.Constants.Const
         public const string FOLDER_UPLOAD = "uploads";
         public const string FOLDER_AVATAR = "avatars";
         public const string FOLDER_CV = "cvs";
+        public const string FOLDER_VOICE = "voices";
     }
 }

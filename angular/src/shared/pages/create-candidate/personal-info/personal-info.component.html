@@ -418,6 +418,36 @@
         </div>
       </div>
 
+      <div class="group-item" *ngIf="userType">
+        <span class="lb-item" for="file">
+          {{ "Video" | localize }}
+        </span>
+
+        <div class="input-item">
+          <input
+            type="file"
+            id="filevideo"
+            [accept]="ACCEPT_VIDEO"
+            (change)="onVoiceFileChange($event.target.files)"
+          />
+          <label for="filevideo" class="btn-inputfile">Choose a file</label>
+          <a
+            *ngIf="voiceFileName"
+            class="ml-3"
+            [attr.href]="viewFile(formControls['linkVoiceInterview']?.value)"
+            target="_blank"
+          >
+            {{ voiceFileName }}</a
+          >
+          <span
+            class="ml-2 text-danger"
+            *ngIf="formControls.linkVoiceInterview.errors?.invalidCVExtension"
+          >
+          Voice Type allow: {{ ACCEPT_VIDEO }}
+          </span>
+        </div>
+      </div>
+
       <div class="group-item">
         <span class="lb-item" for="file">
           {{ "Avatar" | localize }}

@@ -130,3 +130,4 @@ export const RQ_PROCESS_STATUS = [
 export const IMAGE_EXTENSION_ALLOW = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
 
 export const CV_EXTENSION_ALLOW = ['doc', 'docx', 'xlsx', 'csv', 'pdf'];
+export const VOICE_EXTENSION_ALLOW = ['mp3', 'mp4', 'avi', 'mkv'];

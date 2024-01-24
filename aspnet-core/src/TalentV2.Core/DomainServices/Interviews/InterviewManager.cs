@@ -32,6 +32,7 @@ namespace TalentV2.DomainServices.Interviews
                     Phone = rqCv.CV.Phone,
                     PathAvatar = rqCv.CV.Avatar,
                     PathLinkCV = rqCv.CV.LinkCV,
+                    PathLinkVoiceInterview = rqCv.CV.LinkVoiceInterview,
                     UserType = rqCv.CV.UserType,
                     IsFemale = rqCv.CV.IsFemale,
                     CvStatus = rqCv.CV.CVStatus,

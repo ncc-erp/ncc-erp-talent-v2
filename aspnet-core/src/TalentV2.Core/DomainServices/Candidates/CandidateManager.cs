@@ -108,6 +108,7 @@ namespace TalentV2.DomainServices.Candidates
                     Address = s.Address,
                     PathAvatar = s.Avatar,
                     PathLinkCV = s.LinkCV,
+                    PathLinkVoiceInterview = s.LinkVoiceInterview,
                     CVSourceId = s.CVSourceId,
                     DOB = s.Birthday,
                     Email = s.Email,
@@ -910,6 +911,7 @@ namespace TalentV2.DomainServices.Candidates
                             UserType = candidate.UserType,
                             PathAvatar = candidate.Avatar,
                             PathLinkCV = candidate.LinkCV,
+                            PathLinkVoiceInterview = candidate.LinkVoiceInterview,
                             Email = candidate.Email,
                             FullName = candidate.Name,
                             Phone = candidate.Phone,
@@ -1105,6 +1107,16 @@ namespace TalentV2.DomainServices.Candidates
             if (input.FileUpdate == null) return string.Empty;
             var subLink = await _fileCandidate.UploadCV(input.FileUpdate);
             cv.LinkCV = subLink;
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return CommonUtils.FullFilePath(subLink);
+        }
+
+        public async Task<string> UpdateVoiceInterview(UpdateFileVoiceInterviewDto input)
+        {
+            var cv = await WorkScope.GetAsync<CV>(input.CVId);
+            if (input.FileUpdate == null) return string.Empty;
+            var subLink = await _fileCandidate.UpdateFileVoiceInterview(input.FileUpdate);
+            cv.LinkVoiceInterview = subLink;
             await CurrentUnitOfWork.SaveChangesAsync();
             return CommonUtils.FullFilePath(subLink);
         }

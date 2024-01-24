@@ -31,9 +31,10 @@ namespace TalentV2.Entities
         [MaxLength(100)]
         public string NCCEmail { get; set; }
         [MaxLength(1000)]
+        public string LinkVoiceInterview { get; set; }
+        [MaxLength(100)]
         public string Note { get; set; }
         public CVStatus CVStatus { get; set; }
-
         public long? CVSourceId { get; set; }
         [ForeignKey(nameof(CVSourceId))]
         public CVSource CVSource { get; set; }
@@ -41,11 +42,9 @@ namespace TalentV2.Entities
         public long BranchId { get; set; }
         [ForeignKey(nameof(BranchId))]
         public Branch Branch { get; set; }
-
         public long SubPositionId { get; set; }
         [ForeignKey(nameof(SubPositionId))]
         public SubPosition SubPosition { get; set; }
-
         public ICollection<CVSkill> CVSkills { get; set; }
         public ICollection<CVEducation> CVEducations { get; set; }
         public ICollection<RequestCV> RequestCVs { get; set; }

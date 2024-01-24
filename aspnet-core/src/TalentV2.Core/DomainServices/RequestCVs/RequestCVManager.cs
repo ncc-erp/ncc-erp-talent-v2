@@ -37,6 +37,7 @@ namespace TalentV2.DomainServices.RequestCVs
                             Email = rc.CV.Email,
                             FullName = rc.CV.Name,
                             PathLinkCV = rc.CV.LinkCV,
+                            PathLinkVoiceInterview = rc.CV.LinkVoiceInterview,
                             Phone = rc.CV.Phone,
                             IsFemale = rc.CV.IsFemale,
                             CvStatus = rc.CV.CVStatus,

@@ -53,6 +53,7 @@ namespace TalentV2.DomainServices.Candidates
         Task DeleteRequestCVInterview(long id);
         Task<string> UpdateAvatar(UpdateFileAvatarDto input);
         Task<string> UpdateCV(UpdateFileCVDto input);
+        Task<string> UpdateVoiceInterview(UpdateFileVoiceInterviewDto input);
         Task<List<HistoryCandidateDto>> GetHistoryCV(long cvId);
         Task<ValidCandidateDto> ValidEmail(string email, long? cvId);
         Task<ValidCandidateDto> ValidPhone(string phone, long? cvId);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,15 @@ namespace TalentV2.FileServices.Services.Candidates
             CommonUtils.CheckFormatFile(file, FileTypes.IMAGE);
 
             var paths = await _filePath.GetPath(FOLDER_SERVICE, PathFolder.FOLDER_AVATAR, _session.TenantId);
+            var subUrl = await _fileService.UploadFileAsync(paths, file);
+
+            return subUrl;
+        }
+        public async Task<string> UpdateFileVoiceInterview(IFormFile file)
+        {
+            CommonUtils.CheckFormatFile(file, FileTypes.VOICEINTERVIEW);
+
+            var paths = await _filePath.GetPath(FOLDER_SERVICE, PathFolder.FOLDER_VOICE, _session.TenantId);
             var subUrl = await _fileService.UploadFileAsync(paths, file);
 
             return subUrl;

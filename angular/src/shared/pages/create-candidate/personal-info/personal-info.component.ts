@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostListener, Injector, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { checkNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
+import { checkNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow, isVoiceExtensionAllow } from '@app/core/helpers/utils.helper';
 import { CustomValidators } from '@app/core/helpers/validator.helper';
 import { Candidate, CandidatePayload, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
 import { MailDialogConfig, MailPreviewInfo } from '@app/core/models/mail/mail.model';
@@ -25,6 +25,7 @@ import { debounceTime } from 'rxjs/operators';
 export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   readonly ACCEPT_IMAGE = '.png, .jpg, .jpeg, .gif';
   readonly ACCEPT_CV = '.doc, .docx, .xlsx, .csv, .pdf';
+  readonly ACCEPT_VIDEO = '.mp4, .mp3, .avi, .mkv'
   readonly DEBOUNCE_TIME = 200; //0.2s
   readonly REFERT_TYPE = CV_REFERENCE_TYPE;
   readonly DATE_FORMAT = DateFormat;
@@ -44,12 +45,14 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
   public form: FormGroup;
   originalFormData: Candidate;
-
   cvFile: File;
   cvUrl: string;
   cvFileName: string;
   avatarUrl: string;
   avatarFile: File;
+  voiceFile: File;
+  voiceUrl: string;
+  voiceFileName: string;
   imageChangedEvent;
   referenceType: CV_REFERENCE_TYPE;
 
@@ -83,7 +86,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     this.initForm();
     if (this.candidate) {
       this.updateCandidateInfoData(this.candidate);
-    }
+      }
 
     if (this.dataApplyCv){
       this.setValueApplyCV(this.dataApplyCv);
@@ -122,6 +125,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     if (!this.isEditing) {
       this.form.patchValue(this.originalFormData, { emitEvent: false });
       this.cvFileName = this.getCvFileName(this.originalFormData);
+      this.voiceFileName = this.getVoiceFileName(this.originalFormData);
     }
     (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();
     this.checkEnableReferBy(getFormControlValue(this.form, 'cvSourceId'));
@@ -129,7 +133,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
   onCVFileChange(fileList: FileList) {
     let file = fileList[0];
-
+    
     this.cvFile = file;
     this.cvFileName = file?.name;
     if (!isCVExtensionAllow(file)) {
@@ -138,7 +142,24 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     }
     const reader = new FileReader();
     reader.onload = (event) => {
-      this.uploadFile(this.cvFile);
+    this.uploadFile(this.cvFile);
+    }
+    reader.readAsText(file);
+  }
+
+  onVoiceFileChange(fileList: FileList) {
+    let file = fileList[0];
+    
+    this.voiceFile = file;
+    this.voiceFileName = file?.name;
+
+    if (!isVoiceExtensionAllow(file)) {
+      this.formControls['linkVoiceInterview'].setErrors({ invalidCVExtension: true });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      this.uploadVoiceFile(this.voiceFile);
     }
     reader.readAsText(file);
   }
@@ -308,7 +329,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     const formData = new FormData();
     formData.append('CVId', getFormControlValue(this.form, 'id'));
     formData.append('FileUpdate', file);
-
+    
     if (isAvatarFile) {
       this.subs.add(
         this._candidate.updateFileAvatar(formData).subscribe(res => {
@@ -318,7 +339,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
         })
       );
       return;
-    }
+      }
 
     this.subs.add(
       this._candidate.updateFileCV(formData).subscribe(res => {
@@ -326,6 +347,24 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
           this.originalFormData.linkCV = res.result;
           this.formControls['linkCV'].patchValue(res.result);
           this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Candidate CV');
+        }
+      })
+    );
+  }
+
+  private uploadVoiceFile(file: File) {
+    if (!this.candidateId) return;
+
+    const formData = new FormData();
+    formData.append('CVId',getFormControlValue(this.form, 'id') );
+    formData.append('FileUpdate', file); 
+  
+    this.subs.add(
+      this._candidate.updateVoiceInterview(formData).subscribe(res => {
+        if (!res.loading && res.success) {
+          this.originalFormData.linkVoiceInterview = res.result;
+          this.formControls['linkVoiceInterview'].patchValue(res.result);
+          this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Candidate VoiceInterview');
         }
       })
     );
@@ -349,6 +388,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       cvStatus: [this._utilities.catCvStatus[0].id, [Validators.required]],
       cvStatusName: '',
       linkCV: [null, []],
+      linkVoiceInterview: [null, []],
       cvSourceId: [null, [Validators.required]], //number
       referenceId: ['', [Validators.required]],
       avatar: null,
@@ -425,8 +465,9 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
     this.originalFormData = this.form.getRawValue();
     this.avatarUrl = this._utilities.getLinkFile(candidate.avatar);
-
+    
     this.cvFileName = this.getCvFileName(candidate);
+    this.voiceFileName = this.getVoiceFileName(candidate);
     this.isEnaleRefBy = this.checkEnableReferBy(candidate.cvSourceId);
   }
 
@@ -474,13 +515,13 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       formData.append("linkCv", linkCv.attachCV);
       formData.append('applyId',linkCv.id.toString())
     }
-    this.cvFile && formData.append("cv", this.cvFile);
+    //this.cvFile && formData.append("cv", this.cvFile);
     this.isAvata =this.dataApplyCv ? true : false; 
     if (this.isAvata == true) {
     formData.append("avatarCv", linkCv.avatar);
     }
     this.avatarFile && formData.append('avatar', this.avatarFile);
-    this.isEnaleRefBy && formData.append('referenceId', getFormControlValue(this.form, 'referenceId'));
+      this.isEnaleRefBy && formData.append('referenceId', getFormControlValue(this.form, 'referenceId'));
 
     return formData;
   }
@@ -489,6 +530,14 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     if (entity?.linkCV) {
       const extensionFile = entity.linkCV.split('.');
       return `CV_${entity.fullName}.${extensionFile[extensionFile.length - 1]}`
+    }
+    return '';
+  }
+
+  private getVoiceFileName(entity: Candidate) {
+    if (entity?.linkVoiceInterview) {
+      const extensionFile = entity.linkVoiceInterview.split('.');
+      return `VOICE_${entity.fullName}.${extensionFile[extensionFile.length - 1]}`
     }
     return '';
   }

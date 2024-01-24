@@ -95,5 +95,10 @@
     >
       {{ data.cvStatusName }}
     </span>
+    <span *ngIf="_utilities.getLinkFile(data.linkVoiceInterview)">
+      <a [href]="_utilities.getLinkFile(data.linkVoiceInterview)" target="_blank">
+        <img class="icon-cv" src="../../../assets/img/video.png" alt="video" />
+      </a>
+    </span>
   </div>
 </div>

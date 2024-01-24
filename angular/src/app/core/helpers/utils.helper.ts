@@ -1,5 +1,5 @@
 import { FormGroup } from '@angular/forms';
-import { CV_EXTENSION_ALLOW, IMAGE_EXTENSION_ALLOW } from '@shared/AppConsts';
+import { CV_EXTENSION_ALLOW, IMAGE_EXTENSION_ALLOW, VOICE_EXTENSION_ALLOW } from '@shared/AppConsts';
 import * as _ from "lodash";
 
 export function checkNumber(value: number) {
@@ -25,6 +25,11 @@ export function isImageExtensionAllow(file: File) {
 export function isCVExtensionAllow(file: File) {
   const extensionFile = file.name.split('.').pop();
   return CV_EXTENSION_ALLOW.includes(extensionFile);
+}
+
+export function isVoiceExtensionAllow(file: File) {
+  const extensionFile = file?.name.split('.').pop();
+  return VOICE_EXTENSION_ALLOW.includes(extensionFile);
 }
 
 export function randomHexColor(): string {

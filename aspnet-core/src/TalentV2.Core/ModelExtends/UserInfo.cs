@@ -22,6 +22,8 @@ namespace TalentV2.ModelExtends
         public string PathLinkCV { get; set; }
         public string LinkCV { get => CommonUtils.FullFilePath(PathLinkCV); }
         public bool IsFemale { get; set; }
+        public string PathLinkVoiceInterview { get; set; }
+        public string LinkVoiceInterview { get => CommonUtils.FullFilePath(PathLinkVoiceInterview); }
         public CVStatus CvStatus { get; set; }
         public string CvStatusName { get => CommonUtils.GetEnumName(CvStatus); }
         public long SubPositionId { get; set; }

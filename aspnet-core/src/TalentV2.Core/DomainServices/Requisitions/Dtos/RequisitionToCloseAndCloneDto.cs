@@ -32,6 +32,8 @@ namespace TalentV2.DomainServices.Requisitions.Dtos
 
         public string LinkCV { get; set; }
 
+        public string LinkVoiceInterview { get; set; }
+
         public bool IsFemale { get; set; }
 
         public bool IsClone => !CommonUtils.ListStatusNotAvailableClone

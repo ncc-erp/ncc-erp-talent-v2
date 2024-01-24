@@ -124,6 +124,7 @@ export class RequisitonCandidate {
   email: string;
   avatar: string;
   linkCV: string;
+  linkVoiceInterview: string;
   userType: number;
   userTypeName: string;
   skills: Skill[];
