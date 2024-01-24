@@ -23,6 +23,7 @@ export function isImageExtensionAllow(file: File) {
 }
 
 export function isCVExtensionAllow(file: File) {
+  if(!file){ return; }
   const extensionFile = file.name.split('.').pop();
   return CV_EXTENSION_ALLOW.includes(extensionFile);
 }

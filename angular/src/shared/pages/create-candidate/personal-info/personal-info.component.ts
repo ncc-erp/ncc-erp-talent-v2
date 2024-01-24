@@ -312,6 +312,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     if (isAvatarFile) {
       this.subs.add(
         this._candidate.updateFileAvatar(formData).subscribe(res => {
+          this.isLoading = res.loading;
           if (!res.loading && res.success) {
             this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Candidate Photo');
           }
@@ -322,6 +323,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
     this.subs.add(
       this._candidate.updateFileCV(formData).subscribe(res => {
+        this.isLoading = res.loading;
         if (!res.loading && res.success) {
           this.originalFormData.linkCV = res.result;
           this.formControls['linkCV'].patchValue(res.result);
