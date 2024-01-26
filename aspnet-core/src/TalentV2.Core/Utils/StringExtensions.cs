@@ -41,16 +41,22 @@ namespace TalentV2.Utils
             var surname = GetSurnamePerson(textNotUnicode);
 
             var name = GetNamePerson(textNotUnicode);
-            var usName = name + "." + ReplaceWhitespace(surname) + "."
-                    + ReplaceWhitespace(subposition) + "."
-                    + userType + "."
-                    + GetBranchName(branch) + "."
-                    + UsernameUntils.GenerateUsername(3, true);
             if (statusCreateAccount == StatusCreateAccount.CREATE_LMS_ACCOUT)
             {
+                var usName = name + "." + ReplaceWhitespace(surname) + "."
+                + ReplaceWhitespace(subposition) + "."
+                + userType + "."
+                + GetBranchName(branch) + "."
+                + UsernameUntils.GenerateUsername(3, true);
                 return ReplaceSpecialCharacters(usName);
             };
-            return ReplaceSpecialCharacters(usName.Replace('.', '_'));
+            var usNameContest = name + "_" + ReplaceWhitespace(surname) + "_"
+                + ReplaceWhitespace(subposition.Substring(0, 2)) + "_"
+                + userType.Substring(0, 2) + "_"
+                + GetBranchName(branch) + "_"
+                + UsernameUntils.GenerateUsername(3, true);
+
+            return ReplaceSpecialCharacters(usNameContest);
         }
 
         public static string ReplaceSpecialCharacters(string input) => Regex.Replace(input, "/", "_");
