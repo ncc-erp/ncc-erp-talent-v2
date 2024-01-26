@@ -192,6 +192,6 @@ export class CandidateStaffService extends BaseApiService {
   }
 
   exportReport(payload: CandidateReportPaylaod): Observable<Blob> {
-    return this.generateExport(payload, '/ExportOnboard');
+    return this.generateExport(payload, '/ExportReport');
   }
 }

@@ -1295,7 +1295,7 @@ namespace TalentV2.DomainServices.Candidates
                 };
             }
         }
-        public async Task<FileContentResult> ExportOnboard(Dtos.ExportReport input)
+        public async Task<FileContentResult> ExportReport(Dtos.ExportReport input)
         {
             var requestCvs = await WorkScope.GetAll<RequestCV>()
                 .Where(t => !t.IsDeleted)

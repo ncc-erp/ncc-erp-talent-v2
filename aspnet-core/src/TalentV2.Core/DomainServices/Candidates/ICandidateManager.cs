@@ -65,7 +65,7 @@ namespace TalentV2.DomainServices.Candidates
         #region export Infomation
 
         Task<FileContentResult> ExportInfo(ExportInput input);
-        Task<FileContentResult> ExportOnboard(ExportReport input);
+        Task<FileContentResult> ExportReport(ExportReport input);
 
         #endregion
 
