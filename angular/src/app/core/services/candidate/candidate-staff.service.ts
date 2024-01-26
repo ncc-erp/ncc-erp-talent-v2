@@ -1,4 +1,4 @@
-import { MailDetail } from './../../models/candidate/candidate.model';
+import { CandidateReportPaylaod, MailDetail } from './../../models/candidate/candidate.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateInterviewed, CandidateInterviewedPayload } from '@app/core/models/candidate/candiadte-requisition.model';
@@ -191,7 +191,7 @@ export class CandidateStaffService extends BaseApiService {
     return this.generateExport(payload, '/ExportInfo');
   }
 
-  exportReport(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
+  exportReport(payload: CandidateReportPaylaod): Observable<Blob> {
     return this.generateExport(payload, '/ExportOnboard');
   }
 }

@@ -318,7 +318,7 @@ namespace TalentV2.APIs
             return await _candidateManager.ExportInfo(input);
         }
         [HttpPost]
-        public async Task<IActionResult> ExportOnboard(ExportInput input)
+        public async Task<IActionResult> ExportOnboard(ExportReport input)
         {
             return await _candidateManager.ExportOnboard(input);
         }

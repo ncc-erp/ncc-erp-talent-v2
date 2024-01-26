@@ -25,6 +25,33 @@
               <label for="toDate">To Date:</label>
               <input class="p-inputtext" type="month" id="toDate" [(ngModel)]="toDate" name="toDate" [value]="toDate">
             </div>
+
+            <div class="group" *ngIf="report">
+              <label for="status">Application Status
+              <span class="text-danger">*</span>
+             </label>
+              <div class="d-flex">
+                <div class="w-100">
+                  <p-dropdown
+                    inputId="status"
+                    [options]="_utilities.catReqCvStatus"
+                    placeholder="All"
+                    optionLabel="name"
+                    optionValue="id"
+                    styleClass="w-100"
+                    [filter]="true"
+                    filterBy="name"
+                    [showClear]="true"
+                    (onChange)="onDropdownChange($event)"
+                  ></p-dropdown>
+                </div>
+              </div>
+              <div
+              class="text-error text-danger"
+              *ngIf="submitted">
+              Application Status is required
+            </div>
+            </div>
           </div>
         </div>
 

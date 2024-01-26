@@ -1255,10 +1255,15 @@ namespace TalentV2.DomainServices.Candidates
                 Phone = u.Phone,
                 Email = u.Email,
                 Name = u.FullName,
+                CvStatus = u.CvStatus,
                 Branch = u.BranchName,
+                Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
                 Sex = u.IsFemale ? "Male" : "Female",
+                Positon = u.SubPositionName,
                 Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
                 ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
+                FinalLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.FinalLevel?.ToString(),
+                InterviewLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewLevel.ToString(),
                 Note = u.Note,
                 CV = CommonUtils.FullFilePath(u.PathLinkCV)
             })
@@ -1290,35 +1295,42 @@ namespace TalentV2.DomainServices.Candidates
                 };
             }
         }
-        public async Task<FileContentResult> ExportOnboard(Dtos.ExportInput input)
+        public async Task<FileContentResult> ExportOnboard(Dtos.ExportReport input)
         {
-
             var requestCvs = await WorkScope.GetAll<RequestCV>()
                 .Where(t => !t.IsDeleted)
                 .ToListAsync();
+            var cvs = await WorkScope.GetAll<CV>()
+                .Where(t => !t.IsDeleted)
+                .ToListAsync();
 
-            var requestCvsIdOnboarded = requestCvs
-                 .Where(t => t.OnboardDate != null)
+            var timeRequestCvsId = cvs
+                 .Where(t => t.LastModificationTime != null)
                  .ToList();
             var listOnboarded = await IQGetAllCVs()
                 .Where(q => q.UserType.Equals(input.userType))
-                .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == RequestCVStatus.Onboarded))
+                .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == input.reqCvStatus))
                 .ToListAsync();
             var resultsOnboarded = listOnboarded
-                .Select((u, index) => new OnBoard()
+                .Select((u, index) => new CadidateReportDto()
                 {
                     No = index++,
                     Name = u.FullName,
+                    Phone = u.Phone,
+                    Email = u.Email,
+                    Sex = u.IsFemale ? "Male" : "Female",
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                    Time = requestCvsIdOnboarded.Find(s => s.CVId.Equals(u.Id))?.OnboardDate,
+                    Time = timeRequestCvsId.Find(s => s.Id.Equals(u.Id))?.LastModificationTime,
                     ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
                     FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
+                    InterviewLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.InterviewLevel ?? null)?.ToString(),
                 })
                 .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
                 .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
-                .OrderBy(q => q.Time)
+                .Where(q => q.Status == input.reqCvStatus)
+                 .OrderBy(q => q.Time)
                 .ToList();
 
             var requestCvsIdInterviewed = requestCvs
@@ -1330,8 +1342,8 @@ namespace TalentV2.DomainServices.Candidates
                 .ToListAsync();
             var resultsInterViewed = listInterviewed
                 .Select((u, index) => new InterView()
-                {
-                    No = index + 1,
+                { 
+                    No = index++,
                     Name = u.FullName,
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
@@ -1339,6 +1351,7 @@ namespace TalentV2.DomainServices.Candidates
                     Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
                     ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
                     FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
+                    InterviewLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.InterviewLevel ?? null)?.ToString(),
                 })
                 .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
                 .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
@@ -1351,15 +1364,17 @@ namespace TalentV2.DomainServices.Candidates
                 var startColumn = 1;
                 var columnKey = GetColumnNameFromNumber(startColumn);
 
-                var worksheetOnBoarded = package.Workbook.Worksheets.Add(typeof(OnBoard).Name);
-                worksheetOnBoarded.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
-                worksheetOnBoarded.Cells.AutoFitColumns();
-                worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                var worksheetReport = package.Workbook.Worksheets.Add(typeof(CadidateReportDto).Name);
+                worksheetReport.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
+                worksheetReport.Column(6).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                worksheetReport.Cells.AutoFitColumns();
+                worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var worksheetInterViewed = package.Workbook.Worksheets.Add(typeof(InterView).Name);
                 worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
-                worksheetOnBoarded.Cells.AutoFitColumns();
-                worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheetInterViewed.Column(3).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                worksheetReport.Cells.AutoFitColumns();
+                worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var stream = new MemoryStream();
                 package.SaveAs(stream);
