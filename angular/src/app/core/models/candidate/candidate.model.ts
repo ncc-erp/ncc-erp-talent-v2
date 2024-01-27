@@ -99,7 +99,7 @@ export interface MailDetail {
   isSentMailStatus?: boolean;
   mailStatusHistories: MailStatusHistory[];
 }
-export class CandidateReportPaylaod {
+export class CandidateReportPayload {
   userType: UserType;
   fromDate:string;
   toDate:string;

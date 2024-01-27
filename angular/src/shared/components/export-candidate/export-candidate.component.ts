@@ -5,7 +5,7 @@ import { AppComponentBase } from '@shared/app-component-base';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { ToastMessageType, UserType } from '@shared/AppEnums';
 import { UtilitiesService } from '@app/core/services/utilities.service';
-import { CandidateReportPaylaod } from '@app/core/models/candidate/candidate.model';
+import { CandidateReportPayload } from '@app/core/models/candidate/candidate.model';
 @Component({
   selector: 'talent-export-candidate',
   templateUrl: './export-candidate.component.html',
@@ -172,7 +172,7 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
       return;
     }
       const fileName = userType === 0 ? 'InternReport_'+ this.fromDate + '_' +this.toDate +'.xlsx' : 'StaffReport_'+ this.fromDate + '_' +this.toDate +'.xlsx';
-      const payload: CandidateReportPaylaod = {
+      const payload: CandidateReportPayload = {
       userType: userType ,
       fromDate: formattedFromDate,
       toDate: formattedToDate,
