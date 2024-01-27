@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateInterviewed, CandidateInterviewedPayload, CandidateRequisiton } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CandidateEducation, CandidateEducationPayload } from '@app/core/models/candidate/candidate-education.model';
 import { CandidateSkill, CandidateSkillPayload } from '@app/core/models/candidate/candidate-skill.model';
-import { CandidateIntern, CandidatePayload, MailDetail } from '@app/core/models/candidate/candidate.model';
+import { CandidateIntern, CandidatePayload, CandidateReportPayload, MailDetail } from '@app/core/models/candidate/candidate.model';
 import { MailPreviewInfo } from '@app/core/models/mail/mail.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { BaseApiService } from '../apis/base-api.service';
@@ -187,8 +187,8 @@ export class CandidateInternService extends BaseApiService {
     return this.generateExport(payload, '/ExportInfo');
   }
 
-  exportReport(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
-    return this.generateExport(payload, '/ExportOnboard');
+  exportReport(payload: CandidateReportPayload): Observable<Blob> {
+    return this.generateExport(payload, '/ExportReport');
   }
 
 }
