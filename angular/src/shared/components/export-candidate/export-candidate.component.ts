@@ -1,9 +1,11 @@
 import { Component, Injector, Input, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {CandidateInternService} from '@app/core/services/candidate/candidate-intern.service';
-import {AppComponentBase} from '@shared/app-component-base';
-import {BsModalRef} from 'ngx-bootstrap/modal';
-import {ToastMessageType, UserType} from '@shared/AppEnums';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
+import { AppComponentBase } from '@shared/app-component-base';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { ToastMessageType, UserType } from '@shared/AppEnums';
+import { UtilitiesService } from '@app/core/services/utilities.service';
+import { CandidateReportPayload } from '@app/core/models/candidate/candidate.model';
 @Component({
   selector: 'talent-export-candidate',
   templateUrl: './export-candidate.component.html',
@@ -16,14 +18,17 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
   exportForm: FormGroup; 
   loading = false;
   infomation:boolean = false ;
-  report: boolean= false ;
-  
+  report: boolean = false ;
+  reqCvStatus: number;
+  submitted = false;
+
   @Input() userType: UserType.INTERN | UserType.STAFF;
 
   constructor(
     injector: Injector,
     public bsModalRef: BsModalRef,
     public _candidateIntern: CandidateInternService,
+    public _utilities: UtilitiesService,
     private _fb: FormBuilder,
       ) {
     super(injector);
@@ -45,7 +50,9 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
   closePopup(): void {
     this.bsModalRef.hide();
   }
-  
+  onDropdownChange(status: any) {
+    this.reqCvStatus = status.value;
+  }
   public exportCandidate(){
     let requestsCount = 0;
     if(this.infomation){
@@ -125,11 +132,17 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
     ));
   }
   
-  public onExportReport(requestsCount: number) {
+  public onExportReport(requestsCount: number) {  
     this.loading = true;
+    this.submitted = false;
     const userType = this.userType === UserType.INTERN ? 0 : 1;
     if (!this.fromDate || !this.toDate) {
       this.showToastMessage(ToastMessageType.ERROR,'Full date required');
+      this.loading = false;
+      return;
+    }
+    if (this.reqCvStatus == undefined || this.reqCvStatus == null) {
+      this.submitted = true;
       this.loading = false;
       return;
     }
@@ -159,10 +172,11 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
       return;
     }
       const fileName = userType === 0 ? 'InternReport_'+ this.fromDate + '_' +this.toDate +'.xlsx' : 'StaffReport_'+ this.fromDate + '_' +this.toDate +'.xlsx';
-      const payload = {
+      const payload: CandidateReportPayload = {
       userType: userType ,
       fromDate: formattedFromDate,
       toDate: formattedToDate,
+      reqCvStatus: this.reqCvStatus,
     };
     this.subs.add(
       this._candidateIntern.exportReport(payload).subscribe(

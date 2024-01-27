@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewed, CandidateInterviewedPayload, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CatalogModel } from '@app/core/models/common/common.dto';
-import { RequisitionStaff } from '@app/core/models/requisition/requisition.model';
+import { RequisitionPayload, RequisitionStaff } from '@app/core/models/requisition/requisition.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
 import { UtilitiesService } from '@app/core/services/utilities.service';
@@ -12,7 +12,7 @@ import { RequisitionInternComponent } from '@app/modules/requisitiion/requisitio
 import { RequisitionStaffComponent } from '@app/modules/requisitiion/requisition-staff/requisition-staff.component';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DateFormat, MESSAGE } from '@shared/AppConsts';
-import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, REQUEST_CV_STATUS, ToastMessageType, UserType } from '@shared/AppEnums';
+import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
 import * as moment from 'moment';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import * as _ from 'lodash';
@@ -52,6 +52,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   requisitionDetail: CurrentRequisition;
   ref: DynamicDialogRef;
 
+  headerCreate: string;
+  notifiCationHeader: string;
+  endofNotifiCation: string;
+  messages: string;
   capabilitySettings: CapabilityWithSetting[] = [];
   scoreRangeResults: ScoreRangeWithSetting[];
   clonedCanCapability: { [s: string]: CandidateCapability; } = {};
@@ -67,7 +71,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isInterviewed;
   visible: boolean;
   position: string;
-
+  createAccoutStatusId: number;
   optionFailInternLevel = [
     {
       defaultName: "Fail",
@@ -79,7 +83,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   ]
   catInternLevels = this.optionFailInternLevel.concat(this._utilities.catLevelFinalIntern).filter(item => item.defaultName !== "FresherPlus");
   catStaffLevels = this._utilities.catLevelFinalStaff.filter(item => item.id !== 100);
-
+  createAccout = Object.keys(StatusCreateAccount)
+  .filter((value) => !isNaN(Number(value)))
+  .map((key) => ({ name: StatusCreateAccount[key], id: key }));
   //permission
   PS_EditSalaryIntern: string = this.PS.Pages_CandidateIntern_ViewDetail_RequestCV_EditSalary;
   PS_EditSalaryStaff: string = this.PS.Pages_CandidateStaff_ViewDetail_RequestCV_EditSalary;
@@ -154,6 +160,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     );
   }
 
+  onDropdownChange(createAccout: any) {
+    this.createAccoutStatusId = createAccout.value;
+  }
+
   onInterviewerChange(id: number) {
     this.interviewForm.get('interviewId').setValue(id);
   }
@@ -182,10 +192,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.handleSendMail();
   }
   
-  getButtonLabel(userType: UserType): string {
-    return userType === UserType.INTERN ? 'Create LMS Account' : 'Create Contest';
-  }
-
   toggleEditingApplyResult() {
     this.isApplyResultEditing = !this.isApplyResultEditing;
     if (!this.isApplyResultEditing) {
@@ -219,21 +225,34 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
   }
 
-  createLMSAccount() {
+  createAccount() {
+    const statusCreateAccout = this.applyResultForm.get('createAccout')?.value;
+      if(statusCreateAccout === StatusCreateAccount.CREATE_LMS_ACCOUT.toString()){
+      this.headerCreate ='Create LMS account';
+      this.notifiCationHeader = 'Create account for';
+      this.endofNotifiCation = 'LMS tool ?';
+      this.messages = 'LMS Account';
+    }
+    else if(statusCreateAccout === StatusCreateAccount.CREATE_URL_CONTEST.toString()) {
+      this.headerCreate = 'Create Url Contest';
+      this.notifiCationHeader = 'Create Contest for';
+      this.endofNotifiCation = 'Url Contest ?';
+      this.messages = 'Url Contest';
+    }
     this.confirmationService.confirm({
-      message: ` <div>Create account for <strong>${this.candidateRequisiton.cvName} </strong>
-        in <span class=text-success>LMS tool ?</span></div>`,
-      header: 'Create LMS account',
+      message: `<div>${this.notifiCationHeader}<strong>${this.candidateRequisiton.cvName}</strong>
+        in <span class=text-success>${this.endofNotifiCation}</span></div>`,
+      header: this.headerCreate,
       icon: 'pi pi-exclamation-circle',
       accept: () => {
         this.subs.add(
-          this._candidate.createLMSAccount(this.candidateId, this.candidateRequisiton.id).subscribe(res => {
+          this._candidate.createAccount(this.candidateId, this.candidateRequisiton.id, statusCreateAccout).subscribe(res => {
             this.isLoading = res.loading;
 
             if (!res.loading && res.success) {
               this.applyResultForm.get('lmsInfo').setValue(res.result);
               this.originalApprResultFormData = this.applyResultForm.getRawValue();
-              this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS, 'LMS Account');
+              this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.CREATE_SUCCESS, this.messages);
             }
           })
         );
@@ -331,18 +350,66 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   onRequestStatusChange(id: number) {
-    const hasRequired = this.applyResultForm.get('onboardDate').hasValidator(Validators.required);
-    if (id !== REQUEST_CV_STATUS.Onboarded && hasRequired) {
-      this.applyResultForm.get('onboardDate').removeValidators(Validators.required);
-      this.applyResultForm.get('onboardDate').updateValueAndValidity();
-      return;
+    this.validateRequestCVLevel(id)
+    this.validateStaffRequestCVStatus(id);
+  }
+
+  validateRequestCVLevel(id: number)
+  {
+    const onboardDate = this.applyResultForm.get('onboardDate');
+    const hasRequired = onboardDate.hasValidator(Validators.required);
+    if(id !== REQUEST_CV_STATUS.Onboarded && hasRequired) {
+      onboardDate.removeValidators(Validators.required);
+      onboardDate.updateValueAndValidity();
     }
-    if (id === REQUEST_CV_STATUS.Onboarded) {
-      this.applyResultForm.get('onboardDate').setValidators([Validators.required]);
-      this.applyResultForm.get('onboardDate').updateValueAndValidity();
+    if(id === REQUEST_CV_STATUS.Onboarded) {
+      onboardDate.setValidators([Validators.required]);
+      onboardDate.updateValueAndValidity();
     }
   }
 
+  validateStaffRequestCVStatus(id: number){
+    const applyLevel = this.applyResultForm.get('applyLevel');
+    const finalLevel = this.applyResultForm.get('finalLevel');
+    const salary = this.applyResultForm.get('salary');
+    const percentage = this.applyResultForm.get('percentage');
+    const onboardDate = this.applyResultForm.get('onboardDate');
+
+    if(this.userType === UserType.STAFF){
+      if(id !== REQUEST_CV_STATUS.AcceptedOffer){
+        applyLevel.removeValidators(Validators.required);
+        finalLevel.removeValidators(Validators.required);
+        salary.removeValidators(Validators.required);
+        percentage.removeValidators(Validators.required);
+
+        applyLevel.updateValueAndValidity();
+        finalLevel.updateValueAndValidity();
+        salary.updateValueAndValidity();
+        percentage.updateValueAndValidity();
+      }
+      if(id === REQUEST_CV_STATUS.AcceptedOffer){
+        applyLevel.setValidators([Validators.required]);
+        finalLevel.setValidators([Validators.required]);
+        salary.setValidators([Validators.required]);
+        percentage.setValidators([Validators.required]);
+        onboardDate.setValidators([Validators.required]);
+
+        applyLevel.updateValueAndValidity();
+        finalLevel.updateValueAndValidity();
+        salary.updateValueAndValidity();
+        percentage.updateValueAndValidity();
+        onboardDate.updateValueAndValidity();
+      }
+      if(id === REQUEST_CV_STATUS.ScheduledTest || id === REQUEST_CV_STATUS.PassedInterview){
+        applyLevel.setValidators([Validators.required]);
+        applyLevel.updateValueAndValidity();
+      }
+      if(id === REQUEST_CV_STATUS.PassedInterview){
+        finalLevel.setValidators([Validators.required]);
+        finalLevel.updateValueAndValidity();
+      }
+    }
+  }
   private removeEditingCapaRow(id: number) {
     this.editingRowKey[id] = false;
     const values = Object.keys(this.editingRowKey).filter(key => this.editingRowKey[key] === true);
@@ -600,6 +667,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       mailDetail: null,
       lmsInfo: null,
       percentage: '',
+      createAccout: [this.getDefaultcreateAccout()],
     })
 
     const interviewLevelForm = this.fb.group({
@@ -627,7 +695,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
 
     this.interviewLevelForm.get('interviewLevel').valueChanges.subscribe(interviewLevel => {
-      this.onRequestStatusChange(interviewLevel);
+      this.validateRequestCVLevel(interviewLevel);
     })
 
     this.requisitonForm.disable();
@@ -663,6 +731,13 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
+  getDefaultcreateAccout() {
+    if (this.userType === UserType.INTERN) {
+      return '0';
+    } else {
+      return '1';
+    }
+  }
 
   private onResetApplyResultForm() {
     this.submitted = false;
@@ -775,6 +850,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private handleAddCurrentReq() {
+    const presentrequestId= this.candidateRequisiton?.currentRequisition.id
     const requisitionComponent = this.userType === UserType.INTERN ? RequisitionInternComponent : RequisitionStaffComponent
     const subHeader = this.userType === UserType.INTERN ? 'Intern' : 'Staff'
     const dialogRef = this._dialog.open(requisitionComponent, {
@@ -785,9 +861,14 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       data: { dialogMode: ActionEnum.SELECT },
     });
 
-    dialogRef.onClose.subscribe((entity: RequisitionStaff) => {
-       if (entity?.id) {
-        const payload = { cvId: this.candidateId, requestId: entity.id }
+    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean,entity: RequisitionStaff}) => {
+      if (res?.entity.id) {
+        const payload : RequisitionPayload = { 
+          cvId: this.candidateId,
+          requestId: res.entity.id, 
+          currentRequestId: presentrequestId ,
+          isPresentForHr: res.isPresentForHr 
+        }
           this.subs.add(
             this._candidate.createReqCV(payload).subscribe(res => {
               if (!res.loading && res.success) {

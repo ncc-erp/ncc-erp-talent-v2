@@ -109,6 +109,7 @@ import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 import { ExportCandidateComponent } from './components/export-candidate/export-candidate.component'
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component'
+import { ConfirmPresentForHr } from "./pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component";
 
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
@@ -178,6 +179,7 @@ const candidate = [
   CurrentRequisitionComponent,
   ApplicationHistoryComponent,
   ExportCandidateComponent,
+  ConfirmPresentForHr
 ]
 
 @NgModule({

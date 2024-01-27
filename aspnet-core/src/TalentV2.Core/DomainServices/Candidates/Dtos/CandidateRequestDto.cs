@@ -11,6 +11,8 @@ namespace TalentV2.DomainServices.Candidates.Dtos
     {
         public long CvId { get; set; }
         public long RequestId { get; set; }
+        public long? CurrentRequestId { get; set; }
+        public bool IsPresentForHr { get; set; }
         public RequestCVStatus? RequestCVStatus { get; set; }
     }
 }

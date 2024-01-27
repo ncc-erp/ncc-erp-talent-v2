@@ -286,16 +286,35 @@ namespace TalentV2.DomainServices.Candidates
                 return default;
 
             var request = await WorkScope.GetAll<Request>()
-                .Where(q => q.Id == input.RequestId)
-                .Select(s => new
-                {
-                    s.UserType,
-                    s.SubPositionId
-                })
-                .FirstOrDefaultAsync();
+             .Where(q => q.Id == input.RequestId)
+             .Select(s => new
+             {
+                 s.UserType,
+                 s.SubPositionId
+             })
+             .FirstOrDefaultAsync();
+
+            var currentRequestCV = await WorkScope.GetAll<RequestCV>()
+            .Where(q => q.RequestId == input.CurrentRequestId && q.CVId == input.CvId)
+            .Select(s => new
+            {
+                s.Id,
+                s.Status,
+                s.Interviewed,
+                s.InterviewLevel,
+                s.ApplyLevel,
+                s.Salary,
+                s.FinalLevel,
+                s.InterviewTime,
+                s.HRNote,
+                s.OnboardDate,
+                s.EmailSent,
+                s.LMSInfo,
+                s.Percentage,
+            })
+           .FirstOrDefaultAsync();
 
             var cv = await WorkScope.GetAsync<CV>(input.CvId);
-
             var requestCVStatus = input.RequestCVStatus.HasValue ? input.RequestCVStatus.Value : RequestCVStatus.AddedCV;
             var requestCv = new RequestCV
             {
@@ -303,11 +322,50 @@ namespace TalentV2.DomainServices.Candidates
                 CVId = input.CvId,
                 Status = requestCVStatus
             };
+            if (input.IsPresentForHr == true)
+            {
+                var currentRequestCVInterview = await WorkScope.GetAll<RequestCVInterview>()
+                  .Where(q => q.RequestCVId == currentRequestCV.Id)
+                  .ToListAsync();
 
+                var currentRequestCVStatusHistories = await WorkScope.GetAll<RequestCVStatusHistory>()
+                 .Where(q => q.RequestCVId == currentRequestCV.Id)
+                 .ToListAsync();
+
+                var currentRequestCVStatusChangeHistory = await WorkScope.GetAll<RequestCVStatusChangeHistory>()
+                 .Where(q => q.RequestCVId == currentRequestCV.Id)
+                 .ToListAsync();
+
+                requestCv.Status = currentRequestCV.Status;
+                requestCv.InterviewTime = currentRequestCV.InterviewTime;
+                requestCv.ApplyLevel = currentRequestCV.ApplyLevel;
+                requestCv.InterviewLevel = currentRequestCV.InterviewLevel;
+                requestCv.FinalLevel = currentRequestCV.FinalLevel;
+                requestCv.HRNote = currentRequestCV.HRNote;
+                requestCv.OnboardDate = currentRequestCV.OnboardDate;
+                requestCv.Salary = currentRequestCV.Salary;
+                requestCv.RequestCVInterviews = currentRequestCVInterview;
+                requestCv.RequestCVStatusHistories = currentRequestCVStatusHistories;
+                requestCv.RequestCVStatusChangeHistoies = currentRequestCVStatusChangeHistory;
+                requestCv.EmailSent = currentRequestCV.EmailSent;
+                requestCv.LMSInfo = currentRequestCV.LMSInfo;
+                requestCv.Percentage = currentRequestCV.Percentage;
+            }
             var requestCvId = await WorkScope.InsertAndGetIdAsync(requestCv);
 
             await CurrentUnitOfWork.SaveChangesAsync();
-
+            if (currentRequestCV != null)
+            {
+            var cvCapabilityResult = await WorkScope.GetAll<RequestCVCapabilityResult>()
+                    .Where(q => q.RequestCVId == currentRequestCV.Id)
+                    .Select(q => new CVCapabilityResultDto{
+                        CapabilityId = q.CapabilityId,
+                        Score = q.Score,
+                        Note = q.Note,
+                    }).ToListAsync();
+             await KeepRequestCVCapabilityResults(requestCvId, request.UserType, request.SubPositionId, cvCapabilityResult);
+             return input.CvId;
+            }
             await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
 
             await CreateRequestCVHistory(new HistoryRequestCVDto
@@ -323,6 +381,39 @@ namespace TalentV2.DomainServices.Candidates
             });
 
             return input.CvId;
+        }
+
+        private async Task KeepRequestCVCapabilityResults(long requestCvId, UserType userType, long subPositionId, List<CVCapabilityResultDto> cvCapabilityResult)
+        {
+            var capabilitySettings = await WorkScope.GetAll<CapabilitySetting>()
+                .Where(q => q.UserType == userType && q.SubPositionId == subPositionId && q.IsDeleted == false)
+                .Select(s => new
+                {
+                    s.CapabilityId,
+                    s.Factor
+                })
+                .ToListAsync();
+            var capabilityResults = new List<RequestCVCapabilityResult>();
+            foreach (var item in capabilitySettings)
+            {
+                var capabilityResult = new RequestCVCapabilityResult
+                {
+                    RequestCVId = requestCvId,
+                    CapabilityId = item.CapabilityId,
+                    Factor = item.Factor
+                };
+                foreach (var capability in cvCapabilityResult)
+                {
+                    if (capability.CapabilityId == item.CapabilityId)
+                    {
+                        capabilityResult.Score = capability.Score;
+                        capabilityResult.Note = capability.Note;
+                    }
+                }
+                capabilityResults.Add(capabilityResult);
+            }
+            await WorkScope.InsertRangeAsync(capabilityResults);
+            await CurrentUnitOfWork.SaveChangesAsync();
         }
 
         private async Task AddRequestCVCapabilityResult(long requestCvId, UserType userType, long subPositionId)
@@ -1164,10 +1255,15 @@ namespace TalentV2.DomainServices.Candidates
                 Phone = u.Phone,
                 Email = u.Email,
                 Name = u.FullName,
+                CvStatus = u.CvStatus,
                 Branch = u.BranchName,
+                Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
                 Sex = u.IsFemale ? "Male" : "Female",
+                Positon = u.SubPositionName,
                 Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
                 ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
+                FinalLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.FinalLevel?.ToString(),
+                InterviewLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewLevel.ToString(),
                 Note = u.Note,
                 CV = CommonUtils.FullFilePath(u.PathLinkCV)
             })
@@ -1199,35 +1295,42 @@ namespace TalentV2.DomainServices.Candidates
                 };
             }
         }
-        public async Task<FileContentResult> ExportOnboard(Dtos.ExportInput input)
+        public async Task<FileContentResult> ExportReport(Dtos.ExportReport input)
         {
-
             var requestCvs = await WorkScope.GetAll<RequestCV>()
                 .Where(t => !t.IsDeleted)
                 .ToListAsync();
+            var cvs = await WorkScope.GetAll<CV>()
+                .Where(t => !t.IsDeleted)
+                .ToListAsync();
 
-            var requestCvsIdOnboarded = requestCvs
-                 .Where(t => t.OnboardDate != null)
+            var timeRequestCvsId = cvs
+                 .Where(t => t.LastModificationTime != null)
                  .ToList();
             var listOnboarded = await IQGetAllCVs()
                 .Where(q => q.UserType.Equals(input.userType))
-                .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == RequestCVStatus.Onboarded))
+                .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == input.reqCvStatus))
                 .ToListAsync();
             var resultsOnboarded = listOnboarded
-                .Select((u, index) => new OnBoard()
+                .Select((u, index) => new CadidateReportDto()
                 {
                     No = index++,
                     Name = u.FullName,
+                    Phone = u.Phone,
+                    Email = u.Email,
+                    Sex = u.IsFemale ? "Male" : "Female",
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                    Time = requestCvsIdOnboarded.Find(s => s.CVId.Equals(u.Id))?.OnboardDate,
+                    Time = timeRequestCvsId.Find(s => s.Id.Equals(u.Id))?.LastModificationTime,
                     ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
                     FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
+                    InterviewLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.InterviewLevel ?? null)?.ToString(),
                 })
                 .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
                 .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
-                .OrderBy(q => q.Time)
+                .Where(q => q.Status == input.reqCvStatus)
+                 .OrderBy(q => q.Time)
                 .ToList();
 
             var requestCvsIdInterviewed = requestCvs
@@ -1239,8 +1342,8 @@ namespace TalentV2.DomainServices.Candidates
                 .ToListAsync();
             var resultsInterViewed = listInterviewed
                 .Select((u, index) => new InterView()
-                {
-                    No = index + 1,
+                { 
+                    No = index++,
                     Name = u.FullName,
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
@@ -1248,6 +1351,7 @@ namespace TalentV2.DomainServices.Candidates
                     Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
                     ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
                     FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
+                    InterviewLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.InterviewLevel ?? null)?.ToString(),
                 })
                 .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
                 .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
@@ -1260,15 +1364,17 @@ namespace TalentV2.DomainServices.Candidates
                 var startColumn = 1;
                 var columnKey = GetColumnNameFromNumber(startColumn);
 
-                var worksheetOnBoarded = package.Workbook.Worksheets.Add(typeof(OnBoard).Name);
-                worksheetOnBoarded.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
-                worksheetOnBoarded.Cells.AutoFitColumns();
-                worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                var worksheetReport = package.Workbook.Worksheets.Add(typeof(CadidateReportDto).Name);
+                worksheetReport.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
+                worksheetReport.Column(6).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                worksheetReport.Cells.AutoFitColumns();
+                worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var worksheetInterViewed = package.Workbook.Worksheets.Add(typeof(InterView).Name);
                 worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
-                worksheetOnBoarded.Cells.AutoFitColumns();
-                worksheetOnBoarded.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheetInterViewed.Column(3).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                worksheetReport.Cells.AutoFitColumns();
+                worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var stream = new MemoryStream();
                 package.SaveAs(stream);
@@ -1381,9 +1487,9 @@ namespace TalentV2.DomainServices.Candidates
             };
         }
 
-        public async Task<string> CreateAccountStudent(long cvId, long requestCVId)
+        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, StatusCreateAccount statusCreateAccount)
         {
-            var cv = WorkScope.GetAll<CV>().Include(s => s.SubPosition.Position)
+            var cv = WorkScope.GetAll<CV>()
                 .Where(q => q.Id == cvId)
                 .Select(s => new
                 {
@@ -1393,7 +1499,6 @@ namespace TalentV2.DomainServices.Candidates
                     SubPositionId = s.SubPositionId,
                     EmailAddress = s.Email,
                     BranchDisplayName = s.Branch.DisplayName ?? s.Branch.Name,
-                    Position = s.SubPosition.Position.Name
                 }).FirstOrDefault();
 
             var urlContest = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentContestUrl);
@@ -1404,10 +1509,10 @@ namespace TalentV2.DomainServices.Candidates
                 Name = Utils.StringExtensions.GetNamePerson(cv.Name),
                 Surname = Utils.StringExtensions.GetSurnamePerson(cv.Name),
                 Password = PasswordUtils.GeneratePassword(6, true),
-                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName,cv.Position)
+                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName, statusCreateAccount)
             };
             var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
-            if (cv.UserType == UserType.Intern ||( cv.UserType == UserType.Staff && cv.Position.Equals("Tester", StringComparison.OrdinalIgnoreCase)))
+            if (statusCreateAccount == StatusCreateAccount.CREATE_LMS_ACCOUT)
             {
                 var course = WorkScope.GetAll<PositionSetting>()
                 .Where(q => q.UserType == cv.UserType && q.SubPositionId == cv.SubPositionId)

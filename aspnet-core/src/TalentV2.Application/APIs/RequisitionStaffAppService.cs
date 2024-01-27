@@ -75,22 +75,24 @@ namespace TalentV2.APIs
                 .IQGetAllRequisition()
                 .FirstOrDefaultAsync(x => x.Id == requestId);
         }
-        [HttpGet]
+        [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_RequisitionStaff_AddCV)]
-        public async Task<object> CreateRequestCV(long requestId, long cvId)
+        public async Task<object> CreateRequestCV(CandidateRequestDto input)
         {
             var result = await _candidateManager.CreateRequestCV(new CandidateRequestDto
             {
-                CvId = cvId,
-                RequestId = requestId,
+                CvId = input.CvId,
+                RequestId = input.RequestId,
+                CurrentRequestId = input.CurrentRequestId,
+                IsPresentForHr = input.IsPresentForHr,
             });
             var cv = await _candidateManager
                 .IQGetAllCVs()
-                .FirstOrDefaultAsync(s => s.Id == cvId);
+                .FirstOrDefaultAsync(s => s.Id == input.CvId);
 
             var requisition = await _requisitionManager
                 .IQGetAllRequisition()
-                .FirstOrDefaultAsync(s => s.Id == requestId);
+                .FirstOrDefaultAsync(s => s.Id == input.RequestId);
             var response = new
             {
                 CV = cv,
