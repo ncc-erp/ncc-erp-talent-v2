@@ -183,9 +183,6 @@ export class CandidateInternService extends BaseApiService {
   cloneCandidateByCvId(id: number): Observable<ApiResponse<string>> {
     return this.get(`/CloneCandidateByCvId?cvId=${id}`);
   }
-  exportInfomation(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
-    return this.generateExport(payload, '/ExportInfo');
-  }
 
   exportReport(payload: CandidateReportPayload): Observable<Blob> {
     return this.generateExport(payload, '/ExportReport');

@@ -104,4 +104,6 @@ export class CandidateReportPayload {
   fromDate:string;
   toDate:string;
   reqCvStatus: number ;
+  toStatus: number;
+  fromStatus: number;
 }
