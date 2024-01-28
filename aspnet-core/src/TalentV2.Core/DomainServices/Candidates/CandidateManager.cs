@@ -1,6 +1,7 @@
 ﻿using Abp.Authorization.Users;
 using Abp.Collections.Extensions;
 using Abp.Extensions;
+using Abp.Linq.Extensions;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.AspNetCore.Mvc;
@@ -1236,65 +1237,7 @@ namespace TalentV2.DomainServices.Candidates
 
         #region export infomation
 
-        public async Task<FileContentResult> ExportInfo(Dtos.ExportInput input)
-        {
-            var listEmployee = IQGetAllCVs()
-                .Where(q => q.UserType.Equals(input.userType))
-                .WhereIf(input.FromDate.HasValue, q => q.LastModifiedTime.Value.Date >= input.FromDate.Value.Date)
-                .WhereIf(input.ToDate.HasValue, q => q.LastModifiedTime.Value.Date <= input.ToDate.Value.Date)
-                .OrderBy(q => q.FullName)
-                .ToList();
-            var educationCVs = await IQGetEducationCVs().ToListAsync();
-            var requestCvs = await WorkScope.GetAll<RequestCV>().ToListAsync();
 
-            var bulletPoint = "\u002B" + "\x20";
-            var resultsExport = listEmployee
-            .Select((u, index) => new Candidate()
-            {
-                No = index++,
-                Phone = u.Phone,
-                Email = u.Email,
-                Name = u.FullName,
-                CvStatus = u.CvStatus,
-                Branch = u.BranchName,
-                Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                Sex = u.IsFemale ? "Male" : "Female",
-                Positon = u.SubPositionName,
-                Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
-                ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
-                FinalLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.FinalLevel?.ToString(),
-                InterviewLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewLevel.ToString(),
-                Note = u.Note,
-                CV = CommonUtils.FullFilePath(u.PathLinkCV)
-            })
-            .ToList();
-
-            using (var package = new ExcelPackage())
-            {
-                var startRow = 1;
-                var startColumn = 1;
-                var columnKey = GetColumnNameFromNumber(startColumn);
-                var worksheet = package.Workbook.Worksheets.Add(typeof(Candidate).Name);
-                worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsExport, true, TableStyles.Light9);
-                var row = worksheet.Dimension.Start.Row;
-                resultsExport.ForEach(s =>
-                {
-                    var CVColumn = worksheet.Cells[++row, worksheet.Dimension.End.Column];
-                    if (!string.IsNullOrWhiteSpace(s.CV))
-                    {
-                        CVColumn.Hyperlink = new ExcelHyperLink(s.CV) { Display = "CV link" };
-                        CVColumn.Style.Font.UnderLine = true;
-                        CVColumn.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
-                    }
-                });
-                worksheet.Cells.AutoFitColumns();
-                worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                return new FileContentResult(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-                {
-                    FileDownloadName = "Candidate.xlsx"
-                };
-            }
-        }
         public async Task<FileContentResult> ExportReport(Dtos.ExportReport input)
         {
             var requestCvs = await WorkScope.GetAll<RequestCV>()
@@ -1303,34 +1246,39 @@ namespace TalentV2.DomainServices.Candidates
             var cvs = await WorkScope.GetAll<CV>()
                 .Where(t => !t.IsDeleted)
                 .ToListAsync();
-
+            var educationCVs = await IQGetEducationCVs().ToListAsync();
+            var bulletPoint = "\u002B" + "\x20";
             var timeRequestCvsId = cvs
                  .Where(t => t.LastModificationTime != null)
                  .ToList();
-            var listOnboarded = await IQGetAllCVs()
-                .Where(q => q.UserType.Equals(input.userType))
-                .Where(s => s.RequisitionInfos.Any(st => st.RequestCVStatus == input.reqCvStatus))
-                .ToListAsync();
-            var resultsOnboarded = listOnboarded
-                .Select((u, index) => new CadidateReportDto()
+            var listExportCandidate = await IQGetAllCVs()
+               .Where(q => q.UserType.Equals(input.userType))
+               .WhereIf(input.reqCvStatus.HasValue, q => q.RequisitionInfos.Any(s => s.RequestCVStatus == input.reqCvStatus))
+               .WhereIf(input.FromStatus.HasValue, q => q.HistoryChangeStatuses.Any(s => s.FromStatus == input.FromStatus))
+               .WhereIf(input.ToStatus.HasValue, q => q.HistoryChangeStatuses.Any(s => s.ToStatus == input.ToStatus))
+               .WhereIf(input.FromDate.HasValue, q => q.LastModifiedTime.Value.Date >= input.FromDate.Value.Date)
+               .WhereIf(input.ToDate.HasValue, q => q.LastModifiedTime.Value.Date <= input.ToDate.Value.Date)
+               .ToListAsync();
+            var resultsCandidate = listExportCandidate
+                .Select((u, index) => new CadidateReport()
                 {
                     No = index++,
                     Name = u.FullName,
                     Phone = u.Phone,
                     Email = u.Email,
                     Sex = u.IsFemale ? "Male" : "Female",
+                    CvStatus = u.CvStatus,
+                    Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
                     Time = timeRequestCvsId.Find(s => s.Id.Equals(u.Id))?.LastModificationTime,
-                    ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
-                    FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
-                    InterviewLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.InterviewLevel ?? null)?.ToString(),
+                    ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
+                    FinalLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.FinalLevel?.ToString(),
+                    InterviewLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewLevel.ToString(),
+                    Note = u.Note,
+                    CV = CommonUtils.FullFilePath(u.PathLinkCV)
                 })
-                .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
-                .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
-                .Where(q => q.Status == input.reqCvStatus)
-                 .OrderBy(q => q.Time)
                 .ToList();
 
             var requestCvsIdInterviewed = requestCvs
@@ -1364,9 +1312,20 @@ namespace TalentV2.DomainServices.Candidates
                 var startColumn = 1;
                 var columnKey = GetColumnNameFromNumber(startColumn);
 
-                var worksheetReport = package.Workbook.Worksheets.Add(typeof(CadidateReportDto).Name);
-                worksheetReport.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsOnboarded, true, TableStyles.Light9);
-                worksheetReport.Column(6).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                var worksheetReport = package.Workbook.Worksheets.Add(typeof(CadidateReport).Name);
+                worksheetReport.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsCandidate, true, TableStyles.Light9);
+                var row = worksheetReport.Dimension.Start.Row;
+                worksheetReport.Column(8).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                resultsCandidate.ForEach(s =>
+                {
+                    var CVColumn = worksheetReport.Cells[++row, worksheetReport.Dimension.End.Column];
+                    if (!string.IsNullOrWhiteSpace(s.CV))
+                    {
+                        CVColumn.Hyperlink = new ExcelHyperLink(s.CV) { Display = "CV link" };
+                        CVColumn.Style.Font.UnderLine = true;
+                        CVColumn.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
+                    }
+                });
                 worksheetReport.Cells.AutoFitColumns();
                 worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
