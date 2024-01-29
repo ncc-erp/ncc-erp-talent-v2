@@ -20,7 +20,8 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
   infomation:boolean = false ;
   report: boolean = false ;
   reqCvStatus: number;
-  submitted = false;
+  reqCvToStatus: number;
+  reqCvFromStatus: number;
 
   @Input() userType: UserType.INTERN | UserType.STAFF;
 
@@ -53,99 +54,34 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
   onDropdownChange(status: any) {
     this.reqCvStatus = status.value;
   }
+  onDropdownFromStatus(fromstatus: any) {
+    this.reqCvFromStatus = fromstatus.value;
+  }
+  onDropdownToStatus(tostatus: any) {
+    this.reqCvToStatus = tostatus.value;
+  }
   public exportCandidate(){
     let requestsCount = 0;
-    if(this.infomation){
-      requestsCount++;
-     this.onExportInfomation(requestsCount );
-    }
     if(this.report){
       requestsCount++;
      this.onExportReport(requestsCount );
     }
-    if(!this.infomation && !this.report){
+    if(!this.report){
       this.showToastMessage(ToastMessageType.ERROR, 'No checkbox selected.');
       this.loading = false;
       return;
     }
    }
 
-  public onExportInfomation(requestsCount: number) {
-    this.loading = true;
-    const userType = this.userType === UserType.INTERN ? 0 : 1
-    const fileName = userType === 0 ? 'InternInfomation_'+ this.fromDate + '_' +this.toDate +'.xlsx' : 'StaffInfomation_'+ this.fromDate + '_' +this.toDate +'.xlsx';
-    if (!this.fromDate || !this.toDate) {
-      this.showToastMessage(ToastMessageType.ERROR,'Full date required');
-      this.loading = false;
-      return;
-    }
-     const fromDateParts = this.fromDate.split('-');
-     const fromDateYear = Number(fromDateParts[0]);
-     const fromDateMonth = Number(fromDateParts[1]);
-     const fromDateDay = 1;
-     const startDate = this.formatDate(new Date(fromDateYear, fromDateMonth - 1, fromDateDay)) ;
-     const formattedFromDate = startDate.split('T')[0];
-    
-     const toDateParts = this.toDate.split('-');
-     const toDateYear = Number(toDateParts[0]);
-     const toDateMonth = Number(toDateParts[1]);
-     const toDateDay = new Date(toDateYear, toDateMonth, 0).getDate(); 
-     const endDate = this.formatDate(new Date(toDateYear, toDateMonth - 1, toDateDay)) ;
-     const formattedToDate = endDate.split('T')[0];
-  
-    if (fromDateYear > toDateYear) {
-      this.showToastMessage(ToastMessageType.ERROR,'Year from date cannot be greater than year to date.');
-      this.loading = false;
-      return;
-    }
-  
-    if (fromDateYear === toDateYear && parseInt(fromDateParts[1]) > parseInt(toDateParts[1])) {
-      this.showToastMessage(ToastMessageType.ERROR,'Month from date must not be greater than month to day in the same year.');
-      this.loading = false;
-      return;
-    }
-    const payload = {
-      userType: userType ,
-      fromDate: formattedFromDate,
-      toDate: formattedToDate,
-    };
-   
-    this.subs.add(
-      this._candidateIntern.exportInfomation(payload ).subscribe(
-        (result: Blob) => {
-        if (result.size > 0) {
-          const blob = new Blob([result], { type: 'application/octet-stream' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-        }
-        requestsCount --;
-        if ( requestsCount === 0) {
-          this.loading = false; 
-        }
-      },
-    ));
-  }
-  
   public onExportReport(requestsCount: number) {  
     this.loading = true;
-    this.submitted = false;
     const userType = this.userType === UserType.INTERN ? 0 : 1;
     if (!this.fromDate || !this.toDate) {
       this.showToastMessage(ToastMessageType.ERROR,'Full date required');
       this.loading = false;
       return;
     }
-    if (this.reqCvStatus == undefined || this.reqCvStatus == null) {
-      this.submitted = true;
-      this.loading = false;
-      return;
-    }
+
      const fromDateParts = this.fromDate.split('-');
      const fromDateYear = Number(fromDateParts[0]);
      const fromDateMonth = Number(fromDateParts[1]);
@@ -171,12 +107,15 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
       this.loading = false;
       return;
     }
+
       const fileName = userType === 0 ? 'InternReport_'+ this.fromDate + '_' +this.toDate +'.xlsx' : 'StaffReport_'+ this.fromDate + '_' +this.toDate +'.xlsx';
       const payload: CandidateReportPayload = {
       userType: userType ,
       fromDate: formattedFromDate,
       toDate: formattedToDate,
-      reqCvStatus: this.reqCvStatus,
+      reqCvStatus: this?.reqCvStatus,
+      toStatus: this?.reqCvToStatus,
+      fromStatus: this?.reqCvFromStatus,
     };
     this.subs.add(
       this._candidateIntern.exportReport(payload).subscribe(
