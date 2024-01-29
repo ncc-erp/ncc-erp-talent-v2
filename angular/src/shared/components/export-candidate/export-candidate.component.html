@@ -8,12 +8,47 @@
 
   <div class="modal-body edit-user-body">
           <div class="grid-item">
-            <div class="group-cb" >
-              <div class="groupcb">
-                <mat-checkbox id="cbinfomation" [(ngModel)]="infomation" name="cbinfomation">Candidate Infomation</mat-checkbox>
-              </div>
+            <div class="group-cb mt-3 ml-2 w-100" >
               <div class="groupcb">
                 <mat-checkbox id="cbreport" [(ngModel)]="report" name="cbreport">Report</mat-checkbox>
+              </div>
+              <div class="groupcb mt-3">
+                <label for="fromStatus">From Status</label>
+                <div class="d-flex">
+                  <div class="w-100">
+                    <p-dropdown
+                      inputId="fromStatus"
+                      [options]="_utilities.catReqCvStatus"
+                      placeholder="All"
+                      optionLabel="name"
+                      optionValue="id"
+                      styleClass="w-100"
+                      [filter]="true"
+                      filterBy="name"
+                      [showClear]="true"
+                      (onChange)="onDropdownFromStatus($event)"
+                    ></p-dropdown>
+                  </div>
+                </div>
+              </div>
+              <div class="groupcb mt-3" >
+                <label for="fromStatus">To Status</label>
+                <div class="d-flex">
+                  <div class="w-100">
+                    <p-dropdown
+                      inputId="fromStatus"
+                      [options]="_utilities.catReqCvStatus"
+                      placeholder="All"
+                      optionLabel="name"
+                      optionValue="id"
+                      styleClass="w-100"
+                      [filter]="true"
+                      filterBy="name"
+                      [showClear]="true"
+                      (onChange)="onDropdownToStatus($event)"
+                    ></p-dropdown>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="group-date">
@@ -24,6 +59,27 @@
             <div class="group">
               <label for="toDate">To Date:</label>
               <input class="p-inputtext" type="month" id="toDate" [(ngModel)]="toDate" name="toDate" [value]="toDate">
+            </div>
+
+            <div class="group">
+              <label for="status">Application Status
+             </label>
+              <div class="d-flex">
+                <div class="w-100">
+                  <p-dropdown
+                    inputId="status"
+                    [options]="_utilities.catReqCvStatus"
+                    placeholder="All"
+                    optionLabel="name"
+                    optionValue="id"
+                    styleClass="w-100"
+                    [filter]="true"
+                    filterBy="name"
+                    [showClear]="true"
+                    (onChange)="onDropdownChange($event)"
+                  ></p-dropdown>
+                </div>
+              </div>
             </div>
           </div>
         </div>

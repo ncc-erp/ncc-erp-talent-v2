@@ -3,14 +3,15 @@ import { Injectable } from '@angular/core';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateInterviewed, CandidateInterviewedPayload, CandidateRequisiton } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CandidateEducation, CandidateEducationPayload } from '@app/core/models/candidate/candidate-education.model';
 import { CandidateSkill, CandidateSkillPayload } from '@app/core/models/candidate/candidate-skill.model';
-import { CandidateIntern, CandidatePayload, MailDetail } from '@app/core/models/candidate/candidate.model';
+import { CandidateIntern, CandidatePayload, CandidateReportPayload, MailDetail } from '@app/core/models/candidate/candidate.model';
 import { MailPreviewInfo } from '@app/core/models/mail/mail.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { BaseApiService } from '../apis/base-api.service';
 import { ApiResponse } from './../../../../shared/paged-listing-component-base';
 import { CandidateApplyHistory } from './../../models/candidate/candidate-apply-history.model';
 import { CatalogModel } from './../../models/common/common.dto';
-import {UserType} from '@shared/AppEnums';
+import { StatusCreateAccount, UserType } from '@shared/AppEnums';
+import { RequisitionPayload } from '@app/core/models/requisition/requisition.model';
 
 @Injectable({
   providedIn: 'root'
@@ -86,7 +87,7 @@ export class CandidateInternService extends BaseApiService {
     return this.create(payload, '/CreateCVSkill');
   }
 
-  createReqCV(payload: { cvId: number, requestId: number }): Observable<ApiResponse<CandidateRequisiton>> {
+  createReqCV(payload: RequisitionPayload): Observable<ApiResponse<CandidateRequisiton>> {
     return this.create(payload, '/CreateRequestCV');
   }
 
@@ -171,8 +172,8 @@ export class CandidateInternService extends BaseApiService {
     return cvId ? this.get(`/ValidPhone?phone=${phone}&cvId=${cvId}`) : this.get("/ValidPhone?phone=" + phone);
   }
 
-  createLMSAccount(cvId: number, requestCvId: number): Observable<ApiResponse<string>> {
-    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}`);
+  createAccount(cvId: number, requestCvId: number, statusCreateAccount: StatusCreateAccount): Observable<ApiResponse<string>> {
+    return this.get(`/CreateAccountStudent?cvId=${cvId}&requestCVId=${requestCvId}&statusCreateAccount=${statusCreateAccount}`);
   }
 
   updateCandidateNote(payload: { cvId: number, note: string }): Observable<ApiResponse<{ cvId: number, note: string }>> {
@@ -182,12 +183,9 @@ export class CandidateInternService extends BaseApiService {
   cloneCandidateByCvId(id: number): Observable<ApiResponse<string>> {
     return this.get(`/CloneCandidateByCvId?cvId=${id}`);
   }
-  exportInfomation(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
-    return this.generateExport(payload, '/ExportInfo');
-  }
 
-  exportReport(payload: {userType: UserType,fromDate:string,toDate:string }): Observable<Blob> {
-    return this.generateExport(payload, '/ExportOnboard');
+  exportReport(payload: CandidateReportPayload): Observable<Blob> {
+    return this.generateExport(payload, '/ExportReport');
   }
 
 }

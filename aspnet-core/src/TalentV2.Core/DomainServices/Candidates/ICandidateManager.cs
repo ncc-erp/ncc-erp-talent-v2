@@ -64,8 +64,7 @@ namespace TalentV2.DomainServices.Candidates
 
         #region export Infomation
 
-        Task<FileContentResult> ExportInfo(ExportInput input);
-        Task<FileContentResult> ExportOnboard(ExportInput input);
+        Task<FileContentResult> ExportReport(ExportReport input);
 
         #endregion
 
@@ -74,7 +73,7 @@ namespace TalentV2.DomainServices.Candidates
         Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long cvId);
         Task<MailDetailDto> SendMailCV(long cvId, MailPreviewInfoDto message);
         Task<MailDetailDto> SendMailRequestCV(long cvId, MailPreviewInfoDto message);
-        Task<string> CreateAccountStudent(long cvId, long requestCVId);
+        Task<string> CreateAccountStudent(long cvId, long requestCVId, StatusCreateAccount statusCreateAccount);
 
         #endregion
     }

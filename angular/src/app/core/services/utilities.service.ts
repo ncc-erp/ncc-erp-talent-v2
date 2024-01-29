@@ -38,6 +38,7 @@ import { EducationService } from './categories/education.service';
 import { JobPositionService } from "./categories/job-position.service";
 import { SkillService } from "./categories/skill.service";
 import { CommonService } from "./common.service";
+import { DataSharingService } from './categories/data-sharing-capabillity.service';
 
 @Injectable({
   providedIn: "root",
@@ -57,7 +58,8 @@ export class UtilitiesService {
     private _candidateIntern: CandidateInternService,
     private _candidateInterview: CandidateInterviewService,
     private _positionSetting: PositionSettingService,
-    private _commonEmployee: CommonEmployeeService
+    private _commonEmployee: CommonEmployeeService,
+    private _dataSharingService: DataSharingService
   ) { }
 
   catEducation: Education[];

@@ -2,6 +2,7 @@ import { Skill } from '@app/core/models/categories/skill.model';
 import { PagedRequestDto } from '@shared/paged-listing-component-base';
 import { LevelInfo } from '../common/common.dto';
 import { CandidateRequisitionInfo } from '../requisition/requisition.model';
+import { UserType } from '@shared/AppEnums';
 
 export class CandidateInfo {
   id: number;
@@ -97,4 +98,12 @@ export interface MailDetail {
   isAllowSendMail: boolean;
   isSentMailStatus?: boolean;
   mailStatusHistories: MailStatusHistory[];
+}
+export class CandidateReportPayload {
+  userType: UserType;
+  fromDate:string;
+  toDate:string;
+  reqCvStatus: number ;
+  toStatus: number;
+  fromStatus: number;
 }

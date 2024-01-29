@@ -7,15 +7,24 @@
     <sidebar-menu></sidebar-menu>
   </div>
   
-  <div class="sidebar-custom">
-    <span>
-      <header-language-menu></header-language-menu>
-    </span>
-
-    <span>
-      <a class="btn btn-secondary" href="javascript:;" (click)="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-      </a>
-    </span>
+  <div class="sidebar-custom pl-0">
+    <div class="ml-3">
+      <span>
+        <header-language-menu></header-language-menu>
+      </span>
+      <span class="mr-1 mb-1">
+        <a class="btn btn-secondary btn-sm m-1" 
+        href="https://docs.google.com/document/d/1pESEVRabkMK77su_XCjqGLsU3nOwjkrRwvsvl8BN9eM" 
+        target="_blank" title="Release Note"
+        >
+        <i class="fas fa-clipboard-list"></i>
+        </a>
+        </span>
+      <span class="mr-1">
+        <a class="btn btn-secondary btn-sm m-1" href="javascript:;" (click)="logout()">
+          <i class="fas fa-sign-out-alt" style="width:13px"></i>
+        </a>
+      </span>
+    </div>
   </div>
 </aside>

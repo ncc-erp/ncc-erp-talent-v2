@@ -12,6 +12,7 @@ import { MenuItem } from 'primeng/api';
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { RequisitionInternService } from './../../../core/services/requisition/requisition-intern.service';
 import { RequisitionInternDialogComponent } from './requisition-intern-dialog/requisition-intern-dialog.component';
+import { ConfirmPresentForHr } from '@shared/pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component';
 
 @Component({
   selector: 'talent-requisition-intern',
@@ -92,7 +93,18 @@ export class RequisitionInternComponent extends PagedListingComponentBase<Requis
   }
 
   onCandidateSelectedRequisiton(entity: RequisitionIntern) {
-    this.ref.close(entity)
+    const dialogRef = this._dialog.open(ConfirmPresentForHr, {
+      showHeader: false,
+      width: '25%',
+      contentStyle: { 'background-color': 'rgba(242,245,245)', overflow: 'visible' },
+      baseZIndex: 10000,
+      data: entity
+    });
+    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean}) => {
+      if (res) {
+       this.ref.close({ entity, ...res });
+      }
+    });
   }
 
   onPositionSelect(subPositionId: number) {
@@ -164,7 +176,6 @@ export class RequisitionInternComponent extends PagedListingComponentBase<Requis
       baseZIndex: 5000,
       data: null,
     });
-
     dialogRef.onClose.subscribe((res: boolean) => res && this.onGetDataChange());
   }
 

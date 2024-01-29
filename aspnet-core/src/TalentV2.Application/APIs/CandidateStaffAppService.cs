@@ -278,9 +278,9 @@ namespace TalentV2.APIs
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS)]
-        public async Task<string> CreateAccountStudent(long cvId, long requestCVId)
+        public async Task<string> CreateAccountStudent(long cvId, long requestCVId, StatusCreateAccount statusCreateAccount)
         {
-            return await _candidateManager.CreateAccountStudent(cvId, requestCVId);
+            return await _candidateManager.CreateAccountStudent(cvId, requestCVId, statusCreateAccount);
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_CandidateStaff_EditNote)]
@@ -312,15 +312,9 @@ namespace TalentV2.APIs
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_CandidateStaff_Export)]
-
-        public async Task<IActionResult> ExportInfo(ExportInput input)
+        public async Task<IActionResult> ExportReport(ExportReport input)
         {
-            return await _candidateManager.ExportInfo(input);
-        }
-        [HttpPost]
-        public async Task<IActionResult> ExportOnboard(ExportInput input)
-        {
-            return await _candidateManager.ExportOnboard(input);
+            return await _candidateManager.ExportReport(input);
         }
     }
 }
