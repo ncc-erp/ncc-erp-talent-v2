@@ -76,11 +76,13 @@
         </span>
 
         <div class="input-item">
-          <p-inputMask
-            mask="9999999999"
-            formControlName="phone"
-            styleClass="w-100"
-          ></p-inputMask>
+          <input type="text"
+          pInputText 
+          formControlName="phone"
+          class="w-100"
+          maxlength="10"
+          oninput="this.value = this.value.replace(/[^0-9]/g, ''); 
+          if(this.value.length > 10) this.value = this.value.slice(0, 10);" />
         </div>
 
         <div
