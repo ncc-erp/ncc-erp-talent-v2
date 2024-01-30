@@ -24,7 +24,8 @@ namespace TalentV2.DomainServices.Candidates
         Task<List<CapabilityCandidateDto>> GetCapabilityCVsByRequestCVId(long requestCvId);
         Task<CurrentRequisitionCandidateDto> GetCurrentRequisitionByCVId(long cvId);
         Task<PersonBioDto> UpdateCV(UpdatePersonBioDto input);
-        Task<long> CreateRequestCV(CandidateRequestDto input);
+        Task<long> CreateRequestCV(RequesitionCVDto input);
+        Task<long> CreateCandidateRequestCV(CandidateRequestCVDto input);
         Task<SkillCandidateDto> CreateCVSkill(CreateUpdateSkillCandidateDto input);
         Task<SkillCandidateDto> UpdateSkillCV(CreateUpdateSkillCandidateDto input);
         Task DeleteSkillCV(long id);

@@ -212,6 +212,13 @@ export class CandidateInternListComponent
     });
     dialogRef.onClose.subscribe((ref: { isPresentForHr: boolean}) => {
       if (ref) {
+        if(!entity.requisitionInfos[0] &&  ref.isPresentForHr == true){
+          this.showToastMessage(
+            ToastMessageType.ERROR,
+            MESSAGE.ADD_FAILD
+          );
+          return;
+        }
       const payload : RequisitionPayload = { 
         cvId: entity.id,
         requestId: this.requisitionInternId, 

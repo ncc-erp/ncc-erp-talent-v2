@@ -105,9 +105,9 @@ namespace TalentV2.APIs
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_Create)]
-        public async Task<CurrentRequisitionCandidateDto> CreateRequestCV(CandidateRequestDto input)
+        public async Task<CurrentRequisitionCandidateDto> CreateCandidateRequestCV(CandidateRequestCVDto input)
         {
-            var cvId = await _candidateManager.CreateRequestCV(input);
+            var cvId = await _candidateManager.CreateCandidateRequestCV(input);
             if (cvId == default)
                 throw new UserFriendlyException($"Request {input.RequestId} and CV {input.CvId} Already Existed");
             return await _candidateManager.GetCurrentRequisitionByCVId(cvId);
