@@ -625,8 +625,10 @@ namespace TalentV2.DomainServices.Candidates
                 {
                     RequestCV = s,
                     CV = s.CV,
-                    Status = s.Status
+                    Status = s.Status,
+                    EmailSent = s.EmailSent
                 }).FirstOrDefault();
+            input.EmailSent = entity.EmailSent;
 
             if (entity == default)
             {
