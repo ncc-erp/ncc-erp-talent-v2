@@ -337,7 +337,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     const { id, requestCvId, capabilityId, capabilityName, score, note, factor } = entity;
     const payload = { id, requestCvId, capabilityId, capabilityName, score, note, factor };
 
-    if (payload.note.length > 5000){
+    if (payload.note?.length > 5000){
       this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED,`${payload.capabilityName}_Max 5000 characters` );
       return;
     }
@@ -600,8 +600,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     const payload = [];
     const canCapabilities = this.candidateRequisiton?.capabilityCandidate;
     canCapabilities.filter(item => this.editingRowKey[item.id] === true).forEach(item => {
-      const { id, score, note, capabilityName} = item;
-      payload.push({ id, score, note,capabilityName });
+      const { id, score, note, capabilityName } = item;
+      payload.push({ id, score, note, capabilityName });
     })
     canCapabilities.forEach(item => this.editingRowKey[item.id] = false)
     this.saveManyCapability(payload);
