@@ -394,6 +394,14 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     );
   }
 
+  handleInputEvent(event)
+  {
+    const inputElement = event.target;
+    inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
+    if (inputElement.value.length > 10) {
+      inputElement.value = inputElement.value.slice(0, 10);
+    }
+  }
   private backToCandidate() {
     if (this.userType === UserType.INTERN) {
       return this.router.navigate(['/app/candidate/intern-list'])

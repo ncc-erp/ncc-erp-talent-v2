@@ -50,9 +50,8 @@ namespace TalentV2.Utils
                 + UsernameUntils.GenerateUsername(3, true);
                 return ReplaceSpecialCharacters(usName);
             };
-            var usNameContest = name + "_" + ReplaceWhitespace(surname) + "_"
+            var usNameContest = name + "_" + GetInitials(surname) + "_"
                 + ReplaceWhitespace(subposition.Substring(0, 2)) + "_"
-                + userType.Substring(0, 2) + "_"
                 + GetBranchName(branch) + "_"
                 + UsernameUntils.GenerateUsername(3, true);
 
@@ -70,6 +69,19 @@ namespace TalentV2.Utils
 
         public static string ReplaceWhitespace(string input)
             => Regex.Replace(input, @"\s+", "");
+
+        public static string GetInitials(string input)
+        {
+            string[] words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            StringBuilder initials = new StringBuilder();
+
+            foreach (string word in words)
+            {
+                initials.Append(word[0]);
+            }
+
+            return initials.ToString();
+        }
 
         private static string RemoveSign4VietnameseString(string str)
         {

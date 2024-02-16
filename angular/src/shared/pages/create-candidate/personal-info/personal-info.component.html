@@ -76,13 +76,14 @@
         </span>
 
         <div class="input-item">
-          <p-inputMask
-            mask="9999999999"
-            formControlName="phone"
-            styleClass="w-100"
-          ></p-inputMask>
+          <input type="text"
+          pInputText 
+          formControlName="phone"
+          class="w-100"
+          maxlength="10"
+          (input)="handleInputEvent($event)" 
+        />
         </div>
-
         <div
           class="text-error text-danger"
           *ngIf="submitted && formControls.phone.errors?.required"

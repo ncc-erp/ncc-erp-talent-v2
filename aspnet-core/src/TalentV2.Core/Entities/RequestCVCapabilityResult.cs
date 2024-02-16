@@ -14,7 +14,7 @@ namespace TalentV2.Entities
 	{
 		public int? TenantId { get; set; }
 		public int Score { get; set; }
-		[MaxLength(1000)]
+		[MaxLength(5000)]
 		public string Note { get; set; }
 
 		public long RequestCVId { get; set; }

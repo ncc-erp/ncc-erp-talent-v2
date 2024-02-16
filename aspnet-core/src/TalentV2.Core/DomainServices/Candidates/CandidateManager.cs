@@ -281,7 +281,45 @@ namespace TalentV2.DomainServices.Candidates
             return await GetCVById(personBio.Id);
         }
 
-        public async Task<long> CreateRequestCV(CandidateRequestDto input)
+        public async Task<long> CreateCandidateRequestCV(CandidateRequestCVDto input)
+        {
+            var request = await WorkScope.GetAll<Request>()
+                .Where(q => q.Id == input.RequestId)
+                .Select(s => new
+                {
+                    s.UserType,
+                    s.SubPositionId
+                })
+                .FirstOrDefaultAsync();
+            var cv = await WorkScope.GetAsync<CV>(input.CvId);
+            var requestCVStatus = input.RequestCVStatus.HasValue ? input.RequestCVStatus.Value : RequestCVStatus.AddedCV;
+            var requestCv = new RequestCV
+            {
+                RequestId = input.RequestId,
+                CVId = input.CvId,
+                Status = requestCVStatus,
+            };
+            var requestCvId = await WorkScope.InsertAndGetIdAsync(requestCv);
+
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+            await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
+
+            await CreateRequestCVHistory(new HistoryRequestCVDto
+            {
+                Id = requestCv.Id,
+                Status = requestCVStatus
+            });
+            await CreateRequestCVStatusChangeHistory(new StatusChangeRequestCVDto
+            {
+                Id = requestCv.Id,
+                FromStatus = null,
+                ToStatus = requestCVStatus,
+            });
+
+            return input.CvId;
+        }
+        public async Task<long> CreateRequestCV(RequesitionCVDto input)
         {
             if (await WorkScope.GetAll<RequestCV>().AnyAsync(q => q.RequestId == input.RequestId && q.CVId == input.CvId))
                 return default;
@@ -325,18 +363,6 @@ namespace TalentV2.DomainServices.Candidates
             };
             if (input.IsPresentForHr == true)
             {
-                var currentRequestCVInterview = await WorkScope.GetAll<RequestCVInterview>()
-                  .Where(q => q.RequestCVId == currentRequestCV.Id)
-                  .ToListAsync();
-
-                var currentRequestCVStatusHistories = await WorkScope.GetAll<RequestCVStatusHistory>()
-                 .Where(q => q.RequestCVId == currentRequestCV.Id)
-                 .ToListAsync();
-
-                var currentRequestCVStatusChangeHistory = await WorkScope.GetAll<RequestCVStatusChangeHistory>()
-                 .Where(q => q.RequestCVId == currentRequestCV.Id)
-                 .ToListAsync();
-
                 requestCv.Status = currentRequestCV.Status;
                 requestCv.InterviewTime = currentRequestCV.InterviewTime;
                 requestCv.ApplyLevel = currentRequestCV.ApplyLevel;
@@ -345,9 +371,6 @@ namespace TalentV2.DomainServices.Candidates
                 requestCv.HRNote = currentRequestCV.HRNote;
                 requestCv.OnboardDate = currentRequestCV.OnboardDate;
                 requestCv.Salary = currentRequestCV.Salary;
-                requestCv.RequestCVInterviews = currentRequestCVInterview;
-                requestCv.RequestCVStatusHistories = currentRequestCVStatusHistories;
-                requestCv.RequestCVStatusChangeHistoies = currentRequestCVStatusChangeHistory;
                 requestCv.EmailSent = currentRequestCV.EmailSent;
                 requestCv.LMSInfo = currentRequestCV.LMSInfo;
                 requestCv.Percentage = currentRequestCV.Percentage;
@@ -357,18 +380,58 @@ namespace TalentV2.DomainServices.Candidates
             await CurrentUnitOfWork.SaveChangesAsync();
             if (currentRequestCV != null)
             {
-            var cvCapabilityResult = await WorkScope.GetAll<RequestCVCapabilityResult>()
+                var currentRequestCVInterview = await WorkScope.GetAll<RequestCVInterview>()
+                   .Where(q => q.RequestCVId == currentRequestCV.Id)
+                   .ToListAsync();
+
+                var currentRequestCVStatusHistories = await WorkScope.GetAll<RequestCVStatusHistory>()
+                    .Where(q => q.RequestCVId == currentRequestCV.Id)
+                    .ToListAsync();
+
+                var currentRequestCVStatusChangeHistory = await WorkScope.GetAll<RequestCVStatusChangeHistory>()
+                    .Where(q => q.RequestCVId == currentRequestCV.Id)
+                    .ToListAsync();
+
+                var cvCapabilityResult = await WorkScope.GetAll<RequestCVCapabilityResult>()
                     .Where(q => q.RequestCVId == currentRequestCV.Id)
                     .Select(q => new CVCapabilityResultDto{
                         CapabilityId = q.CapabilityId,
                         Score = q.Score,
                         Note = q.Note,
                     }).ToListAsync();
-             await KeepRequestCVCapabilityResults(requestCvId, request.UserType, request.SubPositionId, cvCapabilityResult);
-             return input.CvId;
-            }
-            await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
+                await KeepRequestCVCapabilityResults(requestCvId, request.UserType, request.SubPositionId, cvCapabilityResult);
 
+                foreach (var requestCVInterview in currentRequestCVInterview)
+                {
+                   await AddInterviewerInCVRequest(new CreateInterviewerCVRequestDto
+                   {
+                       InterviewerId = requestCVInterview.InterviewId,
+                       RequestCvId = requestCvId,
+                   });
+                } 
+
+                foreach (var requestCVStatusHistories in currentRequestCVStatusHistories)
+                {
+                  await CreateRequestCVHistory(new HistoryRequestCVDto
+                    {
+                    Id = requestCvId,
+                    Status = requestCVStatusHistories.Status,
+                  });
+                }
+                foreach (var requestCVStatusChangeHistory in currentRequestCVStatusChangeHistory)
+                {
+                    await CreateRequestCVStatusChangeHistory(new StatusChangeRequestCVDto
+                    {
+                        Id = requestCvId,
+                        FromStatus = requestCVStatusChangeHistory.FromStatus,
+                        ToStatus = requestCVStatusChangeHistory.ToStatus,
+                    });
+                }
+
+                return input.CvId;
+            } 
+            await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
+   
             await CreateRequestCVHistory(new HistoryRequestCVDto
             {
                 Id = requestCv.Id,
@@ -625,8 +688,10 @@ namespace TalentV2.DomainServices.Candidates
                 {
                     RequestCV = s,
                     CV = s.CV,
-                    Status = s.Status
+                    Status = s.Status,
+                    EmailSent = s.EmailSent
                 }).FirstOrDefault();
+            input.EmailSent = entity.EmailSent;
 
             if (entity == default)
             {
