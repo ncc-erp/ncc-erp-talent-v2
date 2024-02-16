@@ -344,7 +344,6 @@ export class RequisitionDetailComponent extends AppComponentBase implements OnIn
   }
 
   private _openRequestStaffDialog(dialogAction: ActionEnum) {
-    console.log(dialogAction);
     const dialogConfig: RequisitionStaffConfigDiaLog = { requisitionStaff: this.currentRequisition, action: dialogAction };
     const dialogRef = this._dialog.open(RequisitionStaffDialogComponent, {
       header: `${dialogAction} Requisition`,

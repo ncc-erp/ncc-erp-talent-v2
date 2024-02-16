@@ -26,5 +26,6 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string Address { get; set; }
         public string Note { get; set; }
         public CVStatus CVStatus { get; set; }
+        public string CandidateLanguage { get; set; }
     }
 }
