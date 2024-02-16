@@ -246,6 +246,28 @@
       </div>
 
       <div class="group-item">
+        <span class="lb-item">
+          {{ "Languages" | localize }}
+          <span class="text-danger">*</span>
+        </span>
+        <div class="input-item">
+          <talent-multi-select-h-radio
+          [valueSeletecd]="formControls['candidateLanguage'].value"
+          [catalogConfig]="catalogConfig"
+          [appendTo]="'body'"
+          (onChange)="onLanguageChange($event)"
+          (onSearchTypeChange)="onSearchTypeChange($event)"
+        ></talent-multi-select-h-radio>
+        <span
+          class="text-danger"
+          *ngIf="submitted && formControls.candidateLanguage.errors?.required"
+        >
+          Select at least a skill
+        </span>
+      </div>
+      </div>
+
+      <div class="group-item">
         <span class="lb-item" for="dob">
           {{ "Date of birth" | localize }}
         </span>

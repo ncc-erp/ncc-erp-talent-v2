@@ -20,6 +20,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public long? CVSourceId { get; set; }
         public long? ReferenceId { get; set; }
         public MailDetailDto MailDetail { get; set; }
+        public string CandidateLanguage { get; set; }
     }
     public class MailDetailDto
     {

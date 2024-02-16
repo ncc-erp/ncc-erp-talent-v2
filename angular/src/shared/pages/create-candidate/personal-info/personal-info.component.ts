@@ -2,6 +2,7 @@ import { Component, EventEmitter, HostListener, Injector, Input, OnInit, Output 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { checkNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
 import { CustomValidators } from '@app/core/helpers/validator.helper';
+import {CandidateLanguageConfigDiaLog} from '@app/core/models/candidate/candidate-language.model';
 import { Candidate, CandidatePayload, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
 import { MailDialogConfig, MailPreviewInfo } from '@app/core/models/mail/mail.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
@@ -10,7 +11,7 @@ import { UtilitiesService } from '@app/core/services/utilities.service';
 import { MailDialogComponent } from '@app/modules/admin/mail/mail-dialog/mail-dialog.component';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DateFormat, MESSAGE } from '@shared/AppConsts';
-import { CANDIDATE_DETAILT_TAB_DEFAULT, CV_REFERENCE_TYPE, ToastMessageType, UserType } from '@shared/AppEnums';
+import { CANDIDATE_DETAILT_TAB_DEFAULT, CV_REFERENCE_TYPE, SearchType, ToastMessageType, UserType } from '@shared/AppEnums';
 import { UploadAvatarComponent } from '@shared/components/upload-avatar/upload-avatar.component';
 import { AppSessionService } from '@shared/session/app-session.service';
 import * as moment from 'moment';
@@ -44,7 +45,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
   public form: FormGroup;
   originalFormData: Candidate;
-
+  isSearchAnd: boolean = false;
   cvFile: File;
   cvUrl: string;
   cvFileName: string;
@@ -52,6 +53,13 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   avatarFile: File;
   imageChangedEvent;
   referenceType: CV_REFERENCE_TYPE;
+
+  catalogConfig = {
+    labelName: '',
+    catalogList: this._utilities.catLanguages,
+    optionLabel: 'name',
+    optionValue: 'id'
+  }
 
   public dataApplyCv = this.getDataApplyCv("idApplyCV");
 
@@ -124,7 +132,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.cvFileName = this.getCvFileName(this.originalFormData);
     }
     (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();
-    this.checkEnableReferBy(getFormControlValue(this.form, 'cvSourceId'));
+    this.checkEnableReferBy(getFormControlValue(this.form, 'cvSourceId')); 
   }
 
   onCVFileChange(fileList: FileList) {
@@ -196,7 +204,13 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
         this.onCreateCandidate.emit(res.result.id);
         this.activeChange.emit(this.tabActived);
 
-        this.form.patchValue(res.result);
+        const jsonArray = JSON.parse(res.result.candidateLanguage);
+        const json = jsonArray?.map(item => (item.id )
+        );
+        this.form.patchValue({
+          ...res.result,
+          candidateLanguage:json
+        });
         this.isViewMode = true;
         (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();
         this.originalFormData = this.form.getRawValue();
@@ -352,6 +366,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       cvStatusName: '',
       linkCV: [null, []],
       cvSourceId: [null, [Validators.required]], //number
+      candidateLanguage: [null, [Validators.required]],
       referenceId: ['', [Validators.required]],
       avatar: null,
       mailDetail: null
@@ -428,19 +443,34 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   }
 
   private updateCandidateInfoData(candidate: Candidate) {
+    const jsonArray = JSON.parse(candidate.candidateLanguage);
+    const json = jsonArray?.map(item => (item.id ))
+    const catalogIds = this.catalogConfig.catalogList.map(item => item.id);
+    const filteredJson = jsonArray
+      ?.map(item => item.id)
+      ?.filter(id => catalogIds.includes(id));
+
     this.form.patchValue({
       ...candidate,
       dob: candidate.dob ? new Date(candidate.dob) : null,
+      candidateLanguage:filteredJson
     })
 
     this.originalFormData = this.form.getRawValue();
     this.avatarUrl = this._utilities.getLinkFile(candidate.avatar);
-
     this.cvFileName = this.getCvFileName(candidate);
     this.isEnaleRefBy = this.checkEnableReferBy(candidate.cvSourceId);
   }
 
   private getPayload(isUpdate: boolean = false) {
+    const languages = this._utilities.catLanguages;
+    const laguagesjs = this.formControls['candidateLanguage'].value
+    const formattedLanguages = languages.filter(language => 
+      laguagesjs.includes(language.id)
+      );
+
+    const payloadString = JSON.stringify(formattedLanguages);
+
     if (isUpdate) {
       const payload: CandidatePayload = {
         id: getFormControlValue(this.form, 'id'),
@@ -457,9 +487,10 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
         isFemale: getFormControlValue(this.form, 'isFemale'),
         address: getFormControlValue(this.form, 'address'),
         note: getFormControlValue(this.form, 'note'),
-        cvStatus: getFormControlValue(this.form, 'cvStatus')
+        cvStatus: getFormControlValue(this.form, 'cvStatus'),
+        candidateLanguage: payloadString,
       }
-      return payload;
+          return payload;
     }
 
     const formData = new FormData();
@@ -474,7 +505,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     formData.append('address', getFormControlValue(this.form, 'address'));
     formData.append('note', getFormControlValue(this.form, 'note'));
     formData.append('cvStatus', getFormControlValue(this.form, 'cvStatus'));
-
+    formData.append('candidateLanguage', payloadString);   
     getFormControlValue(this.form, 'dob') ?
     formData.append('birthDay', moment(this.formControls['dob'].value).format(DateFormat.YYYY_MM_DD)) : formData.append('birthDay', '');
 
@@ -493,6 +524,25 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     this.isEnaleRefBy && formData.append('referenceId', getFormControlValue(this.form, 'referenceId'));
 
     return formData;
+  }
+
+  private checkonLanguageChange(candidateLanguage: number) {
+    const reference = this._utilities.catLanguages.find(item => item.id === candidateLanguage);
+    if (candidateLanguage && !reference) {
+      this.formControls['candidateLanguage'].enable();
+      this.formControls['candidateLanguage'].patchValue(candidateLanguage)
+      return true;
+    }
+    this.formControls['candidateLanguage'].setValue(null);
+    return false;
+  }
+
+ onLanguageChange(candidateLanguage: number) {
+    this.checkonLanguageChange(candidateLanguage);
+  }
+
+  onSearchTypeChange(value: string) {
+    this.isSearchAnd = value === SearchType.AND;
   }
 
   private getCvFileName(entity: Candidate) {

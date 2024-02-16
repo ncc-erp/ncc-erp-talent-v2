@@ -44,6 +44,7 @@ export class Candidate extends CandidateInfo {
   updatedName: string;
   updatedTime: string;
   mailDetail?: MailDetail;
+  candidateLanguage: string;
 }
 
 export interface CandidateStaff extends Candidate { }
@@ -76,6 +77,7 @@ export class CandidatePayload {
   address: string;
   note: string;
   cvStatus: number;
+  candidateLanguage: string;
 }
 
 export interface CVSkill {

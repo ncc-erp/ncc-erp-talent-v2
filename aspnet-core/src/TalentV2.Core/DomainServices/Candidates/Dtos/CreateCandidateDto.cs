@@ -33,5 +33,6 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string LinkCv { get; set; }  
         public string AvatarCv { get; set; }
         public long? ApplyId { get; set; }
+        public string CandidateLanguage { get; set; }
     }
 }

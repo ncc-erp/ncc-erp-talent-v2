@@ -10,6 +10,7 @@ using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Posts;
 using TalentV2.DomainServices.Users.Dtos;
+using static TalentV2.DomainServices.Categories.Dtos.CandidateLanguageDto;
 
 namespace TalentV2.DomainServices.Categories
 {
@@ -66,5 +67,9 @@ namespace TalentV2.DomainServices.Categories
         Task<PostDto> UpdatePostsMetadata(UpdatePostsMetadataDto inputPost);
         Task DeletePost(long postId);
         Task<List<UserReferenceDto>> GetAllRecruitmentUser();
+        IQueryable<CandidateLanguageDto> IQGetAllLanguage();
+        Task<CandidateLanguageDto> CreateLanguage(CreateLanguageDto inputPost);
+        Task<CandidateLanguageDto> UpdateLanguage(UpdateLanguageDto inputPost);
+        Task DeleteLanguage(long Id);
     }
 }

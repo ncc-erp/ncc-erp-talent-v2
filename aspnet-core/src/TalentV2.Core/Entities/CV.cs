@@ -46,6 +46,9 @@ namespace TalentV2.Entities
         [ForeignKey(nameof(SubPositionId))]
         public SubPosition SubPosition { get; set; }
 
+        [Column(TypeName = "jsonb")]
+        public string CandidateLanguage { get; set; }
+
         public ICollection<CVSkill> CVSkills { get; set; }
         public ICollection<CVEducation> CVEducations { get; set; }
         public ICollection<RequestCV> RequestCVs { get; set; }
