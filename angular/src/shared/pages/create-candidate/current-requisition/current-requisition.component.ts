@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewed, CandidateInterviewedPayload, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CatalogModel } from '@app/core/models/common/common.dto';
-import { RequisitionPayload, RequisitionStaff } from '@app/core/models/requisition/requisition.model';
+import { RequisitionStaff } from '@app/core/models/requisition/requisition.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
 import { UtilitiesService } from '@app/core/services/utilities.service';
@@ -304,6 +304,12 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   saveManyCapability(payload: CandidateCapability[]) {
+    const noteCandidateCapability = payload.find((item) => item.note?.length > 5000);
+    if (noteCandidateCapability){
+      this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED,`${noteCandidateCapability.capabilityName}_Max 5000 characters`);
+      return;
+    }
+    
     this.subs.add(
       this._candidate.updateManyCapabilityCV(payload).subscribe(res => {
         this.isLoadingCapabilityTable = res.loading;
@@ -330,6 +336,11 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   saveCapability(entity: CandidateCapability) {
     const { id, requestCvId, capabilityId, capabilityName, score, note, factor } = entity;
     const payload = { id, requestCvId, capabilityId, capabilityName, score, note, factor };
+
+    if (payload.note?.length > 5000){
+      this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED,`${payload.capabilityName}_Max 5000 characters` );
+      return;
+    }
 
     this.subs.add(
       this._candidate.updateCapabilityCV(payload).subscribe(res => {
@@ -589,10 +600,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     const payload = [];
     const canCapabilities = this.candidateRequisiton?.capabilityCandidate;
     canCapabilities.filter(item => this.editingRowKey[item.id] === true).forEach(item => {
-      const { id, score, note } = item;
-      payload.push({ id, score, note });
+      const { id, score, note, capabilityName } = item;
+      payload.push({ id, score, note, capabilityName });
     })
-        
     canCapabilities.forEach(item => this.editingRowKey[item.id] = false)
     this.saveManyCapability(payload);
     this.totalScore();
@@ -850,7 +860,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private handleAddCurrentReq() {
-    const presentrequestId= this.candidateRequisiton?.currentRequisition.id
     const requisitionComponent = this.userType === UserType.INTERN ? RequisitionInternComponent : RequisitionStaffComponent
     const subHeader = this.userType === UserType.INTERN ? 'Intern' : 'Staff'
     const dialogRef = this._dialog.open(requisitionComponent, {
@@ -861,14 +870,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       data: { dialogMode: ActionEnum.SELECT },
     });
 
-    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean,entity: RequisitionStaff}) => {
-      if (res?.entity.id) {
-        const payload : RequisitionPayload = { 
-          cvId: this.candidateId,
-          requestId: res.entity.id, 
-          currentRequestId: presentrequestId ,
-          isPresentForHr: res.isPresentForHr 
-        }
+    dialogRef.onClose.subscribe((entity: RequisitionStaff) => {
+      if (entity?.id) {
+       const payload = { cvId: this.candidateId, requestId: entity.id }
           this.subs.add(
             this._candidate.createReqCV(payload).subscribe(res => {
               if (!res.loading && res.success) {

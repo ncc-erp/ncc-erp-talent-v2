@@ -93,18 +93,7 @@ export class RequisitionInternComponent extends PagedListingComponentBase<Requis
   }
 
   onCandidateSelectedRequisiton(entity: RequisitionIntern) {
-    const dialogRef = this._dialog.open(ConfirmPresentForHr, {
-      showHeader: false,
-      width: '25%',
-      contentStyle: { 'background-color': 'rgba(242,245,245)', overflow: 'visible' },
-      baseZIndex: 10000,
-      data: entity
-    });
-    dialogRef.onClose.subscribe((res: { isPresentForHr: boolean}) => {
-      if (res) {
-       this.ref.close({ entity, ...res });
-      }
-    });
+    this.ref.close( entity );
   }
 
   onPositionSelect(subPositionId: number) {

@@ -119,6 +119,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public MailDetailDto MailDetail { get; set; }
         public string LMSInfo { get; set; }
         public string Percentage { get; set; }
+        public bool? EmailSent { get; set; }
     }
     public class InterviewLevelCandidateDto
     {

@@ -11,7 +11,6 @@ import { ApiResponse } from './../../../../shared/paged-listing-component-base';
 import { CandidateApplyHistory } from './../../models/candidate/candidate-apply-history.model';
 import { CatalogModel } from './../../models/common/common.dto';
 import { StatusCreateAccount, UserType } from '@shared/AppEnums';
-import { RequisitionPayload } from '@app/core/models/requisition/requisition.model';
 
 @Injectable({
   providedIn: 'root'
@@ -87,8 +86,8 @@ export class CandidateInternService extends BaseApiService {
     return this.create(payload, '/CreateCVSkill');
   }
 
-  createReqCV(payload: RequisitionPayload): Observable<ApiResponse<CandidateRequisiton>> {
-    return this.create(payload, '/CreateRequestCV');
+  createReqCV(payload: { cvId: number, requestId: number }): Observable<ApiResponse<CandidateRequisiton>> {
+    return this.create(payload, '/CreateCandidateRequestCV');
   }
 
   addInterviewer(payload: { interviewerId: number, requestCvId: number }) {

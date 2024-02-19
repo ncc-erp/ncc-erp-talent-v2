@@ -79,9 +79,9 @@ namespace TalentV2.APIs
 
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_RequisitionIntern_AddCV)]
-        public async Task<object> CreateRequestCV(CandidateRequestDto input)
+        public async Task<object> CreateRequestCV(RequesitionCVDto input)
         {
-            var result = await _candidateManager.CreateRequestCV(new CandidateRequestDto
+            var result = await _candidateManager.CreateRequestCV(new RequesitionCVDto
             {
                 CvId = input.CvId,
                 RequestId = input.RequestId,
@@ -110,7 +110,7 @@ namespace TalentV2.APIs
             var resultCreateMany = new CreateRequestCVResultDto();
             foreach (var cvId in input.CVIds)
             {
-                var cvIdSuccess = await _candidateManager.CreateRequestCV(new CandidateRequestDto
+                var cvIdSuccess = await _candidateManager.CreateRequestCV(new RequesitionCVDto
                 {
                     CvId = cvId,
                     RequestId = input.RequestId,

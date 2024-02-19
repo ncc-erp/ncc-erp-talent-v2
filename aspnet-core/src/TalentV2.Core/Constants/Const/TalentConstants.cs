@@ -10,7 +10,7 @@ namespace TalentV2.Constants.Const
     {
         public const float LAUNCH_ALLOWANCE = 800000;
         public const string PROJECT_NAME = "talent";
-        public const long MEGA_BYTE = 1000 * 1000;
+        public const long MEGA_BYTE = 1024 * 1024;
         public static string UploadFileProvider { get; set; }
         public static string[] AllowImageFileTypes { get; set; }
         public static readonly string AmazoneS3 = "AWS";

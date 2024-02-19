@@ -76,13 +76,14 @@
         </span>
 
         <div class="input-item">
-          <p-inputMask
-            mask="9999999999"
-            formControlName="phone"
-            styleClass="w-100"
-          ></p-inputMask>
+          <input type="text"
+          pInputText 
+          formControlName="phone"
+          class="w-100"
+          maxlength="10"
+          (input)="handleInputEvent($event)" 
+        />
         </div>
-
         <div
           class="text-error text-danger"
           *ngIf="submitted && formControls.phone.errors?.required"
@@ -318,6 +319,38 @@
             pInputText
             formControlName="address"
           />
+        </div>
+      </div>
+
+      <div class="group-item">
+        <span class="lb-item" for="created">
+          {{ "Assign to" | localize }}
+        </span>
+        <div class="input-item" *ngIf="userType === USER_TYPE.STAFF">
+          <p-dropdown
+          inputId="created"
+          [options]="_utilities.catCanStaffCreatedBy"
+          formControlName="creatorUserId"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-100"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+        ></p-dropdown>
+        </div>
+        <div class="input-item" *ngIf="userType === USER_TYPE.INTERN">
+          <p-dropdown
+            inputId="created"
+            [options]="_utilities.catCanInternCreatedBy"
+            formControlName="creatorUserId"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-100"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+          ></p-dropdown>
         </div>
       </div>
 
