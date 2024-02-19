@@ -354,7 +354,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       cvSourceId: [null, [Validators.required]], //number
       referenceId: ['', [Validators.required]],
       avatar: null,
-      mailDetail: null
+      mailDetail: null,
+      creatorUserId: [null, []],
     });
 
     (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();
@@ -457,7 +458,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
         isFemale: getFormControlValue(this.form, 'isFemale'),
         address: getFormControlValue(this.form, 'address'),
         note: getFormControlValue(this.form, 'note'),
-        cvStatus: getFormControlValue(this.form, 'cvStatus')
+        cvStatus: getFormControlValue(this.form, 'cvStatus'),
+        creatorUserId: getFormControlValue(this.form, 'creatorUserId'),
       }
       return payload;
     }
@@ -491,7 +493,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     }
     this.avatarFile && formData.append('avatar', this.avatarFile);
     this.isEnaleRefBy && formData.append('referenceId', getFormControlValue(this.form, 'referenceId'));
-
+    formData.append('creatorUserId', getFormControlValue(this.form, 'creatorUserId'));
     return formData;
   }
 

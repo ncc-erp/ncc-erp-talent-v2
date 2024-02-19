@@ -123,7 +123,9 @@ namespace TalentV2.DomainServices.Candidates
                     ReferenceId = s.ReferenceId,
                     UserType = s.UserType,
                     CvStatus = s.CVStatus,
-                    isClone = s.isClone
+                    isClone = s.isClone,
+                    CreatorUserId = s.CreatorUserId,
+                    CreatorName = s.CreatorUser.Name,
                 })
                 .FirstOrDefaultAsync();
             var controlSendMail = await CheckAllowSendMail(cvId: cvId);
