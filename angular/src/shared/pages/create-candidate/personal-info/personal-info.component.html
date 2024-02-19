@@ -322,6 +322,38 @@
         </div>
       </div>
 
+      <div class="group-item">
+        <span class="lb-item" for="created">
+          {{ "Created By" | localize }}
+        </span>
+        <div class="input-item" *ngIf="userType === USER_TYPE.STAFF">
+          <p-dropdown
+          inputId="created"
+          [options]="_utilities.catCanStaffCreatedBy"
+          formControlName="creatorUserId"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-100"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true"
+        ></p-dropdown>
+        </div>
+        <div class="input-item" *ngIf="userType === USER_TYPE.INTERN">
+          <p-dropdown
+            inputId="created"
+            [options]="_utilities.catCanInternCreatedBy"
+            formControlName="creatorUserId"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="w-100"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+          ></p-dropdown>
+        </div>
+      </div>
+
       <div class="group-item group-item--status">
         <span class="lb-item text-status" for="cvStatus">
           {{ "Status" | localize }}
