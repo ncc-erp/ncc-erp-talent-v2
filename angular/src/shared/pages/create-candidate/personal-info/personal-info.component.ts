@@ -355,7 +355,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       referenceId: ['', [Validators.required]],
       avatar: null,
       mailDetail: null,
-      creatorUserId: [null, []],
+      creatorUserId: ['', []],
     });
 
     (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();
