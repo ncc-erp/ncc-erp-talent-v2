@@ -76,7 +76,7 @@ export class CandidatePayload {
   address: string;
   note: string;
   cvStatus: number;
-  creatorUserId: number;
+  creatorUserId?: number;
 }
 
 export interface CVSkill {
