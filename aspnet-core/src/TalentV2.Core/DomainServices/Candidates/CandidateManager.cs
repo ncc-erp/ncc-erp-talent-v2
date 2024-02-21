@@ -1535,7 +1535,7 @@ namespace TalentV2.DomainServices.Candidates
                 Name = Utils.StringExtensions.GetNamePerson(cv.Name),
                 Surname = Utils.StringExtensions.GetSurnamePerson(cv.Name),
                 Password = PasswordUtils.GeneratePassword(6, true),
-                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName, statusCreateAccount)
+                UserName = Utils.StringExtensions.GetAccountUserLMS(cv.Name, cv.UserType.ToString(), cv.SubPositionName, cv.BranchDisplayName)
             };
             var requestCV = await WorkScope.GetAsync<RequestCV>(requestCVId);
             if (statusCreateAccount == StatusCreateAccount.CREATE_LMS_ACCOUT)
@@ -1558,7 +1558,7 @@ namespace TalentV2.DomainServices.Candidates
             }
             else
             {
-                requestCV.LMSInfo = TemplateHelper.ContestUrl(accountStudent.UserName, urlContest);
+                requestCV.LMSInfo = TemplateHelper.ContestUrl(urlContest);
                 return requestCV.LMSInfo;
             }
         }

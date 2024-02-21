@@ -62,8 +62,8 @@ namespace TalentV2.Notifications.Templates
         public static string ContentLMSInfo(string username, string password, string lmsCourseName, Guid courseInstanceId)
              => $"<div dir='ltr'>   <p dir='ltr'>Link b&agrave;i Test: <strong><a href='{TalentConstants.LMSClientRootAddress}app/student/course/{courseInstanceId}'>{lmsCourseName}</a></strong></p> <p dir='ltr'>Username: {username}</p> <p dir='ltr'>Pass: {password}</p> </div>";
 
-        public static string ContestUrl(string username, string urlContest)
-            => $"<div dir='ltr'>   <p dir='ltr'>Link b&agrave;i Test: <strong><a href='{urlContest}'>CONTEST.NCC</a></strong></p> <p dir='ltr'>Username: {username}</p></div>";
+        public static string ContestUrl(string urlContest)
+            => $"<div dir='ltr'>   <p dir='ltr'>Link b&agrave;i Test: <strong><a href='{urlContest}'>CONTEST.NCC</a></strong></p></div>";
 
         public static string DefaulSignature =>
             "<div> <div dir='ltr'> <div> <div dir='ltr' data-smartmail='gmail_signature'> <div dir='ltr'> <p><em><strong>NGUYEN HONG HR</strong></em></p> <p><strong><em>[A]:&nbsp;Human Resource Department</em></strong></p> <p><strong><em>Floor 5,</em></strong><strong><em>&nbsp;Ecolife Building, No.58 To Huu Street, Nam Tu Liem District, Ha Noi</em></strong><u></u></p> <p><em><strong>[P]</strong>:<strong>077.33.11.272</strong></em></p> <p><strong>[</strong><strong>E]:&nbsp;</strong><strong><a href='mailto:van.nguyenhong@ncc.asia' target='_blank'>hr.nguyenhong@ncc.asia</a></strong></p> </div> </div> </div> </div> </div>";
