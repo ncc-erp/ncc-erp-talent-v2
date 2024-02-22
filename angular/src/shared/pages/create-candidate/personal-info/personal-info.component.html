@@ -81,7 +81,8 @@
           formControlName="phone"
           class="w-100"
           maxlength="10"
-          (input)="handleInputEvent($event)" 
+          (paste)="pasteInputEvent($event)" 
+          (input)="handleInputEvent($event)"
         />
         </div>
         <div
