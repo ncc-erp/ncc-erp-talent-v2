@@ -14,16 +14,18 @@ using TalentV2.Entities;
 using TalentV2.Utils;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
+using Abp.Authorization.Users;
+using TalentV2.DomainServices.Candidates.Dtos;
 
 namespace TalentV2.DomainServices.Reports
 {
     public class ReportManager : BaseManager, IReportManager
     {
         public ReportManager() { }
-        public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId)
+        public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId, long? userId)
         {
             var fromDate = fd.Date;
-            var toDate = td.Date;  
+            var toDate = td.Date;
             var qsubPositionStatistic = from sp in WorkScope.GetAll<SubPosition>()
                                         join r in WorkScope.GetAll<Request>() on sp.Id equals r.SubPositionId into rr
                                         from gr in rr.DefaultIfEmpty()
@@ -48,12 +50,12 @@ namespace TalentV2.DomainServices.Reports
                         QuantityHiring = x.QuantityHiring
                     }
                 );
-            
-            var cvStatistics = await GetDicSubPositionIdToStatisticQuantityCV(fd,td,userType,branchId);
+
+            var cvStatistics = await GetDicSubPositionIdToStatisticQuantityCV(fd,td,userType,branchId, userId);
 
             var cvsources = await WorkScope.GetAll<CVSource>().OrderBy(s => s.Name).ToListAsync();
-            var qstatisticIQCVSources = IQStatisticCVSources(fd, td, userType, branchId, cvsources);
-            var qstatisticBySubPostion = IQStatisticRequestCVHistory(fd, td, userType, branchId);
+            var qstatisticIQCVSources = IQStatisticCVSources(fd, td, userType, branchId, cvsources, userId);
+            var qstatisticBySubPostion = IQStatisticRequestCVHistory(fd, td, userType, branchId, userId);
 
             var statisticBySubPosition = qstatisticBySubPostion.ToDictionary
                 (
@@ -157,13 +159,15 @@ namespace TalentV2.DomainServices.Reports
           DateTime td,
           UserType? userType,
           long? branchId,
-          List<CVSource> cvsources
+          List<CVSource> cvsources,
+          long? userId
           )
          {
             Expression<Func<CV, bool>> predic = q => (q.CreationTime.Date >= fd.Date && q.CreationTime.Date <= td.Date) &&
                                                                          (userType.HasValue ? q.UserType == userType : true) &&
                                                                          (!q.IsDeleted && !q.IsDeleted && !q.IsDeleted) &&
-                                                                         (branchId.HasValue ? q.BranchId == branchId.Value : true);
+                                                                         (branchId.HasValue ? q.BranchId == branchId.Value : true) &&
+                                                                         (userId.HasValue ? q.CreatorUserId == userId.Value: true);
 
             var requestCVSources = WorkScope.GetAll<CV>()
             .Where(predic)
@@ -198,12 +202,15 @@ namespace TalentV2.DomainServices.Reports
             DateTime fd, 
             DateTime td, 
             UserType? userType, 
-            long? branchId)
+            long? branchId,
+            long? userId
+            )
         {
             Expression<Func<RequestCVStatusHistory, bool>> predic = q => (q.TimeAt.Date >= fd.Date && q.TimeAt.Date <= td.Date) &&
                                                                          (userType.HasValue ? q.RequestCV.CV.UserType == userType : true) &&
                                                                          (!q.RequestCV.IsDeleted && !q.RequestCV.Request.IsDeleted && !q.RequestCV.CV.IsDeleted) &&
-                                                                         (branchId.HasValue ? q.RequestCV.CV.BranchId == branchId.Value : true);
+                                                                         (branchId.HasValue ? q.RequestCV.CV.BranchId == branchId.Value : true)&&
+                                                                         (userId.HasValue ? q.RequestCV.CV.CreatorUserId == userId.Value : true);        
 
             var requestCVStatusHistory = WorkScope.GetAll<RequestCVStatusHistory>()
             .Where(predic)
@@ -239,7 +246,8 @@ namespace TalentV2.DomainServices.Reports
             DateTime fd, 
             DateTime td, 
             UserType? userType, 
-            long? branchId)
+            long? branchId,
+            long? userId)
         {
             var qCVStatistics = from sp in WorkScope.GetAll<SubPosition>()
                                 join cv in WorkScope.GetAll<CV>() on sp.Id equals cv.SubPositionId into cvp
@@ -251,6 +259,7 @@ namespace TalentV2.DomainServices.Reports
                                     qAllCVApply = r.Where(q => q.CreationTime.Date >= fd.Date && q.CreationTime.Date <= td.Date)
                                                    .Where(q => branchId.HasValue ? q.BranchId == branchId.Value : true)
                                                    .Where(q => userType.HasValue ? q.UserType == userType : true)
+                                                   .Where(q => userId.HasValue ? q.CreatorUserId == userId.Value : true)
                                 };
             var cvStatistics = await qCVStatistics
                 .ToDictionaryAsync
@@ -476,7 +485,25 @@ namespace TalentV2.DomainServices.Reports
 
             return result;
         }
+        public async Task<List<IdAndNameDto>> GetUserCreated()
+        {
+            var query = from cv in WorkScope.GetAll<CV>()
+                        where cv.CreatorUserId.HasValue  && !cv.CreatorUser.IsDeleted
+                        select new IdAndNameDto
+                        {
+                            Id = cv.CreatorUserId.Value,
+                            Name = cv.CreatorUserId == AbpSession.UserId ?
+                                    "@Me" :
+                                    cv.CreatorUser.FullName,
+                        };
+            var allCreator = query
+                .Distinct()
+                .AsNoTracking()
+                .AsEnumerable()
+                .OrderBy(x => x.Name);
 
+            return allCreator.ToList();
+        }
         public async Task<FileContentResult> ExportOverviewHiring(ExportChartInput input)
         {
             var noData = "NoData";
@@ -487,7 +514,7 @@ namespace TalentV2.DomainServices.Reports
             pieChartStatusStatistics.ModelCharts = new List<ModelChart>();     
             foreach (var branch in input.Branchs)
             {
-                var overviewHiring = await GetOverviewHiring(input.FromDate.Value, input.ToDate.Value, input.userType, branch.Id);
+                var overviewHiring = await GetOverviewHiring(input.FromDate.Value, input.ToDate.Value, input.userType, branch.Id, input.userId);
                 var subPositionStatistics = overviewHiring?.SubPositionStatistics.FirstOrDefault();
                 var cvSourceStatistics = subPositionStatistics?.CVSourceStatistics.ToList();
                 var totalOverviewHiring = overviewHiring.TotalOverviewHiring.TotalCVSources;

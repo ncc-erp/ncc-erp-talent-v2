@@ -1,6 +1,6 @@
 import { LoopArrayPipe } from './../../../../shared/pipes/loop-array.pipe';
 import { REQUEST_CV_STATUS, ToastMessageType, } from './../../../../shared/AppEnums';
-import { forkJoin, of } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { ReportOverview, StatusStatistic } from '../../../core/models/report/report.model';
 import { ReportOverviewService } from '../../../core/services/report/report-overview.service';
 import { Injector } from '@angular/core';
@@ -13,12 +13,13 @@ import { DateFormat } from '@shared/AppConsts';
 import { ApiResponse } from '@shared/paged-listing-component-base';
 import { LoopNumberPipe } from '@shared/pipes/loop-number.pipe';
 import { Branch } from '@app/core/models/categories/branch.model';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CatalogModel } from '@app/core/models/common/common.dto';
-import {ExportDialogComponent} from '../../../../shared/components/export-dialog/export-dialog.component';
-import {MatDialog} from '@angular/material/dialog';
-import {ExportDialogService} from '../../../core/services/export/export-dialog.service';
+import { ExportDialogComponent } from '../../../../shared/components/export-dialog/export-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ExportDialogService } from '../../../core/services/export/export-dialog.service';
+import { UserServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'talent-recruitment-overview',  
@@ -38,8 +39,11 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
     } as Branch
   ];
   filterUserType: CatalogModel = { id: null, name: 'All', } as CatalogModel;
+  filterUser: CatalogModel = { id: null, name: 'All', } as CatalogModel;
+
   branches: Branch[] = [];
   usertypes: CatalogModel[] = [];
+  userList: CatalogModel[] = [];
   colOverview: number;
   colQuantity: number = 5; //Col: QuatyHiring, QuatyApply, QuatyFailed, ...
   colLabel: number = 2; //Col: No, PositionName
@@ -58,6 +62,9 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
     this.breadcrumbConfig = this.getBreadcrumbConfig();
     this.branches = this.getDropdownFilterBranch();
     this.usertypes = this.getDropdownFilterUserType();
+    this.getDropdownFilterUser().subscribe(users => {
+      this.userList = users;
+    });
     this.lengthCVSourceAndStatus = this.getLengthCVSourceAndStatus();
     this.colOverview = this.getColTotalOverview();
   }
@@ -67,6 +74,10 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
   }
 
   onSelectChangeUserType($event) {
+    this.getOverviewStatistics(false, true);
+  }
+
+  onSelectChangeUser($event) {
     this.getOverviewStatistics(false, true);
   }
 
@@ -97,7 +108,7 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
 
     this.filterBranch.forEach((branch: Branch) => {
       if (!isChangeTime && !isChangeUserType && this.reports.find(s => s.branchId == branch.id)) return;
-      promises.push(this._report.getOverviewStatistic(fd, td, branch.id, this.filterUserType.id));
+      promises.push(this._report.getOverviewStatistic(fd, td, branch.id, this.filterUserType.id, this.filterUser?.id));
     });
     this.isLoading = true;
     forkJoin(promises)
@@ -130,6 +141,19 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
       ...this._utilities.catUserType
     ]
   }
+  getDropdownFilterUser(): Observable<CatalogModel[]> {
+    return this._report.getAllUserCreated().pipe(
+        map(res => {
+          if (res?.result) {
+            const users = res.result;
+            users.unshift({ id: null, name: 'All' } as CatalogModel);
+          return users; 
+            } else {
+                return []; 
+            }
+        }),
+    );
+}
 
   onTalentDateChange(talentDateTime: TalentDateTime) {
     this.searchWithCreationTime = talentDateTime;
