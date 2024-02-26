@@ -75,6 +75,7 @@ namespace TalentV2.DomainServices.Reports.Dtos
     public class ExportChartInput : ExportInput
     {
         public List<BranchDtoExport> Branchs { get; set; }
+        public long? userId {  get; set; }
     }
 
     public class ExportChartEducationInput : DateInput

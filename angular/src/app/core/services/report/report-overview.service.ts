@@ -8,6 +8,7 @@ import { ReportOverview } from '../../models/report/report.model';
 import { catchError, map, startWith } from 'rxjs/operators';
 import * as moment from 'moment';
 import { SourceStatistic } from '@app/core/models/report/report-performance.model';
+import { CatalogModel } from '@app/core/models/common/common.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -23,10 +24,11 @@ export class ReportOverviewService extends BaseApiService {
     super(http);
   }
 
-  public getOverviewStatistic(fd: string, td: string, branchId?: any, userType?: any): Observable<ApiResponse<ReportOverview>> {
+  public getOverviewStatistic(fd: string, td: string, branchId?: any, userType?: any, userId?: any): Observable<ApiResponse<ReportOverview>> {
     branchId = branchId == null ? '' : branchId;
     userType = userType == null ? '' : userType;
-    return this.http.get<any>(this.rootUrl + `/GetOverviewHiring?fd=${fd}&td=${td}&userType=${userType}&branchId=${branchId}`).pipe(
+    userId = userId === null ? '' : userId;
+    return this.http.get<any>(this.rootUrl + `/GetOverviewHiring?fd=${fd}&td=${td}&userType=${userType}&branchId=${branchId}&userId=${userId}`).pipe(
       catchError((err: HttpErrorResponse) => {
         return of({ error: err });
       })
@@ -55,5 +57,9 @@ export class ReportOverviewService extends BaseApiService {
   
   exportOverviewHiring(payload: {fromDate: string, toDate: string,userType: UserType, branchs?: any[] }): Observable<Blob> {
     return this.generateExport(payload, '/ExportOverviewHiring');
+  }
+  
+  getAllUserCreated(): Observable<ApiResponse<CatalogModel[]>> {
+    return this.getAll("/GetAllUserCreated");
   }
 }
