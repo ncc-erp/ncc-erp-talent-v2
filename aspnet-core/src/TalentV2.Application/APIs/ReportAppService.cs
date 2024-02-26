@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization;
 using TalentV2.Constants.Enum;
+using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Reports;
 using TalentV2.DomainServices.Reports.Dtos;
 using TalentV2.DomainServices.Requisitions.Dtos;
@@ -28,9 +29,9 @@ namespace TalentV2.APIs
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Reports_Overview)]
-        public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId)
+        public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId , long? userId)
         {
-            return await _reportManager.GetOverviewHiring(fd, td, userType, branchId);
+            return await _reportManager.GetOverviewHiring(fd, td, userType, branchId, userId);
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Reports_Staff_Performance)]
@@ -73,6 +74,12 @@ namespace TalentV2.APIs
         public async Task<FileContentResult> ExportInternEducation(ExportChartEducationInput input)
         {
             return await _reportManager.ExportInternEducation(input);
+        }
+
+        [HttpGet]
+        public async Task<List<IdAndNameDto>> GetAllUserCreated()
+        {
+            return await _reportManager.GetUserCreated();
         }
     }
 }
