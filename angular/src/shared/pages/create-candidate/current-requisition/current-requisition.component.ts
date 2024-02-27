@@ -742,11 +742,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   getDefaultcreateAccout() {
-    if (this.userType === UserType.INTERN) {
-      return '0';
-    } else {
       return '1';
-    }
   }
 
   private onResetApplyResultForm() {

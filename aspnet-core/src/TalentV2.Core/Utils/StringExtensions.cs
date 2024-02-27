@@ -35,27 +35,19 @@ namespace TalentV2.Utils
             return surname.Trim();
         }
 
-        public static string GetAccountUserLMS(string fullName, string userType, string subposition, string branch, StatusCreateAccount statusCreateAccount)
+        public static string GetAccountUserLMS(string fullName, string userType, string subposition, string branch)
         {
             var textNotUnicode = RemoveSign4VietnameseString(fullName);
             var surname = GetSurnamePerson(textNotUnicode);
 
             var name = GetNamePerson(textNotUnicode);
-            if (statusCreateAccount == StatusCreateAccount.CREATE_LMS_ACCOUT)
-            {
+          
                 var usName = name + "." + ReplaceWhitespace(surname) + "."
                 + ReplaceWhitespace(subposition) + "."
                 + userType + "."
                 + GetBranchName(branch) + "."
                 + UsernameUntils.GenerateUsername(3, true);
                 return ReplaceSpecialCharacters(usName);
-            };
-            var usNameContest = name + "_" + GetInitials(surname) + "_"
-                + ReplaceWhitespace(subposition.Substring(0, 2)) + "_"
-                + GetBranchName(branch) + "_"
-                + UsernameUntils.GenerateUsername(3, true);
-
-            return ReplaceSpecialCharacters(usNameContest);
         }
 
         public static string ReplaceSpecialCharacters(string input) => Regex.Replace(input, "/", "_");
@@ -69,19 +61,6 @@ namespace TalentV2.Utils
 
         public static string ReplaceWhitespace(string input)
             => Regex.Replace(input, @"\s+", "");
-
-        public static string GetInitials(string input)
-        {
-            string[] words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            StringBuilder initials = new StringBuilder();
-
-            foreach (string word in words)
-            {
-                initials.Append(word[0]);
-            }
-
-            return initials.ToString();
-        }
 
         private static string RemoveSign4VietnameseString(string str)
         {

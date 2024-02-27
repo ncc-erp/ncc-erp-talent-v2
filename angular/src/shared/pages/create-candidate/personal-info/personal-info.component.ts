@@ -394,8 +394,16 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       })
     );
   }
+  
+  pasteInputEvent(event: any){
+    event.preventDefault();
+    const pastedData = event.clipboardData.getData('text/plain');
+    const numbersOnly = pastedData.replace(/[^0-9]/g, '');
+    event.target.value = numbersOnly;
+    event.target.dispatchEvent(new Event('input'));
+  }
 
-  handleInputEvent(event)
+  handleInputEvent(event: any)
   {
     const inputElement = event.target;
     inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
