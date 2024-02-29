@@ -400,7 +400,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   pasteInputEvent(event: any){
     event.preventDefault();
     const pastedData = event.clipboardData.getData('text/plain');
-    const numbersOnly = pastedData.replace(/[^0-9]/g, '');
+    const numbersOnly = pastedData.replace(/[^0-9]/g, '').slice(0, 10);
     event.target.value = numbersOnly;
     event.target.dispatchEvent(new Event('input'));
   }
