@@ -83,7 +83,7 @@
 
   <div class="group-right">
     <span *ngIf="_utilities.getLinkFile(data.linkCV)">
-      <a [href]="_utilities.getLinkFile(data.linkCV)" target="_blank">
+      <a (click)="openLink()" target="_blank">
         <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
       </a>
     </span>

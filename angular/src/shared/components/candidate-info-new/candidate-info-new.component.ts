@@ -38,6 +38,10 @@ export class CandidateInfoNewComponent extends AppComponentBase implements OnIni
     );
     window.open(url.toString(), '_blank')
   }
+  openLink() {
+    localStorage.setItem('documentUrl', this.data.linkCV);
+    window.open('/app/candidate/view-files', '_blank');
+  }
 
   private getTabActiveDetail(requestId: number) {
     return checkNumber(requestId) ? CANDIDATE_DETAILT_TAB_DEFAULT.CURRENT_REQ : this.tabActive;
