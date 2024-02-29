@@ -169,6 +169,11 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.uploadFile(this.avatarFile, true);
     });
   }
+  
+  openLink(){
+    const googleDriveurl = 'https://drive.google.com/viewerng/viewer?embedded=true&url='+ this.formControls['linkCV'].value;
+    window.open(googleDriveurl, '_blank');
+  }
 
   onSaveClose() {
     this.submitted = true;
