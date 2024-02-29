@@ -132,16 +132,16 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
     this.cvFile = file;
     this.cvFileName = file?.name;
-    if (!isCVExtensionAllow(file)) {
-      this.formControls['linkCV'].setErrors({ invalidCVExtension: true });
-      return;
+      if (!isCVExtensionAllow(file)) {
+        this.formControls['linkCV'].setErrors({ invalidCVExtension: true });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.uploadFile(this.cvFile);
+      }
+      reader.readAsText(file);
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      this.uploadFile(this.cvFile);
-    }
-    reader.readAsText(file);
-  }
 
   onAvatarFileChange(event) {
     this.imageChangedEvent = event;
@@ -166,6 +166,11 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.formControls['avatar'].patchValue(this.avatarUrl);
       this.uploadFile(this.avatarFile, true);
     });
+  }
+
+  openLink() {
+    const googleDriveurl = 'https://drive.google.com/viewerng/viewer?embedded=true&url='+  this.formControls['linkCV'].value
+    window.open(googleDriveurl, '_blank');
   }
 
   onSaveClose() {
@@ -340,7 +345,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       fullName: ['', [Validators.required]],
       dob: [null, [CustomValidators.isDateMustLessThanCurrent()]],
       email: ['', [Validators.required, Validators.email]],
-      isFemale: true,
+      isFemale: false,
       phone: ['', [Validators.required]],
       address: '',
       userType: [userType, [Validators.required]], //number
