@@ -130,6 +130,10 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   onCVFileChange(fileList: FileList) {
     if (fileList.length > 0) {
     let file = fileList[0];
+    if (!file?.name.match(/^[a-zA-Z0-9_.-]*$/)) {
+      this.showToastMessage(ToastMessageType.ERROR, 'The file name cannot contain special characters');
+      return;
+    }
 
     this.cvFile = file;
     this.cvFileName = file?.name;
@@ -405,7 +409,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   pasteInputEvent(event: any){
     event.preventDefault();
     const pastedData = event.clipboardData.getData('text/plain');
-    const numbersOnly = pastedData.replace(/[^0-9]/g, '');
+    const numbersOnly = pastedData.replace(/[^0-9]/g, '').slice(0, 10);
     event.target.value = numbersOnly;
     event.target.dispatchEvent(new Event('input'));
   }
