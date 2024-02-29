@@ -128,6 +128,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   }
 
   onCVFileChange(fileList: FileList) {
+    if (fileList.length > 0) {
     let file = fileList[0];
 
     this.cvFile = file;
@@ -141,6 +142,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.uploadFile(this.cvFile);
     }
     reader.readAsText(file);
+  }
   }
 
   onAvatarFileChange(event) {
