@@ -17,6 +17,7 @@ import { LayoutStoreService } from "./layout/layout-store.service";
 
 import { BusyDirective } from "./directives/busy.directive";
 import { EqualValidator } from "./directives/equal-validator.directive";
+import { NumberOnly } from "./directives/number-only.directive"
 
 import { MatCardModule } from '@angular/material/card'
 import { MatCheckboxModule } from '@angular/material/checkbox'
@@ -206,6 +207,7 @@ const candidate = [
         LocalizePipe,
         BusyDirective,
         EqualValidator,
+        NumberOnly,
         ListFilterPipe,
         FilterComponent,
         UserInfoComponent,
@@ -241,6 +243,7 @@ const candidate = [
         DateTimePipe,
         BusyDirective,
         EqualValidator,
+        NumberOnly,
         NgxStarsModule,
         DragDropModule,
         ToastModule,

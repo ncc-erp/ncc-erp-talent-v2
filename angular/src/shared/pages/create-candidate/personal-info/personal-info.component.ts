@@ -406,22 +406,6 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     );
   }
   
-  pasteInputEvent(event: any){
-    event.preventDefault();
-    const pastedData = event.clipboardData.getData('text/plain');
-    const numbersOnly = pastedData.replace(/[^0-9]/g, '').slice(0, 10);
-    event.target.value = numbersOnly;
-    event.target.dispatchEvent(new Event('input'));
-  }
-
-  handleInputEvent(event: any)
-  {
-    const inputElement = event.target;
-    inputElement.value = inputElement.value.replace(/[^0-9]/g, '');
-    if (inputElement.value.length > 10) {
-      inputElement.value = inputElement.value.slice(0, 10);
-    }
-  }
   private backToCandidate() {
     if (this.userType === UserType.INTERN) {
       return this.router.navigate(['/app/candidate/intern-list'])

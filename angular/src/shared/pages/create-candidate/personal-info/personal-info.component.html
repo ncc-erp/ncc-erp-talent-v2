@@ -76,13 +76,13 @@
         </span>
 
         <div class="input-item">
-          <input type="text"
+          <input 
+          type="text"
           pInputText 
           formControlName="phone"
           class="w-100"
           maxlength="10"
-          (paste)="pasteInputEvent($event)" 
-          (input)="handleInputEvent($event)"
+          numberOnly
         />
         </div>
         <div
