@@ -351,7 +351,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       fullName: ['', [Validators.required]],
       dob: [null, [CustomValidators.isDateMustLessThanCurrent()]],
       email: ['', [Validators.required, Validators.email]],
-      isFemale: true,
+      isFemale: false,
       phone: ['', [Validators.required]],
       address: '',
       userType: [userType, [Validators.required]], //number
@@ -512,7 +512,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     }
     this.avatarFile && formData.append('avatar', this.avatarFile);
     this.isEnaleRefBy && formData.append('referenceId', getFormControlValue(this.form, 'referenceId'));
-    formData.append('creatorUserId', getFormControlValue(this.form, 'creatorUserId'));
+    formData.append('creatorUserId', getFormControlValue(this.form, 'creatorUserId')!== null ? getFormControlValue(this.form, 'creatorUserId') : '');
     return formData;
   }
 
