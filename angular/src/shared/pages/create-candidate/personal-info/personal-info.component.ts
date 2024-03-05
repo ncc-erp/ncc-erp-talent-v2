@@ -130,11 +130,6 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   onCVFileChange(fileList: FileList) {
     if (fileList.length > 0) {
     let file = fileList[0];
-    if (!file?.name.match(/^[a-zA-Z0-9_.-]*$/)) {
-      this.showToastMessage(ToastMessageType.ERROR, 'The file name cannot contain special characters');
-      return;
-    }
-
     this.cvFile = file;
     this.cvFileName = file?.name;
     if (!isCVExtensionAllow(file)) {
@@ -175,8 +170,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   }
   
   openLink(){
-    const googleDriveurl = 'https://drive.google.com/viewerng/viewer?embedded=true&url='+ this.formControls['linkCV'].value;
-    window.open(googleDriveurl, '_blank');
+    const url = this.router.createUrlTree(['/app/candidate/view-files', { documentUrl: this.formControls['linkCV'].value}]);
+     window.open(url.toString(), '_blank');
   }
 
   onSaveClose() {
