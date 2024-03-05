@@ -61,6 +61,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   clonedCanCapability: { [s: string]: CandidateCapability; } = {};
   isLoadingCapabilityTable = false;
   isLoadingSendMail = false;
+  levelByScore : string;
+  islevelByScore = false;
 
   form: FormGroup;
   submitted = false;
@@ -815,6 +817,26 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       }
     })
   }
+  
+  levelFilterbyScore(tocoScore : any){
+    if(tocoScore){
+      let closestRange: ScoreRangeWithSetting | null = null;
+  
+      for (let i = 0; i < this.scoreRangeResults?.length; i++) {
+        const range = this.scoreRangeResults[i];
+        if (tocoScore >= range.scoreFrom && (tocoScore < range.scoreTo || tocoScore == 5)) {
+          closestRange = range;
+        }
+        if (!closestRange) {
+          this.islevelByScore = false;
+          this.levelByScore = '';
+        } else {
+          this.islevelByScore = true;
+          this.levelByScore = closestRange.levelInfo.defaultName;
+        }
+      }
+    }
+  }
 
   private interviewerMaper() {
     if (this._utilities?.catAllUser) {
@@ -920,7 +942,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
         totalPoint += reviewerCapability[i].score * reviewerCapability[i].factor;
         totalFactor += reviewerCapability[i].factor;
       }
-      return (totalPoint / totalFactor).toFixed(2);
+      const tocolScore = (totalPoint / totalFactor).toFixed(2);
+      this.levelFilterbyScore(tocolScore)
+      return tocolScore;
     }
     return '';
   }
