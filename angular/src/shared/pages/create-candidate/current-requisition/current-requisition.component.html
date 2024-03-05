@@ -270,7 +270,7 @@
             :
             <label class="tl-link" (click)="showDialogScoreRanges('top')">{{totalScore()}}/5</label>
           </div>
-          <div class="mt-1">
+          <div class="mt-1" *ngIf="userType === USER_TYPE.INTERN">
           <input type="text" pInputText [value]="levelByScore" disabled />
           <div
           class="text-error text-danger"

@@ -821,34 +821,20 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   levelFilterbyScore(tocoScore : any){
     if(tocoScore){
       let closestRange: ScoreRangeWithSetting | null = null;
-      let minDifference = Infinity;
   
       for (let i = 0; i < this.scoreRangeResults?.length; i++) {
         const range = this.scoreRangeResults[i];
-        const differenceFrom = Math.abs(tocoScore - range.scoreFrom);
-        const differenceTo = Math.abs(tocoScore - range.scoreTo);
-  
-         if (differenceFrom < minDifference) {
-            minDifference = differenceFrom;
-            closestRange = range;
-          }
-          if (differenceTo < minDifference) {
-            minDifference = differenceTo;
-            closestRange = range;
-          }
-      }
-        if (!closestRange) {
-          this.islevelByScore = false
-           this.levelByScore = ''
-        } else {
-            if (closestRange.scoreTo < tocoScore || closestRange.scoreFrom > tocoScore) {
-              this.islevelByScore = false
-              this.levelByScore = ''
-            } else {
-             this.levelByScore = closestRange.levelInfo.defaultName
-             this.islevelByScore = true
-            }
+        if (tocoScore >= range.scoreFrom && (tocoScore < range.scoreTo || tocoScore == 5)) {
+          closestRange = range;
         }
+        if (!closestRange) {
+          this.islevelByScore = false;
+          this.levelByScore = '';
+        } else {
+          this.islevelByScore = true;
+          this.levelByScore = closestRange.levelInfo.defaultName;
+        }
+      }
     }
   }
 
