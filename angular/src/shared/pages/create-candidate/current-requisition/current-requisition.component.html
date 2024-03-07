@@ -264,11 +264,22 @@
           )
         " [toggleable]="true">
         <ng-template pTemplate="header">
+          <div class="d-flex ">
           <div class="panel-title d-flex mr-3 align-items-center">
             Capability (for interviewer) Total Score
             :
             <label class="tl-link" (click)="showDialogScoreRanges('top')">{{totalScore()}}/5</label>
           </div>
+          <div class="mt-1" *ngIf="userType === USER_TYPE.INTERN">
+          <input type="text" pInputText [value]="levelByScore" disabled />
+          <div
+          class="text-error text-danger"
+          *ngIf="!hasValidScoreLevel "
+         >
+         There is no suitable range
+          </div>
+          </div>
+        </div>
         </ng-template>
         <ng-template pTemplate="icons">
           <div class="d-flex">
