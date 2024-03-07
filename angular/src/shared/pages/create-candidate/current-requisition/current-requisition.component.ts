@@ -62,7 +62,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isLoadingCapabilityTable = false;
   isLoadingSendMail = false;
   levelByScore : string;
-  islevelByScore = false;
+  hasValidScoreLevel  = false;
 
   form: FormGroup;
   submitted = false;
@@ -828,10 +828,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           closestRange = range;
         }
         if (!closestRange) {
-          this.islevelByScore = false;
+          this.hasValidScoreLevel  = false;
           this.levelByScore = '';
         } else {
-          this.islevelByScore = true;
+          this.hasValidScoreLevel  = true;
           this.levelByScore = closestRange.levelInfo.defaultName;
         }
     }
