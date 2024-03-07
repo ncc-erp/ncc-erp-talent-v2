@@ -818,13 +818,13 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
   
-  levelFilterbyScore(tocoScore : any){
-    if(tocoScore){
+  levelFilterbyScore(totalScore : any){
+    if(!totalScore) return;
       let closestRange: ScoreRangeWithSetting | null = null;
   
       for (let i = 0; i < this.scoreRangeResults?.length; i++) {
         const range = this.scoreRangeResults[i];
-        if (tocoScore >= range.scoreFrom && (tocoScore < range.scoreTo || tocoScore == 5)) {
+        if (totalScore >= range.scoreFrom && (totalScore < range.scoreTo || totalScore == 5)) {
           closestRange = range;
         }
         if (!closestRange) {
@@ -834,7 +834,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           this.islevelByScore = true;
           this.levelByScore = closestRange.levelInfo.defaultName;
         }
-      }
     }
   }
 
@@ -942,9 +941,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
         totalPoint += reviewerCapability[i].score * reviewerCapability[i].factor;
         totalFactor += reviewerCapability[i].factor;
       }
-      const tocolScore = (totalPoint / totalFactor).toFixed(2);
-      this.levelFilterbyScore(tocolScore)
-      return tocolScore;
+      const totalScore = (totalPoint / totalFactor).toFixed(2);
+      this.levelFilterbyScore(totalScore)
+      return totalScore;
     }
     return '';
   }
