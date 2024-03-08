@@ -47,6 +47,8 @@
     "lodash-es": "^4.17.15",
     "moment": "2.24.0",
     "moment-timezone": "0.5.33",
+    "ng2-pdf-viewer": "^9.1.5",
+    "ng2-pdfjs-viewer": "^14.0.0",
     "ngx-bootstrap": "^5.6.1",
     "ngx-doc-viewer": "^2.1.4",
     "ngx-image-cropper": "^5.0.1",
