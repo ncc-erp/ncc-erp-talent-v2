@@ -83,7 +83,10 @@
 
   <div class="group-right">
     <span *ngIf="_utilities.getLinkFile(data.linkCV)">
-      <span (click)="openLink()" target="_blank">
+      <a [href]="_utilities.getLinkFile(data.linkCV)" target="_blank" *ngIf="data.linkCV.endsWith('.pdf')">
+        <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
+      </a>
+      <span (click)="openLink()" target="_blank" *ngIf="!data.linkCV.endsWith('.pdf')" >
         <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
       </span>
     </span>
