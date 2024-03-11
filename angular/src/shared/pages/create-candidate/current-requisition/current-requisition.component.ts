@@ -819,7 +819,12 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
   
   levelFilterbyScore(totalScore : any){
-    if(!totalScore) return;
+    if(!totalScore || this.scoreRangeResults?.length === 0) {
+      this.hasValidScoreLevel  = false;
+      this.levelByScore = '';
+      return;
+    }
+
       let closestRange: ScoreRangeWithSetting | null = null;
   
       for (let i = 0; i < this.scoreRangeResults?.length; i++) {
