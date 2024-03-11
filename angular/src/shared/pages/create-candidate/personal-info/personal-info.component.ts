@@ -130,6 +130,10 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   onCVFileChange(fileList: FileList) {
     if (fileList.length > 0) {
     let file = fileList[0];
+    if (file?.name.includes('#') || file?.name.includes('%')) {
+      this.showToastMessage(ToastMessageType.ERROR, 'File name does not contain # or % characters');
+      return;
+    }
     this.cvFile = file;
     this.cvFileName = file?.name;
     if (!isCVExtensionAllow(file)) {
