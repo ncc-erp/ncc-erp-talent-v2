@@ -332,6 +332,7 @@
           inputId="created"
           [options]="_utilities.catCanStaffCreatedBy"
           formControlName="creatorUserId"
+          placeholder="Select a User"
           optionLabel="name"
           optionValue="id"
           styleClass="w-100"
@@ -345,6 +346,7 @@
             inputId="created"
             [options]="_utilities.catCanInternCreatedBy"
             formControlName="creatorUserId"
+            placeholder="Select a User"
             optionLabel="name"
             optionValue="id"
             styleClass="w-100"
@@ -434,16 +436,14 @@
 
           <label for="file" class="btn-inputfile">Choose a file</label>
 
-          <a
-            *ngIf="cvFileName"
-            class="ml-3"
-            [attr.href]="viewFile(formControls['linkCV']?.value)"
-            target="_blank"
-          >
-            {{ cvFileName }}</a
-          >
-
           <span
+          *ngIf="cvFileName"
+          class="text-name tl-link ml-3"
+          (click)="openLink()"
+            >
+            {{ cvFileName }}
+            </span>
+            <span
             class="ml-2 text-danger"
             *ngIf="formControls.linkCV.errors?.invalidCVExtension"
           >

@@ -110,7 +110,9 @@ import { ExportCandidateComponent } from './components/export-candidate/export-c
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component'
 import { ConfirmPresentForHr } from "./pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component";
-
+import { NgxDocViewerModule } from "ngx-doc-viewer";
+import { ViewFllesComponent } from "./pages/create-candidate/view-flles/view-flles.component" 
+import { PdfJsViewerModule } from "ng2-pdfjs-viewer";
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
   TableModule,
@@ -179,7 +181,8 @@ const candidate = [
   CurrentRequisitionComponent,
   ApplicationHistoryComponent,
   ExportCandidateComponent,
-  ConfirmPresentForHr
+  ConfirmPresentForHr,
+  ViewFllesComponent,
 ]
 
 @NgModule({
@@ -195,6 +198,8 @@ const candidate = [
     TabsModule,
     ReactiveFormsModule,
     ImageCropperModule,
+    NgxDocViewerModule,
+    PdfJsViewerModule,
     ...materialLibs,
     ...primengLibs
   ],
