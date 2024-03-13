@@ -128,8 +128,12 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   }
 
   onCVFileChange(fileList: FileList) {
+    if (fileList.length > 0) {
     let file = fileList[0];
-
+    if (file?.name.includes('#') || file?.name.includes('%')) {
+      this.showToastMessage(ToastMessageType.ERROR, 'File name does not contain # or % characters');
+      return;
+    }
     this.cvFile = file;
     this.cvFileName = file?.name;
     if (!isCVExtensionAllow(file)) {
@@ -141,6 +145,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.uploadFile(this.cvFile);
     }
     reader.readAsText(file);
+  }
   }
 
   onAvatarFileChange(event) {
@@ -166,6 +171,11 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.formControls['avatar'].patchValue(this.avatarUrl);
       this.uploadFile(this.avatarFile, true);
     });
+  }
+  
+  openLink(){
+    const url = this.router.createUrlTree(['/app/candidate/view-files', { documentUrl: this.formControls['linkCV'].value}]);
+     window.open(url.toString(), '_blank');
   }
 
   onSaveClose() {
@@ -340,7 +350,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       fullName: ['', [Validators.required]],
       dob: [null, [CustomValidators.isDateMustLessThanCurrent()]],
       email: ['', [Validators.required, Validators.email]],
-      isFemale: true,
+      isFemale: false,
       phone: ['', [Validators.required]],
       address: '',
       userType: [userType, [Validators.required]], //number
@@ -398,7 +408,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   pasteInputEvent(event: any){
     event.preventDefault();
     const pastedData = event.clipboardData.getData('text/plain');
-    const numbersOnly = pastedData.replace(/[^0-9]/g, '');
+    const numbersOnly = pastedData.replace(/[^0-9]/g, '').slice(0, 10);
     event.target.value = numbersOnly;
     event.target.dispatchEvent(new Event('input'));
   }
@@ -501,7 +511,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     }
     this.avatarFile && formData.append('avatar', this.avatarFile);
     this.isEnaleRefBy && formData.append('referenceId', getFormControlValue(this.form, 'referenceId'));
-    formData.append('creatorUserId', getFormControlValue(this.form, 'creatorUserId'));
+    formData.append('creatorUserId', getFormControlValue(this.form, 'creatorUserId')!== null ? getFormControlValue(this.form, 'creatorUserId') : '');
     return formData;
   }
 

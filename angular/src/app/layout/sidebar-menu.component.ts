@@ -267,6 +267,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     PERMISSIONS_CONSTANT.FakeSkill
                 ),
             ]),
+            new MenuItem('Guideline', 'https://docs.google.com/document/d/1wzMDnhIJCWGQ6cPlr4T5wEm4H64UcVYgw5abbOJfFDw', 'fas fa-book'),
         ];
     }
 
