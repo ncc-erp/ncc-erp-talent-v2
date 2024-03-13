@@ -436,8 +436,16 @@
 
           <label for="file" class="btn-inputfile">Choose a file</label>
 
+          <a
+          *ngIf="cvFileName && cvFileName.endsWith('.pdf')"
+          class="ml-3"
+          [attr.href]="viewFile(formControls['linkCV']?.value)"
+          target="_blank"
+        >
+          {{ cvFileName }}</a
+        >
           <span
-          *ngIf="cvFileName"
+          *ngIf="cvFileName  && !cvFileName.endsWith('.pdf')"
           class="text-name tl-link ml-3"
           (click)="openLink()"
             >
