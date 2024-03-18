@@ -9,7 +9,6 @@ import { AppAuthService } from "./auth/app-auth.service";
 import { AppRouteGuard } from "./auth/auth-route-guard";
 import { LocalizePipe } from "@shared/pipes/localize.pipe";
 
-import { AbpPaginationControlsComponent } from "./components/pagination/abp-pagination-controls.component";
 import { AbpValidationSummaryComponent } from "./components/validation/abp-validation.summary.component";
 import { AbpModalHeaderComponent } from "./components/modal/abp-modal-header.component";
 import { AbpModalFooterComponent } from "./components/modal/abp-modal-footer.component";
@@ -41,7 +40,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxStarsModule } from 'ngx-stars';
 import { ListFilterPipe } from './pipes/list-filter.pipe';
-import { FilterComponent } from './filter/filter.component';
 import { UserInfoComponent } from './components/user-info/user-info.component';
 import { TableModule } from 'primeng/table';
 import { TreeModule } from 'primeng/tree';
@@ -64,7 +62,6 @@ import { CustomDateDialogComponent } from './components/date-selector/custom-dat
 import { CalendarModule } from 'primeng/calendar';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
-import { MultiSelectHRadioComponent } from './components/multi-select-h-radio/multi-select-h-radio.component';
 import { DateTimePipe } from './pipes/date-time.pipe';
 import { TabViewModule } from 'primeng/tabview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -87,17 +84,10 @@ import { SliderModule } from 'primeng/slider';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { PasswordModule } from 'primeng/password';
 
-import { CreateCandidateComponent } from './pages/create-candidate/create-candidate.component';
-import { PersonalInfoComponent } from './pages/create-candidate/personal-info/personal-info.component';
-import { CandidateEducationComponent } from './pages/create-candidate/candidate-education/candidate-education.component';
-import { CandidateSkillComponent } from './pages/create-candidate/candidate-skill/candidate-skill.component';
-import { CurrentRequisitionComponent } from './pages/create-candidate/current-requisition/current-requisition.component';
 import { ResizeContentDirective } from './directives/resize-content.directive';
-import { RequisitionDetailComponent } from './pages/requisition-detail/requisition-detail.component';
 import { LoopNumberPipe } from './pipes/loop-number.pipe';
 import { UploadAvatarComponent } from './components/upload-avatar/upload-avatar.component';
 import { ImageCropperModule } from 'ngx-image-cropper';
-import { ApplicationHistoryComponent } from './pages/create-candidate/application-history/application-history.component';
 import { LoopArrayPipe } from './pipes/loop-array.pipe';
 import { RequisitionInfoComponent } from './components/requisition-info/requisition-info.component';
 import { CandidateInfoNewComponent } from './components/candidate-info-new/candidate-info-new.component';
@@ -106,12 +96,8 @@ import { PositionDropdownComponent } from './components/position-dropdown/positi
 import { PageErrorComponent } from './pages/page-error/page-error.component';
 import { SafeHtmlPipe } from '@shared/pipes/safe-html.pipe';
 
-import { ExportCandidateComponent } from './components/export-candidate/export-candidate.component'
 import { TabsModule } from "ngx-bootstrap/tabs";
-import { ExportDialogComponent } from './components/export-dialog/export-dialog.component'
-import { ConfirmPresentForHr } from "./pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component";
 import { NgxDocViewerModule } from "ngx-doc-viewer";
-import { ViewFllesComponent } from "./pages/create-candidate/view-flles/view-flles.component" 
 import { PdfJsViewerModule } from "ng2-pdfjs-viewer";
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
@@ -174,15 +160,6 @@ const materialLibs = [
 
 const candidate = [
   CandidateInfoNewComponent,
-  CreateCandidateComponent,
-  PersonalInfoComponent,
-  CandidateEducationComponent,
-  CandidateSkillComponent,
-  CurrentRequisitionComponent,
-  ApplicationHistoryComponent,
-  ExportCandidateComponent,
-  ConfirmPresentForHr,
-  ViewFllesComponent,
 ]
 
 @NgModule({
@@ -204,7 +181,6 @@ const candidate = [
     ...primengLibs
   ],
     declarations: [
-        AbpPaginationControlsComponent,
         AbpValidationSummaryComponent,
         AbpModalHeaderComponent,
         AbpModalFooterComponent,
@@ -212,19 +188,16 @@ const candidate = [
         BusyDirective,
         EqualValidator,
         ListFilterPipe,
-        FilterComponent,
         UserInfoComponent,
         AutoFocusDirective,
         DialogActionToolbarComponent,
         DateSelectorComponent,
         CustomDateDialogComponent,
-        MultiSelectHRadioComponent,
         DateTimePipe,
         TagSelectComponent,
         DisplayRatingComponent,
         ...candidate,
         ResizeContentDirective,
-        RequisitionDetailComponent,
         LoopNumberPipe,
         UploadAvatarComponent,
         LoopArrayPipe,
@@ -233,12 +206,10 @@ const candidate = [
         PositionDropdownComponent,
         PageErrorComponent,
         SafeHtmlPipe,
-        ExportDialogComponent,
 
         //CurrentRequesitionGuildlineDialogComponent,
     ],
     exports: [
-        AbpPaginationControlsComponent,
         AbpValidationSummaryComponent,
         AbpModalHeaderComponent,
         AbpModalFooterComponent,
@@ -254,7 +225,6 @@ const candidate = [
         AutoFocusDirective,
         DialogActionToolbarComponent,
         DateSelectorComponent,
-        MultiSelectHRadioComponent,
         TagSelectComponent,
         DisplayRatingComponent,
         ResizeContentDirective,
@@ -265,7 +235,6 @@ const candidate = [
         SectionBreadcrumbComponent,
         LoopArrayPipe,
         PositionDropdownComponent,
-        ExportDialogComponent,
         ...materialLibs,
         ...primengLibs,
         ...candidate,
