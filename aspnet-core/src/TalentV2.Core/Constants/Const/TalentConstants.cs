@@ -17,6 +17,7 @@ namespace TalentV2.Constants.Const
         public static readonly string InternalUploadFile = "InternalUploadFile";
         public static string BaseBEAddress { get; set; }
         public static string BaseFEAddress { get; set; }
+        public static string PublicClientRootAddress { get; set; }
         public static long MaxSizeFile { get; set; }
         public static string LMSClientRootAddress { get; set; }
         public static int MAX_SCORE = 5;
