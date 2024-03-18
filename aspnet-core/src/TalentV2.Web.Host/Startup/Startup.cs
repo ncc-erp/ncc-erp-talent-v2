@@ -241,6 +241,7 @@ namespace TalentV2.Web.Host.Startup
 
             TalentConstants.BaseBEAddress =  _appConfiguration.GetSection("App")["ServerRootAddress"];
             TalentConstants.BaseFEAddress =  _appConfiguration.GetSection("App")["ClientRootAddress"];
+            TalentConstants.PublicClientRootAddress = _appConfiguration.GetSection("App")["PublicClientRootAddress"];
         }
     }
 }
