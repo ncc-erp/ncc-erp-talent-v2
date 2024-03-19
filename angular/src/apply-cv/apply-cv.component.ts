@@ -141,6 +141,8 @@ export class ApplyCvComponent extends AppComponentBase implements OnInit {
   onsubmit() {
     this.submitted = true;
     if (this.form.invalid) return;
+    if(!this.cvFile  || !this.avatarFile ) return;
+    
     const payload = this.getPayload();
     this._applyCv.create(payload).subscribe(res => {
       this.isLoading = res.loading;
