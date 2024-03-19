@@ -21,7 +21,12 @@ namespace TalentV2.DomainServices.Categories.Dtos
         public string CreatorsName { get; set; }
         public string CreatorsEmailAddess { get; set; }
         public int ApplyNumber { get; set; }
-        public string ApplyCvLink { get => TalentConstants.PublicClientRootAddress.TrimEnd('/') + "/applycv?postid=" + Id; }
+        public string ApplyCvLink { get => GetApplyCvLink(); }
+
+        private string GetApplyCvLink() {
+          string rootAddress = TalentConstants.PublicClientRootAddress ?? TalentConstants.BaseFEAddress;
+          return rootAddress.TrimEnd('/') + "/applycv?postid=" + Id; ;
+        }
     }
     [AutoMapTo(typeof(Entities.Post))]
     public class CreatePostDto : PostDto { }
