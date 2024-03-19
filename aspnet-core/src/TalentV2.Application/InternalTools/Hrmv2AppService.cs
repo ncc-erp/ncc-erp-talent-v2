@@ -122,39 +122,5 @@ namespace TalentV2.InternalTools
             await UpdateUserStatus(input.EmailAddress, true);
         }
 
-        [HttpPost]
-        [NccAuth]
-        public async Task UpdateOnboardStatus(InputOnboardFromHRMDto input)
-        {
-            using (CurrentUnitOfWork.SetTenantId(AbpSession.TenantId))
-            {
-                var requestCV = await WorkScope.GetAll<RequestCV>()
-                .Where(x => x.CV.Email == input.Email)
-                .OrderByDescending(x => x.CreationTime)
-                .FirstOrDefaultAsync();
-
-                if (requestCV == default)
-                {
-                    return;
-                }
-                await _candidateManager.CreateRequestCVStatusChangeHistory(new StatusChangeRequestCVDto
-                {
-                    Id = requestCV.Id,
-                    FromStatus = requestCV.Status,
-                    ToStatus = Constants.Enum.RequestCVStatus.Onboarded,
-                });
-                requestCV.Status = Constants.Enum.RequestCVStatus.Onboarded;
-                await _candidateManager.CreateRequestCVHistory(new HistoryRequestCVDto
-                {
-                    Id = requestCV.Id,
-                    Status = requestCV.Status,
-                    OnboardDate = requestCV.OnboardDate,
-                });
-
-                await CurrentUnitOfWork.SaveChangesAsync();
-            }
-        }
-
-
     }
 }

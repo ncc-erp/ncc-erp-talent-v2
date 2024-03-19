@@ -34,26 +34,11 @@ namespace TalentV2.APIs
         {
             return CommonUtils.ListPriority;
         }
-        [HttpGet]
-        public List<LevelDto> GetLevel()
-        {
-            return CommonUtils.ListLevel;
-        }
-        [HttpGet]
-        public List<CategoryDto> GetStatusCandidateOffer()
-        {
-            return CommonUtils.ListStatusCandidateOffer;
-        }
-        [HttpGet]
-        public List<CategoryDto> GetStatusCandidateOnboard()
-        {
-            return CommonUtils.ListStatusCandidateOnboard;
-        }
-        [HttpGet] 
-        public List<CategoryDto> GetStatusRequest()
-        {
-            return CommonUtils.ListRequestStatus;
-        }
+        //[HttpGet]
+        //public List<LevelDto> GetLevel()
+        //{
+        //    return CommonUtils.ListLevel;
+        //}
         [HttpGet]
         public async Task<List<UserReferenceDto>> GetAllUser()
         {
@@ -115,21 +100,6 @@ namespace TalentV2.APIs
         public List<CategoryDto> GetListInterviewStatus()
         {
             return CommonUtils.ListInterviewStatus;
-        }
-        [HttpGet]
-        public List<LevelDto> GetLevelInterviewStaff()
-        {
-            return CommonUtils.ListLevelInterviewStaff;
-        }
-        [HttpGet]
-        public List<LevelDto> GetLevelFinalStaff()
-        {
-            return CommonUtils.ListLevelFinalStaff;
-        }
-        [HttpGet]
-        public List<InternSalaryDto> GetLevelFinalIntern()
-        {
-            return CommonUtils.ListLevelFinalIntern;
         }
     }
 }

@@ -16,7 +16,6 @@ using Abp.UI;
 using TalentV2.Authorization;
 using TalentV2.Authorization.Roles;
 using TalentV2.Authorization.Users;
-using TalentV2.Roles.Dto;
 using TalentV2.Users.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -121,12 +120,6 @@ namespace TalentV2.Users
             {
                 entity.IsActive = false;
             });
-        }
-
-        public async Task<ListResultDto<RoleDto>> GetRoles()
-        {
-            var roles = await _roleRepository.GetAllListAsync();
-            return new ListResultDto<RoleDto>(ObjectMapper.Map<List<RoleDto>>(roles));
         }
 
         public async Task ChangeLanguage(ChangeUserLanguageDto input)

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using TalentV2.DomainServices.ApplyCVs.Dtos;
-using TalentV2.DomainServices.ExternalCVs.Dtos;
 
 namespace TalentV2.DomainServices.ApplyCVs
 {

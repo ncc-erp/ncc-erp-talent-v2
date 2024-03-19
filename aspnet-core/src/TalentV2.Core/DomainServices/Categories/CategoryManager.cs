@@ -13,9 +13,7 @@ using Abp.Domain.Entities;
 using System.Linq.Expressions;
 using System.Reflection;
 using NccCore.Extension;
-using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.Authorization.Users;
-using TalentV2.DomainServices.Posts;
 using Microsoft.AspNetCore.Mvc;
 using TalentV2.Authorization.Roles;
 using TalentV2.DomainServices.Users.Dtos;
@@ -194,44 +192,7 @@ namespace TalentV2.DomainServices.Categories
                                  };
             return qallEducations;
         }
-        public async Task<EducationDto> CreateEducation(CreateUpdateEducationDto inputEducation)
-        {
-            inputEducation.Name = inputEducation.Name.Trim();
-            var isDuplicate = WorkScope.GetAll<Education>()
-                .Where(q => q.Name == inputEducation.Name && inputEducation.EducationTypeId == q.EducationTypeId)
-                .Any();
-            if (isDuplicate)
-                throw new UserFriendlyException("Education have already existed!");
-
-            var education = ObjectMapper.Map<Education>(inputEducation);
-
-            var id = await WorkScope.InsertOrUpdateAndGetIdAsync<Education>(education);
-            await CurrentUnitOfWork.SaveChangesAsync();
-
-            return await IQGetAllEducation()
-                .Where(q => q.Id == id)
-                .FirstOrDefaultAsync();
-        }
-        public async Task<EducationDto> UpdateEducation(CreateUpdateEducationDto inputEducation)
-        {
-            var isDuplicate = WorkScope.GetAll<Education>()
-                .Where(q => inputEducation.Name == q.Name && 
-                            inputEducation.EducationTypeId == q.EducationTypeId && 
-                            inputEducation.Id != q.Id)
-                .Any();
-            if (isDuplicate)
-                throw new UserFriendlyException("Education have already existed!");
-
-            var education = await WorkScope.GetAsync<Education>(inputEducation.Id);
-            ObjectMapper.Map<CreateUpdateEducationDto,Education>(inputEducation,education);
-
-            await WorkScope.UpdateAsync(education);
-            await CurrentUnitOfWork.SaveChangesAsync();
-
-            return await IQGetAllEducation()
-                .Where(q => q.Id == education.Id)
-                .FirstOrDefaultAsync();
-        }
+       
         public async Task DeleteEducation(long Id)
         {
             var isExisted = await WorkScope.GetAll<Education>()
@@ -341,138 +302,7 @@ namespace TalentV2.DomainServices.Categories
             cvSource.IsDeleted = true;
             await CurrentUnitOfWork.SaveChangesAsync();
         }
-        public IQueryable<CapabilityDto> IQGetAllCapability()
-        {
-            var qgetAllCapabilities = from c in WorkScope.GetAll<Capability>()
-                                      select new CapabilityDto
-                                      {
-                                          Id = c.Id,
-                                          Name = c.Name,
-                                          Note = c.Note,
-                                          FromType = c.FromType,
-                                      };
-            return qgetAllCapabilities.OrderBy(x => x.Id);
-        }
-        public async Task<CapabilityDto> CreateCapability(CapabilityDto inputCapability)
-        {
-            await CheckDuplicateNameCategory<Capability>(inputCapability.Name);
-            var capability = ObjectMapper.Map<Capability>(inputCapability);
-
-            var id = await WorkScope.InsertAndGetIdAsync<Capability>(capability);
-            await CurrentUnitOfWork.SaveChangesAsync();
-
-            return await IQGetAllCapability()
-                .Where(q => q.Id == id)
-                .FirstOrDefaultAsync();
-        }
-        public async Task<CapabilityDto> UpdateCapability(CapabilityDto inputCapability)
-        {
-            await CheckDuplicateNameCategory<Capability>(inputCapability.Name, inputCapability.Id);
-            var capability = await WorkScope.GetAsync<Capability>(inputCapability.Id);
-            ObjectMapper.Map<CapabilityDto, Capability>(inputCapability,capability);
-
-            await WorkScope.UpdateAsync<Capability>(capability);
-            await CurrentUnitOfWork.SaveChangesAsync();
-
-            return await IQGetAllCapability()
-                .Where(q => q.Id == capability.Id)
-                .FirstOrDefaultAsync();
-        }
-        public async Task DeleteCapability(long Id)
-        {
-            var isExisted = await WorkScope.GetAll<Capability>()
-                .Where(q => q.Id == Id)
-                .Where(q => q.CapabilitySettings.Any(s => !s.IsDeleted))
-                .AnyAsync();
-            if (isExisted)
-                throw new UserFriendlyException($"Not Deleted, Capability already exists somewhere");
-            var capability = await WorkScope.GetAsync<Capability>(Id);
-            capability.IsDeleted = true;
-            await CurrentUnitOfWork.SaveChangesAsync();
-        }
-        public IQueryable<CapabilitySettingDto> IQGetAllCapabilitySetting()
-        {
-            var qgetAllCapabilitySettings = from c in WorkScope.GetAll<CapabilitySetting>()
-                                            select new CapabilitySettingDto
-                                            {
-                                                Id = c.Id,
-                                                UserType = c.UserType,
-                                                CapabilityId = c.Capability.Id,
-                                                CapabilityName = c.Capability.Name,
-                                                SubPositionId = c.SubPositionId,
-                                                SubPositionName = c.SubPosition.Name,
-                                                Note = c.Note,
-                                                Factor = c.Factor,
-                                                IsDeleted = c.IsDeleted,
-                                                FromType = c.Capability.FromType
-                                            };
-            return qgetAllCapabilitySettings;
-        }
-        public IQueryable<GetPagingCapabilitySettingDto> IQGetAllCapabilitySettingsGroupBy(string capabilityName = "", bool? fromType = null)
-        {
-            var query = WorkScope.GetAll<CapabilitySetting>();
-            if (!string.IsNullOrEmpty(capabilityName))
-            {
-                capabilityName = capabilityName.Trim().ToLower();
-                query = query.Where(x => x.Capability.Name.ToLower().Contains(capabilityName));
-            }
-
-            if (fromType.HasValue)
-                query = query.Where(x => x.Capability.FromType == fromType);
-
-            return (from c in query
-                    group c by new { c.SubPositionId, c.SubPosition.Name, c.UserType } into g
-                    select new GetPagingCapabilitySettingDto
-                    {
-                        SubPositionId = g.Key.SubPositionId,
-                        UserType = g.Key.UserType,
-                        SubPositionName = g.Key.Name,
-                        Capabilities = g
-                        .Select(x => new CapabilityInCapabilitySettingDto
-                        {
-                            CapabilityId = x.CapabilityId,
-                            CapabilityName= x.Capability.Name,
-                            GuideLine = x.GuideLine,
-                            Note= x.Note,
-                            Id = x.Id,
-                            Factor=x.Factor,
-                            CreationTime=x.CreationTime,
-                            FromType = x.Capability.FromType
-                        }).OrderBy(z=>z.CreationTime).ToList()
-                    }
-            );
-        }
-        public async Task<CapabilitySettingDto> CreateCapabilitySetting(CreateUpdateCapabilitySettingDto input)
-        {
-            var isCapabilitiesExists = await WorkScope
-                .GetAll<CapabilitySetting>()
-                .Where(s => s.UserType == input.UserType)
-                .Where(s => s.SubPositionId == input.SubPositionId)
-                .Where(s => s.CapabilityId == input.CapabilityId)
-                .AnyAsync();
-            if (isCapabilitiesExists)
-                throw new UserFriendlyException("Capability Already Exists");
-
-            var capabilitySetting = ObjectMapper.Map<CapabilitySetting>(input);
-
-            var id = await WorkScope.InsertAndGetIdAsync<CapabilitySetting>(capabilitySetting);
-            await CurrentUnitOfWork.SaveChangesAsync();
-
-            return await IQGetAllCapabilitySetting()
-                .Where(q => q.Id == id)
-                .FirstOrDefaultAsync();
-        }
-        public async Task<CapabilitySettingDto> UpdateCapabilitySetting(CreateUpdateCapabilitySettingDto input)
-        {
-            var capabilitySetting = await WorkScope.GetAsync<CapabilitySetting>(input.Id);
-            ObjectMapper.Map<CreateUpdateCapabilitySettingDto,CapabilitySetting>(input,capabilitySetting);
-            await WorkScope.UpdateAsync(capabilitySetting);
-            await CurrentUnitOfWork.SaveChangesAsync();
-
-            return await IQGetAllCapabilitySetting()
-                .Where(q => q.Id == capabilitySetting.Id)
-                .FirstOrDefaultAsync();
-        }
+      
         public async Task DeleteCapabilitySetting(long Id)
         {
             var capabilitySetting = await WorkScope.GetAsync<CapabilitySetting>(Id);
@@ -545,45 +375,7 @@ namespace TalentV2.DomainServices.Categories
                 throw new UserFriendlyException($"Not Deleted, Branch already exists somewhere");
             await WorkScope.DeleteAsync<Branch>(Id);
         }
-        public async Task<List<CapabilitySettingDto>> GetCapabilitiesByUserTypeAndPositionId(UserType userType, long subPositionId)
-        {
-            var query = from cs in WorkScope.GetAll<CapabilitySetting>()
-                        where cs.UserType == userType && cs.SubPositionId == subPositionId
-                        orderby cs.CreationTime
-                        select new CapabilitySettingDto
-                        {
-                            CapabilityId = cs.CapabilityId,
-                            CapabilityName = cs.Capability.Name,
-                            Id = cs.Id,
-                            Note = cs.Note,
-                            SubPositionId = cs.SubPositionId,
-                            SubPositionName = cs.SubPosition.Name,
-                            GuideLine = cs.GuideLine,
-                            UserType = cs.UserType,
-                            Factor =cs.Factor,
-                            IsDeleted = cs.IsDeleted
-                        };
-            return await query.ToListAsync();
-        }
-        public async Task<List<CapabilitySettingDto>> GetRemainCapabilitiesByUserTypeAndPositionId(UserType userType, long subPositionId)
-        {
-            var capabilitiesExists = await (from cs in WorkScope.GetAll<CapabilitySetting>()
-                                                where cs.UserType == userType && cs.SubPositionId == subPositionId
-                                                select cs.CapabilityId)
-                                                .Distinct().ToListAsync();
-            var qremainCapabilities = from c in WorkScope.GetAll<Capability>()
-                                      where !capabilitiesExists.Contains(c.Id)
-                                      orderby c.Id
-                                      select new CapabilitySettingDto
-                                      {
-                                          CapabilityId = c.Id,
-                                          CapabilityName = c.Name,
-                                          Note = c.Note,
-                                          Factor = 1,
-                                          IsDeleted = true
-                                         };
-            return await qremainCapabilities.ToListAsync();
-        }
+       
 
         private async Task CheckDuplicateUrl<IEntity>(string name, long id = default)
             where IEntity : class, IEntity<long>
@@ -638,45 +430,7 @@ namespace TalentV2.DomainServices.Categories
                 throw new UserFriendlyException($"{name} existed");
             }
         }
-        public async Task<List<CapabilitySettingDto>> GetCapabilitySettingClone(CapabilitySettingCloneDto input)
-        {
-            var isCapabilitiesExists = await WorkScope
-                .GetAll<CapabilitySetting>()
-                .Where(s => s.UserType == input.ToUserType)
-                .Where(s => s.SubPositionId == input.ToSubPositionId)
-                .AnyAsync();
-            if (isCapabilitiesExists)
-                throw new UserFriendlyException("Capability Already Exists");
-
-            var listCapabilitiesSelected = await GetCapabilitiesByUserTypeAndPositionId(input.FromUserType, input.FromSubPositionId);
-            if (listCapabilitiesSelected.Count() == 0)
-            {
-                throw new UserFriendlyException("No Capabilites Exist");
-            }
-
-            return listCapabilitiesSelected;
-        }
-
-        public string GetSubPositionName(long subPositionId)
-        {
-            var query = from c in WorkScope.GetAll<CapabilitySetting>()
-                        where c.SubPositionId == subPositionId
-                        select new
-                        {
-                            SubPositionName = c.SubPosition.Name
-                        };
-            return query.FirstOrDefault().SubPositionName;
-        }
-        public async Task UpdateFactor(List<CreateUpdateCapabilitySettingDto> input)
-        {
-            var ids = input.Select(s => s.Id);
-            var dicIdToFactor = input.ToDictionary(x => x.Id, x => x.Factor);
-            WorkScope.GetAll<CapabilitySetting>()
-            .Where(s => ids.Contains(s.Id))
-            .ToList()
-            .ForEach(s => s.Factor = dicIdToFactor.ContainsKey(s.Id) ? dicIdToFactor[s.Id] : s.Factor);
-            await CurrentUnitOfWork.SaveChangesAsync();
-        }
+       
         public IQueryable<PostDto> IQGetAllPosts()
         {
             var posts = from b in WorkScope.GetAll<Post>()
@@ -733,16 +487,6 @@ namespace TalentV2.DomainServices.Categories
             await WorkScope.DeleteAsync<Post>(postId);
         }
 
-        public async Task<PostDto> UpdatePostsMetadata(UpdatePostsMetadataDto inputPost)
-        {
-            var post = await WorkScope.GetAsync<Post>(inputPost.Id);
-            post.Metadata= inputPost.Metadata;
-            await WorkScope.UpdateAsync(post);
-            await CurrentUnitOfWork.SaveChangesAsync();
-            return await IQGetAllPosts()
-                    .Where(q => q.Id == post.Id)
-                    .FirstOrDefaultAsync();
-        }
 
         public async Task<List<UserReferenceDto>> GetAllRecruitmentUser()
         {
