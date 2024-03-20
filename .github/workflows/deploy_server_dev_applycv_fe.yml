@@ -8,7 +8,7 @@ on:
       - '.github/workflows/deploy_server_applycv_fe.yml'
 jobs:
   build:
-    runs-on: applycv-dev
+    runs-on: dev
     name: Build Talentv2_FE Applycv-dev
     environment: dev
     steps:
