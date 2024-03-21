@@ -16,7 +16,6 @@ using TalentV2.Authorization.Users;
 using TalentV2.Constants.Const;
 using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
-using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
 using TalentV2.NccCore;
 using TalentV2.Notifications.Mail.Dtos;
@@ -225,78 +224,78 @@ namespace TalentV2.Notifications.Mail
                 case MailFuncEnum.AcceptedOfferJob:
                 case MailFuncEnum.AcceptedOfferInternship:
                 case MailFuncEnum.RejectedOffer:
-                    return await GetDataRequestCV(id);
-                case MailFuncEnum.FailedCV:
-                    return await GetDataCandidate(id);
+                //    return await GetDataRequestCV(id);
+                //case MailFuncEnum.FailedCV:
+                //    return await GetDataCandidate(id);
                 default:
                     return null;
             }
         }
-        private async Task<ResultTemplateEmail<AllInformationRequestCVDto>> GetDataRequestCV(long requestCVId)
-        {
-            if (requestCVId == default)
-            {
-                var fakeData = new AllInformationRequestCVDto
-                {
-                    Address = "Ha Noi",
-                    ApplyLevel = Level.Intern_0,
-                    Avatar = "",
-                    BirthdayDateTime = new DateTime(2022, 12, 11),
-                    Email = "",
-                    FinalLevel = Level.Intern_0,
-                    FullName = "Nguyen Van A",
-                    HRNote = "",
-                    Id = 0,
-                    InterviewLevel = Level.Intern_0,
-                    InterviewTimeDate = new DateTime(2022, 10, 11),
-                    JobPositionRecruit = "Java Developer",
-                    OnboardDateTime = new DateTime(2022, 12, 11),
-                    Phone = "0912845678",
-                    Salary = 1000000,
-                    Status = RequestCVStatus.AcceptedOffer,
-                    Percentage= "",
-                };
-                SetSignatureContact(fakeData);
-                return new ResultTemplateEmail<AllInformationRequestCVDto>
-                {
-                    Result = fakeData
-                };
-            }
+        //private async Task<ResultTemplateEmail<AllInformationRequestCVDto>> GetDataRequestCV(long requestCVId)
+        //{
+        //    if (requestCVId == default)
+        //    {
+        //        var fakeData = new AllInformationRequestCVDto
+        //        {
+        //            Address = "Ha Noi",
+        //            ApplyLevel = Level.Intern_0,
+        //            Avatar = "",
+        //            BirthdayDateTime = new DateTime(2022, 12, 11),
+        //            Email = "",
+        //            FinalLevel = Level.Intern_0,
+        //            FullName = "Nguyen Van A",
+        //            HRNote = "",
+        //            Id = 0,
+        //            InterviewLevel = Level.Intern_0,
+        //            InterviewTimeDate = new DateTime(2022, 10, 11),
+        //            JobPositionRecruit = "Java Developer",
+        //            OnboardDateTime = new DateTime(2022, 12, 11),
+        //            Phone = "0912845678",
+        //            Salary = 1000000,
+        //            Status = RequestCVStatus.AcceptedOffer,
+        //            Percentage= "",
+        //        };
+        //        SetSignatureContact(fakeData);
+        //        return new ResultTemplateEmail<AllInformationRequestCVDto>
+        //        {
+        //            Result = fakeData
+        //        };
+        //    }
 
-            var result = await _workScope.GetAll<RequestCV>()
-                .Where(q => q.Id == requestCVId)
-                .Select(s => new AllInformationRequestCVDto
-                {
-                    Id = s.Id,
-                    CVId = s.CVId,
-                    Address = s.CV.Address,
-                    ApplyLevel = s.ApplyLevel,
-                    Avatar = s.CV.Avatar,
-                    BirthdayDateTime = s.CV.Birthday,
-                    Email = s.CV.Email,
-                    FinalLevel = s.FinalLevel,
-                    FullName = s.CV.Name,
-                    HRNote = s.HRNote,
-                    InterviewLevel = s.InterviewLevel,
-                    InterviewTimeDate = s.InterviewTime,
-                    JobPositionRecruit = s.Request.SubPosition.Name,
-                    OnboardDateTime = s.OnboardDate,
-                    Phone = s.CV.Phone,
-                    Salary = s.Salary,
-                    Status = s.Status,
-                    LMSInfo = s.LMSInfo,
-                    Percentage = s.Percentage,
-                    RequestBranchName = s.Request.Branch.Name,
-                    RequestBranchAddress = s.Request.Branch.Address,
-                    CVBranchAddress = s.CV.Branch.Address,
-                    CVBranchName = s.CV.Branch.Name,
-                }).FirstOrDefaultAsync();
-            SetSignatureContact(result);
-            return new ResultTemplateEmail<AllInformationRequestCVDto>
-            {
-                Result = result,
-            };
-        }
+        //    var result = await _workScope.GetAll<RequestCV>()
+        //        .Where(q => q.Id == requestCVId)
+        //        .Select(s => new AllInformationRequestCVDto
+        //        {
+        //            Id = s.Id,
+        //            CVId = s.CVId,
+        //            Address = s.CV.Address,
+        //            ApplyLevel = s.ApplyLevel,
+        //            Avatar = s.CV.Avatar,
+        //            BirthdayDateTime = s.CV.Birthday,
+        //            Email = s.CV.Email,
+        //            FinalLevel = s.FinalLevel,
+        //            FullName = s.CV.Name,
+        //            HRNote = s.HRNote,
+        //            InterviewLevel = s.InterviewLevel,
+        //            InterviewTimeDate = s.InterviewTime,
+        //            JobPositionRecruit = s.Request.SubPosition.Name,
+        //            OnboardDateTime = s.OnboardDate,
+        //            Phone = s.CV.Phone,
+        //            Salary = s.Salary,
+        //            Status = s.Status,
+        //            LMSInfo = s.LMSInfo,
+        //            Percentage = s.Percentage,
+        //            RequestBranchName = s.Request.Branch.Name,
+        //            RequestBranchAddress = s.Request.Branch.Address,
+        //            CVBranchAddress = s.CV.Branch.Address,
+        //            CVBranchName = s.CV.Branch.Name,
+        //        }).FirstOrDefaultAsync();
+        //    SetSignatureContact(result);
+        //    return new ResultTemplateEmail<AllInformationRequestCVDto>
+        //    {
+        //        Result = result,
+        //    };
+        //}
         private async Task<ResultTemplateEmail<CandidateEmailInfo>> GetDataCandidate(long cvId)
         {
             if (cvId == default)
