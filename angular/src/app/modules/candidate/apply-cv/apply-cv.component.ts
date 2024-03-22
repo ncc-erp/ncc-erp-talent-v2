@@ -60,6 +60,11 @@ export class ApplyCvComponent extends PagedListingComponentBase<ApplyCv> impleme
         this.applyCvList = [];
         if (rs.success) {
           this.applyCvList = rs.result.items;
+          this.applyCvList.map(item =>{
+            if(item.postId <= 0){
+              item.postId = null;
+            };
+          })
           this.showPaging(rs.result, pageNumber);
         }
         this.isLoading = rs.loading;  
