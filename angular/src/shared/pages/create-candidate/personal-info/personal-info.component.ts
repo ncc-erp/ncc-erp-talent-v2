@@ -225,7 +225,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
   onUpdate() {
     this.submitted = true;
-    if (this.form.invalid ||!this.cvFile) return;
+    if (this.form.invalid || !this.cvFileName ) return;
 
     const payload = this.getPayload(true) as CandidatePayload;
     this._candidate.updateCV(payload).subscribe(res => {
