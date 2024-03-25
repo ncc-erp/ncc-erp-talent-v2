@@ -50,6 +50,10 @@ export class CreateCandidateComponent extends AppComponentBase implements OnInit
   }
 
   updateQueryTabIndex(tabIndex: number) {
+    if(tabIndex === 0){
+      this.isViewMode = true
+      this.getCandidateInfoData();
+    }
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab: tabIndex },

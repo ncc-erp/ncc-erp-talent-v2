@@ -84,7 +84,11 @@
             <td><a [href]="post.url">{{ post.url }}</a></td>
             <td>{{ post.type }}</td>
             <td><a [href]="post.applyCvLink">{{ post.applyCvLink }}</a></td>
-            <td class="text-center">{{ post.applyNumber }}</td>
+            <td class="text-center">
+              <span [ngClass]="{'font-weight-bold': post.applyNumber > 0}">
+                {{ post.applyNumber }}
+              </span>
+            </td>
             <td class="text-center">
             <button
             type="button"

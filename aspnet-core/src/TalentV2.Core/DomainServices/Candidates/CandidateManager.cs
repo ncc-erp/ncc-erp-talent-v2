@@ -263,11 +263,18 @@ namespace TalentV2.DomainServices.Candidates
         public async Task<PersonBioDto> UpdateCV(UpdatePersonBioDto input)
         {
             var personBio = await WorkScope.GetAsync<CV>(input.Id);
+            var requestCVs = await WorkScope.GetAll<RequestCV>()
+            .FirstOrDefaultAsync(r => r.CVId == input.Id);
+         
             var isSendNotification = personBio.UserType != input.UserType
                 || personBio.BranchId != input.BranchId
                 || !personBio.Phone.Equals(input.Phone)
                 || !personBio.Email.Equals(input.Email);
+            if (input?.Note != requestCVs?.HRNote && requestCVs?.HRNote != null)
+            {
+                requestCVs.HRNote = input.Note;
 
+            }
             ObjectMapper.Map<UpdatePersonBioDto, CV>(input, personBio);
             personBio.Phone = Utils.StringExtensions.ReplaceWhitespace(personBio.Phone);
             await CurrentUnitOfWork.SaveChangesAsync();
@@ -300,6 +307,7 @@ namespace TalentV2.DomainServices.Candidates
                 RequestId = input.RequestId,
                 CVId = input.CvId,
                 Status = requestCVStatus,
+                HRNote = cv.Note,
             };
             var requestCvId = await WorkScope.InsertAndGetIdAsync(requestCv);
 
@@ -691,7 +699,8 @@ namespace TalentV2.DomainServices.Candidates
                     RequestCV = s,
                     CV = s.CV,
                     Status = s.Status,
-                    EmailSent = s.EmailSent
+                    EmailSent = s.EmailSent,
+                    HRNote = s.HRNote
                 }).FirstOrDefault();
             input.EmailSent = entity.EmailSent;
 
@@ -699,9 +708,12 @@ namespace TalentV2.DomainServices.Candidates
             {
                 throw new UserFriendlyException("Not found RequestCV with Id " + input.RequestCvId);
             }
-
+            var getCv = entity.CV;
             var applicationResult = entity.RequestCV;
-
+            if (getCv?.Note != input?.HRNote && input?.HRNote != null)
+            {
+                getCv.Note = input.HRNote;
+            }
             var oldStatus = applicationResult.Status;
             var oldOnboardDate = applicationResult.OnboardDate;
             if (input.Status == RequestCVStatus.Onboarded || applicationResult.Status != input.Status)
