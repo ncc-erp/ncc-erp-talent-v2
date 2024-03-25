@@ -458,6 +458,12 @@
             CV Type allow: {{ ACCEPT_CV }}
           </span>
         </div>
+        <div
+        class="text-error text-danger mt-2"
+        *ngIf="submitted && !cvFileName"
+      >
+        CV is required
+      </div>
       </div>
 
       <div class="group-item">

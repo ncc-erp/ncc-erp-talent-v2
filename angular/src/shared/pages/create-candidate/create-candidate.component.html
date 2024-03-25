@@ -50,7 +50,7 @@
     [(activeIndex)]="tabActived"
     (onChange)="updateQueryTabIndex($event.index)"
   >
-    <p-tabPanel header="Header 1">
+    <p-tabPanel header="Header 1" [cache]="false">
       <ng-template pTemplate="header">
         <div class="tab-header">
           <i class="fas fa-id-card"></i>
@@ -147,7 +147,7 @@
       </ng-template>
     </p-tabPanel>
 
-    <p-tabPanel header="Header 3" [disabled]="!hasCandidate()">
+    <p-tabPanel header="Header 3" [disabled]="!hasCandidate()" [cache]="false">
       <ng-template pTemplate="header">
         <div class="tab-header">
           <i class="fas fa-bullhorn"></i>
