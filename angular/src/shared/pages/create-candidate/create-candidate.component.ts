@@ -6,6 +6,7 @@ import { CandidateStaffService } from '@app/core/services/candidate/candidate-st
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { AppComponentBase } from '@shared/app-component-base';
 import { CANDIDATE_DETAILT_TAB_DEFAULT, UserType } from '@shared/AppEnums';
+import { PersonalInfoComponent } from './personal-info/personal-info.component';
 
 @Component({
   selector: 'talent-create-candidate',
@@ -23,6 +24,7 @@ export class CreateCandidateComponent extends AppComponentBase implements OnInit
   isCandidateIntern = false;
 
   _candidate: CandidateInternService | CandidateStaffService;
+  @ViewChild(PersonalInfoComponent) talentPersonalInfo: PersonalInfoComponent;
 
   constructor(
     injector: Injector,
@@ -91,6 +93,8 @@ export class CreateCandidateComponent extends AppComponentBase implements OnInit
         this.isLoading = res.loading;
         if (!res.loading && res.success && res.result) {
           this.candidate = res.result;
+
+          this.talentPersonalInfo?.refreshPersonalInfo(this.candidate)
         }
       })
     );
