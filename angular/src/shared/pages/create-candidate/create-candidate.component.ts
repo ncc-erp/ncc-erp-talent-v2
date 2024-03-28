@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { checkNumber } from '@app/core/helpers/utils.helper';
 import { Candidate } from '@app/core/models/candidate/candidate.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
