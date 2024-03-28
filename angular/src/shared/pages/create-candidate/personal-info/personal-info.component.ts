@@ -117,6 +117,13 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     return data ? JSON.parse(data) : null;
   }
 
+  refreshPersonalInfo(candidate: Candidate) {
+    this.form.patchValue({
+      ...candidate,
+      dob: candidate.dob ? new Date(candidate.dob) : null,
+    })
+  }
+
   toggleEditing() {
     this.isEditing = !this.isEditing;
     if (!this.isEditing) {
@@ -447,10 +454,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   }
 
   private updateCandidateInfoData(candidate: Candidate) {
-    this.form.patchValue({
-      ...candidate,
-      dob: candidate.dob ? new Date(candidate.dob) : null,
-    })
+    this.refreshPersonalInfo(candidate)
 
     this.originalFormData = this.form.getRawValue();
     this.avatarUrl = this._utilities.getLinkFile(candidate.avatar);

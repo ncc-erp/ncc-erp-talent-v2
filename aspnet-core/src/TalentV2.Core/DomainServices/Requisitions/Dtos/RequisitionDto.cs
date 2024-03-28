@@ -31,6 +31,7 @@ namespace TalentV2.DomainServices.Requisitions.Dtos
         public int QuantityOnboard { get; set; }
         public int QuantityFail { get; set; }
         public int TotalCandidateApply { get; set; }
+        public int QuantityAcceptedOffer { get; set; }
         public UserType UserType { get; set; }
         public string UserTypeName { get => CommonUtils.GetEnumName(UserType); }
         public string Note { get; set; }
