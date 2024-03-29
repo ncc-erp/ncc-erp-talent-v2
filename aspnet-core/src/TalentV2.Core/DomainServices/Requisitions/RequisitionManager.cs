@@ -65,6 +65,7 @@ namespace TalentV2.DomainServices.Requisitions
                                                                     s.Status == RequestCVStatus.RejectedOffer)
                                                         .Count(),
                             TotalCandidateApply = r.RequestCVs.Count(),
+                            QuantityAcceptedOffer = r.RequestCVs.Where(s => s.Status == RequestCVStatus.AcceptedOffer).Count(),
                             UserType = r.UserType,
                             Note = r.Note,
                             TimeNeed = r.TimeNeed,

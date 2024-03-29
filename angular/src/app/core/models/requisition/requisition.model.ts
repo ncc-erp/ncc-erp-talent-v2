@@ -40,6 +40,7 @@ export interface Requisition extends RequisitionInfo {
   quantityOnboard: number;
   quantityFail: number;
   totalCandidateApply: number;
+  quantityAcceptedOffer: number,
   projectToolRequestId?: number;
   note: string;
   lastModifiedTime: string;
