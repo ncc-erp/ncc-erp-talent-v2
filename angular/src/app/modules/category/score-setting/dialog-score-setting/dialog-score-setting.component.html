@@ -53,8 +53,7 @@
                 </div>
             </div>
 
-            <div *ngIf="form.get('scoreTo').invalid || form.get('scoreFrom').invalid ||
-             isValidateScoreIncorrectValue" class="text-danger py-1 px-2">
+            <div *ngIf="form.get('scoreTo').invalid || form.get('scoreFrom').invalid" class="text-danger py-1 px-2">
                 ScoreRanges is required , unit must be .5 or .0
             </div>
 

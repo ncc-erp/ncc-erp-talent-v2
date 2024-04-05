@@ -25,7 +25,6 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
   form: FormGroup;
   isValidateScoreExists: boolean;
   isValidateLevelExists: boolean;
-  isValidateScoreIncorrectValue: boolean;
   submitted = false;
   scoreRangeResult: ScoreRangeWithSetting[];
   catInternLevels: InternSalaryCatalog[] = this._utilities.catLevelFinalIntern.filter((item: any) => item?.defaultName !== "FresherPlus");;
@@ -105,11 +104,9 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
     this.submitted = true;
     this.isValidateScoreExists = false;
     this.isValidateLevelExists = false;
-    this.isValidateScoreIncorrectValue = false;
     const payloadCreate: FormDialogCreateScoreSetting = this.form.getRawValue();
     this.validateExists(payloadCreate, this.dialogData.dialogAction);
-    this.validateScoreIncorrectValue();
-    if (this.isValidateScoreExists || this.isValidateLevelExists || this.isValidateScoreIncorrectValue || this.form.invalid) return;
+    if (this.isValidateScoreExists || this.isValidateLevelExists || this.form.invalid) return;
     if (this.dialogData.dialogAction === ActionEnum.CREATE) {
       this.create(payloadCreate);
     } else if (this.dialogData.dialogAction === ActionEnum.UPDATE) {
@@ -156,9 +153,6 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
     return this.formControls.scoreTo.value == this.min || this.minScoreTo() == this.formControls.scoreTo.value ? 'p-button-secondary' : ''
   }
 
-  validateScoreIncorrectValue() {
-    this.isValidateScoreIncorrectValue = this.formControls.scoreFrom.value * 10 % 5 != 0 || this.formControls.scoreTo.value * 10 % 5 != 0
-  }
 
   validateExists(payload: FormDialogCreateScoreSetting, action: ActionEnum) {
     let scoreRangeValidate: ScoreRangeWithSetting[] = [];
