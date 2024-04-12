@@ -31,7 +31,7 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
   catStaffLevels: LevelInfo[] = this._utilities.catLevelFinalStaff.filter((item: any) => item?.id !== 100);
   min: number = 0;
   max: number = 5;
-  step: number = 0.5;
+  step: number = 0.1;
 
   constructor(public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
