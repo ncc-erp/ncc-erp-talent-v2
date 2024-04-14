@@ -31,7 +31,7 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
   catStaffLevels: LevelInfo[] = this._utilities.catLevelFinalStaff.filter((item: any) => item?.id !== 100);
   min: number = 0;
   max: number = 5;
-  step: number = 0.1;
+  step: number = 0.5;
 
   constructor(public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
@@ -161,8 +161,8 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
         return arr !== this.dialogData.scoreRange;
       }) : checkArrayUndefined(this.scoreRangeResult);
     scoreRangeValidate.find((rs) => {
-      const scoreToValidate: boolean = payload.scoreTo > rs.scoreTo && payload.scoreFrom >= rs.scoreTo || payload.scoreTo <= rs.scoreFrom;
-      if (!scoreToValidate) {
+      const scoreToValidate: boolean = payload.scoreTo <= rs.scoreTo && payload.scoreFrom >= rs.scoreFrom;
+      if (scoreToValidate) {
         this.isValidateScoreExists = true;
       }
     });
