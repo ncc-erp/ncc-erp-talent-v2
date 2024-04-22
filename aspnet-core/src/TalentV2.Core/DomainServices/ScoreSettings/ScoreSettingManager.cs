@@ -115,9 +115,16 @@ namespace TalentV2.DomainServices.ScoreSettings
 
         private void ValidateRange(float scoreFrom, float scoreTo, IEnumerable<ScoreRange> scoreRanges)
         {
-            if (scoreFrom * 10 % 5 != 0 || scoreTo * 10 % 5 != 0)
+            double fromScoreRemainder = scoreFrom % 0.1;
+            double toScoreRemainder = scoreTo % 0.1;
+
+            if (Math.Abs(fromScoreRemainder) < double.Epsilon || Math.Abs(fromScoreRemainder - 0.1) < double.Epsilon)
             {
-                throw new UserFriendlyException("Score must be *.0 or *.5");
+                throw new UserFriendlyException("ScoreFrom does not step by 0.1");
+            }
+            if (Math.Abs(toScoreRemainder) < double.Epsilon || Math.Abs(toScoreRemainder - 0.1) < double.Epsilon)
+            {
+                throw new UserFriendlyException("ScoreTo does not step by 0.1");
             }
             if (scoreFrom >= scoreTo)
             {
