@@ -122,9 +122,10 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
 
   maxScoreForm() {
     if (this.formControls.scoreTo.value >= (this.min + this.step)) {
-      return this.formControls.scoreTo.value - this.step;
+      return this.formControls.scoreTo.value;
     }
-    else if (!checkNumber(this.formControls.scoreTo.value)) {
+    else
+    if (!checkNumber(this.formControls.scoreTo.value)) {
       return this.min;
     }
   }
@@ -140,7 +141,7 @@ export class DialogScoreSettingComponent extends AppComponentBase implements OnI
 
   minScoreTo() {
     if (checkNumber(this.formControls.scoreFrom.value)) {
-      return this.formControls.scoreFrom.value + this.step;
+      return this.formControls.scoreFrom.value;
     }
     return this.min + this.step;
   }
