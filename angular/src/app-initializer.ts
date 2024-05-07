@@ -162,6 +162,7 @@ export class AppInitializer {
       .subscribe((response) => {
         AppConsts.appBaseUrl = response.appBaseUrl;
         AppConsts.remoteServiceBaseUrl = response.remoteServiceBaseUrl;
+        AppConsts.autoBotServiceBaseUrl = response.autoBotServiceBaseUrl;
         AppConsts.localeMappings = response.localeMappings;
 
         callback();

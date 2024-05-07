@@ -1,4 +1,5 @@
 {
+  "autoBotServiceBaseUrl": "http://172.16.100.116:1300",
   "remoteServiceBaseUrl": "https://localhost:44311",
   "appBaseUrl": "http://localhost:4200",
   "localeMappings": [

@@ -100,6 +100,7 @@ export interface MailDetail {
   isSentMailStatus?: boolean;
   mailStatusHistories: MailStatusHistory[];
 }
+
 export class CandidateReportPayload {
   userType: UserType;
   fromDate:string;
@@ -107,4 +108,14 @@ export class CandidateReportPayload {
   reqCvStatus: number ;
   toStatus: number;
   fromStatus: number;
+}
+
+export interface ICandidateReportExtractCV {
+  address: string,
+  dob: string,
+  email: string,
+  fullname: string,
+  gender: string,
+  phone_number: string,
+  position: string
 }
