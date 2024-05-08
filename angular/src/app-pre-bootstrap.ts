@@ -26,6 +26,7 @@ export class AppPreBootstrap {
         }).done(result => {
             AppConsts.appBaseUrl = result.appBaseUrl;
             AppConsts.remoteServiceBaseUrl = result.remoteServiceBaseUrl;
+            AppConsts.autoBotServiceBaseUrl = result.autoBotServiceBaseUrl;
             AppConsts.localeMappings = result.localeMappings;
             AppConsts.enableNormalLogin = result.enableNormalLogin;
             AppConsts.backendIsNotABP = result.backendIsNotABP;
