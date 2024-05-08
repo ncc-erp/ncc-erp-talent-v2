@@ -9,13 +9,14 @@ import { CandidateStaffService } from '@app/core/services/candidate/candidate-st
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { MailDialogComponent } from '@app/modules/admin/mail/mail-dialog/mail-dialog.component';
 import { AppComponentBase } from '@shared/app-component-base';
-import { DateFormat, MESSAGE } from '@shared/AppConsts';
+import { AppConsts, DateFormat, MESSAGE } from '@shared/AppConsts';
 import { CANDIDATE_DETAILT_TAB_DEFAULT, CV_REFERENCE_TYPE, ToastMessageType, UserType } from '@shared/AppEnums';
 import { UploadAvatarComponent } from '@shared/components/upload-avatar/upload-avatar.component';
 import { AppSessionService } from '@shared/session/app-session.service';
 import * as moment from 'moment';
 import { DialogService } from 'primeng/dynamicdialog';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, finalize } from 'rxjs/operators';
+import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
 
 @Component({
   selector: 'talent-personal-info',
@@ -55,7 +56,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
   public dataApplyCv = this.getDataApplyCv("idApplyCV");
 
-  @HostListener("window:unload", ["$event"])  
+  @HostListener("window:unload", ["$event"])
    unloadHandler(event)
    { this.setDataApplyCv(this.dataApplyCv);   }
     setDataApplyCv(data: any) {
@@ -73,7 +74,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     public _utilities: UtilitiesService,
     private _fb: FormBuilder,
     private _dialog: DialogService,
-    private _apSession: AppSessionService
+    private _apSession: AppSessionService,
+    private _autoBotService: AutoBotApiService
     ) {
     super(injector);
 
@@ -107,10 +109,10 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       userType: data?.positionType === "Intern" ? 0 : 1,
       branchId: data?.branchId,
       linkCV: data?.attachCVLink,
-      avatar: data.avatarLink 
+      avatar: data.avatarLink
     });
   }
-  
+
   getDataApplyCv(key: string): any {
     const data = localStorage.getItem(key);
     localStorage.clear()
@@ -141,6 +143,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.showToastMessage(ToastMessageType.ERROR, 'File name does not contain # or % characters');
       return;
     }
+
     this.cvFile = file;
     this.cvFileName = file?.name;
     if (!isCVExtensionAllow(file)) {
@@ -152,6 +155,33 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.uploadFile(this.cvFile);
     }
     reader.readAsText(file);
+
+    if (!AppConsts.autoBotServiceBaseUrl) {
+      this.showToastMessage(ToastMessageType.WARN, MESSAGE.EXTRACT_CV_WARN);
+      return;
+    }
+    this.message.add({ severity: ToastMessageType.INFO, summary: MESSAGE.EXTRACTING_CV, life: 10000});
+
+    const formData = new FormData();
+    formData.append("file", fileList.item(0));
+
+    this._autoBotService.extractCV(formData).pipe(finalize(() => {
+      this.message.clear();
+    })).subscribe({
+      next: (data) => {
+        const { fullname, address: addressRes, dob: dobRes, email: emailRes, gender, phone_number } = data || {};
+        const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
+
+        this.form.patchValue({
+          fullName: fullname || fullName,
+          email: emailRes || email,
+          isFemale: gender ? gender?.toLowerCase() === "female" : isFemale,
+          phone: phone_number || phone,
+          address: addressRes || address,
+          dob: dobRes || dob
+        });
+      },
+    })
   }
   }
 
@@ -179,7 +209,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.uploadFile(this.avatarFile, true);
     });
   }
-  
+
   openLink(){
     const url = this.router.createUrlTree(['/app/candidate/view-files', { documentUrl: this.formControls['linkCV'].value}]);
      window.open(url.toString(), '_blank');
@@ -411,7 +441,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       })
     );
   }
-  
+
   pasteInputEvent(event: any){
     event.preventDefault();
     const pastedData = event.clipboardData.getData('text/plain');
@@ -509,7 +539,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       formData.append('applyId',linkCv.id.toString())
     }
     this.cvFile && formData.append("cv", this.cvFile);
-    this.isAvata =this.dataApplyCv ? true : false; 
+    this.isAvata =this.dataApplyCv ? true : false;
     if (this.isAvata == true) {
     formData.append("avatarCv", linkCv.avatar);
     }

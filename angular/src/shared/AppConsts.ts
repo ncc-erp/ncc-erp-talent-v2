@@ -1,5 +1,6 @@
 export class AppConsts {
 
+    static autoBotServiceBaseUrl: string;
     static remoteServiceBaseUrl: string;
     static appBaseUrl: string;
     static appBaseHref: string; // returns angular's base-href parameter value if used during the publish
@@ -83,6 +84,8 @@ export const MESSAGE = {
     CLOSE_SUCCESS: "Close was successfully",
     REOPEN_SUCCESS: "Reopen was successfully",
     APPLY_CV_SUCCESS: "You have submitted the application form successfully!",
+    EXTRACT_CV_WARN: "CV information extraction function is not configured. Please contact the administrator",
+    EXTRACTING_CV: "Extracting CV information...."
 }
 
 export const DateFormat = {
