@@ -12,7 +12,9 @@ import { ICandidateReportExtractCV } from "@app/core/models/candidate/candidate.
   providedIn: "root",
 })
 export class AutoBotApiService {
-  baseAutoBotUrl = AppConsts.autoBotServiceBaseUrl;
+  get baseUrl() {
+    return AppConsts.autoBotServiceBaseUrl.replace(/\/+$/, "");
+  }
 
   constructor (public http: HttpClient) {
     this.http = http;
@@ -20,7 +22,7 @@ export class AutoBotApiService {
 
   extractCV(file: FormData): Observable<ICandidateReportExtractCV> {
     return this.http
-      .post<any>(this.baseAutoBotUrl + "/extract-cv", file)
+      .post<any>(this.baseUrl + "/extract-cv", file)
       .pipe(
         map(data => ({ ...data, loading: false })),
         startWith({ loading: true, success: false }),
