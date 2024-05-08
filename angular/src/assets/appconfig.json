@@ -1,5 +1,5 @@
 {
-  "autoBotServiceBaseUrl": "http://172.16.100.116:1300",
+  "autoBotServiceBaseUrl": "https://ai-dev.nccsoft.vn",
   "remoteServiceBaseUrl": "http://localhost:21021",
   "appBaseUrl": "http://localhost:4200",
   "localeMappings": [
