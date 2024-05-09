@@ -36,3 +36,17 @@ export function randomHexColor(): string {
 export function nullToEmpty(value): string {
   return value ?? '';
 }
+
+export function convertPhoneNumber(number: string): string {
+  let resultNumber: string;
+  if (number) {
+    resultNumber = number.replace(/[^\d]/g, "");
+    if (resultNumber.slice(0, 2) === "84") {
+      resultNumber = resultNumber.substring(2);
+    }
+    if (resultNumber.slice(0, 1) !== "0") {
+      resultNumber = `0${resultNumber}`;
+    }
+  }
+  return resultNumber;
+}

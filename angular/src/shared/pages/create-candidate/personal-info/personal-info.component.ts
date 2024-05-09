@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostListener, Injector, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { checkNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
+import { checkNumber, convertPhoneNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
 import { CustomValidators } from '@app/core/helpers/validator.helper';
 import { Candidate, CandidatePayload, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
 import { MailDialogConfig, MailPreviewInfo } from '@app/core/models/mail/mail.model';
@@ -17,11 +17,13 @@ import * as moment from 'moment';
 import { DialogService } from 'primeng/dynamicdialog';
 import { debounceTime, finalize } from 'rxjs/operators';
 import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'talent-personal-info',
   templateUrl: './personal-info.component.html',
-  styleUrls: ['./personal-info.component.scss']
+  styleUrls: ['./personal-info.component.scss'],
+  providers: [TitleCasePipe]
 })
 export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   readonly ACCEPT_IMAGE = '.png, .jpg, .jpeg, .gif';
@@ -75,7 +77,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     private _fb: FormBuilder,
     private _dialog: DialogService,
     private _apSession: AppSessionService,
-    private _autoBotService: AutoBotApiService
+    private _autoBotService: AutoBotApiService,
+    private _titleCasePipe: TitleCasePipe
     ) {
     super(injector);
 
@@ -169,7 +172,12 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.message.clear();
     })).subscribe({
       next: (data) => {
-        const { fullname, address: addressRes, dob: dobRes, email: emailRes, gender, phone_number } = data || {};
+        const phone_number: string = convertPhoneNumber(data?.phone_number);
+        const fullname = this._titleCasePipe
+          .transform(data?.fullname)
+          ?.replace(/\s+/g, " ")
+          .trim();
+        const { address: addressRes, dob: dobRes, email: emailRes, gender } = data || {};
         const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
 
         this.form.patchValue({
@@ -384,25 +392,25 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     const userType = this.userType === UserType.INTERN ? UserType.INTERN : UserType.STAFF;
     this.form = this._fb.group({
       id: 0,
-      fullName: ['', [Validators.required]],
+      fullName: ["", [Validators.required]],
       dob: [null, [CustomValidators.isDateMustLessThanCurrent()]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ["", [Validators.required, Validators.email]],
       isFemale: false,
-      phone: ['', [Validators.required]],
-      address: '',
+      phone: ["", [Validators.required]],
+      address: "",
       userType: [userType, [Validators.required]], //number
-      note: '',
-      subPositionId: [null, [Validators.required]],  //number
+      note: "",
+      subPositionId: [null, [Validators.required]], //number
       branchId: [null, [Validators.required]],
-      branchName: '',
+      branchName: "",
       cvStatus: [this._utilities.catCvStatus[0].id, [Validators.required]],
-      cvStatusName: '',
+      cvStatusName: "",
       linkCV: [null, []],
       cvSourceId: [null, [Validators.required]], //number
-      referenceId: ['', [Validators.required]],
+      referenceId: ["", [Validators.required]],
       avatar: null,
       mailDetail: null,
-      creatorUserId: ['', []],
+      creatorUserId: ["", []],
     });
 
     (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();
