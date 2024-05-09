@@ -392,32 +392,25 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     const userType = this.userType === UserType.INTERN ? UserType.INTERN : UserType.STAFF;
     this.form = this._fb.group({
       id: 0,
-      fullName: ['', [Validators.required]],
+      fullName: ["", [Validators.required]],
       dob: [null, [CustomValidators.isDateMustLessThanCurrent()]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ["", [Validators.required, Validators.email]],
       isFemale: false,
-      phone: [
-        "",
-        [
-          Validators.required,
-          Validators.minLength(10),
-          Validators.maxLength(10),
-        ],
-      ],
-      address: '',
+      phone: ["", [Validators.required]],
+      address: "",
       userType: [userType, [Validators.required]], //number
-      note: '',
-      subPositionId: [null, [Validators.required]],  //number
+      note: "",
+      subPositionId: [null, [Validators.required]], //number
       branchId: [null, [Validators.required]],
-      branchName: '',
+      branchName: "",
       cvStatus: [this._utilities.catCvStatus[0].id, [Validators.required]],
-      cvStatusName: '',
+      cvStatusName: "",
       linkCV: [null, []],
       cvSourceId: [null, [Validators.required]], //number
-      referenceId: ['', [Validators.required]],
+      referenceId: ["", [Validators.required]],
       avatar: null,
       mailDetail: null,
-      creatorUserId: ['', []],
+      creatorUserId: ["", []],
     });
 
     (this.isViewMode && !this.isEditing) ? this.form.disable() : this.form.enable();

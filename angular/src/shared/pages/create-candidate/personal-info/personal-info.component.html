@@ -93,12 +93,6 @@
         </div>
         <div
           class="text-error text-danger"
-          *ngIf="submitted && (formControls.phone.errors?.minlength || formControls.phone.errors?.maxlength)"
-        >
-          Phone is invalid
-        </div>
-        <div
-          class="text-error text-danger"
           *ngIf="formControls.phone.errors?.existPhone"
         >
           Phone already existed:
