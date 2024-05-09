@@ -38,7 +38,6 @@ export function nullToEmpty(value): string {
 }
 
 export function convertPhoneNumber(number: string): string {
-  console.log("standardizePhoneNumber", number);
   let resultNumber: string;
   if (number) {
     resultNumber = number.replace(/[^\d]/g, "");
