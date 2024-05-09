@@ -17,11 +17,13 @@ import * as moment from 'moment';
 import { DialogService } from 'primeng/dynamicdialog';
 import { debounceTime, finalize } from 'rxjs/operators';
 import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'talent-personal-info',
   templateUrl: './personal-info.component.html',
-  styleUrls: ['./personal-info.component.scss']
+  styleUrls: ['./personal-info.component.scss'],
+  providers: [TitleCasePipe]
 })
 export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   readonly ACCEPT_IMAGE = '.png, .jpg, .jpeg, .gif';
@@ -75,7 +77,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     private _fb: FormBuilder,
     private _dialog: DialogService,
     private _apSession: AppSessionService,
-    private _autoBotService: AutoBotApiService
+    private _autoBotService: AutoBotApiService,
+    private _titleCasePipe: TitleCasePipe
     ) {
     super(injector);
 
@@ -170,7 +173,11 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     })).subscribe({
       next: (data) => {
         const phone_number: string = convertPhoneNumber(data?.phone_number);
-        const { fullname, address: addressRes, dob: dobRes, email: emailRes, gender } = data || {};
+        const fullname = this._titleCasePipe
+          .transform(data?.fullname)
+          ?.replace(/\s+/g, " ")
+          .trim();
+        const { address: addressRes, dob: dobRes, email: emailRes, gender } = data || {};
         const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
 
         this.form.patchValue({
