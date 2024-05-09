@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostListener, Injector, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { checkNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
+import { checkNumber, convertPhoneNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
 import { CustomValidators } from '@app/core/helpers/validator.helper';
 import { Candidate, CandidatePayload, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
 import { MailDialogConfig, MailPreviewInfo } from '@app/core/models/mail/mail.model';
@@ -169,7 +169,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.message.clear();
     })).subscribe({
       next: (data) => {
-        const { fullname, address: addressRes, dob: dobRes, email: emailRes, gender, phone_number } = data || {};
+        const phone_number: string = convertPhoneNumber(data?.phone_number);
+        const { fullname, address: addressRes, dob: dobRes, email: emailRes, gender } = data || {};
         const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
 
         this.form.patchValue({
@@ -388,7 +389,14 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       dob: [null, [CustomValidators.isDateMustLessThanCurrent()]],
       email: ['', [Validators.required, Validators.email]],
       isFemale: false,
-      phone: ['', [Validators.required]],
+      phone: [
+        "",
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(10),
+        ],
+      ],
       address: '',
       userType: [userType, [Validators.required]], //number
       note: '',
