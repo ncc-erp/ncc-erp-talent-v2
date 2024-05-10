@@ -226,7 +226,6 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   onSaveClose() {
     this.submitted = true;
     if (this.form.invalid ||!this.cvFile) return;
-
     const payload = this.getPayload();
     this._candidate.create(payload).subscribe(res => {
       this.isLoading = res.loading;
@@ -537,8 +536,14 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     formData.append('note', getFormControlValue(this.form, 'note'));
     formData.append('cvStatus', getFormControlValue(this.form, 'cvStatus'));
 
-    getFormControlValue(this.form, 'dob') ?
-    formData.append('birthDay', moment(this.formControls['dob'].value).format(DateFormat.YYYY_MM_DD)) : formData.append('birthDay', '');
+    getFormControlValue(this.form, "dob")
+      ? formData.append(
+          "birthDay",
+          moment(this.formControls["dob"].value, DateFormat.DD_MM_YYYY).format(
+            DateFormat.YYYY_MM_DD
+          )
+        )
+      : formData.append("birthDay", "");
 
     const linkCv = this.dataApplyCv;
     this.isApplyCV = this.dataApplyCv ? true : false;
