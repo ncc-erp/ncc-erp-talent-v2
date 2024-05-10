@@ -24,6 +24,7 @@ bin/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.vscode
 
 # misc
 /.sass-cache
@@ -41,3 +42,4 @@ testem.log
 #System Files
 .DS_Store
 Thumbs.db
+package-lock.json
