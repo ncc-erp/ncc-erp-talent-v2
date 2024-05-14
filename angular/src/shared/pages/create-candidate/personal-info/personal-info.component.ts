@@ -120,7 +120,8 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
               .transform(fullname)
               ?.replace(/\s+/g, " ")
               .trim() : null;
-            const dobRes = data.dob ? moment(data.dob, 'DD/MM/YYYY').toDate() : null;
+            const momentDob = moment(data.dob, 'DD/MM/YYYY');
+            const dobRes = momentDob.isValid() ? momentDob.toDate() : null;
 
             const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
 
