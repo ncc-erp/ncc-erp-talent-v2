@@ -15,9 +15,10 @@ import { UploadAvatarComponent } from '@shared/components/upload-avatar/upload-a
 import { AppSessionService } from '@shared/session/app-session.service';
 import * as moment from 'moment';
 import { DialogService } from 'primeng/dynamicdialog';
-import { debounceTime, finalize } from 'rxjs/operators';
+import { debounceTime, filter, finalize, switchMap } from 'rxjs/operators';
 import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
 import { TitleCasePipe } from '@angular/common';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'talent-personal-info',
@@ -70,6 +71,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   submitted = false;
   isEnaleRefBy = false;
   isEditing = false;
+  private extractCVSubject = new Subject<FormData>();
 
   constructor(
     injector: Injector,
@@ -97,7 +99,44 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.avatarUrl = this.dataApplyCv.avatarLink ?? null;
       this.cvFileName = applyCvlink;
     }
+    this.subscribeExtractCVSubject();
   }
+
+  subscribeExtractCVSubject() {
+    this.subs.add(
+      this.extractCVSubject.pipe(
+        filter(data => Boolean(data)),
+        switchMap(formData => this._autoBotService.extractCV(formData).pipe(
+            finalize(() => {
+              this.message.clear();
+            })
+          )
+        )).subscribe({
+          next: (data) => {
+            if (!data) return;
+            const { address: addressRes, email: emailRes, gender, phone_number, fullname } = data || {};
+            const phoneNumberRes: string = phone_number ? convertPhoneNumber(phone_number) : null;
+            const fullNameRes = fullname ? this._titleCasePipe
+              .transform(fullname)
+              ?.replace(/\s+/g, " ")
+              .trim() : null;
+            const dobRes = data.dob ? moment(data.dob, 'DD/MM/YYYY').toDate() : null;
+
+            const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
+
+            this.form.patchValue({
+              fullName: fullNameRes || fullName,
+              email: emailRes || email,
+              isFemale: gender ? ["female", "nữ"].includes(gender?.toLowerCase()) : isFemale,
+              phone: phoneNumberRes || phone,
+              address: addressRes || address,
+              dob: dobRes || dob
+            });
+          },
+        })
+    )
+  }
+
 
   get formControls() {
     return this.form.controls;
@@ -159,6 +198,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     }
     reader.readAsText(file);
 
+    //Extract PDF CV
     if (!AppConsts.autoBotServiceBaseUrl) {
       this.showToastMessage(ToastMessageType.WARN, MESSAGE.EXTRACT_CV_WARN);
       return;
@@ -168,28 +208,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     const formData = new FormData();
     formData.append("file", fileList.item(0));
 
-    this._autoBotService.extractCV(formData).pipe(finalize(() => {
-      this.message.clear();
-    })).subscribe({
-      next: (data) => {
-        const phone_number: string = convertPhoneNumber(data?.phone_number);
-        const fullname = this._titleCasePipe
-          .transform(data?.fullname)
-          ?.replace(/\s+/g, " ")
-          .trim();
-        const { address: addressRes, dob: dobRes, email: emailRes, gender } = data || {};
-        const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
-
-        this.form.patchValue({
-          fullName: fullname || fullName,
-          email: emailRes || email,
-          isFemale: gender ? gender?.toLowerCase() === "female" : isFemale,
-          phone: phone_number || phone,
-          address: addressRes || address,
-          dob: dobRes || dob
-        });
-      },
-    })
+    this.extractCVSubject.next(formData);
   }
   }
 
@@ -589,5 +608,4 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     })
 
   }
-
 }
