@@ -117,5 +117,6 @@ export interface ICandidateReportExtractCV {
   fullname: string,
   gender: string,
   phone_number: string,
-  position: string
+  position: string,
+  note: string
 }
