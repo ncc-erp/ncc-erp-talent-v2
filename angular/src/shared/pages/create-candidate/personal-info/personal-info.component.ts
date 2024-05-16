@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostListener, Injector, Input, OnInit, Output 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { checkNumber, convertPhoneNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
 import { CustomValidators } from '@app/core/helpers/validator.helper';
-import { Candidate, CandidatePayload, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
+import { Candidate, CandidatePayload, ICandidateReportExtractCV, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
 import { MailDialogConfig, MailPreviewInfo } from '@app/core/models/mail/mail.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
@@ -114,28 +114,40 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
         )).subscribe({
           next: (data) => {
             if (!data) return;
-            const { address: addressRes, email: emailRes, gender, phone_number, fullname } = data || {};
-            const phoneNumberRes: string = phone_number ? convertPhoneNumber(phone_number) : null;
-            const fullNameRes = fullname ? this._titleCasePipe
-              .transform(fullname)
-              ?.replace(/\s+/g, " ")
-              .trim() : null;
-            const momentDob = moment(data.dob, 'DD/MM/YYYY');
-            const dobRes = momentDob.isValid() ? momentDob.toDate() : null;
-
-            const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
-
-            this.form.patchValue({
-              fullName: fullNameRes || fullName,
-              email: emailRes || email,
-              isFemale: gender ? ["female", "nữ"].includes(gender?.toLowerCase()) : isFemale,
-              phone: phoneNumberRes || phone,
-              address: addressRes || address,
-              dob: dobRes || dob
-            });
+            this.form.patchValue(this.convertExtractDataToFormData(data));
           },
         })
     )
+  }
+
+  convertExtractDataToFormData(resData: ICandidateReportExtractCV) {
+    const { address: addressRes, email: emailRes, gender, phone_number, fullname, dob } = resData || {};
+    const { fullName, address, email, isFemale, phone } = this.form.getRawValue() || {};
+
+    const phoneNumberRes: string = phone_number ? convertPhoneNumber(phone_number) : null;
+    const fullNameRes = fullname ? this._titleCasePipe
+      .transform(fullname)
+      ?.replace(/\s+/g, " ")
+      .trim() : null;
+
+    return {
+      fullName: fullNameRes || fullName || '',
+      email: emailRes || email || '',
+      isFemale: gender ? !["male", "nam"].includes(gender?.toLowerCase()) : Boolean(isFemale),
+      phone: phoneNumberRes || phone || '',
+      address: addressRes || address || '',
+      dob: this.getDateFromExtractDob(dob) || null
+    }
+  }
+
+  getDateFromExtractDob(dob: string) {
+    const formDob = this.formControls['dob']?.value;
+    const momentResDob = moment(dob, 'DD/MM/YYYY');
+    const dobDate = momentResDob.isValid() ?
+      momentResDob.toDate() :
+      moment(formDob)?.isValid() ? moment(formDob).toDate() : null;
+
+    return dobDate;
   }
 
 
