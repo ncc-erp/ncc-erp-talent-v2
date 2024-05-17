@@ -16,9 +16,15 @@ namespace TalentV2.WebServices
     public class BaseWebService
     {
         private readonly HttpClient httpClient;
+        public HttpClient HttpClient
+        {
+            get { return httpClient; }
+        }
+
         protected readonly ILogger logger;
         private readonly IAbpSession _abpSession;
         private readonly TenantManager _tenantManager;
+
         public BaseWebService(
             HttpClient httpClient,
             ILogger logger,
@@ -31,32 +37,33 @@ namespace TalentV2.WebServices
             this._tenantManager = IocManager.Instance.Resolve<TenantManager>();
             SetHeader();
         }
+
         protected virtual async Task<T> GetAsync<T>(string url)
         {
-            var fullUrl = $"{ httpClient.BaseAddress }/{ url}";
+            var fullUrl = $"{httpClient.BaseAddress}/{url}";
             try
             {
                 logger.LogInformation($"Get: {fullUrl}");
                 var response = await httpClient.GetAsync(url);
 
-              /*  if (response.IsSuccessStatusCode)
-                {*/
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    logger.LogInformation($"Get: {fullUrl} response: { responseContent}");
-                    return JsonConvert.DeserializeObject<T>(responseContent);
-               /* }*/
+                /*  if (response.IsSuccessStatusCode)
+                  {*/
+                var responseContent = await response.Content.ReadAsStringAsync();
+                logger.LogInformation($"Get: {fullUrl} response: {responseContent}");
+                return JsonConvert.DeserializeObject<T>(responseContent);
+                /* }*/
             }
             catch (Exception ex)
             {
-                logger.LogError($"Get: {fullUrl} error: { ex.Message}");
+                logger.LogError($"Get: {fullUrl} error: {ex.Message}");
             }
 
             return default;
-
         }
+
         protected virtual async Task<T> PostAsync<T>(string url, object input)
         {
-            var fullUrl = $"{ httpClient.BaseAddress }/{ url}";
+            var fullUrl = $"{httpClient.BaseAddress}/{url}";
             var strInput = JsonConvert.SerializeObject(input);
             var contentString = new StringContent(strInput, Encoding.UTF8, "application/json");
 
@@ -66,16 +73,17 @@ namespace TalentV2.WebServices
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    logger.LogInformation($"Post: {fullUrl} input: {strInput} response: { responseContent}");
+                    logger.LogInformation($"Post: {fullUrl} input: {strInput} response: {responseContent}");
                     return JsonConvert.DeserializeObject<T>(responseContent);
                 }
             }
             catch (Exception ex)
             {
-                logger.LogError($"Post: {fullUrl} error: { ex.Message}");
+                logger.LogError($"Post: {fullUrl} error: {ex.Message}");
             }
             return default;
         }
+
         protected virtual void Post(string url, object input)
         {
             var fullUrl = $"{httpClient.BaseAddress}/{url}";
@@ -90,14 +98,15 @@ namespace TalentV2.WebServices
             {
                 logger.LogError($"Post: {fullUrl} input: {strInput} Error: {e.Message}");
             }
-
         }
+
         protected virtual string GetTenantName()
         {
             if (!_abpSession.TenantId.HasValue) return string.Empty;
             var tenant = _tenantManager.FindById(_abpSession.TenantId.Value);
             return tenant.TenancyName;
         }
+
         private void SetHeader()
         {
             this.httpClient.DefaultRequestHeaders.Add("Abp-TenantName", GetTenantName());

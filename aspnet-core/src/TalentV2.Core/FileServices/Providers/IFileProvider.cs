@@ -1,15 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
-using TalentV2.Constants.Const;
 
 namespace TalentV2.FileServices.Providers
 {
     public interface IFileProvider
     {
         Task<string> UploadFileAsync(List<string> paths, IFormFile file);
+
+        Task<Stream> ReadFileAsync(List<string> paths, string fileName);
+
+        Task<string> CopyFileAsync(List<string> sourcePaths, List<string> destinationPaths, string fileName, bool hasTimestamp = false);
+
+        Task MoveFileAsync(List<string> sourcePaths, List<string> destinationPaths, string fileName, bool hasTimestamp = false);
+
+        Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived");
+
+        Task<List<string>> GetFileNamesAsync(List<string> paths);
     }
 }

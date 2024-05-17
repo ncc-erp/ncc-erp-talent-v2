@@ -15,5 +15,7 @@ namespace TalentV2.Constants.Enum
         Passed = 2,
 
         Failed = 10,
+
+        Draft = 20
     }
 }

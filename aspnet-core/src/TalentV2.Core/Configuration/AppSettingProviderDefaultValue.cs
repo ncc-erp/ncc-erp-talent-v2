@@ -23,8 +23,10 @@ namespace TalentV2.Configuration
         public string NoticeInterviewMinutes { get; set; }
         public string NoticeInterviewResultMinutes { get; set; }
         public string IsNoticeInterviewViaChannel { get; set; }
+        public string NoticeTalentGeneralChannel { get; set; }
         public string NoticeInterviewScheduleChannel { get; set; }
         public string NoticeInterviewResultChannel { get; set; }
+        public string NoticeCVCreatedToHR { get; set; }
         public string GoogleClientAppEnable { get; set; }
         public string EnableNormalLogin { get; set; }
         public string TalentContestUrl { get; set; }

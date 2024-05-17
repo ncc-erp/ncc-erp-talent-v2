@@ -55,10 +55,16 @@ namespace TalentV2.Configuration
                     _defaultValue.TalentSecurityCode,
                     scopes:SettingScopes.Application| SettingScopes.Tenant
                 ),
-                  new SettingDefinition
+                new SettingDefinition
                 (
                     AppSettingNames.TalentContestUrl,
                     _defaultValue.TalentContestUrl,
+                    scopes:SettingScopes.Application| SettingScopes.Tenant
+                ),
+                new SettingDefinition
+                (
+                    AppSettingNames.NoticeCVCreatedToHR,
+                    _defaultValue.NoticeCVCreatedToHR,
                     scopes:SettingScopes.Application| SettingScopes.Tenant
                 ),
                 #endregion 
@@ -87,6 +93,11 @@ namespace TalentV2.Configuration
                 new SettingDefinition(
                     AppSettingNames.IsNoticeInterviewViaChannel,
                     _defaultValue.IsNoticeInterviewViaChannel,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                ),
+                new SettingDefinition(
+                    AppSettingNames.NoticeTalentGeneralChannel,
+                    _defaultValue.NoticeTalentGeneralChannel,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                 ),
                 new SettingDefinition(
