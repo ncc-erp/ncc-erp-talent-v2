@@ -127,7 +127,18 @@ namespace TalentV2.Configuration
                 SecurityCode = _appConfiguration.GetValue<string>("HRMService:SecurityCode")
             };
         }
-      
+
+        [HttpGet]
+        [AbpAuthorize(PermissionNames.Pages_Configurations_ViewAutoBotSettings)]
+        public async Task<InternalToolSettingInput> GetAutoBotSettings()
+        {
+            return new InternalToolSettingInput
+            {
+                URL = _appConfiguration.GetValue<string>("AutobotService:BaseAddress"),
+                SecurityCode = _appConfiguration.GetValue<string>("AutobotService:SecurityCode")
+            };
+        }
+
         [HttpPost]
         //[AbpAuthorize(PermissionNames.Pages_Configurations_EditTimesheetSettings)]
         public async Task<TimesheetSettingInput> SetTimesheetSettings(TimesheetSettingInput input)
