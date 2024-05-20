@@ -8,18 +8,12 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
-using System.Threading.Channels;
 using TalentV2.Configuration;
 using TalentV2.Constants.Enum;
-using TalentV2.DomainServices.Candidates;
 using TalentV2.DomainServices.CVAutomation;
 using TalentV2.DomainServices.CVAutomation.Dto;
-using TalentV2.DomainServicesWithoutWorkScope.CandidateManager.Dtos;
-using TalentV2.FileServices.Paths;
 using TalentV2.Utils;
-using TalentV2.WebServices.ExternalServices.Autobot;
 using TalentV2.WebServices.ExternalServices.Komu;
 
 namespace TalentV2.BackgroundWorker
@@ -53,7 +47,14 @@ namespace TalentV2.BackgroundWorker
         protected override void DoWork()
         {
             Logger.Info("CrawlCVFromAWSWorker start");
-            AsyncHelper.RunSync(async () =>
+            DateTime now = DateTimeUtils.GetNow();
+            if (now.DayOfWeek == DayOfWeek.Sunday || now.DayOfWeek == DayOfWeek.Saturday)
+            {
+                Logger.Info("Today is DayOff => stop");
+                return;
+            }
+
+            AsyncHelper.RunSync(async () => 
             {
                 var internResult = await _cvAutomationService.AutoCreateInternCV();
                 if (internResult != null)
@@ -174,7 +175,7 @@ namespace TalentV2.BackgroundWorker
 
         private string GetTalentLink(string clientUrl, UserType userType)
         {
-            return $"{clientUrl}app/candidate/{(userType == UserType.Intern ? "intern-list" : "staff-list")}";
+            return $"{clientUrl}app/candidate/{(userType == UserType.Intern ? "intern-list" : "staff-list")}?cvStatus=20";
         }
     }
 }

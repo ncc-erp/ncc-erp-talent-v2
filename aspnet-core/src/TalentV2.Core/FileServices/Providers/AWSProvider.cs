@@ -128,12 +128,17 @@ namespace TalentV2.FileServices.Providers
             await _s3Client.DeleteObjectAsync(deleteRequest);
         }
 
-        public async Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived")
+        public async Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived", bool hasTimestamp = false)
         {
             var sourceKey = fileName;
             if (sourcePaths != null && sourcePaths.Count > 0)
             {
                 sourceKey = $"{string.Join("/", sourcePaths)}/{fileName}";
+            }
+
+            if (hasTimestamp)
+            {
+                fileName = $"{DateTimeUtils.GetNow():yyyyMMddHHmmss}_{fileName}";
             }
 
             var destinationKey = fileName;

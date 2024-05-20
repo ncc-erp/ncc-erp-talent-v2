@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TalentV2.Authorization.Users;
+using TalentV2.Configuration;
 using TalentV2.Constants.Const;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.CVAutomation.Dto;
@@ -84,7 +86,7 @@ namespace TalentV2.DomainServices.CVAutomation
                         var cvCandidatePaths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
                         var cvLink = await _fileService.CopyFileAsync(paths, cvCandidatePaths, fileName, hasTimestamp: true);
                         await TransformDataAndCreateCV(cvExtractionData, UserType.Intern, cvLink, positionMapping.Value);
-                        await _fileService.ArchiveFileAsync(paths, fileName);
+                        await _fileService.ArchiveFileAsync(paths, fileName, hasTimestamp: true);
                         result.Success++;
                     }
                     catch (Exception ex)
@@ -135,7 +137,7 @@ namespace TalentV2.DomainServices.CVAutomation
                         var cvCandidatePaths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
                         var cvLink = await _fileService.CopyFileAsync(paths, cvCandidatePaths, fileName, hasTimestamp: true);
                         await TransformDataAndCreateCV(cvExtractionData, UserType.Staff, cvLink, positionMapping.Value);
-                        await _fileService.ArchiveFileAsync(paths, fileName);
+                        await _fileService.ArchiveFileAsync(paths, fileName, hasTimestamp: true);
                         result.Success++;
                     }
                     catch (Exception ex)
@@ -180,6 +182,15 @@ namespace TalentV2.DomainServices.CVAutomation
             else
             {
                 cv.IsFemale = true;
+            }
+
+            var user = SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeCVCreatedToHR);
+            if (!string.IsNullOrEmpty(user))
+            {
+                var email = user.Split(',').Select(x => x.Trim()).FirstOrDefault();
+                var defaultUserCreation = await WorkScope.GetAll<User>().FirstOrDefaultAsync(x => x.EmailAddress.Equals(email));
+                cv.CreatorUserId = defaultUserCreation?.Id;
+                cv.LastModifierUserId = defaultUserCreation?.Id;
             }
 
             var defaultBranch = await WorkScope.GetAll<Branch>()

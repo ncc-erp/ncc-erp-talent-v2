@@ -55,7 +55,7 @@ namespace TalentV2.FileServices.Providers
             throw new NotImplementedException("MoveFileAsync() method is only supported for AWS.");
         }
 
-        public Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived")
+        public Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived", bool hasTimestamp = false)
         {
             throw new NotImplementedException("ArchiveFileAsync() method is only supported for AWS.");
         }
