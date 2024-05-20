@@ -68,6 +68,11 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
     private _dialog: DialogService
   ) {
     super(injector);
+    this.route.queryParams.subscribe(params => {
+      const statusParam = params['cvStatus'] ? Number(params['cvStatus']) : null;
+      const isStatusId = _utilities.catCvStatus.some(status => (status.id === statusParam));
+      this.searchDetail.cvStatus = isStatusId && statusParam ? statusParam : null;
+    });
   }
 
   ngOnInit(): void {
@@ -118,6 +123,16 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
   onShowEditNote(item: CandidateStaff) {
     this.showDialogUpdateNote = true;
     this.candidateStaffEdit = item;
+  }
+
+  onCvStatusChanges() {
+    this.router.navigate([], {
+      queryParamsHandling: "merge",
+      replaceUrl: true,
+      queryParams: { cvStatus: this.searchDetail.cvStatus }
+    }).then(() =>
+      this.getDataPage(this.GET_FIRST_PAGE)
+    )
   }
 
   cancelUpdateNote() {
@@ -184,9 +199,9 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
           );
           return;
         }
-        const payload : RequisitionPayload = { 
+        const payload : RequisitionPayload = {
           cvId: entity.id,
-          requestId: this.requisitionStaffId, 
+          requestId: this.requisitionStaffId,
           currentRequestId: entity.requisitionInfos[0]?.id || null ,
           isPresentForHr: ref.isPresentForHr
         }
@@ -255,7 +270,7 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
     (this.searchWithFromStatus || this.searchWithFromStatus === 0) && (payload.fromStatus = this.searchWithFromStatus);
     (this.searchWithToStatus || this.searchWithToStatus === 0) && (payload.toStatus = this.searchWithToStatus);
     (this.searchWithProcessCvStatus || this.searchWithProcessCvStatus === 0) && (payload.processCVStatus = this.searchWithProcessCvStatus);
-    
+
     if (this.searchWithCreationTime && this.searchWithCreationTime.dateType !== CreationTimeEnum.ALL) {
       payload.fromDate = this.searchWithCreationTime?.fromDate?.format(DateFormat.YYYY_MM_DD);
       payload.toDate = this.searchWithCreationTime?.toDate?.format(DateFormat.YYYY_MM_DD);
@@ -299,7 +314,7 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
       class: 'modal-lg',
       initialState: {
       userType: userType,
-      }, 
+      },
     });
   }
 }
