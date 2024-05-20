@@ -196,6 +196,17 @@ namespace TalentV2.Utils
             }
         }
 
+        public static void CheckFormatFile(string fileName, string typeFile)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return;
+            var fileExt = Path.GetExtension(fileName).Substring(1).ToLower();
+            if (!DictionaryHelper.FileTypeDic[typeFile].Contains(fileExt))
+            {
+                throw new UserFriendlyException($"Wrong Format! Allow File Type: {string.Join(",", DictionaryHelper.FileTypeDic[typeFile])}");
+            }
+        }
+
         public static void CheckSizeFile(IFormFile file)
         {
             if (file.Length > TalentConstants.MaxSizeFile)

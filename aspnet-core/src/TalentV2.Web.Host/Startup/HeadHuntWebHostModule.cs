@@ -34,6 +34,7 @@ namespace TalentV2.Web.Host.Startup
             var worker = IocManager.Resolve<IBackgroundWorkerManager>();
             worker.Add(IocManager.Resolve<NoticeInterviewResultWorker>());
             worker.Add(IocManager.Resolve<NoticeInterviewWorker>());
+            worker.Add(IocManager.Resolve<CrawlCVFromAWSWorker>());
             Configuration.BackgroundJobs.IsJobExecutionEnabled = true;
             Logger.Info("PostInitialize() done");
         }
