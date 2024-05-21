@@ -51,6 +51,7 @@ namespace TalentV2.Authorization
         public const string Pages_Configurations_ViewChannelHRITSettings = "Pages.Configurations.ViewChannelHRITSettings";
         public const string Pages_Configurations_EditChannelHRITSettings = "Pages.Configurations.EditChannelHRITSettings";
         public const string Pages_Configurations_ViewHRMSettings = "Pages.Configurations.ViewHRMSettings";
+        public const string Pages_Configurations_ViewAutoBotSettings = "Pages.Configurations.ViewAutoBotSettings";
         public const string Pages_Configurations_ViewLMSSettings = "Pages.Configurations.ViewLMSSettings";
         public const string Pages_Configurations_ViewGoogleClientAppSettings = "Pages.Configurations.ViewGoogleClientAppSettings";
         public const string Pages_Configurations_EditGoogleClientAppSettings = "Pages.Configurations.EditGoogleClientAppSettings";
@@ -433,6 +434,7 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_Configurations_ViewChannelHRITSettings,
                     PermissionNames.Pages_Configurations_ViewEmailSettings,
                     PermissionNames.Pages_Configurations_ViewHRMSettings,
+                    PermissionNames.Pages_Configurations_ViewAutoBotSettings,
                     PermissionNames.Pages_Configurations_ViewKomuSettings,
                     PermissionNames.Pages_Configurations_ViewLMSSettings,
                     PermissionNames.Pages_Configurations_ViewGoogleClientAppSettings,
@@ -1214,6 +1216,7 @@ namespace TalentV2.Authorization
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewEmailSettings, DisplayName = "View Setting Email", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditEmailSettings, DisplayName = "Edit Setting Email", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewHRMSettings, DisplayName = "View Setting HRM", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewAutoBotSettings, DisplayName = "View Setting AutoBot", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewLMSSettings, DisplayName = "View Setting LMS", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewGoogleClientAppSettings, DisplayName = "View Setting Google Client App", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditGoogleClientAppSettings, DisplayName = "Edit Setting Google Client App", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
@@ -1607,6 +1610,7 @@ namespace TalentV2.Authorization
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewEmailSettings, DisplayName = "View Setting Email", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditEmailSettings, DisplayName = "Edit Setting Email", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewHRMSettings, DisplayName = "View Setting HRM", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewAutoBotSettings, DisplayName = "View Setting AutoBot", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewLMSSettings, DisplayName = "View Setting LMS", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_ViewGoogleClientAppSettings, DisplayName = "View Setting Google Client App", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission{Name = PermissionNames.Pages_Configurations_EditGoogleClientAppSettings, DisplayName = "Edit Setting Google Client App", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},

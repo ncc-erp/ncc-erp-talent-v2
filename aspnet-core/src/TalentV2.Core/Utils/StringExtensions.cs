@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -57,6 +58,33 @@ namespace TalentV2.Utils
             branch = ReplaceWhitespace(branch);
             branch = RemoveSign4VietnameseString(branch);
             return branch;
+        }
+
+        public static string FormatPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                return phoneNumber;
+            }
+
+            string formattedNumber = Regex.Replace(phoneNumber, @"\D", "");
+            formattedNumber = Regex.Replace(formattedNumber, "^84", "0");
+            return formattedNumber;
+        }
+
+        public static string FormatName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return name;
+
+            string normalized = Regex.Replace(name, @"[-_.]", " ");
+
+            normalized = Regex.Replace(normalized, @"\s+", " ");
+
+            TextInfo textInfo = new CultureInfo("vi-VN", false).TextInfo;
+            normalized = textInfo.ToTitleCase(normalized.ToLower());
+
+            return normalized.Trim();
         }
 
         public static string ReplaceWhitespace(string input)

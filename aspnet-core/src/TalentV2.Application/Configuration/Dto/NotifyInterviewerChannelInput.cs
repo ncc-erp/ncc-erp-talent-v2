@@ -15,5 +15,6 @@ namespace TalentV2.Configuration.Dto
         public string IsToChannel { get; set; }
         public string ScheduleChannel { get; set; }
         public string ResultChannel { get; set; }
+        public string TalentGeneralChannel { get; set; }
     }
 }

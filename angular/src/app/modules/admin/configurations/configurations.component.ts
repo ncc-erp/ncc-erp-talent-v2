@@ -35,8 +35,10 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   talentSecretCode: TalentSecretCode;
   talentContestUrl: TalentContestUrl;
   noticeTimerInterviewer: NoticeInterviewSettingDto;
+  autoBotSettings: ConfigurationSetting;
   public hrmResult: GetResultConnectDto = {} as GetResultConnectDto;
   public lmsResult: GetResultConnectDto = {} as GetResultConnectDto;
+
   isEditing = {
     komu: false,
     discordChanel: false,
@@ -70,7 +72,8 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     googleClientAppSetting: false,
     talentSecretCode: false,
     talentContestUrl: false,
-    noticeTimerInterviewer: false
+    noticeTimerInterviewer: false,
+    autoBotSetting: false
   }
   constructor(
     injector: Injector,
@@ -234,6 +237,18 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     this.getTalentSecretCode();
     this.getNotifyInterViewerTimerSetting();
     this.getContestUrl();
+    this.getAutoBotSettings();
+  }
+
+  private getAutoBotSettings() {
+    this.subs.add(
+      this._configuration.getAutoBotSettings().subscribe(res => {
+        this.isLoading = res.loading;
+        if (res.success) {
+          this.autoBotSettings = res.result;
+        }
+      })
+    );
   }
 
   private getContestUrl() {

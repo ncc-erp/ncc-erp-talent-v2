@@ -462,6 +462,50 @@
     </p-panel>
   </div>
 
+  <div class="panel panel--hrm-setting" *ngIf="autoBotSettings">
+    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.autoBotSetting">
+      <ng-template pTemplate="header">
+        <div class="d-flex align-items-center">
+          <span class="panel-title">
+            {{ "AutoBot Setting" | localize }}
+          </span>
+        </div>
+      </ng-template>
+
+      <div class="panel-body">
+        <div class="group-item">
+          <label for="autobotUrl" class="label-title">
+            {{ "AutoBot Url" | localize }}</label
+          >
+          <input
+            type="text"
+            id="autobotUrl"
+            pInputText
+            class="w-100 p-0"
+            [(ngModel)]="autoBotSettings.url"
+            [readonly]="true"
+          />
+        </div>
+
+        <div class="group-item">
+          <label for="autobotCode" class="label-title">{{
+            "AutoBot Code" | localize
+          }}</label>
+          <input
+            type="text"
+            id="autobotCode"
+            pInputText
+            class="w-100 p-0"
+            [(ngModel)]="autoBotSettings.securityCode"
+            [readonly]="true"
+          />
+        </div>
+      </div>
+    </p-panel>
+  </div>
+</section>
+
+<section class="content setting-grid">
   <div class="panel panel--email-setting" *ngIf="emailSetting">
     <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.emailSetting">
       <ng-template pTemplate="header">
@@ -617,6 +661,7 @@
       </div>
     </p-panel>
   </div>
+
   <div class="panel panel--notify-interviewer-setting"
        *ngIf="noticeTimerInterviewer">
     <p-panel [toggleable]="true"
@@ -743,6 +788,18 @@
                  class="w-75 p-0"
                  [(ngModel)]="noticeTimerInterviewer.resultChannel"
                  [readonly]="!isEditing.notifyinterviewer" />
+
+          <label for="tlGeneralChannelId" class="label-title">
+            {{ "Talent General Channel ID " | localize }}
+          </label>
+          <input
+            type="text"
+            id="tlGeneralChannelId"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="noticeTimerInterviewer.talentGeneralChannel"
+            [readonly]="!isEditing.notifyinterviewer"
+          />
         </div>
       </div>
     </p-panel>

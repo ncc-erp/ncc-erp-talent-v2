@@ -268,8 +268,8 @@ namespace TalentV2.DomainServices.Candidates
          
             var isSendNotification = personBio.UserType != input.UserType
                 || personBio.BranchId != input.BranchId
-                || !personBio.Phone.Equals(input.Phone)
-                || !personBio.Email.Equals(input.Email);
+                || (!string.IsNullOrEmpty(personBio.Phone) && !personBio.Phone.Equals(input.Phone))
+                || (!string.IsNullOrEmpty(personBio.Email) && !personBio.Email.Equals(input.Email));
             if (input?.Note != requestCVs?.HRNote && requestCVs?.HRNote != null)
             {
                 requestCVs.HRNote = input.Note;

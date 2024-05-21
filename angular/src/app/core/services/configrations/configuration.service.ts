@@ -34,6 +34,10 @@ export class ConfigurationService extends BaseApiService {
     return this.get("/GetHRMSettings");
   }
 
+  getAutoBotSettings(): Observable<ApiResponse<ConfigurationSetting>> {
+    return this.get('/GetAutoBotSettings');
+  }
+
   getEmailSetting(): Observable<ApiResponse<EmailSetting>> {
     return this.get("/getEmailSetting");
   }

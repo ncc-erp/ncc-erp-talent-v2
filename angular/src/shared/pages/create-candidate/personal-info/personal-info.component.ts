@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostListener, Injector, Input, OnInit, Output 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { checkNumber, convertPhoneNumber, getFormControlValue, isCVExtensionAllow, isImageExtensionAllow } from '@app/core/helpers/utils.helper';
 import { CustomValidators } from '@app/core/helpers/validator.helper';
-import { Candidate, CandidatePayload, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
+import { Candidate, CandidatePayload, ICandidateReportExtractCV, MailStatusHistory } from '@app/core/models/candidate/candidate.model';
 import { MailDialogConfig, MailPreviewInfo } from '@app/core/models/mail/mail.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
@@ -15,9 +15,10 @@ import { UploadAvatarComponent } from '@shared/components/upload-avatar/upload-a
 import { AppSessionService } from '@shared/session/app-session.service';
 import * as moment from 'moment';
 import { DialogService } from 'primeng/dynamicdialog';
-import { debounceTime, finalize } from 'rxjs/operators';
+import { debounceTime, filter, finalize, switchMap } from 'rxjs/operators';
 import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
 import { TitleCasePipe } from '@angular/common';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'talent-personal-info',
@@ -70,6 +71,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
   submitted = false;
   isEnaleRefBy = false;
   isEditing = false;
+  private extractCVSubject = new Subject<FormData>();
 
   constructor(
     injector: Injector,
@@ -97,7 +99,57 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.avatarUrl = this.dataApplyCv.avatarLink ?? null;
       this.cvFileName = applyCvlink;
     }
+    this.subscribeExtractCVSubject();
   }
+
+  subscribeExtractCVSubject() {
+    this.subs.add(
+      this.extractCVSubject.pipe(
+        filter(data => Boolean(data)),
+        switchMap(formData => this._autoBotService.extractCV(formData).pipe(
+            finalize(() => {
+              this.message.clear();
+            })
+          )
+        )).subscribe({
+          next: (data) => {
+            if (!data) return;
+            this.form.patchValue(this.convertExtractDataToFormData(data));
+          },
+        })
+    )
+  }
+
+  convertExtractDataToFormData(resData: ICandidateReportExtractCV) {
+    const { address: addressRes, email: emailRes, gender, phone_number, fullname, dob } = resData || {};
+    const { fullName, address, email, isFemale, phone } = this.form.getRawValue() || {};
+
+    const phoneNumberRes: string = phone_number ? convertPhoneNumber(phone_number) : null;
+    const fullNameRes = fullname ? this._titleCasePipe
+      .transform(fullname)
+      ?.replace(/\s+/g, " ")
+      .trim() : null;
+
+    return {
+      fullName: fullNameRes || fullName || '',
+      email: emailRes || email || '',
+      isFemale: gender ? !["male", "nam"].includes(gender?.toLowerCase()) : Boolean(isFemale),
+      phone: phoneNumberRes || phone || '',
+      address: addressRes || address || '',
+      dob: this.getDateFromExtractDob(dob) || null
+    }
+  }
+
+  getDateFromExtractDob(dob: string) {
+    const formDob = this.formControls['dob']?.value;
+    const momentResDob = moment(dob, 'DD/MM/YYYY');
+    const dobDate = momentResDob.isValid() ?
+      momentResDob.toDate() :
+      moment(formDob)?.isValid() ? moment(formDob).toDate() : null;
+
+    return dobDate;
+  }
+
 
   get formControls() {
     return this.form.controls;
@@ -159,6 +211,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     }
     reader.readAsText(file);
 
+    //Extract PDF CV
     if (!AppConsts.autoBotServiceBaseUrl) {
       this.showToastMessage(ToastMessageType.WARN, MESSAGE.EXTRACT_CV_WARN);
       return;
@@ -168,28 +221,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     const formData = new FormData();
     formData.append("file", fileList.item(0));
 
-    this._autoBotService.extractCV(formData).pipe(finalize(() => {
-      this.message.clear();
-    })).subscribe({
-      next: (data) => {
-        const phone_number: string = convertPhoneNumber(data?.phone_number);
-        const fullname = this._titleCasePipe
-          .transform(data?.fullname)
-          ?.replace(/\s+/g, " ")
-          .trim();
-        const { address: addressRes, dob: dobRes, email: emailRes, gender } = data || {};
-        const { fullName, address, dob, email, isFemale, phone } = this.form.getRawValue() || {};
-
-        this.form.patchValue({
-          fullName: fullname || fullName,
-          email: emailRes || email,
-          isFemale: gender ? gender?.toLowerCase() === "female" : isFemale,
-          phone: phone_number || phone,
-          address: addressRes || address,
-          dob: dobRes || dob
-        });
-      },
-    })
+    this.extractCVSubject.next(formData);
   }
   }
 
@@ -589,5 +621,4 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     })
 
   }
-
 }

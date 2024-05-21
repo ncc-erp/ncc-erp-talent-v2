@@ -29,12 +29,16 @@
         public const string NoticeInterviewMinutes = "App.NoticeInterviewMinutes";
         public const string NoticeInterviewResultMinutes = "App.NoticeInterviewResultMinutes";
 
+        public const string NoticeCVCreatedToHR = "App.NoticeCVCreatedToHR";
+
         public const string IsNoticeInterviewViaChannel = "App.IsNoticeInterviewViaChannel";
+        public const string NoticeTalentGeneralChannel = "App.NoticeTalentGeneralChannel";
         public const string NoticeInterviewScheduleChannel = "App.NoticeInterviewScheduleChannel";
         public const string NoticeInterviewResultChannel = "App.NoticeInterviewResultChannel";
 
         public const string GoogleClientAppEnable = "App.GoogleClientAppEnable";
         public const string EnableNormalLogin = "App.EnableNormalLogin";
+
 
         public const string TalentContestUrl = "App.TalentContestUrl";
     }
