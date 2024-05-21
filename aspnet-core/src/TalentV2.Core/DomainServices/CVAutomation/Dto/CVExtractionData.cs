@@ -1,31 +1,31 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace TalentV2.DomainServices.CVAutomation.Dto
 {
     public class CVExtractionData
     {
-        [JsonPropertyName("address")]
+        [JsonProperty("address")]
         public string Address { get; set; }
 
-        [JsonPropertyName("dob")]
+        [JsonProperty("dob")]
         public string Birthday { get; set; }
 
-        [JsonPropertyName("email")]
+        [JsonProperty("email")]
         public string Email { get; set; }
 
-        [JsonPropertyName("fullname")]
+        [JsonProperty("fullname")]
         public string Fullname { get; set; }
 
-        [JsonPropertyName("gender")]
+        [JsonProperty("gender")]
         public string Gender { get; set; }
 
-        [JsonPropertyName("note")]
+        [JsonProperty("note")]
         public string Note { get; set; }
 
-        [JsonPropertyName("phone_number")]
+        [JsonProperty("phone_number")]
         public string PhoneNumber { get; set; }
 
-        [JsonPropertyName("position")]
+        [JsonProperty("position")]
         public string Position { get; set; }
     }
 }
