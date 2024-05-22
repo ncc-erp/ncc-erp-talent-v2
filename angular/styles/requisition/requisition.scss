@@ -26,8 +26,8 @@
   thead tr {
     th.req-info {
       width: 250px;
-    } 
-    
+    }
+
     td {
       div.req-info {
         display: flex;
@@ -71,6 +71,11 @@
 .quantity-failed {
   color: $color-warning-danger;
 }
+
 .quantity-acceptedoffer {
   color: $bg-lighten-input-file;
+}
+
+.total-candidate-apply {
+  color: $color-tag-selected;
 }
