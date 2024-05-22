@@ -100,15 +100,11 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
             {
                 logger.LogInformation($"Get: {fullUrl}");
                 var response = await HttpClient.GetAsync(fullUrl);
-                var responseSuccess = response.StatusCode == HttpStatusCode.OK;
-                return responseSuccess ? new GetResultConnectDto
+                var isSuccess = response.StatusCode == HttpStatusCode.OK;
+                return new GetResultConnectDto
                 {
-                    IsConnected = true,
-                    Message = "Success"
-                } : new GetResultConnectDto
-                {
-                    IsConnected = false,
-                    Message = "Can not connect to AutoBot"
+                    IsConnected = isSuccess,
+                    Message = isSuccess ? "Success" : "Can not connect to AutoBot"
                 };
             }
             catch (Exception ex)
