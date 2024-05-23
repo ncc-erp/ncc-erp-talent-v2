@@ -90,6 +90,11 @@ export class CandidateInternListComponent
     private _dialog: DialogService
   ) {
     super(injector);
+    this.route.queryParams.subscribe(params => {
+      const statusParam = params['cvStatus'] ? Number(params['cvStatus']) : null;
+      const isStatusId = _utilities.catCvStatus.some(status => (status.id === statusParam));
+      this.searchDetail.cvStatus = isStatusId && statusParam ? statusParam : null;
+    });
   }
 
   ngOnInit(): void {
@@ -162,6 +167,16 @@ export class CandidateInternListComponent
     this.getDataPage(this.GET_FIRST_PAGE);
   }
 
+  onCvStatusChanges() {
+    this.router.navigate([], {
+      queryParamsHandling: "merge",
+      replaceUrl: true,
+      queryParams: { cvStatus: this.searchDetail.cvStatus }
+    }).then(() =>
+      this.getDataPage(this.GET_FIRST_PAGE)
+    )
+  }
+
   onSaveUpdateNote() {
     const payload = {
       cvId: this.candidateInternEdit.id,
@@ -219,11 +234,11 @@ export class CandidateInternListComponent
           );
           return;
         }
-      const payload : RequisitionPayload = { 
+      const payload : RequisitionPayload = {
         cvId: entity.id,
-        requestId: this.requisitionInternId, 
+        requestId: this.requisitionInternId,
         currentRequestId: entity.requisitionInfos[0]?.id || null ,
-        isPresentForHr: ref.isPresentForHr 
+        isPresentForHr: ref.isPresentForHr
       }
 
         this.subs.add(
@@ -260,11 +275,11 @@ export class CandidateInternListComponent
           this.candInterns = rs.result.items;
           this.showPaging(rs.result, pageNumber);
         }
-        this.isLoading = rs.loading;    
-      })  
+        this.isLoading = rs.loading;
+      })
     );
   }
-  
+
   protected delete(entity: CandidateIntern): void {
     const deleteRequest = this._candidateIntern.delete(entity.id);
     this.subs.add(
@@ -361,7 +376,7 @@ export class CandidateInternListComponent
       class: 'modal-lg',
       initialState: {
         userType: userType,
-      }, 
+      },
     });
   }
 }

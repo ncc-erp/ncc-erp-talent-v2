@@ -56,6 +56,7 @@ export class NoticeInterviewSettingDto {
   isToChannel: string;
   scheduleChannel: string;
   resultChannel: string;
+  talentGeneralChannel: string;
 }
 
 export class GetResultConnectDto{
