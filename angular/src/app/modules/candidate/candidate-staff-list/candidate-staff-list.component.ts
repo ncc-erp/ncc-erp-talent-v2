@@ -71,7 +71,7 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
     this.route.queryParams.subscribe(params => {
       const statusParam = params['cvStatus'] ? Number(params['cvStatus']) : null;
       const isStatusId = _utilities.catCvStatus.some(status => (status.id === statusParam));
-      this.searchDetail.cvStatus = isStatusId && statusParam ? statusParam : null;
+      this.searchDetail.cvStatus = isStatusId && checkNumber(statusParam) ? statusParam : null;
     });
   }
 
