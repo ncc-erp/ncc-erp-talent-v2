@@ -18,6 +18,13 @@ enum SETTING_TYPE {
   NOTIFYINTERVIEWER = 'notifyinterviewer',
   CONTEST = 'contest',
 }
+
+enum SECTION_TYPE {
+  HRM = "HRM",
+  LMS = "LMS",
+  AUTOBOT = "AUTOBOT"
+}
+
 @Component({
   selector: 'talent-configurations',
   templateUrl: './configurations.component.html',
@@ -25,6 +32,7 @@ enum SETTING_TYPE {
 })
 export class ConfigurationsComponent extends NccAppComponentBase implements OnInit {
   readonly SETTING_TYPE = SETTING_TYPE;
+  readonly SECTION_TYPE = SECTION_TYPE;
 
   komuSetting: KomuSetting;
   discordChanelSetting = {} as DiscordChannelSettings;
@@ -38,6 +46,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   autoBotSettings: ConfigurationSetting;
   public hrmResult: GetResultConnectDto = {} as GetResultConnectDto;
   public lmsResult: GetResultConnectDto = {} as GetResultConnectDto;
+  public autoBotConnectionStatus: GetResultConnectDto = {} as GetResultConnectDto;
 
   isEditing = {
     komu: false,
@@ -86,6 +95,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     this.getData();
     this.testHRMConnection();
     this.testLMSConnection();
+    this.testAutoBotConnection();
   }
 
   toggleEditing(settingType: SETTING_TYPE) {
@@ -205,6 +215,17 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     );
   }
 
+  testConnection(type: SECTION_TYPE) {
+    switch (type) {
+      case SECTION_TYPE.HRM:
+        this.testHRMConnection()
+      case SECTION_TYPE.LMS:
+        this.testLMSConnection()
+      case SECTION_TYPE.AUTOBOT:
+        this.testAutoBotConnection()
+    }
+  }
+
   testLMSConnection() {
     this.subs.add(
       this._configuration.testLMSConnection().subscribe(value => {
@@ -212,12 +233,29 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
       })
     )
   }
+
   testHRMConnection() {
     this.subs.add(
       this._configuration.testHRMConnection().subscribe(value => {
         this.hrmResult = value.result;
       })
     )
+  }
+
+  testAutoBotConnection() {
+    this.subs.add(
+      this._configuration.testAutoBotConnection().subscribe({
+        next: value => {
+          this.autoBotConnectionStatus = value.result;
+        },
+        error: () => {
+          this.autoBotConnectionStatus = {
+            isConnected: false,
+            message: "Can not connect to AutoBot"
+          }
+        }
+      }
+    ))
   }
 
   protected getBreadCrumbConfig(): BreadCrumbConfig {
