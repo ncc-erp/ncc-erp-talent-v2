@@ -1,8 +1,6 @@
 ﻿using Abp.Authorization.Users;
 using Abp.Collections.Extensions;
-using Abp.Extensions;
 using Abp.Linq.Extensions;
-using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -1140,7 +1138,7 @@ namespace TalentV2.DomainServices.Candidates
         public async Task<List<IdAndNameDto>> GetUserCreated(UserType userType)
         {
             var query = from cv in WorkScope.GetAll<CV>()
-                        where cv.CreatorUserId.HasValue && cv.UserType == userType && !cv.CreatorUser.IsDeleted
+                        where cv.CreatorUserId.HasValue && cv.UserType == userType && !cv.CreatorUser.IsDeleted && cv.CreatorUser.IsActive
                         select new IdAndNameDto
                         {
                             Id = cv.CreatorUserId.Value,
