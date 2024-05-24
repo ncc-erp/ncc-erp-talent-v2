@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TalentV2.Constants.Const;
 using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
@@ -32,26 +30,26 @@ namespace TalentV2.Utils
 
         public static List<CategoryDto> ListRequestCVStatus = new List<CategoryDto>
         {
-            new CategoryDto { Id = RequestCVStatus.AddedCV.GetHashCode(), Name = "Added CV" },
-            new CategoryDto { Id = RequestCVStatus.RejectedApply.GetHashCode(), Name = "Rejected Apply" },
-            new CategoryDto { Id = RequestCVStatus.ScheduledTest.GetHashCode(), Name = "Scheduled Test" },
-            new CategoryDto { Id = RequestCVStatus.RejectedTest.GetHashCode(), Name = "Rejected Test" },
-            new CategoryDto { Id = RequestCVStatus.FailedTest.GetHashCode(), Name = "Failed Test" },
-            new CategoryDto { Id = RequestCVStatus.PassedTest.GetHashCode(), Name = "Passed Test" },
-            new CategoryDto { Id = RequestCVStatus.ScheduledInterview.GetHashCode(), Name = "Scheduled Interview" },
-            new CategoryDto { Id = RequestCVStatus.RejectedInterview.GetHashCode(), Name = "Rejected Interview" },
-            new CategoryDto { Id = RequestCVStatus.PassedInterview.GetHashCode(), Name = "Passed Interview" },
-            new CategoryDto { Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = "Failed Interview" },
-            new CategoryDto { Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = "Accepted Offer" },
-            new CategoryDto { Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = "Rejected Offer" },
-            new CategoryDto { Id = RequestCVStatus.Onboarded.GetHashCode(), Name = "Onboarded" },
+            new CategoryDto { Id = RequestCVStatus.AddedCV.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.AddedCV] },
+            new CategoryDto { Id = RequestCVStatus.RejectedApply.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedApply] },
+            new CategoryDto { Id = RequestCVStatus.ScheduledTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.ScheduledTest] },
+            new CategoryDto { Id = RequestCVStatus.RejectedTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedTest] },
+            new CategoryDto { Id = RequestCVStatus.FailedTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedTest] },
+            new CategoryDto { Id = RequestCVStatus.PassedTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.PassedTest] },
+            new CategoryDto { Id = RequestCVStatus.ScheduledInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.ScheduledInterview] },
+            new CategoryDto { Id = RequestCVStatus.RejectedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedInterview] },
+            new CategoryDto { Id = RequestCVStatus.PassedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.PassedInterview] },
+            new CategoryDto { Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedInterview] },
+            new CategoryDto { Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.AcceptedOffer] },
+            new CategoryDto { Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedOffer] },
+            new CategoryDto { Id = RequestCVStatus.Onboarded.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.Onboarded] },
         };
 
         public static List<CategoryDto> ListInterviewStatus = new List<CategoryDto>
         {
-            new CategoryDto {Id = RequestCVStatus.ScheduledInterview.GetHashCode(), Name = RequestCVStatus.ScheduledInterview.ToString()},
-            new CategoryDto {Id = RequestCVStatus.PassedInterview.GetHashCode(), Name = RequestCVStatus.PassedInterview.ToString()},
-            new CategoryDto {Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = RequestCVStatus.FailedInterview.ToString()},
+            new CategoryDto {Id = RequestCVStatus.ScheduledInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.ScheduledInterview]},
+            new CategoryDto {Id = RequestCVStatus.PassedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.PassedInterview]},
+            new CategoryDto {Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedInterview]},
         };
 
         public static List<CategoryDto> ListStatusDeadline = new List<CategoryDto>
@@ -66,9 +64,9 @@ namespace TalentV2.Utils
 
         public static List<CategoryDto> ListStatusCandidateOffer = new List<CategoryDto>
         {
-            new CategoryDto {Id = RequestCVStatus.PassedInterview.GetHashCode(), Name = RequestCVStatus.PassedInterview.ToString()},
-            new CategoryDto {Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = RequestCVStatus.AcceptedOffer.ToString()},
-            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = RequestCVStatus.RejectedOffer.ToString()},
+            new CategoryDto {Id = RequestCVStatus.PassedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.PassedInterview]},
+            new CategoryDto {Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.AcceptedOffer]},
+            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedOffer]},
         };
 
         public static List<CategoryDto> ListStatusCandidateOnboard = new List<CategoryDto>

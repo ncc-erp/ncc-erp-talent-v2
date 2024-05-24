@@ -1,11 +1,8 @@
-﻿using NccCore.Anotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
-using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.ModelExtends;
 using TalentV2.Utils;
@@ -22,7 +19,7 @@ namespace TalentV2.DomainServices.RequestCVs.Dtos
         public StatusRequest RequestStatus { get; set; }
         public string RequestStatusName { get => CommonUtils.GetEnumName(RequestStatus); }
         public RequestCVStatus RequestCVStatus { get; set; }
-        public string RequestCVStatusName { get => CommonUtils.GetEnumName(RequestCVStatus); }
+        public string RequestCVStatusName { get => DictionaryHelper.RequestCVStatusDict[RequestCVStatus]; }
         public Level? FinalLevel { get; set; }
         public LevelDto FinalLevelName
         {

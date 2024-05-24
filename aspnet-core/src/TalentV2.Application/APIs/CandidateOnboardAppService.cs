@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NccCore.Extension;
 using NccCore.Paging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization;
 using TalentV2.Constants.Enum;
@@ -17,7 +15,6 @@ using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
 using TalentV2.Utils;
 using TalentV2.WebServices.InternalServices.HRM;
-using TalentV2.WebServices.InternalServices.HRM.Dtos;
 
 namespace TalentV2.APIs
 {

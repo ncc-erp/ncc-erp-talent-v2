@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using TalentV2.Constants.Enum;
 using TalentV2.Notifications.Templates.Dtos;
 
@@ -90,6 +86,23 @@ namespace TalentV2.Constants.Dictionary
                     Subject = "[NCC]_THƯ CẢM ƠN",
                 }
             },
+        };
+
+        public static readonly Dictionary<RequestCVStatus, string> RequestCVStatusDict = new Dictionary<RequestCVStatus, string>
+        {
+            {RequestCVStatus.AddedCV, "Added CV" },
+            {RequestCVStatus.ScheduledTest, "Scheduled Test" },
+            {RequestCVStatus.FailedTest, "Failed Test" },
+            {RequestCVStatus.PassedTest, "Passed Test" },
+            {RequestCVStatus.ScheduledInterview, "Scheduled Interview" },
+            {RequestCVStatus.RejectedInterview, "Rejected Interview" },
+            {RequestCVStatus.PassedInterview, "Passed Interview" },
+            {RequestCVStatus.FailedInterview, "Failed Interview" },
+            {RequestCVStatus.AcceptedOffer, "Accepted Offer" },
+            {RequestCVStatus.RejectedOffer, "Rejected Offer" },
+            {RequestCVStatus.Onboarded, "Onboarded" },
+            {RequestCVStatus.RejectedTest, "Rejected Test" },
+            {RequestCVStatus.RejectedApply, "Rejected Apply" },
         };
     }
 }
