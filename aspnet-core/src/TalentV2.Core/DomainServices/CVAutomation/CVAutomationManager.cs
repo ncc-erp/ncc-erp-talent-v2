@@ -193,9 +193,8 @@ namespace TalentV2.DomainServices.CVAutomation
                 cv.LastModifierUserId = defaultUserCreation?.Id;
             }
 
-            var defaultBranch = await WorkScope.GetAll<Branch>()
-                .Where(x => x.Name.ToLower().Equals("hn1"))
-                .FirstOrDefaultAsync()
+            var defaultBranch = await WorkScope.GetAll<Branch>().Where(x => x.Name.ToLower().Equals("toàn bộ")).FirstOrDefaultAsync()
+                ?? await WorkScope.GetAll<Branch>().Where(x => x.Name.ToLower().Equals("hn1")).FirstOrDefaultAsync()
                 ?? await WorkScope.GetAll<Branch>().FirstOrDefaultAsync();
             cv.BranchId = defaultBranch.Id;
 
