@@ -71,9 +71,9 @@ namespace TalentV2.Utils
 
         public static List<CategoryDto> ListStatusCandidateOnboard = new List<CategoryDto>
         {
-            new CategoryDto {Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = RequestCVStatus.AcceptedOffer.ToString()},
-            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = RequestCVStatus.RejectedOffer.ToString()},
-            new CategoryDto {Id = RequestCVStatus.Onboarded.GetHashCode(), Name = RequestCVStatus.Onboarded.ToString()},
+            new CategoryDto {Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.AcceptedOffer]},
+            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedOffer]},
+            new CategoryDto {Id = RequestCVStatus.Onboarded.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.Onboarded]},
         };
 
         public static List<CategoryDto> ListStatusNotAvailableClone = new List<CategoryDto>
