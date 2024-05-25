@@ -54,12 +54,12 @@ namespace TalentV2.Utils
 
         public static List<CategoryDto> ListStatusDeadline = new List<CategoryDto>
         {
-            new CategoryDto {Id = RequestCVStatus.FailedTest.GetHashCode(), Name = RequestCVStatus.FailedTest.ToString()},
-            new CategoryDto {Id = RequestCVStatus.ScheduledTest.GetHashCode(), Name = RequestCVStatus.ScheduledTest.ToString()},
-            new CategoryDto {Id = RequestCVStatus.ScheduledInterview.GetHashCode(), Name = RequestCVStatus.ScheduledInterview.ToString()},
-            new CategoryDto {Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = RequestCVStatus.FailedInterview.ToString()},
-            new CategoryDto {Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = RequestCVStatus.AcceptedOffer.ToString()},
-            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = RequestCVStatus.RejectedOffer.ToString()},
+            new CategoryDto {Id = RequestCVStatus.FailedTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedTest]},
+            new CategoryDto {Id = RequestCVStatus.ScheduledTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.ScheduledTest]},
+            new CategoryDto {Id = RequestCVStatus.ScheduledInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.ScheduledInterview]},
+            new CategoryDto {Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedInterview]},
+            new CategoryDto {Id = RequestCVStatus.AcceptedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.AcceptedOffer]},
+            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedOffer]},
         };
 
         public static List<CategoryDto> ListStatusCandidateOffer = new List<CategoryDto>
@@ -78,13 +78,13 @@ namespace TalentV2.Utils
 
         public static List<CategoryDto> ListStatusNotAvailableClone = new List<CategoryDto>
         {
-            new CategoryDto {Id = RequestCVStatus.RejectedTest.GetHashCode(), Name = RequestCVStatus.RejectedTest.ToString()},
-            new CategoryDto {Id = RequestCVStatus.RejectedApply.GetHashCode(), Name = RequestCVStatus.RejectedApply.ToString()},
-            new CategoryDto {Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = RequestCVStatus.FailedInterview.ToString()},
-            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = RequestCVStatus.RejectedOffer.ToString()},
-            new CategoryDto {Id = RequestCVStatus.Onboarded.GetHashCode(), Name = RequestCVStatus.Onboarded.ToString()},
-            new CategoryDto {Id = RequestCVStatus.FailedTest.GetHashCode(), Name = RequestCVStatus.FailedTest.ToString()},
-            new CategoryDto {Id = RequestCVStatus.RejectedInterview.GetHashCode(), Name = RequestCVStatus.RejectedInterview.ToString()},
+            new CategoryDto {Id = RequestCVStatus.RejectedTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedTest]},
+            new CategoryDto {Id = RequestCVStatus.RejectedApply.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedApply]},
+            new CategoryDto {Id = RequestCVStatus.FailedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedInterview]},
+            new CategoryDto {Id = RequestCVStatus.RejectedOffer.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedOffer]},
+            new CategoryDto {Id = RequestCVStatus.Onboarded.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.Onboarded]},
+            new CategoryDto {Id = RequestCVStatus.FailedTest.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.FailedTest]},
+            new CategoryDto {Id = RequestCVStatus.RejectedInterview.GetHashCode(), Name = DictionaryHelper.RequestCVStatusDict[RequestCVStatus.RejectedInterview]},
         };
 
         public static List<CategoryDto> ListCVStatusNotAvailableClone = new List<CategoryDto> {
