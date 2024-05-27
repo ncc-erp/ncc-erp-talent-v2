@@ -469,6 +469,14 @@
           <span class="panel-title">
             {{ "AutoBot Setting" | localize }}
           </span>
+
+          <ng-container *ngIf="!isPanelCollapse.autoBotSetting">
+            <ng-container *ngTemplateOutlet="connectStatus; context: {
+              message: autoBotConnectionStatus?.message,
+              connected: autoBotConnectionStatus?.isConnected,
+              section: SECTION_TYPE.AUTOBOT
+            }"></ng-container>
+          </ng-container>
         </div>
       </ng-template>
 
@@ -805,3 +813,39 @@
     </p-panel>
   </div>
 </section>
+
+<ng-template #connectStatus let-message="message" let-connected="connected" let-section="section">
+  <div class="action d-flex flex-row align-items-center">
+    <p-button
+      icon="pi pi-sync"
+      pTooltip="Check connection."
+      class="mr-2"
+      styleClass="p-button-sm ml-4"
+      (onClick)="testConnection(section)">
+    </p-button>
+
+    <ng-container *ngIf="message; else connectingStatus">
+      <ng-container *ngIf="connected; else connectFail">
+        <div class="text-success">
+          <i class="pi pi-check mr-2"></i>Connected
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <ng-template #connectingStatus>
+      <div>
+        <i class="pi pi-spin pi-spinner mr-2"></i>Is connecting...
+      </div>
+    </ng-template>
+
+    <ng-template #connectFail>
+      <div
+        class="text-danger"
+        [pTooltip]="message"
+      >
+        <i class="pi pi-times fa-x mr-2"></i>Fail connected
+      </div>
+    </ng-template>
+
+  </div>
+</ng-template>
