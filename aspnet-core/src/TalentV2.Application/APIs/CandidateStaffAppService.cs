@@ -1,24 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Abp.Authorization;
+using Abp.Linq.Extensions;
+using Abp.UI;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NccCore.Extension;
 using NccCore.Paging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using TalentV2.Authorization;
+using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates;
 using TalentV2.DomainServices.Candidates.Dtos;
-using NccCore.Extension;
-using Microsoft.EntityFrameworkCore;
-using TalentV2.Constants.Enum;
-using Abp.Authorization;
-using TalentV2.DomainServices.Categories.Dtos;
-using Abp.UI;
-using Abp.Linq.Extensions;
 using TalentV2.DomainServices.Requisitions;
-using TalentV2.Notifications.Mail.Dtos;
-using TalentV2.Authorization;
 using TalentV2.Entities;
-using TalentV2.DomainServices.Requisitions.Dtos;
+using TalentV2.Notifications.Mail.Dtos;
 
 namespace TalentV2.APIs
 {
