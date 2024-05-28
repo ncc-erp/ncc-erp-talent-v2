@@ -1,6 +1,5 @@
 ﻿using Abp.Dependency;
 using Abp.Runtime.Session;
-using Amazon.Runtime.Internal;
 using Castle.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,13 +26,15 @@ namespace TalentV2.DomainServices.CVAutomation
         private readonly string FILE_CANDIDATE_FOLDER_SERVICE = "candidates";
         private readonly string INTERN_FOLDER_SERVICE = "cv_upload/intern";
         private readonly string STAFF_FOLDER_SERVICE = "cv_upload/staff";
+        private readonly string ARCHIVED_FOLDER_NAME = "archived";
+        private readonly string FAILED_FOLDER_NAME = "failed";
         private readonly IAbpSession _session;
         private readonly IFileProvider _fileService;
         private readonly IFilePath _filePath;
         private readonly IConfiguration _configuration;
         private readonly AutobotService _autobotService;
         private readonly ILogger _logger;
-
+        
         public CVAutomationManager(
             IAbpSession session,
             IFileProvider fileService,
@@ -73,25 +74,31 @@ namespace TalentV2.DomainServices.CVAutomation
                     {
                         CommonUtils.CheckFormatFile(fileName, FileTypes.DOCUMENT);
                         using var responseStream = await _fileService.ReadFileAsync(paths, fileName);
-                        var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
+                        CVExtractionData cvExtractionData = null;
+                        
+                        for (int i = 0; i < 3; i++)
+                        {
+                            cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
+                            if (cvExtractionData != null) break;
+                        }
 
                         if (cvExtractionData == null
-                            || string.IsNullOrEmpty(cvExtractionData.Email)
-                                && string.IsNullOrEmpty(cvExtractionData.PhoneNumber)
-                                && string.IsNullOrEmpty(cvExtractionData.Fullname))
+                            || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
                         {
+                            await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
                             continue;
                         }
 
                         var cvCandidatePaths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
                         var cvLink = await _fileService.CopyFileAsync(paths, cvCandidatePaths, fileName, hasTimestamp: true);
                         await TransformDataAndCreateCV(cvExtractionData, UserType.Intern, cvLink, positionMapping.Value);
-                        await _fileService.ArchiveFileAsync(paths, fileName, hasTimestamp: true);
+                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, ARCHIVED_FOLDER_NAME, hasTimestamp: true);
                         result.Success++;
                     }
                     catch (Exception ex)
                     {
                         _logger.Error($"AutoCreateInternCV() - {fileName} - exception", ex);
+                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
                         continue;
                     }
                 }
@@ -124,25 +131,31 @@ namespace TalentV2.DomainServices.CVAutomation
                     {
                         CommonUtils.CheckFormatFile(fileName, FileTypes.DOCUMENT);
                         using var responseStream = await _fileService.ReadFileAsync(paths, fileName);
-                        var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
+                        CVExtractionData cvExtractionData = null;
+
+                        for (int i = 0; i < 3; i++)
+                        {
+                            cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
+                            if (cvExtractionData != null) break;
+                        }
 
                         if (cvExtractionData == null
-                            || string.IsNullOrEmpty(cvExtractionData.Email)
-                                && string.IsNullOrEmpty(cvExtractionData.PhoneNumber)
-                                && string.IsNullOrEmpty(cvExtractionData.Fullname))
+                            || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
                         {
+                            await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
                             continue;
                         }
 
                         var cvCandidatePaths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
                         var cvLink = await _fileService.CopyFileAsync(paths, cvCandidatePaths, fileName, hasTimestamp: true);
                         await TransformDataAndCreateCV(cvExtractionData, UserType.Staff, cvLink, positionMapping.Value);
-                        await _fileService.ArchiveFileAsync(paths, fileName, hasTimestamp: true);
+                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, ARCHIVED_FOLDER_NAME, hasTimestamp: true);
                         result.Success++;
                     }
                     catch (Exception ex)
                     {
                         _logger.Error($"AutoCreateStaffCV() - {fileName} - exception", ex);
+                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
                         continue;
                     }
                 }
