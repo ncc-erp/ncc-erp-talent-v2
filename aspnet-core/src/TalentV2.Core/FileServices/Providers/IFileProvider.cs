@@ -15,7 +15,7 @@ namespace TalentV2.FileServices.Providers
 
         Task MoveFileAsync(List<string> sourcePaths, List<string> destinationPaths, string fileName, bool hasTimestamp = false);
 
-        Task MoveCvFileToFolderAsync(List<string> sourcePaths, string fileName, string folderName, bool hasTimestamp = false);
+        Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived", bool hasTimestamp = false);
 
         Task<List<string>> GetFileNamesAsync(List<string> paths);
     }

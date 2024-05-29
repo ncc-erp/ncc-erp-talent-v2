@@ -26,8 +26,7 @@ namespace TalentV2.DomainServices.CVAutomation
         private readonly string FILE_CANDIDATE_FOLDER_SERVICE = "candidates";
         private readonly string INTERN_FOLDER_SERVICE = "cv_upload/intern";
         private readonly string STAFF_FOLDER_SERVICE = "cv_upload/staff";
-        private readonly string ARCHIVED_FOLDER_NAME = "archived";
-        private readonly string FAILED_FOLDER_NAME = "failed";
+        private readonly string FAILED_FOLDER = "failed";
         private readonly IAbpSession _session;
         private readonly IFileProvider _fileService;
         private readonly IFilePath _filePath;
@@ -65,6 +64,11 @@ namespace TalentV2.DomainServices.CVAutomation
             foreach (var positionMapping in dicFolderAndPosition)
             {
                 var paths = await _filePath.GetPath(INTERN_FOLDER_SERVICE, positionMapping.Key, _session.TenantId);
+
+                List<string> failedPaths = new List<string>();
+                failedPaths.AddRange(paths);
+                failedPaths.Add(FAILED_FOLDER);
+                
                 var fileNamesInPath = await _fileService.GetFileNamesAsync(paths);
                 result.Total += fileNamesInPath.Count;
 
@@ -74,31 +78,24 @@ namespace TalentV2.DomainServices.CVAutomation
                     {
                         CommonUtils.CheckFormatFile(fileName, FileTypes.DOCUMENT);
                         using var responseStream = await _fileService.ReadFileAsync(paths, fileName);
-                        CVExtractionData cvExtractionData = null;
-                        
-                        for (int i = 0; i < 3; i++)
-                        {
-                            cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
-                            if (cvExtractionData != null) break;
-                        }
+                        var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
 
                         if (cvExtractionData == null
                             || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
                         {
-                            await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
+                            await _fileService.MoveFileAsync(paths, failedPaths, fileName, true);
                             continue;
                         }
 
                         var cvCandidatePaths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
                         var cvLink = await _fileService.CopyFileAsync(paths, cvCandidatePaths, fileName, hasTimestamp: true);
                         await TransformDataAndCreateCV(cvExtractionData, UserType.Intern, cvLink, positionMapping.Value);
-                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, ARCHIVED_FOLDER_NAME, hasTimestamp: true);
+                        await _fileService.ArchiveFileAsync(paths, fileName, hasTimestamp: true);
                         result.Success++;
                     }
                     catch (Exception ex)
                     {
                         _logger.Error($"AutoCreateInternCV() - {fileName} - exception", ex);
-                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
                         continue;
                     }
                 }
@@ -122,6 +119,11 @@ namespace TalentV2.DomainServices.CVAutomation
             foreach (var positionMapping in dicFolderAndPosition)
             {
                 var paths = await _filePath.GetPath(STAFF_FOLDER_SERVICE, positionMapping.Key, _session.TenantId);
+
+                List<string> failedPaths = new List<string>();
+                failedPaths.AddRange(paths);
+                failedPaths.Add(FAILED_FOLDER);
+
                 var fileNamesInPath = await _fileService.GetFileNamesAsync(paths);
                 result.Total += fileNamesInPath.Count;
 
@@ -131,31 +133,24 @@ namespace TalentV2.DomainServices.CVAutomation
                     {
                         CommonUtils.CheckFormatFile(fileName, FileTypes.DOCUMENT);
                         using var responseStream = await _fileService.ReadFileAsync(paths, fileName);
-                        CVExtractionData cvExtractionData = null;
-
-                        for (int i = 0; i < 3; i++)
-                        {
-                            cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
-                            if (cvExtractionData != null) break;
-                        }
+                        var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
 
                         if (cvExtractionData == null
                             || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
                         {
-                            await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
+                            await _fileService.MoveFileAsync(paths, failedPaths, fileName, true);
                             continue;
                         }
 
                         var cvCandidatePaths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
                         var cvLink = await _fileService.CopyFileAsync(paths, cvCandidatePaths, fileName, hasTimestamp: true);
                         await TransformDataAndCreateCV(cvExtractionData, UserType.Staff, cvLink, positionMapping.Value);
-                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, ARCHIVED_FOLDER_NAME, hasTimestamp: true);
+                        await _fileService.ArchiveFileAsync(paths, fileName, hasTimestamp: true);
                         result.Success++;
                     }
                     catch (Exception ex)
                     {
                         _logger.Error($"AutoCreateStaffCV() - {fileName} - exception", ex);
-                        await _fileService.MoveCvFileToFolderAsync(paths, fileName, FAILED_FOLDER_NAME, hasTimestamp: true);
                         continue;
                     }
                 }

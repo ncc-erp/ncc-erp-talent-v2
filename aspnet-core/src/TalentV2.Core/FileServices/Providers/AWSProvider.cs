@@ -128,7 +128,7 @@ namespace TalentV2.FileServices.Providers
             await _s3Client.DeleteObjectAsync(deleteRequest);
         }
 
-        public async Task MoveCvFileToFolderAsync(List<string> sourcePaths, string fileName, string folderName, bool hasTimestamp = false)
+        public async Task ArchiveFileAsync(List<string> sourcePaths, string fileName, string archiveFolder = "archived", bool hasTimestamp = false)
         {
             var sourceKey = fileName;
             if (sourcePaths != null && sourcePaths.Count > 0)
@@ -144,7 +144,7 @@ namespace TalentV2.FileServices.Providers
             var destinationKey = fileName;
             if (sourcePaths != null && sourcePaths.Count > 0)
             {
-                destinationKey = $"{string.Join("/", sourcePaths)}/{folderName}/{fileName}";
+                destinationKey = $"{string.Join("/", sourcePaths)}/{archiveFolder}/{fileName}";
             }
 
             _logger.Info($"ArchiveFileAsync() SourceKey: {sourceKey} to DestinationKey: {destinationKey}");

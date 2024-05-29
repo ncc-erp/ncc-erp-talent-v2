@@ -62,12 +62,22 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                 var streamContent = new StreamContent(stream);
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 content.Add(streamContent, "file", fileName);
-                var response = await HttpClient.PostAsync(fullUrl, content);
-                if (response.IsSuccessStatusCode)
+
+                int retry = 1;
+                bool isComplete = false;
+                while (retry <= 3 && !isComplete)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    logger.LogInformation($"Post: {fullUrl} response: {responseContent}");
-                    return JsonConvert.DeserializeObject<T>(responseContent);
+                    var response = await HttpClient.PostAsync(fullUrl, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        isComplete = true;
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        logger.LogInformation($"Post: {fullUrl} response: {responseContent}");
+                        return JsonConvert.DeserializeObject<T>(responseContent);
+                    }
+                    else if (response.StatusCode.GetHashCode() == 429 || response.StatusCode.GetHashCode() >= 500) retry++;
+                    else isComplete = true;
                 }
             }
             catch (Exception ex)
