@@ -56,18 +56,19 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
         {
             var fullUrl = $"{HttpClient.BaseAddress}{ExtractCV}";
 
-            try
+            int attempt = 1;
+            bool isComplete = false;
+            while (attempt <= 3 && !isComplete)
             {
-                using var content = new MultipartFormDataContent();
-                var streamContent = new StreamContent(stream);
-                streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                content.Add(streamContent, "file", fileName);
-
-                int retry = 1;
-                bool isComplete = false;
-                while (retry <= 3 && !isComplete)
+                try
                 {
+                    using var content = new MultipartFormDataContent();
+                    var streamContent = new StreamContent(stream);
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    content.Add(streamContent, "file", fileName);
+
                     var response = await HttpClient.PostAsync(fullUrl, content);
+                    int statusCode = (int)response.StatusCode;
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -76,17 +77,19 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                         logger.LogInformation($"Post: {fullUrl} response: {responseContent}");
                         return JsonConvert.DeserializeObject<T>(responseContent);
                     }
-                    else if (response.StatusCode.GetHashCode() == 429 || response.StatusCode.GetHashCode() >= 500) retry++;
+                    else if (statusCode == 429 || statusCode >= 500)
+                    {
+                        attempt++;
+                        Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                    }
                     else isComplete = true;
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Post: {fullUrl} error: {ex.Message}");
-            }
-            finally
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                catch (Exception ex)
+                {
+                    logger.LogError($"Post: {fullUrl} error: {ex.Message}");
+                    attempt++;
+                    Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                }
             }
             return default;
         }
