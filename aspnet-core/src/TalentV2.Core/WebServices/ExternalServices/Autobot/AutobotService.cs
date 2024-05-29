@@ -90,6 +90,10 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                     attempt++;
                     Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
                 }
+                finally
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                }
             }
             return default;
         }
