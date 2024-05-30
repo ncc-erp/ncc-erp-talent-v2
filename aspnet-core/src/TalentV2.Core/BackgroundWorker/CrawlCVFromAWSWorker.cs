@@ -48,7 +48,7 @@ namespace TalentV2.BackgroundWorker
         {
             Logger.Info("CrawlCVFromAWSWorker start");
             DateTime now = DateTimeUtils.GetNow();
-            if (now.DayOfWeek == DayOfWeek.Sunday || now.DayOfWeek == DayOfWeek.Saturday)
+            if (now.DayOfWeek == DayOfWeek.Sunday)
             {
                 Logger.Info("Today is DayOff => stop");
                 return;
