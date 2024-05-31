@@ -1,20 +1,12 @@
 ﻿using Abp.Net.Mail;
-using Abp.Net.Mail.Smtp;
 using Abp.Runtime.Session;
-using Abp.UI;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Users;
-using TalentV2.Constants.Const;
-using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
@@ -30,6 +22,7 @@ namespace TalentV2.Notifications.Mail
         private readonly IWorkScope _workScope;
         private readonly IEmailSender _emailSender;
         private readonly IAbpSession _abpSession;
+
         public MailService(
             IEmailSender emailSender,
             IWorkScope workScope,
@@ -45,6 +38,7 @@ namespace TalentV2.Notifications.Mail
         {
             return await PreviewContentMail(cvId, MailFuncEnum.FailedCV);
         }
+
         public async Task<MailPreviewInfoDto> GetContentMailRequestCV(long requestCVId)
         {
             var requestCV = await _workScope.GetAll<RequestCV>()
@@ -56,12 +50,14 @@ namespace TalentV2.Notifications.Mail
 
             return await PreviewContentMail(requestCVId, mailFuncType);
         }
+
         public async Task<bool> IsSentMailCV(long cvId, MailFuncEnum mailFuncType)
         {
             return await _workScope.GetAll<EmailStatusHistory>()
                 .Where(s => s.CVId == cvId && s.EmailTemplate.Type == mailFuncType)
                 .AnyAsync();
         }
+
         public async Task<MailPreviewInfoDto> PreviewContentMail(long id, MailFuncEnum emailType)
         {
             var email = await _workScope.GetAll<EmailTemplate>()
@@ -84,6 +80,7 @@ namespace TalentV2.Notifications.Mail
                 CCs = message.CCs
             };
         }
+
         public async Task<List<MailStatusHistoryDto>> GetMailStatusHistoryByCVId(long cvId)
         {
             return await _workScope.GetAll<EmailStatusHistory>()
@@ -100,6 +97,7 @@ namespace TalentV2.Notifications.Mail
                  .OrderByDescending(q => q.CreationTime)
                  .ToListAsync();
         }
+
         public void Send(MailPreviewInfoDto message)
         {
             if (message.CCs.Any())
@@ -111,6 +109,25 @@ namespace TalentV2.Notifications.Mail
                 SendDefault(message);
             }
         }
+
+        public async Task SendAsync(MailPreviewInfoDto message)
+        {
+            var mailMessage = new MailMessage()
+            {
+                Subject = message.Subject,
+                Body = message.BodyMessage,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(message.To);
+
+            if (message.CCs.Any())
+            {
+                message.CCs.ForEach(cc => mailMessage.CC.Add(cc));
+            }
+
+            await _emailSender.SendAsync(mailMessage);
+        }
+
         private void SendDefault(MailPreviewInfoDto message)
         {
             _emailSender.SendAsync(
@@ -120,6 +137,7 @@ namespace TalentV2.Notifications.Mail
                 isBodyHtml: true
             );
         }
+
         private void SendToCC(MailPreviewInfoDto message)
         {
             var mailMessage = new MailMessage()
@@ -132,6 +150,7 @@ namespace TalentV2.Notifications.Mail
             mailMessage.IsBodyHtml = true;
             _emailSender.SendAsync(mailMessage);
         }
+
         public async Task CreateEmailHistory(long cvId, long emailTemplateId, string description = "")
         {
             await _workScope.InsertAsync(new EmailStatusHistory
@@ -148,6 +167,7 @@ namespace TalentV2.Notifications.Mail
             var data = await EmailDispatchData(template.Type);
             return GetContentMail(data.Result, template);
         }
+
         public async Task<MailPreviewInfoDto> GetById(long id)
         {
             var template = await _workScope.GetAsync<EmailTemplate>(id);
@@ -163,6 +183,7 @@ namespace TalentV2.Notifications.Mail
                 CCs = ccs
             };
         }
+
         public IQueryable<MailDto> IQGetEmailTemplate()
         {
             return _workScope.GetAll<EmailTemplate>()
@@ -175,6 +196,7 @@ namespace TalentV2.Notifications.Mail
                         CCs = s.CCs,
                     });
         }
+
         public async Task<List<MailDto>> GetAllMailTemplate()
         {
             return await IQGetEmailTemplate()
@@ -214,6 +236,7 @@ namespace TalentV2.Notifications.Mail
                 CCs = listCCs
             };
         }
+
         private async Task<dynamic> EmailDispatchData(MailFuncEnum EmailType, long id = default)
         {
             switch (EmailType)
@@ -226,12 +249,15 @@ namespace TalentV2.Notifications.Mail
                 case MailFuncEnum.AcceptedOfferInternship:
                 case MailFuncEnum.RejectedOffer:
                     return await GetDataRequestCV(id);
+
                 case MailFuncEnum.FailedCV:
                     return await GetDataCandidate(id);
+
                 default:
                     return null;
             }
         }
+
         private async Task<ResultTemplateEmail<AllInformationRequestCVDto>> GetDataRequestCV(long requestCVId)
         {
             if (requestCVId == default)
@@ -254,7 +280,7 @@ namespace TalentV2.Notifications.Mail
                     Phone = "0912845678",
                     Salary = 1000000,
                     Status = RequestCVStatus.AcceptedOffer,
-                    Percentage= "",
+                    Percentage = "",
                 };
                 SetSignatureContact(fakeData);
                 return new ResultTemplateEmail<AllInformationRequestCVDto>
@@ -297,6 +323,7 @@ namespace TalentV2.Notifications.Mail
                 Result = result,
             };
         }
+
         private async Task<ResultTemplateEmail<CandidateEmailInfo>> GetDataCandidate(long cvId)
         {
             if (cvId == default)
@@ -331,6 +358,7 @@ namespace TalentV2.Notifications.Mail
                 Result = result
             };
         }
+
         private void SetSignatureContact<TDto>(TDto dto) where TDto : class
         {
             var user = _workScope.GetAll<User>().Where(q => q.Id == _abpSession.UserId).FirstOrDefault();

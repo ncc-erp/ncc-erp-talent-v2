@@ -46,7 +46,16 @@ namespace TalentV2.APIs
         [AbpAuthorize(PermissionNames.Pages_Mails_SendMail)]
         public async Task<string> SendMail(MailPreviewInfoDto message)
         {
-            _mailService.Send(message);
+            try
+            {
+                await _mailService.SendAsync(message);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"SendMailRequestCV()_${message.To}", ex);
+                throw new UserFriendlyException("Email sending failed. Please, try again!");
+            }
+
             return "Sent Successfully";
         }
         [HttpGet]

@@ -17,6 +17,7 @@ namespace TalentV2.Notifications.Mail
         Task<List<MailStatusHistoryDto>> GetMailStatusHistoryByCVId(long cvId);
         Task<MailPreviewInfoDto> PreviewContentMail(long id, MailFuncEnum mailFuncType);
         void Send(MailPreviewInfoDto content);
+        Task SendAsync(MailPreviewInfoDto content);
         Task<List<MailDto>> GetAllMailTemplate();
         Task<MailPreviewInfoDto> GetById(long id);
         Task<MailPreviewInfoDto> GetByIdFakeData(long id);
