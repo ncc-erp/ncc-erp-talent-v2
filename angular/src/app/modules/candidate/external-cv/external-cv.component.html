@@ -92,7 +92,7 @@
               >
                   {{ externalCv.isFemale ? "F" : "M" }}
                 </span>
-                <span (click)="openPDFDocViewer(externalCv.linkCVUrl)" *ngIf="externalCv.linkCVUrl">
+                <span class="pointer" (click)="openPDFDocViewer(externalCv.linkCVUrl)" *ngIf="externalCv.linkCVUrl">
                   <img style="width: 30px;margin-left: 10px;" src="/assets/img/cv.png" alt="cv"/>
                 </span>
                 <div class="row-item">
