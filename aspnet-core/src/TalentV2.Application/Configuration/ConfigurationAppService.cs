@@ -13,6 +13,7 @@ using Abp.UI;
 using TalentV2.InternalTools;
 using TalentV2.WebServices.InternalServices.HRM;
 using TalentV2.DomainServices.Dto;
+using TalentV2.WebServices.ExternalServices.Autobot;
 
 namespace TalentV2.Configuration
 {
@@ -22,11 +23,14 @@ namespace TalentV2.Configuration
         private static IConfiguration _appConfiguration;
         private readonly LMSService _lMSService;
         private readonly HRMService _hrmService;
-        public ConfigurationAppService(IConfiguration appConfiguration, LMSService lMSService, HRMService hrmService)
+        private readonly AutobotService _autobotService;
+
+        public ConfigurationAppService(IConfiguration appConfiguration, LMSService lMSService, HRMService hrmService, AutobotService autobotService)
         {
             _appConfiguration = appConfiguration;
             _lMSService = lMSService;
             _hrmService = hrmService;
+            _autobotService = autobotService;
         }
         [AbpAuthorize]
         public async Task ChangeUiTheme(ChangeUiThemeInput input)
@@ -85,12 +89,12 @@ namespace TalentV2.Configuration
             return new KomuSettingsInput
             {
                 KomuSetting = _appConfiguration.GetValue<string>("KomuService:BaseAddress"),
-                IsSendNotify = _appConfiguration.GetValue<string>("KomuService:EnableKomuNotification") == "true" ? true:false,
+                IsSendNotify = _appConfiguration.GetValue<string>("KomuService:EnableKomuNotification") == "true" ? true : false,
                 SecretCode = _appConfiguration.GetValue<string>("KomuService:SecurityCode"),
                 ChannelIdDevMode = _appConfiguration.GetValue<string>("KomuService:ChannelIdDevMode")
             };
         }
-       
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Configurations_ViewChannelHRITSettings)]
         public async Task<DiscordChannelInput> GetDiscordChannelHRIT()
@@ -261,6 +265,12 @@ namespace TalentV2.Configuration
         public GetResultConnectDto CheckConnectToHRM()
         {
             return _hrmService.CheckConnectToHRM();
+        }
+
+        [HttpGet]
+        public Task<GetResultConnectDto> CheckConnectToAutoBot()
+        {
+            return _autobotService.CheckConnectToAutoBot();
         }
 
         [HttpGet]
