@@ -21,7 +21,7 @@ export class PdfDocViewerComponent implements OnInit {
 
   ngOnInit(): void {
     Object.assign(this, this.config.data);
-    const url = this.isPDFType ? this.fileUrl : `https://docs.google.com/viewerng/viewer?url=${this.fileUrl}`;
+    const url = this.isPDFType ? `${this.fileUrl}#zoom=100` : `https://docs.google.com/viewerng/viewer?url=${this.fileUrl}`;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 }
