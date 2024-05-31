@@ -12,6 +12,7 @@ import { UtilitiesService } from '@app/core/services/utilities.service';
 import { JsonHubProtocol } from '@aspnet/signalr';
 import { ShowMetadataComponent } from './showmetadata/showmetadata.component';
 import { DialogService } from 'primeng/dynamicdialog';
+import { CustomDialogService } from '@app/core/services/custom-dialog/custom-dialog.service';
 
 class PagedExternalCvRequestDto extends PagedRequestDto {
   keyword: string;
@@ -35,6 +36,7 @@ export class ExternalCvComponent extends PagedListingComponentBase<ExternalCv> i
     private _externalCv: ExternalCvService,
     public _utilities:UtilitiesService,
     public dialogService: DialogService,
+    private customDialogService: CustomDialogService
   ) {
     super(injector);
     this.breadcrumbConfig = this.getBreadcrumbConfig();
@@ -49,7 +51,7 @@ export class ExternalCvComponent extends PagedListingComponentBase<ExternalCv> i
     finishedCallback: Function
   ): void {
     const payload = this.getPayLoad(request);
-   
+
     this.subs.add(
       this._externalCv.getAllPagging(payload).subscribe((rs) => {
         this.externalsCv = [];
@@ -80,7 +82,7 @@ export class ExternalCvComponent extends PagedListingComponentBase<ExternalCv> i
       homeItem: { icon: "pi pi-home", routerLink: "/" },
     };
   }
-  
+
   openDialog(externalCv: ExternalCv) {
     this.dialogService.open(ShowMetadataComponent, {
       header: `${externalCv.name} - ${externalCv?.branchName} - ${externalCv?.positionName} - Metadata`,
@@ -91,5 +93,9 @@ export class ExternalCvComponent extends PagedListingComponentBase<ExternalCv> i
         id: externalCv.id
       }
     });
+  }
+
+  openPDFDocViewer(url: string) {
+    this.customDialogService.openPDFDocViewerDialog(url);
   }
 }
