@@ -8,6 +8,8 @@ using TalentV2.Authorization;
 using TalentV2.Configuration.Dto;
 using TalentV2.DomainServices.Dto;
 using TalentV2.WebServices.ExternalServices.Autobot;
+using TalentV2.WebServices.InternalServices.HRM;
+using TalentV2.WebServices.InternalServices.LMS;
 
 namespace TalentV2.Configuration
 {
