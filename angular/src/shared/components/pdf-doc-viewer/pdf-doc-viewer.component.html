@@ -1,0 +1,18 @@
+
+<ng-container *ngIf="isFileValid; else fileNotFound">
+  <ng-container *ngIf="isPDFType; else docType">
+    <object [data]="safeUrl" type="application/pdf" class="pdf-doc-viewer"></object>
+  </ng-container>
+</ng-container>
+
+<ng-template #docType>
+  <iframe [src]="safeUrl" class="pdf-doc-viewer"></iframe>
+</ng-template>
+
+<ng-template #fileNotFound>
+  <div class="file-not-found">
+    <img src="/assets/img/file-not-found.png"/>
+    <div class="not-found-text">FILE NOT FOUND</div>
+  </div>
+</ng-template>
+

@@ -114,6 +114,7 @@ import { ConfirmPresentForHr } from "./pages/create-candidate/current-requisitio
 import { NgxDocViewerModule } from "ngx-doc-viewer";
 import { ViewFllesComponent } from "./pages/create-candidate/view-flles/view-flles.component"
 import { PdfJsViewerModule } from "ng2-pdfjs-viewer";
+import { PdfDocViewerComponent } from './components/pdf-doc-viewer/pdf-doc-viewer.component';
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
   TableModule,
@@ -235,7 +236,8 @@ const candidate = [
         PageErrorComponent,
         SafeHtmlPipe,
         ExportDialogComponent,
-        CustomTooltipDirective
+        CustomTooltipDirective,
+        PdfDocViewerComponent
         //CurrentRequesitionGuildlineDialogComponent,
     ],
     exports: [

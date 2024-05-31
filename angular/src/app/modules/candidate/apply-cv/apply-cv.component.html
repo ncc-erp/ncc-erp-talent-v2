@@ -45,7 +45,7 @@
           ></p-dropdown>
         </div>
       </div>
-      
+
       <div class="col item-group">
         <label for="branch"> {{ "ApplyCV Branch" | localize }}</label>
         <div class="w-100">
@@ -64,7 +64,7 @@
         ></p-dropdown>
         </div>
       </div>
-   
+
       <div
         class="col item-group"
         [class]="
@@ -108,7 +108,7 @@
         </th>
 
         <th class="cv-info" pSortableColumn="fullName" pResizableColumn>
-          {{ "Info" | localize }} 
+          {{ "Info" | localize }}
           <p-sortIcon field="fullName"></p-sortIcon>
         </th>
         <th pResizableColumn >
@@ -118,7 +118,7 @@
           {{ "Apply Date" | localize }}
           <p-sortIcon field="applyCVDate"></p-sortIcon>
         </th>
-        
+
         <th pResizableColumn>
           {{ "Position" | localize }}
         </th>
@@ -165,7 +165,7 @@
                   alt="Thumbnail"
                 />
               </div>
-          
+
               <div class="group-info">
                 <div class="group-info--name">
                   <div class="group-item">
@@ -182,7 +182,7 @@
                     </span>
                   </div>
                 </div>
-          
+
                 <div class="section-skill">
                   <div class="row-item">
                     <span>
@@ -198,19 +198,17 @@
               </div>
             </div>
             <div class="group-right">
-              <span *ngIf="_utilities.getLinkFile(item.attachCVLink)">
-                <a [href]="_utilities.getLinkFile(item.attachCVLink)" target="_blank">
-                  <img class="icon-cv" src="../../../assets/img/cv.png" alt="cv" />
-                </a>
+              <span (click)="openPDFDocViewer(item.attachCVLink)" *ngIf="_utilities.getLinkFile(item.attachCVLink)">
+                <img class="icon-cv" src="../../../assets/img/cv.png" alt="cv" />
               </span>
             </div>
           </div>
         </td>
-        
+
         <td class="text-center">
           {{ item.postId }}
         </td>
-        
+
         <td class="text-center">
           {{ item.applyCVDate | talentDateTime: DATE_FORMAT.DD_MM_YYYY }}
         </td>

@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 using TalentV2.Authorization;
 using TalentV2.Configuration.Dto;
 using TalentV2.DomainServices.Dto;
-using TalentV2.WebServices.InternalServices.HRM;
-using TalentV2.WebServices.InternalServices.LMS;
+using TalentV2.WebServices.ExternalServices.Autobot;
 
 namespace TalentV2.Configuration
 {
@@ -18,11 +17,14 @@ namespace TalentV2.Configuration
         private static IConfiguration _appConfiguration;
         private readonly LMSService _lMSService;
         private readonly HRMService _hrmService;
-        public ConfigurationAppService(IConfiguration appConfiguration, LMSService lMSService, HRMService hrmService)
+        private readonly AutobotService _autobotService;
+
+        public ConfigurationAppService(IConfiguration appConfiguration, LMSService lMSService, HRMService hrmService, AutobotService autobotService)
         {
             _appConfiguration = appConfiguration;
             _lMSService = lMSService;
             _hrmService = hrmService;
+            _autobotService = autobotService;
         }
 
         [AbpAuthorize]
@@ -300,6 +302,12 @@ namespace TalentV2.Configuration
         public GetResultConnectDto CheckConnectToHRM()
         {
             return _hrmService.CheckConnectToHRM();
+        }
+
+        [HttpGet]
+        public Task<GetResultConnectDto> CheckConnectToAutoBot()
+        {
+            return _autobotService.CheckConnectToAutoBot();
         }
 
         [HttpGet]

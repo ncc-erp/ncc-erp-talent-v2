@@ -180,3 +180,9 @@ body {
   z-index: 1000;
   pointer-events: none;
 }
+
+.pdf-doc-viewer-dialog {
+  .p-dialog-content {
+    padding: 0 !important;
+  }
+}

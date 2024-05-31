@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using TalentV2.DomainServices.Dto;
 
 namespace TalentV2.WebServices.ExternalServices.Autobot
 {
@@ -106,6 +108,27 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                 _sleepTime = 5;
             }
             _sleepTime = seconds;
+        }
+
+        public async Task<GetResultConnectDto> CheckConnectToAutoBot()
+        {
+            var fullUrl = $"{HttpClient.BaseAddress}/check-connection";
+            try
+            {
+                logger.LogInformation($"Get: {fullUrl}");
+                var response = await HttpClient.GetAsync(fullUrl);
+                var isSuccess = response.StatusCode == HttpStatusCode.OK;
+                return new GetResultConnectDto
+                {
+                    IsConnected = isSuccess,
+                    Message = isSuccess ? "Success" : "Can not connect to AutoBot"
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Get: {fullUrl} error: {ex.Message}");
+            }
+            return default;
         }
     }
 }
