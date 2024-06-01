@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PdfDocViewerComponent } from '@shared/components/pdf-doc-viewer/pdf-doc-viewer.component';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -11,21 +10,20 @@ export class CustomDialogService {
   const
 
   constructor(
-    public _dialog: DialogService,
-    private http: HttpClient
+    public _dialog: DialogService
   ) {}
 
   openPDFDocViewerDialog(fileUrl: string) {
     const isFileValid = this.doesFileExist(fileUrl);
 
     if (!this.isDocUrl(fileUrl) && !this.isPdfUrl(fileUrl) && isFileValid) {
-      this.downloadFile(fileUrl);
+      window.open(fileUrl, '_blank');
       return;
     }
 
     this._dialog.open(PdfDocViewerComponent, {
       width: "60%",
-      contentStyle: { height: '100vh', overflow: 'auto', 'min-width': '600px' },
+      contentStyle: { height: '100vh', overflow: 'auto', 'min-width': '600px', 'border-radius': '8px' },
       styleClass: 'pdf-doc-viewer-dialog',
       baseZIndex: 10000,
       data: { fileUrl, isPDFType: this.isPdfUrl(fileUrl), isFileValid },
@@ -51,15 +49,5 @@ export class CustomDialogService {
     } else {
         return true;
     }
-}
-
-  downloadFile(url: string): void {
-    const aElement = document.createElement('a');
-    aElement.href = url;
-    aElement.download = url;
-    aElement.target = '_blank';
-    document.body.appendChild(aElement);
-    aElement.click();
-    document.body.removeChild(aElement);
   }
 }
