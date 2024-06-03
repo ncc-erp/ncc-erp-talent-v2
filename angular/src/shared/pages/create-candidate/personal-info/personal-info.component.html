@@ -77,11 +77,11 @@
 
         <div class="input-item">
           <input type="text"
-          pInputText
+          pInputText 
           formControlName="phone"
           class="w-100"
           maxlength="10"
-          (paste)="pasteInputEvent($event)"
+          (paste)="pasteInputEvent($event)" 
           (input)="handleInputEvent($event)"
         />
         </div>
@@ -435,8 +435,26 @@
 
           <label for="file" class="btn-inputfile">Choose a file</label>
 
-          <span (click)="openPDFDocViewer()" class="text-name tl-link ml-3">
+          <a
+          *ngIf="cvFileName && cvFileName.endsWith('.pdf')"
+          class="ml-3"
+          [attr.href]="viewFile(formControls['linkCV']?.value)"
+          target="_blank"
+        >
+          {{ cvFileName }}</a
+        >
+          <span
+          *ngIf="cvFileName  && !cvFileName.endsWith('.pdf')"
+          class="text-name tl-link ml-3"
+          (click)="openLink()"
+            >
             {{ cvFileName }}
+            </span>
+            <span
+            class="ml-2 text-danger"
+            *ngIf="formControls.linkCV.errors?.invalidCVExtension"
+          >
+            CV Type allow: {{ ACCEPT_CV }}
           </span>
         </div>
         <div
