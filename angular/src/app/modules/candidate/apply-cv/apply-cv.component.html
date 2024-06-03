@@ -198,8 +198,10 @@
               </div>
             </div>
             <div class="group-right">
-              <span class="pointer" (click)="openPDFDocViewer(item.attachCVLink)" *ngIf="_utilities.getLinkFile(item.attachCVLink)">
-                <img class="icon-cv" src="../../../assets/img/cv.png" alt="cv" />
+              <span *ngIf="_utilities.getLinkFile(item.attachCVLink)">
+                <a [href]="_utilities.getLinkFile(item.attachCVLink)" target="_blank">
+                  <img class="icon-cv" src="../../../assets/img/cv.png" alt="cv" />
+                </a>
               </span>
             </div>
           </div>

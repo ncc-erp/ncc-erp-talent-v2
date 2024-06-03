@@ -8,7 +8,6 @@ import { DateFormat} from '@shared/AppConsts';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { ShowMetadataComponent } from '../showmetadata/showmetadata.component';
 import { DialogService } from 'primeng/dynamicdialog';
-import { CustomDialogService } from '@app/core/services/custom-dialog/custom-dialog.service';
 
 @Component({
   selector: 'talent-detail-external-cv',
@@ -16,7 +15,7 @@ import { CustomDialogService } from '@app/core/services/custom-dialog/custom-dia
   styleUrls: ['./detail-external-cv.component.scss']
 })
 export class DetailExternalCvComponent extends AppComponentBase implements OnInit {
-
+  
   id: number;
   externalCv: ExternalCv = new ExternalCv();
   public readonly DATE_FORMAT = DateFormat;
@@ -25,7 +24,6 @@ export class DetailExternalCvComponent extends AppComponentBase implements OnIni
     public _utilities:UtilitiesService,
     private _externalCv: ExternalCvService,
     public dialogService: DialogService,
-    private customDialogService: CustomDialogService
   ) {
     super(injector);
    }
@@ -49,7 +47,7 @@ export class DetailExternalCvComponent extends AppComponentBase implements OnIni
         { label: "External CV", styleClass: 'menu-item-click', routerLink: DefaultRoute.ExternalCV },
         { label: "Detail External CV " + this.externalCv.name }],
       homeItem: { icon: "pi pi-home", routerLink: "/" },
-    };
+    };   
   }
 
   openDialog(externalCv: ExternalCv) {
@@ -60,9 +58,5 @@ export class DetailExternalCvComponent extends AppComponentBase implements OnIni
       baseZIndex: 10000,
       data: { id: this.id }
     });
-  }
-
-  openPDFDocViewer(url: string) {
-    this.customDialogService.openPDFDocViewerDialog(url);
   }
 }

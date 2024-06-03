@@ -58,8 +58,8 @@
               {{externalCv?.positionName}}
             </span>
         </div>
-        <div class="pointer" (click)="openPDFDocViewer(externalCv.linkCVUrl)" *ngIf="externalCv.linkCVUrl">
-          <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
+        <div *ngIf="externalCv.linkCVUrl">
+            <a [href]="externalCv.linkCVUrl"><img class="icon-cv" src="/assets/img/cv.png" alt="cv" /></a>
         </div>
       </div>
     </div>
