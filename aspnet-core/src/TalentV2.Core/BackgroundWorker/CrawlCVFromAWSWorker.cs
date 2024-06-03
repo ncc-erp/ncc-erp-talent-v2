@@ -54,7 +54,7 @@ namespace TalentV2.BackgroundWorker
                 return;
             }
 
-            AsyncHelper.RunSync(async () => 
+            AsyncHelper.RunSync(async () =>
             {
                 var internResult = await _cvAutomationService.AutoCreateInternCV();
                 if (internResult != null)
@@ -70,7 +70,8 @@ namespace TalentV2.BackgroundWorker
                 }
             });
 
-            PreNotify();
+            bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
+            if (enableNotify && (InternResult.Total > 0 || StaffResult.Total > 0)) PreNotify();
         }
 
         private void PreNotify()
@@ -89,41 +90,37 @@ namespace TalentV2.BackgroundWorker
             if (now.Hour.IsBetween(startAtHour, endAtHour))
             {
                 Logger.Info($"The current time is within the notification configuration period ({startAtHour} - {endAtHour}).");
-                if (InternResult.Success != 0 || StaffResult.Success != 0)
-                {
-                    Notify();
-                    InternResult.Success = StaffResult.Success = 0;
-                    InternResult.Total = StaffResult.Total = 0;
-                }
+                Notify();
+                InternResult.Success = StaffResult.Success = 0;
+                InternResult.Total = StaffResult.Total = 0;
             }
         }
 
         private void Notify()
         {
-            var isToChannel = SettingManager.GetSettingValueForApplication(AppSettingNames.IsNoticeInterviewViaChannel);
-            var talentGeneralChannelId = SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeTalentGeneralChannel);
-            var user = SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeCVCreatedToHR);
-            if (string.IsNullOrEmpty(user))
-            {
-                return;
-            }
-            var emails = user.Split(',').Select(x => x.Trim()).ToList();
-            if (emails.Count == 0)
-            {
-                return;
-            }
+            string notifyUsersString = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNotifyToUser);
+            List<string> notifyUsersList = string.IsNullOrEmpty(notifyUsersString)
+                ? new List<string>()
+                : notifyUsersString.Split(',').Select(x => x.Trim()).ToList();
 
-            if (isToChannel.ToLower().Equals(bool.TrueString.ToLower()))
+            string noticeMode = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeMode);
+            switch (noticeMode)
             {
-                _komuService.NotifyToChannel(BuildMessage(emails), talentGeneralChannelId);
-            }
-            else
-            {
-                var message = BuildMessage();
-                foreach (var email in emails)
-                {
-                    _komuService.SendMessageToUser(CommonUtils.GetUserNameByEmail(email), message);
-                }
+                case "Channel":
+                    string channelId = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeChannelId);
+                    string messageToChannel = BuildMessage(notifyUsersList);
+                    _komuService.NotifyToChannel(messageToChannel, channelId);
+                    break;
+                case "User":
+                    string messageToUser = BuildMessage();
+                    var discordUsers = notifyUsersList.Select(user => CommonUtils.GetUserNameByEmail(user));
+                    foreach (string discordUser in discordUsers)
+                    {
+                        _komuService.SendMessageToUser(discordUser, messageToUser);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
