@@ -1,6 +1,5 @@
 ﻿using Abp.Dependency;
 using Abp.Runtime.Session;
-using Amazon.Runtime.Internal;
 using Castle.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,13 +26,14 @@ namespace TalentV2.DomainServices.CVAutomation
         private readonly string FILE_CANDIDATE_FOLDER_SERVICE = "candidates";
         private readonly string INTERN_FOLDER_SERVICE = "cv_upload/intern";
         private readonly string STAFF_FOLDER_SERVICE = "cv_upload/staff";
+        private readonly string FAILED_FOLDER = "failed";
         private readonly IAbpSession _session;
         private readonly IFileProvider _fileService;
         private readonly IFilePath _filePath;
         private readonly IConfiguration _configuration;
         private readonly AutobotService _autobotService;
         private readonly ILogger _logger;
-
+        
         public CVAutomationManager(
             IAbpSession session,
             IFileProvider fileService,
@@ -64,6 +64,11 @@ namespace TalentV2.DomainServices.CVAutomation
             foreach (var positionMapping in dicFolderAndPosition)
             {
                 var paths = await _filePath.GetPath(INTERN_FOLDER_SERVICE, positionMapping.Key, _session.TenantId);
+
+                List<string> failedPaths = new List<string>();
+                failedPaths.AddRange(paths);
+                failedPaths.Add(FAILED_FOLDER);
+                
                 var fileNamesInPath = await _fileService.GetFileNamesAsync(paths);
                 result.Total += fileNamesInPath.Count;
 
@@ -76,10 +81,9 @@ namespace TalentV2.DomainServices.CVAutomation
                         var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
 
                         if (cvExtractionData == null
-                            || string.IsNullOrEmpty(cvExtractionData.Email)
-                                && string.IsNullOrEmpty(cvExtractionData.PhoneNumber)
-                                && string.IsNullOrEmpty(cvExtractionData.Fullname))
+                            || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
                         {
+                            await _fileService.MoveFileAsync(paths, failedPaths, fileName, true);
                             continue;
                         }
 
@@ -115,6 +119,11 @@ namespace TalentV2.DomainServices.CVAutomation
             foreach (var positionMapping in dicFolderAndPosition)
             {
                 var paths = await _filePath.GetPath(STAFF_FOLDER_SERVICE, positionMapping.Key, _session.TenantId);
+
+                List<string> failedPaths = new List<string>();
+                failedPaths.AddRange(paths);
+                failedPaths.Add(FAILED_FOLDER);
+
                 var fileNamesInPath = await _fileService.GetFileNamesAsync(paths);
                 result.Total += fileNamesInPath.Count;
 
@@ -127,10 +136,9 @@ namespace TalentV2.DomainServices.CVAutomation
                         var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
 
                         if (cvExtractionData == null
-                            || string.IsNullOrEmpty(cvExtractionData.Email)
-                                && string.IsNullOrEmpty(cvExtractionData.PhoneNumber)
-                                && string.IsNullOrEmpty(cvExtractionData.Fullname))
+                            || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
                         {
+                            await _fileService.MoveFileAsync(paths, failedPaths, fileName, true);
                             continue;
                         }
 
@@ -193,9 +201,8 @@ namespace TalentV2.DomainServices.CVAutomation
                 cv.LastModifierUserId = defaultUserCreation?.Id;
             }
 
-            var defaultBranch = await WorkScope.GetAll<Branch>()
-                .Where(x => x.Name.ToLower().Equals("hn1"))
-                .FirstOrDefaultAsync()
+            var defaultBranch = await WorkScope.GetAll<Branch>().Where(x => x.Name.ToLower().Equals("toàn bộ")).FirstOrDefaultAsync()
+                ?? await WorkScope.GetAll<Branch>().Where(x => x.Name.ToLower().Equals("hn1")).FirstOrDefaultAsync()
                 ?? await WorkScope.GetAll<Branch>().FirstOrDefaultAsync();
             cv.BranchId = defaultBranch.Id;
 

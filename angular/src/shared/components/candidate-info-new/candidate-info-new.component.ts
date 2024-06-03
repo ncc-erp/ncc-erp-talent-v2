@@ -4,6 +4,7 @@ import { AppComponentBase } from '@shared/app-component-base';
 import { CANDIDATE_DETAILT_TAB_DEFAULT, UserType } from '@shared/AppEnums';
 import { CandidateInfo } from '../../../app/core/models/candidate/candidate.model';
 import { UtilitiesService } from './../../../app/core/services/utilities.service';
+import { CustomDialogService } from './../../../app/core/services/custom-dialog/custom-dialog.service';
 
 @Component({
   selector: 'talent-candidate-info-new',
@@ -23,6 +24,7 @@ export class CandidateInfoNewComponent extends AppComponentBase implements OnIni
   constructor(
     injector: Injector,
     public _utilities: UtilitiesService,
+    public customDialogService: CustomDialogService,
   ) {
     super(injector);
   }
@@ -38,9 +40,8 @@ export class CandidateInfoNewComponent extends AppComponentBase implements OnIni
     );
     window.open(url.toString(), '_blank')
   }
-  openLink() {
-    const url = this.router.createUrlTree(['/app/candidate/view-files', { documentUrl: this.data.linkCV }]);
-    window.open(url.toString(), '_blank');
+  openPDFDocViewer() {
+    this.customDialogService.openPDFDocViewerDialog(this.data.linkCV);
   }
 
   private getTabActiveDetail(requestId: number) {

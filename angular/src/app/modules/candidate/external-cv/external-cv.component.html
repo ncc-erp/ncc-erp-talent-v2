@@ -59,7 +59,7 @@
 
       <ng-template pTemplate="body" let-externalCv let-i="rowIndex">
         <tr>
-          <td class="w-70px text-center">{{ i + 1 }}</td> 
+          <td class="w-70px text-center">{{ i + 1 }}</td>
           <td class="text-center">
             <div>
               {{
@@ -79,7 +79,7 @@
                 *ngIf="externalCv.avatarUrl"
                 [src]="_utilities.getLinkFile(externalCv.avatarUrl)"
                 alt="Thumbnail"
-              />  
+              />
               </div>
               <div>
                 <span class="tl-link" (click)="navigateToInfoExternalCv(externalCv)"
@@ -92,9 +92,8 @@
               >
                   {{ externalCv.isFemale ? "F" : "M" }}
                 </span>
-                <span *ngIf="externalCv.linkCVUrl">
-                  <a [href]="_utilities.getLinkFile(externalCv.linkCVUrl)" target="_blank"><img
-                      style="width: 30px;margin-left: 10px;" src="/assets/img/cv.png" alt="cv" /></a>
+                <span class="pointer" (click)="openPDFDocViewer(externalCv.linkCVUrl)" *ngIf="externalCv.linkCVUrl">
+                  <img style="width: 30px;margin-left: 10px;" src="/assets/img/cv.png" alt="cv"/>
                 </span>
                 <div class="row-item">
                   <span class="text-phone">

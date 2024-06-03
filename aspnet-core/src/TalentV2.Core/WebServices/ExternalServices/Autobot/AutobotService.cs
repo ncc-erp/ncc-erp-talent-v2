@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using TalentV2.DomainServices.Dto;
 
 namespace TalentV2.WebServices.ExternalServices.Autobot
 {
@@ -56,27 +58,44 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
         {
             var fullUrl = $"{HttpClient.BaseAddress}{ExtractCV}";
 
-            try
+            int attempt = 1;
+            bool isComplete = false;
+            while (attempt <= 3 && !isComplete)
             {
-                using var content = new MultipartFormDataContent();
-                var streamContent = new StreamContent(stream);
-                streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-                content.Add(streamContent, "file", fileName);
-                var response = await HttpClient.PostAsync(fullUrl, content);
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    logger.LogInformation($"Post: {fullUrl} response: {responseContent}");
-                    return JsonConvert.DeserializeObject<T>(responseContent);
+                    using var content = new MultipartFormDataContent();
+                    var streamContent = new StreamContent(stream);
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    content.Add(streamContent, "file", fileName);
+
+                    var response = await HttpClient.PostAsync(fullUrl, content);
+                    int statusCode = (int)response.StatusCode;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        isComplete = true;
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        logger.LogInformation($"Post: {fullUrl} response: {responseContent}");
+                        return JsonConvert.DeserializeObject<T>(responseContent);
+                    }
+                    else if (statusCode == 429 || statusCode >= 500)
+                    {
+                        attempt++;
+                        Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                    }
+                    else isComplete = true;
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Post: {fullUrl} error: {ex.Message}");
-            }
-            finally
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                catch (Exception ex)
+                {
+                    logger.LogError($"Post: {fullUrl} error: {ex.Message}");
+                    attempt++;
+                    Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                }
+                finally
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(_sleepTime));
+                }
             }
             return default;
         }
@@ -89,6 +108,27 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                 _sleepTime = 5;
             }
             _sleepTime = seconds;
+        }
+
+        public async Task<GetResultConnectDto> CheckConnectToAutoBot()
+        {
+            var fullUrl = $"{HttpClient.BaseAddress}/check-connection";
+            try
+            {
+                logger.LogInformation($"Get: {fullUrl}");
+                var response = await HttpClient.GetAsync(fullUrl);
+                var isSuccess = response.StatusCode == HttpStatusCode.OK;
+                return new GetResultConnectDto
+                {
+                    IsConnected = isSuccess,
+                    Message = isSuccess ? "Success" : "Can not connect to AutoBot"
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Get: {fullUrl} error: {ex.Message}");
+            }
+            return default;
         }
     }
 }

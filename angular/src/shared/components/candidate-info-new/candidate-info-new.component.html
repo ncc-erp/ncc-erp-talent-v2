@@ -83,13 +83,10 @@
 
   <div class="group-right">
     <ng-container *ngIf="_utilities.getLinkFile(data.linkCV)">
-      <a [href]="_utilities.getLinkFile(data.linkCV)" target="_blank" *ngIf="data.linkCV.endsWith('.pdf')">
-        <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
-      </a>
-      <span (click)="openLink()" target="_blank" *ngIf="!data.linkCV.endsWith('.pdf')" >
+      <span class="pointer" (click)="openPDFDocViewer()">
         <img class="icon-cv" src="/assets/img/cv.png" alt="cv" />
       </span>
-    </ng-container> 
+    </ng-container>
 
     <span
       *ngIf="showCVStatus && data.cvStatusName"

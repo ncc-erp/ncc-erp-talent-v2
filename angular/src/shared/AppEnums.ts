@@ -211,3 +211,10 @@ export enum StatusCreateAccount {
     CREATE_LMS_ACCOUT = 0,
     CREATE_URL_CONTEST = 1
 }
+
+export enum ECandidateTypeCount {
+    QuantityOnboard,
+    QuantityFail,
+    QuantityAcceptedOffer,
+    TotalCandidateApply,
+}

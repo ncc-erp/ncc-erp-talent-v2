@@ -17,6 +17,7 @@ import { LayoutStoreService } from "./layout/layout-store.service";
 
 import { BusyDirective } from "./directives/busy.directive";
 import { EqualValidator } from "./directives/equal-validator.directive";
+import { CustomTooltipDirective } from "./directives/custom-tooltip.directive";
 
 import { MatCardModule } from '@angular/material/card'
 import { MatCheckboxModule } from '@angular/material/checkbox'
@@ -111,8 +112,9 @@ import { TabsModule } from "ngx-bootstrap/tabs";
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component'
 import { ConfirmPresentForHr } from "./pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component";
 import { NgxDocViewerModule } from "ngx-doc-viewer";
-import { ViewFllesComponent } from "./pages/create-candidate/view-flles/view-flles.component" 
+import { ViewFllesComponent } from "./pages/create-candidate/view-flles/view-flles.component"
 import { PdfJsViewerModule } from "ng2-pdfjs-viewer";
+import { PdfDocViewerComponent } from './components/pdf-doc-viewer/pdf-doc-viewer.component';
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
   TableModule,
@@ -234,7 +236,8 @@ const candidate = [
         PageErrorComponent,
         SafeHtmlPipe,
         ExportDialogComponent,
-
+        CustomTooltipDirective,
+        PdfDocViewerComponent
         //CurrentRequesitionGuildlineDialogComponent,
     ],
     exports: [
@@ -269,7 +272,8 @@ const candidate = [
         ...materialLibs,
         ...primengLibs,
         ...candidate,
-        SafeHtmlPipe
+        SafeHtmlPipe,
+        CustomTooltipDirective
     ]
 })
 export class SharedModule {

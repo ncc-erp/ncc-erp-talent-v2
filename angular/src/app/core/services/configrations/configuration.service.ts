@@ -93,6 +93,9 @@ export class ConfigurationService extends BaseApiService {
   testHRMConnection(): Observable<ApiResponse<GetResultConnectDto>> {
     return this.get(`/CheckConnectToHRM`);
   }
+  testAutoBotConnection(): Observable<ApiResponse<GetResultConnectDto>> {
+    return this.get(`/CheckConnectToAutoBot`);
+  }
   getContestUrl(): Observable<ApiResponse<TalentContestUrl>> {
     return this.get("/GetContestUrl");
   }

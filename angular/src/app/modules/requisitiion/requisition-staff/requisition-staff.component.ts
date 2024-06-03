@@ -4,7 +4,7 @@ import { CandidateInfo } from '@app/core/models/candidate/candidate.model';
 import { RequisitionPayloadList, RequisitionStaff, RequisitionStaffConfigDiaLog, RequisitonCandidate } from '@app/core/models/requisition/requisition.model';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { DateFormat, MESSAGE } from '@shared/AppConsts';
-import { ActionEnum, API_RESPONSE_STATUS, COMPARISION_OPERATOR, DefaultRoute, SearchType, SortType, StatusEnum, ToastMessageType, UserType } from '@shared/AppEnums';
+import { ActionEnum, API_RESPONSE_STATUS, COMPARISION_OPERATOR, DefaultRoute, ECandidateTypeCount, SearchType, SortType, StatusEnum, ToastMessageType, UserType } from '@shared/AppEnums';
 import { ApiResponse, Filter, PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
 import { MenuItem } from 'primeng/api';
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -21,6 +21,7 @@ import { ConfirmPresentForHr } from '@shared/pages/create-candidate/current-requ
 export class RequisitionStaffComponent extends PagedListingComponentBase<RequisitionStaff> implements OnInit {
   public readonly SORT_TYPE = SortType;
   public readonly DATE_FORMAT = DateFormat;
+  public readonly ECandidateTypeCount = ECandidateTypeCount;
 
   searchWithProcessCvStatus: number;
   reqStaffs: RequisitionStaff[] = [];
@@ -33,6 +34,7 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
   isSearchAnd: boolean = false;
   isRowExpand: boolean = false;
   expandedRows: number[] = [];
+  candidateTypeCount: ECandidateTypeCount;
 
   catalogConfig = {
     labelName: 'Skill',
