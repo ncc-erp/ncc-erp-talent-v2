@@ -59,7 +59,7 @@
 
       <ng-template pTemplate="body" let-externalCv let-i="rowIndex">
         <tr>
-          <td class="w-70px text-center">{{ i + 1 }}</td> 
+          <td class="w-70px text-center">{{ i + 1 }}</td>
           <td class="text-center">
             <div>
               {{
@@ -79,7 +79,7 @@
                 *ngIf="externalCv.avatarUrl"
                 [src]="_utilities.getLinkFile(externalCv.avatarUrl)"
                 alt="Thumbnail"
-              />  
+              />
               </div>
               <div>
                 <span class="tl-link" (click)="navigateToInfoExternalCv(externalCv)"

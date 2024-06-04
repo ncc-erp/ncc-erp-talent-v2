@@ -260,21 +260,42 @@
         </td>
 
         <td class="text-center">
-          <div title="Quantity Onboard / Quantity Accepted Offer / Quantity Fail / Total Candidate Apply">
-            <span class="quantity-onboard text-bold"
-              >{{ item.quantityOnboard }}
+          <div [tooltip]="tooltipTemplate" (mouseleave)="candidateTypeCount = null">
+            <span
+              class="quantity-onboard text-bold"
+              (mouseenter)="candidateTypeCount = ECandidateTypeCount.QuantityOnboard"
+            >
+              {{ item.quantityOnboard }}
             </span>
             /
-            <span class="quantity-acceptedoffer text-bold"
-              >{{ item.quantityAcceptedOffer }}
+            <span
+              class="quantity-acceptedoffer text-bold"
+              (mouseenter)="candidateTypeCount = ECandidateTypeCount.QuantityAcceptedOffer"
+            >
+              {{ item.quantityAcceptedOffer }}
             </span>
             /
-            <span class="quantity-failed text-bold"
-              >{{ item.quantityFail }}
+            <span
+              class="quantity-failed text-bold"
+              (mouseenter)="candidateTypeCount = ECandidateTypeCount.QuantityFail"
+            >
+              {{ item.quantityFail }}
             </span>
             /
-            <span class="text-bold">{{ item.totalCandidateApply }} </span>
+            <span
+              class="total-candidate-apply text-bold"
+              (mouseenter)="candidateTypeCount = ECandidateTypeCount.TotalCandidateApply"
+            >
+              {{ item.totalCandidateApply }}
+            </span>
           </div>
+
+          <ng-template #tooltipTemplate>
+            <span [ngClass]="{'quantity-onboard': candidateTypeCount === ECandidateTypeCount.QuantityOnboard}">Quantity Onboard</span> /
+            <span [ngClass]="{'quantity-acceptedoffer': candidateTypeCount === ECandidateTypeCount.QuantityAcceptedOffer}">Quantity Accepted Offer</span> /
+            <span [ngClass]="{'quantity-failed': candidateTypeCount === ECandidateTypeCount.QuantityFail}">Quantity Fail</span> /
+            <span [ngClass]="{'total-candidate-apply': candidateTypeCount === ECandidateTypeCount.TotalCandidateApply}">Total Candidate Apply</span>
+          </ng-template>
         </td>
 
         <td [attr.title]="item?.note">

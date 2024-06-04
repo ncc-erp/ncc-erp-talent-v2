@@ -1,0 +1,29 @@
+
+<ng-container *ngIf="isFileValid; else fileNotFound">
+  <ng-container *ngIf="isPDFType; else docType">
+    <object [data]="safeUrl" type="application/pdf" class="pdf-doc-viewer"></object>
+  </ng-container>
+</ng-container>
+
+<ng-template #docType>
+  <div class="doc-view-container pdf-doc-viewer">
+    <div class="doc-view-header">
+      <div class="doc-view-name">{{this.fileName}}</div>
+      <a [href]="fileUrl" target="_blank">
+        <button
+          pButton pRipple type="button" icon="pi pi-save"
+          class="p-button-rounded p-button-secondary p-button-text"
+        ></button>
+      </a>
+    </div>
+    <iframe [src]="safeUrl"></iframe>
+  </div>
+</ng-template>
+
+<ng-template #fileNotFound>
+  <div class="file-not-found">
+    <img src="/assets/img/file-not-found.png"/>
+    <div class="not-found-text">FILE NOT FOUND</div>
+  </div>
+</ng-template>
+
