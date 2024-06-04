@@ -92,8 +92,9 @@
               >
                   {{ externalCv.isFemale ? "F" : "M" }}
                 </span>
-                <span class="pointer" (click)="openPDFDocViewer(externalCv.linkCVUrl)" *ngIf="externalCv.linkCVUrl">
-                  <img style="width: 30px;margin-left: 10px;" src="/assets/img/cv.png" alt="cv"/>
+                <span *ngIf="externalCv.linkCVUrl">
+                  <a [href]="_utilities.getLinkFile(externalCv.linkCVUrl)" target="_blank"><img
+                      style="width: 30px;margin-left: 10px;" src="/assets/img/cv.png" alt="cv" /></a>
                 </span>
                 <div class="row-item">
                   <span class="text-phone">
