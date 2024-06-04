@@ -2,7 +2,7 @@ import { distinctUntilChanged, debounceTime } from 'rxjs/operators';
 import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
-import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewed, CandidateInterviewedPayload, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
+import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CatalogModel } from '@app/core/models/common/common.dto';
 import { RequisitionStaff } from '@app/core/models/requisition/requisition.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
@@ -82,9 +82,17 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       shortName: "F",
       standardName: "Fail"
     }
-  ]
+  ];
+  optionFailStaffLevel = [
+    {
+      defaultName: "Fail",
+      id: 101,
+      shortName: "F",
+      standardName: "Fail",
+    }
+  ];
   catInternLevels = this.optionFailInternLevel.concat(this._utilities.catLevelFinalIntern).filter(item => item.defaultName !== "FresherPlus");
-  catStaffLevels = this._utilities.catLevelFinalStaff.filter(item => item.id !== 100);
+  catStaffLevels = this.optionFailStaffLevel.concat(this._utilities.catLevelFinalStaff).filter((item) => item.id !== 100);
   createAccout = Object.keys(StatusCreateAccount)
   .filter((value) => !isNaN(Number(value)))
   .map((key) => ({ name: StatusCreateAccount[key], id: key }));
@@ -105,7 +113,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     public _dialog: DialogService,
     public _capSetting: CapabilitySettingService,
     private fb: FormBuilder,
-    private dialogService: DialogService,
     private _scoreSettingService: ScoreSettingService,
   ) {
     super(injector);

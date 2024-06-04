@@ -289,12 +289,12 @@
                 <span for="interviewLevel" class="interview-level lb-item mr-3">
                   {{ "Interviewer suggest level: " | localize }}
                 </span>
-                <div class="input-item itv-level mr-3" *ngIf="userType !== USER_TYPE.INTERN">
+                <div class="input-item itv-level mr-3" *ngIf="userType === USER_TYPE.STAFF">
                   <p-dropdown inputId="itvLevel" [options]="catStaffLevels" formControlName="interviewLevel"
                     placeholder="Select level" optionLabel="standardName" optionValue="id"
                     styleClass="w-100"></p-dropdown>
                 </div>
-                <div class="input-item itv-level mr-3" *ngIf="userType !== USER_TYPE.STAFF">
+                <div class="input-item itv-level mr-3" *ngIf="userType === USER_TYPE.INTERN">
                   <p-dropdown inputId="itvLevel" [options]="catInternLevels" formControlName="interviewLevel"
                     placeholder="Select level" optionLabel="standardName" optionValue="id"
                     styleClass="w-100"></p-dropdown>
