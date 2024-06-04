@@ -8,7 +8,6 @@ import { DateFormat, FILTER_TIME } from '../../../../shared/AppConsts';
 import { ApplyCv, ApplyCvPayloadListData } from '../../../core/models/apply-cv/apply-cv-list.model';
 import { ApplyCVService } from '../../../core/services/candidate/apply-cv-list.service';
 import {TalentDateTime} from '@shared/components/date-selector/date-selector.component';
-import { CustomDialogService } from '@app/core/services/custom-dialog/custom-dialog.service';
 
 class PagedApplyCvRequestDto extends PagedRequestDto {
   keyword: string;
@@ -31,7 +30,7 @@ export class ApplyCvComponent extends PagedListingComponentBase<ApplyCv> impleme
   breadcrumbConfig: BreadCrumbConfig;
   first = 0;
   searchWithCreationTime: TalentDateTime;
-
+  
   @Input() isOpenDetail = true;
   usertype: null;
   branchId: null;
@@ -45,18 +44,17 @@ export class ApplyCvComponent extends PagedListingComponentBase<ApplyCv> impleme
     private _applyCv: ApplyCVService,
     public _utilities:UtilitiesService,
     public dialogService: DialogService,
-    private customDialogService: CustomDialogService
-  ) {
+  ) { 
     super(injector);
   }
 
   ngOnInit(): void {
     this.breadcrumbConfig = this.getBreadcrumbConfig();
   }
-
+  
   list( request: PagedApplyCvRequestDto, pageNumber: number, finishedCallback: Function): void {
     const payload = this.getPayLoad(request);
-
+    
     this.subs.add(
       this._applyCv.getAllPagging(payload).subscribe((rs) => {
         this.applyCvList = [];
@@ -69,26 +67,26 @@ export class ApplyCvComponent extends PagedListingComponentBase<ApplyCv> impleme
           })
           this.showPaging(rs.result, pageNumber);
         }
-        this.isLoading = rs.loading;
-      })
+        this.isLoading = rs.loading;  
+      })  
     );
   }
   onTalentDateChange(talentDateTime: TalentDateTime) {
     this.searchWithCreationTime = talentDateTime;
     this.getDataPage(this.GET_FIRST_PAGE);
   }
-
+  
   private getPayLoad(request: PagedRequestDto): ApplyCvPayloadListData {
     const payload: any = { ...request };
     const filterItems: Filter[] = [];
     payload.usertype = this.usertype;
     payload.searchText = this.keyword;
     payload.branchId =this.branchId;
-
+    
     if (this.searchWithCreationTime && this.searchWithCreationTime.dateType !== CreationTimeEnum.ALL) {
       payload.fromDate = this.searchWithCreationTime?.fromDate?.format(DateFormat.YYYY_MM_DD);
       payload.toDate = this.searchWithCreationTime?.toDate?.format(DateFormat.YYYY_MM_DD);
-    }
+    } 
     payload.filterItems = filterItems;
     return payload;
   }
@@ -113,9 +111,5 @@ export class ApplyCvComponent extends PagedListingComponentBase<ApplyCv> impleme
       menuItem: [{ label: "Candidate", routerLink: DefaultRoute.Candidate, styleClass: 'menu-item-click' }, { label: "Apply CV" }],
       homeItem: { icon: "pi pi-home", routerLink: "/" },
     };
-  }
-
-  openPDFDocViewer(url: string) {
-    this.customDialogService.openPDFDocViewerDialog(url);
   }
 }

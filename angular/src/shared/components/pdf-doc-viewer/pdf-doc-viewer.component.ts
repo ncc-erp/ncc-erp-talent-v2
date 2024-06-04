@@ -10,6 +10,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 export class PdfDocViewerComponent implements OnInit {
   public safeUrl: SafeResourceUrl;
   public fileUrl: string;
+  public fileName: string;
   public isPDFType: boolean;
   public isFileValid: boolean;
 
@@ -21,7 +22,8 @@ export class PdfDocViewerComponent implements OnInit {
 
   ngOnInit(): void {
     Object.assign(this, this.config.data);
-    const url = this.isPDFType ? this.fileUrl : `https://docs.google.com/viewerng/viewer?url=${this.fileUrl}`;
+    this.fileName = this.fileUrl.split('/').pop();
+    const url = this.isPDFType ? `${this.fileUrl}#zoom=100` : `https://docs.google.com/viewer?url=${encodeURIComponent(this.fileUrl)}&embedded=true`;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 }

@@ -6,7 +6,18 @@
 </ng-container>
 
 <ng-template #docType>
-  <iframe [src]="safeUrl" class="pdf-doc-viewer"></iframe>
+  <div class="doc-view-container pdf-doc-viewer">
+    <div class="doc-view-header">
+      <div class="doc-view-name">{{this.fileName}}</div>
+      <a [href]="fileUrl" target="_blank">
+        <button
+          pButton pRipple type="button" icon="pi pi-save"
+          class="p-button-rounded p-button-secondary p-button-text"
+        ></button>
+      </a>
+    </div>
+    <iframe [src]="safeUrl"></iframe>
+  </div>
 </ng-template>
 
 <ng-template #fileNotFound>
