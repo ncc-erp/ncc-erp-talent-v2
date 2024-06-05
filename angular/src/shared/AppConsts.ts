@@ -133,3 +133,8 @@ export const RQ_PROCESS_STATUS = [
 export const IMAGE_EXTENSION_ALLOW = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png'];
 
 export const CV_EXTENSION_ALLOW = ['doc', 'docx', 'xlsx', 'csv', 'pdf'];
+
+export const TOOL_URL = {
+    contest: 'https://contest.ncc.asia',
+    lms: 'http://lms.nccsoft.vn'
+}
