@@ -48,5 +48,5 @@ export function convertPhoneNumber(number: string): string {
       resultNumber = `0${resultNumber}`;
     }
   }
-  return resultNumber?.length !== 10 ? null : resultNumber;
+  return resultNumber?.length > 10 ? null : resultNumber;
 }
