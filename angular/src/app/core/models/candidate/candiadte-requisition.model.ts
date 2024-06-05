@@ -79,6 +79,7 @@ export class CandidateApplyResult {
   onboardDate: string;
   hrNote: string;
   mailDetail: MailDetail;
+  lmsInfo: string;
 }
 
 export class CandidateApplyResultPayload {

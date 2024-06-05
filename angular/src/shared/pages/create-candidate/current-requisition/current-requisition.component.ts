@@ -11,7 +11,7 @@ import { UtilitiesService } from '@app/core/services/utilities.service';
 import { RequisitionInternComponent } from '@app/modules/requisitiion/requisition-intern/requisition-intern.component';
 import { RequisitionStaffComponent } from '@app/modules/requisitiion/requisition-staff/requisition-staff.component';
 import { AppComponentBase } from '@shared/app-component-base';
-import { DateFormat, MESSAGE } from '@shared/AppConsts';
+import { DateFormat, MESSAGE, TOOL_URL } from '@shared/AppConsts';
 import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
 import * as moment from 'moment';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -73,7 +73,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isInterviewed;
   visible: boolean;
   position: string;
-  createAccoutStatusId: number;
+  createAccountStatusId: number;
   optionFailInternLevel = [
     {
       defaultName: "Fail",
@@ -93,9 +93,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   ];
   catInternLevels = this.optionFailInternLevel.concat(this._utilities.catLevelFinalIntern).filter(item => item.defaultName !== "FresherPlus");
   catStaffLevels = this.optionFailStaffLevel.concat(this._utilities.catLevelFinalStaff).filter((item) => item.id !== 100);
-  createAccout = Object.keys(StatusCreateAccount)
-  .filter((value) => !isNaN(Number(value)))
-  .map((key) => ({ name: StatusCreateAccount[key], id: key }));
+  createAccountOption = Object.entries(StatusCreateAccount).map(([key]) => ({ name: key, id: key }));
+
   //permission
   PS_EditSalaryIntern: string = this.PS.Pages_CandidateIntern_ViewDetail_RequestCV_EditSalary;
   PS_EditSalaryStaff: string = this.PS.Pages_CandidateStaff_ViewDetail_RequestCV_EditSalary;
@@ -169,8 +168,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     );
   }
 
-  onDropdownChange(createAccout: any) {
-    this.createAccoutStatusId = createAccout.value;
+  onDropdownChange(createAccount: any) {
+    this.createAccountStatusId = createAccount.value;
   }
 
   onInterviewerChange(id: number) {
@@ -200,7 +199,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
     this.handleSendMail();
   }
-  
+
   toggleEditingApplyResult() {
     this.isApplyResultEditing = !this.isApplyResultEditing;
     if (!this.isApplyResultEditing) {
@@ -235,14 +234,14 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   createAccount() {
-    const statusCreateAccout = this.applyResultForm.get('createAccout')?.value;
-      if(statusCreateAccout === StatusCreateAccount.CREATE_LMS_ACCOUT.toString()){
+    const statusCreateAccount = this.applyResultForm.get('createAccount')?.value;
+      if (statusCreateAccount === StatusCreateAccount.CREATE_LMS_ACCOUNT) {
       this.headerCreate ='Create LMS account';
       this.notifiCationHeader = 'Create account for';
       this.endofNotifiCation = 'LMS tool ?';
       this.messages = 'LMS Account';
     }
-    else if(statusCreateAccout === StatusCreateAccount.CREATE_URL_CONTEST.toString()) {
+    else if (statusCreateAccount === StatusCreateAccount.CREATE_URL_CONTEST) {
       this.headerCreate = 'Create Url Contest';
       this.notifiCationHeader = 'Create Contest for';
       this.endofNotifiCation = 'Url Contest ?';
@@ -255,7 +254,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       icon: 'pi pi-exclamation-circle',
       accept: () => {
         this.subs.add(
-          this._candidate.createAccount(this.candidateId, this.candidateRequisiton.id, statusCreateAccout).subscribe(res => {
+          this._candidate.createAccount(this.candidateId, this.candidateRequisiton.id, statusCreateAccount).subscribe(res => {
             this.isLoading = res.loading;
 
             if (!res.loading && res.success) {
@@ -318,7 +317,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED,`${noteCandidateCapability.capabilityName}_Max 5000 characters`);
       return;
     }
-    
+
     this.subs.add(
       this._candidate.updateManyCapabilityCV(payload).subscribe(res => {
         this.isLoadingCapabilityTable = res.loading;
@@ -539,7 +538,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     const url = `/app/requisition/${reqPath}/${this.candidateRequisiton.currentRequisition.id}?type=${this.userType}`;
     window.open(url, '_blank');
     }
-   
+
   private handleSendMail() {
     this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id).subscribe(res => {
       if (!res.success || res.loading) return;
@@ -604,7 +603,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  onSaveAllCapability() { 
+  onSaveAllCapability() {
     this.isEditingAll = false;
     const payload = [];
     const canCapabilities = this.candidateRequisiton?.capabilityCandidate;
@@ -686,7 +685,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       mailDetail: null,
       lmsInfo: null,
       percentage: '',
-      createAccout: [this.getDefaultcreateAccout()],
+      createAccount: [this.getDefaultCreateAccount()],
     })
 
     const interviewLevelForm = this.fb.group({
@@ -750,8 +749,12 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  getDefaultcreateAccout() {
-      return '1';
+  getDefaultCreateAccount(lmsInfo: string = null) {
+    if (lmsInfo?.includes(TOOL_URL.lms) && !lmsInfo.includes(TOOL_URL.contest)) {
+      return StatusCreateAccount.CREATE_LMS_ACCOUNT;
+    }
+
+    return StatusCreateAccount.CREATE_URL_CONTEST;
   }
 
   private onResetApplyResultForm() {
@@ -768,10 +771,12 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   private updateValueApplyResultForm(applyResult: CandidateApplyResult) {
     applyResult && (this.candidateRequisiton.applicationResult = applyResult);
+
     if (applyResult) {
       this.applyResultForm.patchValue({
         ...applyResult,
         onboardDate: applyResult.onboardDate ? new Date(applyResult.onboardDate) : null,
+        createAccount: this.getDefaultCreateAccount(applyResult?.lmsInfo)
       });
 
       this.applyHistoryStatuses.clear();
@@ -808,7 +813,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.requisitionDetail = currentRequisition;
     if(this.requisitionDetail){
       this.loadScoreRanges(this.requisitionDetail.userType, this.requisitionDetail.subPositionId);
-    } 
+    }
     this.headerCurrentReq = `Current Requisition ${currentRequisition?.id ? '#' + currentRequisition?.id : ''} `;
     this.requisitonForm.patchValue(currentRequisition);
   }
@@ -824,7 +829,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       }
     })
   }
-  
+
   levelFilterbyScore(totalScore : any){
     if(!totalScore || !this.scoreRangeResults?.length) {
       this.hasValidScoreLevel  = false;
@@ -833,7 +838,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
 
       let closestRange: ScoreRangeWithSetting | null = null;
-  
+
       for (let i = 0; i < this.scoreRangeResults?.length; i++) {
         const range = this.scoreRangeResults[i];
         if (totalScore >= range.scoreFrom && (totalScore < range.scoreTo || totalScore == 5)) {
