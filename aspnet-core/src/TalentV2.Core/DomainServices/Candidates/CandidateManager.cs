@@ -1474,15 +1474,17 @@ namespace TalentV2.DomainServices.Candidates
             if (await CheckAllowSendMail(cvId: cvId) == ControlSendMail.DENY)
                 throw new UserFriendlyException("Can't send email. Please, try again!");
 
-            try
+            _ = Task.Run(async () =>
             {
-                await _mailService.SendAsync(message);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"SendMailCV()_${message.To}", ex);
-                throw new UserFriendlyException("Email sending failed. Please, try again!");
-            }
+                try
+                {
+                    await _mailService.SendAsync(message);
+                }
+                catch (Exception ex)
+                {
+                    throw new UserFriendlyException("Email sending failed. Please, try again!");
+                }
+            });
 
             var description = $"Sent {message.Subject}";
             await _mailService.CreateEmailHistory(cvId, message.TemplateId, description);
@@ -1502,15 +1504,17 @@ namespace TalentV2.DomainServices.Candidates
             if (await CheckAllowSendMail(requestCVId: requestCVId) == ControlSendMail.DENY)
                 throw new UserFriendlyException("Can't send email. Please, try again!");
 
-            try
-            {
-                await _mailService.SendAsync(message);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"SendMailRequestCV()_${message.To}", ex);
-                throw new UserFriendlyException("Email sending failed. Please, try again!");
-            }
+            _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _mailService.SendAsync(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new UserFriendlyException("Email sending failed. Please, try again!");
+                    }
+                });
 
             var requestCVs = WorkScope.GetAll<RequestCV>()
               .Where(q => q.Id == requestCVId);

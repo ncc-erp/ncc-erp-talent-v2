@@ -4,15 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization;
-using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.RequestCVs;
-using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
 using TalentV2.Notifications.Mail;
 using TalentV2.Notifications.Mail.Dtos;
@@ -52,7 +47,6 @@ namespace TalentV2.APIs
             }
             catch (Exception ex)
             {
-                Logger.Error($"SendMailRequestCV()_${message.To}", ex);
                 throw new UserFriendlyException("Email sending failed. Please, try again!");
             }
 

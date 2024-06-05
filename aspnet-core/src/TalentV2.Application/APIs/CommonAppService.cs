@@ -1,13 +1,10 @@
 ﻿using Abp.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Users;
-using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.DomainServices.Users.Dtos;
 using TalentV2.Entities;

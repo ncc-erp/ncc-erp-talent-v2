@@ -8,6 +8,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Users;
 using TalentV2.Constants.Enum;
+using TalentV2.DomainServices;
 using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
 using TalentV2.NccCore;
@@ -17,7 +18,7 @@ using TalentV2.Utils;
 
 namespace TalentV2.Notifications.Mail
 {
-    public class MailService : IMailService
+    public class MailService : BaseManager, IMailService
     {
         private readonly IWorkScope _workScope;
         private readonly IEmailSender _emailSender;
@@ -112,20 +113,29 @@ namespace TalentV2.Notifications.Mail
 
         public async Task SendAsync(MailPreviewInfoDto message)
         {
-            var mailMessage = new MailMessage()
+            Logger.Info($"Start SendAsync() email to {message.To}");
+            try
             {
-                Subject = message.Subject,
-                Body = message.BodyMessage,
-                IsBodyHtml = true
-            };
-            mailMessage.To.Add(message.To);
+                var mailMessage = new MailMessage()
+                {
+                    Subject = message.Subject,
+                    Body = message.BodyMessage,
+                    IsBodyHtml = true
+                };
+                mailMessage.To.Add(message.To);
 
-            if (message.CCs.Any())
-            {
-                message.CCs.ForEach(cc => mailMessage.CC.Add(cc));
+                if (message.CCs.Any())
+                {
+                    message.CCs.ForEach(cc => mailMessage.CC.Add(cc));
+                }
+
+                await _emailSender.SendAsync(mailMessage);
             }
-
-            await _emailSender.SendAsync(mailMessage);
+            catch (Exception ex)
+            {
+                Logger.Error($"Error SendAsync() email to {message.To}", ex);
+            }
+            Logger.Info($"End SendAsync() email to {message.To}");
         }
 
         private void SendDefault(MailPreviewInfoDto message)
