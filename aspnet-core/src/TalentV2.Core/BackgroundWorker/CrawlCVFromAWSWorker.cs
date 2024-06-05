@@ -98,22 +98,22 @@ namespace TalentV2.BackgroundWorker
 
         private void Notify()
         {
-            string notifyUsersString = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNotifyToUser);
-            List<string> notifyUsersList = string.IsNullOrEmpty(notifyUsersString)
+            string notifyEmailsString = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNotifyToUser);
+            List<string> notifyEmailsList = string.IsNullOrEmpty(notifyEmailsString)
                 ? new List<string>()
-                : notifyUsersString.Split(',').Select(x => x.Trim()).ToList();
+                : notifyEmailsString.Split(',').Select(x => x.Trim()).ToList();
 
             string noticeMode = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeMode);
             switch (noticeMode)
             {
                 case "Channel":
                     string channelId = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeChannelId);
-                    string messageToChannel = BuildMessage(notifyUsersList);
+                    string messageToChannel = BuildMessage(notifyEmailsList);
                     _komuService.NotifyToChannel(messageToChannel, channelId);
                     break;
                 case "User":
                     string messageToUser = BuildMessage();
-                    var discordUsers = notifyUsersList.Select(user => CommonUtils.GetUserNameByEmail(user));
+                    var discordUsers = notifyEmailsList.Select(email => CommonUtils.GetUserNameByEmail(email));
                     foreach (string discordUser in discordUsers)
                     {
                         _komuService.SendMessageToUser(discordUser, messageToUser);
