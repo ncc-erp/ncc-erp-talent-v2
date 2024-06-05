@@ -1475,16 +1475,9 @@ namespace TalentV2.DomainServices.Candidates
                 throw new UserFriendlyException("Can't send email. Please, try again!");
 
             _ = Task.Run(async () =>
-            {
-                try
                 {
                     await _mailService.SendAsync(message);
-                }
-                catch (Exception ex)
-                {
-                    throw new UserFriendlyException("Email sending failed. Please, try again!");
-                }
-            });
+                });
 
             var description = $"Sent {message.Subject}";
             await _mailService.CreateEmailHistory(cvId, message.TemplateId, description);
@@ -1506,14 +1499,7 @@ namespace TalentV2.DomainServices.Candidates
 
             _ = Task.Run(async () =>
                 {
-                    try
-                    {
-                        await _mailService.SendAsync(message);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new UserFriendlyException("Email sending failed. Please, try again!");
-                    }
+                    await _mailService.SendAsync(message);
                 });
 
             var requestCVs = WorkScope.GetAll<RequestCV>()
