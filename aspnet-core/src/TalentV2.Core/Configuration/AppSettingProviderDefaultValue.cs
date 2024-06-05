@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace TalentV2.Configuration
+﻿namespace TalentV2.Configuration
 {
     public class AppSettingProviderDefaultValue
     {
@@ -30,5 +28,12 @@ namespace TalentV2.Configuration
         public string GoogleClientAppEnable { get; set; }
         public string EnableNormalLogin { get; set; }
         public string TalentContestUrl { get; set; }
+        public string CVAutomationEnabled { get; set; }
+        public string CVAutomationRepeatTimeInMinutes { get; set; }
+        public string CVAutomationNoticeStartAtHour { get; set; }
+        public string CVAutomationNoticeEndAtHour { get; set; }
+        public string CVAutomationNoticeMode { get; set; }
+        public string CVAutomationNoticeChannelId { get; set; }
+        public string CVAutomationNotifyToUser { get; set; }
     }
 }

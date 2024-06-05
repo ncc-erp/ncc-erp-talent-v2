@@ -95,6 +95,13 @@ namespace TalentV2
                 appSettingProviderDefaultValue.TimesheetURLSetting = appSettingValueProvider.GetValue<string>(AppSettingNames.TimesheetURLSetting);
                 appSettingProviderDefaultValue.UiTheme = appSettingValueProvider.GetValue<string>(AppSettingNames.UiTheme);
                 appSettingProviderDefaultValue.TalentContestUrl = appSettingValueProvider.GetValue<string>(AppSettingNames.TalentContestUrl);
+                appSettingProviderDefaultValue.CVAutomationEnabled = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationEnabled);
+                appSettingProviderDefaultValue.CVAutomationRepeatTimeInMinutes = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationRepeatTimeInMinutes);
+                appSettingProviderDefaultValue.CVAutomationNoticeStartAtHour = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeStartAtHour);
+                appSettingProviderDefaultValue.CVAutomationNoticeEndAtHour = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeEndAtHour);
+                appSettingProviderDefaultValue.CVAutomationNoticeMode = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeMode);
+                appSettingProviderDefaultValue.CVAutomationNoticeChannelId = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeChannelId);
+                appSettingProviderDefaultValue.CVAutomationNotifyToUser = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNotifyToUser);
             }
             Configuration.Settings.Providers.Add<AppSettingProvider>();
         }
