@@ -19,7 +19,6 @@ import { debounceTime, filter, finalize, switchMap } from 'rxjs/operators';
 import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
 import { TitleCasePipe } from '@angular/common';
 import { Subject } from 'rxjs';
-import { CustomDialogService } from '@app/core/services/custom-dialog/custom-dialog.service';
 
 @Component({
   selector: 'talent-personal-info',
@@ -81,8 +80,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     private _dialog: DialogService,
     private _apSession: AppSessionService,
     private _autoBotService: AutoBotApiService,
-    private _titleCasePipe: TitleCasePipe,
-    private _customDialogService: CustomDialogService
+    private _titleCasePipe: TitleCasePipe
     ) {
     super(injector);
 
@@ -250,6 +248,11 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       this.formControls['avatar'].patchValue(this.avatarUrl);
       this.uploadFile(this.avatarFile, true);
     });
+  }
+
+  openLink(){
+    const url = this.router.createUrlTree(['/app/candidate/view-files', { documentUrl: this.formControls['linkCV'].value}]);
+     window.open(url.toString(), '_blank');
   }
 
   onSaveClose() {
@@ -617,9 +620,5 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
       saveClose ? this.backToCandidate() : this.moveToEducationStep(candidateId);
     })
 
-  }
-
-  openPDFDocViewer() {
-    this._customDialogService.openPDFDocViewerDialog(this.formControls['linkCV']?.value);
   }
 }
