@@ -4,6 +4,7 @@ using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NccCore.Extension;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -36,21 +37,19 @@ namespace TalentV2.DomainServices.Candidates
     public class CandidateManager : BaseManager, ICandidateManager
     {
         private readonly IFileCandidateService _fileCandidate;
-
         private readonly IMailService _mailService;
-
         private readonly LMSService _lmsService;
-
         private readonly IKomuNotification _komuNotification;
-
-        private readonly HRMService _hrmService;
+        private readonly HRMService _hrmService;        
+        private readonly IConfiguration _configuration;
 
         public CandidateManager(
             IFileCandidateService fileCandidate,
             IMailService mailService,
             LMSService lmsService,
             IKomuNotification komuNotification,
-            HRMService hrmService
+            HRMService hrmService,
+            IConfiguration configuration
         )
         {
             _fileCandidate = fileCandidate;
@@ -58,6 +57,7 @@ namespace TalentV2.DomainServices.Candidates
             _lmsService = lmsService;
             _komuNotification = komuNotification;
             _hrmService = hrmService;
+            _configuration = configuration;
         }
 
         public async Task<long> CreateCV(CreateCandidateDto input)
@@ -1317,6 +1317,7 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<FileContentResult> ExportReport(Dtos.ExportReport input)
         {
+            var clientUrl = _configuration.GetValue<string>($"App:ClientRootAddress");
             var requestCvs = await WorkScope.GetAll<RequestCV>()
                 .Where(t => !t.IsDeleted)
                 .ToListAsync();
@@ -1337,27 +1338,46 @@ namespace TalentV2.DomainServices.Candidates
                .WhereIf(input.ToDate.HasValue, q => q.LastModifiedTime.Value.Date <= input.ToDate.Value.Date)
                .ToListAsync();
             var resultsCandidate = listExportCandidate
-                .Select((u, index) => new CadidateReport()
+                .Select((u, index) =>
                 {
-                    No = index++,
-                    Name = u.FullName,
-                    Phone = u.Phone,
-                    Email = u.Email,
-                    Sex = u.IsFemale ? "Male" : "Female",
-                    CvStatus = u.CvStatus,
-                    Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
-                    Branch = u.BranchName,
-                    Positon = u.SubPositionName,
-                    Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                    Time = timeRequestCvsId.Find(s => s.Id.Equals(u.Id))?.LastModificationTime,
-                    ApplyLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.ApplyLevel?.ToString(),
-                    FinalLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.FinalLevel?.ToString(),
-                    InterviewLevel = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewLevel.ToString(),
-                    Note = u.Note,
-                    CV = CommonUtils.FullFilePath(u.PathLinkCV)
+                    var applyLevel = from requestCv in requestCvs
+                                     join level in CommonUtils.ListLevel on requestCv.ApplyLevel.GetHashCode() equals level.Id
+                                     into requestCvGroup
+                                     where requestCv.CVId.Equals(u.Id)
+                                     select requestCvGroup.FirstOrDefault()?.StandardName;
+
+                    var finalLevel = from requestCv in requestCvs
+                                     join level in CommonUtils.ListLevel on requestCv.FinalLevel.GetHashCode() equals level.Id
+                                     into requestCvGroup
+                                     where requestCv.CVId.Equals(u.Id)
+                                     select requestCvGroup.FirstOrDefault()?.StandardName;
+
+                    var interviewLevel = from requestCv in requestCvs
+                                         join level in CommonUtils.ListLevel on requestCv.InterviewLevel.GetHashCode() equals level.Id
+                                         into requestCvGroup
+                                         where requestCv.CVId.Equals(u.Id)
+                                         select requestCvGroup.FirstOrDefault()?.StandardName;
+                    return new CadidateReport()
+                    {
+                        No = index++,
+                        Name = u.FullName,
+                        Phone = u.Phone,
+                        Email = u.Email,
+                        Sex = u.IsFemale ? "Male" : "Female",
+                        CvStatus = u.CvStatus,
+                        Education = string.Join(Environment.NewLine, educationCVs.Where(q => q.CVId == u.Id).Select(s => bulletPoint + s.EducationName).ToList()),
+                        Branch = u.BranchName,
+                        Positon = u.SubPositionName,
+                        Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
+                        Time = timeRequestCvsId.Find(s => s.Id.Equals(u.Id))?.LastModificationTime,
+                        ApplyLevel = applyLevel.FirstOrDefault(),
+                        FinalLevel = finalLevel.FirstOrDefault(),
+                        InterviewLevel = interviewLevel.FirstOrDefault(),
+                        Note = u.Note,
+                        TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
+                    };
                 })
                 .ToList();
-
             var requestCvsIdInterviewed = requestCvs
                 .Where(t => t.Interviewed.Equals(true) && t.InterviewTime != null)
                 .Select(t => t.CVId).ToList();
@@ -1366,17 +1386,39 @@ namespace TalentV2.DomainServices.Candidates
                 .Where(s => requestCvsIdInterviewed.Contains(s.Id))
                 .ToListAsync();
             var resultsInterViewed = listInterviewed
-                .Select((u, index) => new InterView()
-                { 
-                    No = index++,
-                    Name = u.FullName,
-                    Branch = u.BranchName,
-                    Positon = u.SubPositionName,
-                    Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
-                    Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
-                    ApplyLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.ApplyLevel ?? null)?.ToString(),
-                    FinalLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.FinalLevel ?? null)?.ToString(),
-                    InterviewLevel = (requestCvs.FirstOrDefault(s => s.CVId == u.Id)?.InterviewLevel ?? null)?.ToString(),
+                .Select((u, index) =>
+                {
+                    var applyLevel = from requestCv in requestCvs
+                                     join level in CommonUtils.ListLevel on requestCv.ApplyLevel.GetHashCode() equals level.Id
+                                     into requestCvGroup
+                                     where requestCv.CVId.Equals(u.Id)
+                                     select requestCvGroup.FirstOrDefault()?.StandardName;
+
+                    var finalLevel = from requestCv in requestCvs
+                                     join level in CommonUtils.ListLevel on requestCv.FinalLevel.GetHashCode() equals level.Id
+                                     into requestCvGroup
+                                     where requestCv.CVId.Equals(u.Id)
+                                     select requestCvGroup.FirstOrDefault()?.StandardName;
+
+                    var interviewLevel = from requestCv in requestCvs
+                                         join level in CommonUtils.ListLevel on requestCv.InterviewLevel.GetHashCode() equals level.Id
+                                         into requestCvGroup
+                                         where requestCv.CVId.Equals(u.Id)
+                                         select requestCvGroup.FirstOrDefault()?.StandardName;
+                    return new InterView()
+                    {
+                        No = index++,
+                        Name = u.FullName,
+                        Email = u.Email,
+                        Branch = u.BranchName,
+                        Positon = u.SubPositionName,
+                        Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
+                        Time = requestCvs.Find(s => s.CVId.Equals(u.Id))?.InterviewTime,
+                        ApplyLevel = applyLevel.FirstOrDefault(),
+                        FinalLevel = finalLevel.FirstOrDefault(),
+                        InterviewLevel = interviewLevel.FirstOrDefault(),
+                        TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
+                    };
                 })
                 .WhereIf(input.FromDate.HasValue, q => q.Time?.Date >= input.FromDate.Value.Date)
                 .WhereIf(input.ToDate.HasValue, q => q.Time?.Date <= input.ToDate.Value.Date)
@@ -1389,26 +1431,37 @@ namespace TalentV2.DomainServices.Candidates
                 var startColumn = 1;
                 var columnKey = GetColumnNameFromNumber(startColumn);
 
-                var worksheetReport = package.Workbook.Worksheets.Add(typeof(CadidateReport).Name);
+                var worksheetReport = package.Workbook.Worksheets.Add("CadidateReport");
                 worksheetReport.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsCandidate, true, TableStyles.Light9);
-                var row = worksheetReport.Dimension.Start.Row;
+                var reportRow = worksheetReport.Dimension.Start.Row;
                 worksheetReport.Column(8).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
                 resultsCandidate.ForEach(s =>
                 {
-                    var CVColumn = worksheetReport.Cells[++row, worksheetReport.Dimension.End.Column];
-                    if (!string.IsNullOrWhiteSpace(s.CV))
+                    var talentLinkCell = worksheetReport.Cells[++reportRow, worksheetReport.Dimension.End.Column];
+                    if (!string.IsNullOrWhiteSpace(s.TalentLink))
                     {
-                        CVColumn.Hyperlink = new ExcelHyperLink(s.CV) { Display = "CV link" };
-                        CVColumn.Style.Font.UnderLine = true;
-                        CVColumn.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
+                        talentLinkCell.Hyperlink = new ExcelHyperLink(s.TalentLink) { Display = "Talent link" };
+                        talentLinkCell.Style.Font.UnderLine = true;
+                        talentLinkCell.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
                     }
                 });
                 worksheetReport.Cells.AutoFitColumns();
                 worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-                var worksheetInterViewed = package.Workbook.Worksheets.Add(typeof(InterView).Name);
+                var worksheetInterViewed = package.Workbook.Worksheets.Add("Interview");
                 worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
-                worksheetInterViewed.Column(3).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                var interViewedRow = worksheetInterViewed.Dimension.Start.Row;
+                worksheetInterViewed.Column(4).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                resultsInterViewed.ForEach(s =>
+                {
+                    var talentLinkCell = worksheetInterViewed.Cells[++interViewedRow, worksheetInterViewed.Dimension.End.Column];
+                    if (!string.IsNullOrWhiteSpace(s.TalentLink))
+                    {
+                        talentLinkCell.Hyperlink = new ExcelHyperLink(s.TalentLink) { Display = "Talent link" };
+                        talentLinkCell.Style.Font.UnderLine = true;
+                        talentLinkCell.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
+                    }
+                });
                 worksheetReport.Cells.AutoFitColumns();
                 worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 

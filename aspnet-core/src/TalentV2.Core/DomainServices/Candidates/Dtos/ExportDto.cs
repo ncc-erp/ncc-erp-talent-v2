@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
 
 namespace TalentV2.DomainServices.Candidates.Dtos
@@ -30,6 +26,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
     {
         public int No { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
         public DateTime? Time { get; set; }
         public string Positon { get; set; }
         public string Branch { get; set; }
@@ -37,7 +34,8 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string ApplyLevel { get; set; }
         public string FinalLevel { get; set; }
         public string InterviewLevel { get; set; }
-        public string Reason { get; set; }
+        public string Score { get; set; }
+        public string TalentLink { get; set; }
     }
     public class CadidateReport
     {
@@ -54,10 +52,10 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public RequestCVStatus Status { get; set; }
         public string ApplyLevel { get; set; }
         public string FinalLevel { get; set; }
-        public string InterviewLevel {  get; set; }
-        public string Reason { get; set; }
+        public string InterviewLevel { get; set; }
+        public string Score { get; set; }
         public string Note { get; set; }
-        public string CV { get; set; }
+        public string TalentLink { get; set; }
     }
     public class DateInput
     {
