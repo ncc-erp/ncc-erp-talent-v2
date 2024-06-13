@@ -8,36 +8,18 @@
 
     <div class="modal-body edit-user-body">
       <div class="export-form-container flex-column">
-        <div class="flex-center-vertical w-100">
-          <div class="input-wrapper flex-column">
-            <label for="fromDate">From Date:</label>
-            <input class="p-inputtext w-100" type="month" id="fromDate" [(ngModel)]="fromDate" name="fromDate" [value]="fromDate">
-          </div>
-          <div class="input-wrapper flex-column">
-            <label for="toDate">To Date:</label>
-            <input class="p-inputtext w-100" type="month" id="toDate" [(ngModel)]="toDate" name="toDate" [value]="toDate">
-          </div>
-
-          <div class="input-wrapper">
-            <label for="status">Application Status</label>
-            <p-dropdown
-              inputId="status"
-              [options]="_utilities.catReqCvStatus"
-              placeholder="All"
-              optionLabel="name"
-              optionValue="id"
-              styleClass="w-100"
-              [filter]="true"
-              filterBy="name"
-              [showClear]="true"
-              (onChange)="onDropdownChange($event)"
-            ></p-dropdown>
-          </div>
+        <div class="flex-center-vertical">
+          <label
+            [tooltip]="'Enable this switch to export data along with candidate history.'">
+            Status history
+          </label>
+          <p-inputSwitch
+            [(ngModel)]="statusHistory"
+            name="statusSwitch"
+            class="status-switch">
+          </p-inputSwitch>
         </div>
         <div class="flex-center-vertical w-100">
-          <mat-checkbox id="statusCheckbox" [(ngModel)]="statusHistory" name="statusCheckbox" class="mt-3">
-            <div [pTooltip]="'Check this box to export data along with candidate history.'">Status history</div>
-          </mat-checkbox>
           <div class="input-wrapper">
             <label for="fromStatus">From Status</label>
             <p-dropdown
@@ -68,6 +50,37 @@
               [showClear]="true"
               (onChange)="onDropdownToStatus($event)"
               [disabled]="!statusHistory"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="flex-center-vertical w-100">
+          <div class="input-wrapper flex-column">
+            <label for="fromDate">From Date:</label>
+            <input class="p-inputtext w-100" type="month" id="fromDate" [(ngModel)]="fromDate" name="fromDate" [value]="fromDate">
+          </div>
+          <div class="input-wrapper flex-column">
+            <label for="toDate">To Date:</label>
+            <input class="p-inputtext w-100" type="month" id="toDate" [(ngModel)]="toDate" name="toDate" [value]="toDate">
+          </div>
+        </div>
+
+        <div class="flex-center-vertical w-100">
+          <div class="input-wrapper">
+            <label for="status">Application Status</label>
+            <p-dropdown
+              inputId="status"
+              [options]="_utilities.catReqCvStatus"
+              placeholder="All"
+              optionLabel="name"
+              optionValue="id"
+              styleClass="w-100"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              (onChange)="onDropdownChange($event)"
             ></p-dropdown>
           </div>
         </div>

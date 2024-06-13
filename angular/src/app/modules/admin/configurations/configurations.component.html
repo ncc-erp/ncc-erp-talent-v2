@@ -670,133 +670,148 @@
     </p-panel>
   </div>
 
-  <div class="panel panel--notify-interviewer-setting"
-       *ngIf="noticeTimerInterviewer">
-    <p-panel [toggleable]="true"
-             [(collapsed)]="isPanelCollapse.noticeTimerInterviewer">
+  <div class="panel panel--notify-interviewer-setting" *ngIf="noticeTimerInterviewer">
+    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.noticeTimerInterviewer">
       <ng-template pTemplate="header">
         <div class="d-flex align-items-center">
           <span class="panel-title">
-            {{ "Notify Discord Settings" | localize }}
+            {{ "Notify Discord Interview Settings" | localize }}
           </span>
-          <div class="action"
-               *ngIf="!isPanelCollapse.noticeTimerInterviewer">
-            <p-button *ngIf="
-                          !isEditing.notifyinterviewer &&
-                          isGranted(PS.Pages_Configurations_EditTalentNotifyInterviewSettings)
-                        "
-                      icon="fas fa-edit"
-                      title="Edit"
-                      styleClass="p-button-sm ml-4"
-                      (onClick)="toggleEditing(SETTING_TYPE.NOTIFYINTERVIEWER)"></p-button>
+          <div class="action" *ngIf="!isPanelCollapse.noticeTimerInterviewer">
+            <p-button
+              *ngIf="!isEditing.notifyinterviewer && isGranted(PS.Pages_Configurations_EditTalentNotifyInterviewSettings)"
+              icon="fas fa-edit"
+              title="Edit"
+              styleClass="p-button-sm ml-4"
+              (onClick)="toggleEditing(SETTING_TYPE.NOTIFYINTERVIEWER)">
+            </p-button>
 
-            <p-button *ngIf="isEditing.notifyinterviewer"
-                      icon="pi pi-check"
-                      title="Save"
-                      styleClass="p-button-sm ml-3"
-                      (onClick)="saveNotifyInterviewerChannelId()"></p-button>
+            <p-button
+              *ngIf="isEditing.notifyinterviewer"
+              icon="pi pi-check"
+              title="Save"
+              styleClass="p-button-sm ml-3"
+              (onClick)="saveNotifyInterviewerChannelId()">
+            </p-button>
 
-            <p-button *ngIf="isEditing.notifyinterviewer"
-                      icon="pi pi-times"
-                      title="Cancel Edit"
-                      styleClass="p-button-sm p-button-secondary ml-3"
-                      (click)="cancelEditing(SETTING_TYPE.NOTIFYINTERVIEWER)"></p-button>
+            <p-button
+              *ngIf="isEditing.notifyinterviewer"
+              icon="pi pi-times"
+              title="Cancel Edit"
+              styleClass="p-button-sm p-button-secondary ml-3"
+              (click)="cancelEditing(SETTING_TYPE.NOTIFYINTERVIEWER)">
+            </p-button>
           </div>
         </div>
       </ng-template>
 
       <div class="panel-body">
         <div class="group-item">
-          <label for="tlScheduleMinutes"
-                 class="label-title">
-            {{ "Start notify at" | localize }}</label>
+          <label for="tlScheduleMinutes" class="label-title">
+            {{ "Start notify at" | localize }}
+          </label>
           <div class="d-flex flex-row">
-            <input type="number"
-                   min="0"
-                   max="23"
-                   id="tlScheduleMinutes"
-                   pInputText
-                   class="w-75 p-0"
-                   [(ngModel)]="noticeTimerInterviewer.noticeInterviewStartAtHour"
-                   [readonly]="!isEditing.notifyinterviewer" />
+            <input
+              type="number"
+              min="0"
+              max="23"
+              id="tlScheduleMinutes"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="noticeTimerInterviewer.noticeInterviewStartAtHour"
+              [readonly]="!isEditing.notifyinterviewer"
+            />
             <span>o'clock</span>
           </div>
-          <label for="tlScheduleMinutes"
-                 class="label-title">
-            {{ "End notify at" | localize }}</label>
+          <label for="tlScheduleMinutes" class="label-title">
+            {{ "End notify at" | localize }}
+          </label>
           <div class="d-flex flex-row">
-            <input type="number"
-                   min="0"
-                   max="23"
-                   id="tlScheduleMinutes"
-                   pInputText
-                   class="w-75 p-0"
-                   [(ngModel)]="noticeTimerInterviewer.noticeInterviewEndAtHour"
-                   [readonly]="!isEditing.notifyinterviewer" />
+            <input
+              type="number"
+              min="0"
+              max="23"
+              id="tlScheduleMinutes"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="noticeTimerInterviewer.noticeInterviewEndAtHour"
+              [readonly]="!isEditing.notifyinterviewer"
+            />
             <span>o'clock</span>
           </div>
-          <label for="tlScheduleMinutes"
-                 class="label-title">
-            {{ "Notice to interview before" | localize }}</label>
+          <label for="tlScheduleMinutes" class="label-title">
+            {{ "Notice to interview before" | localize }}
+          </label>
           <div class="d-flex flex-row">
-            <input type="text"
-                   id="tlScheduleMinutes"
-                   pInputText
-                   class="w-75 p-0"
-                   [(ngModel)]="noticeTimerInterviewer.noticeInterviewMinutes"
-                   [readonly]="!isEditing.notifyinterviewer" />
+            <input
+              type="text"
+              id="tlScheduleMinutes"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="noticeTimerInterviewer.noticeInterviewMinutes"
+              [readonly]="!isEditing.notifyinterviewer"
+            />
             <span>minutes</span>
           </div>
-          <label for="tlReviewMinutes"
-                 class="label-title">
-            {{ "Notice to input RESULT after interviewing" | localize }}</label>
+          <label for="tlReviewMinutes" class="label-title">
+            {{ "Notice to input RESULT after interviewing" | localize }}
+          </label>
           <div class="d-flex flex-row">
-            <input type="text"
-                   id="tlReviewMinutes"
-                   pInputText
-                   class="w-75 p-0"
-                   [(ngModel)]="noticeTimerInterviewer.noticeInterviewResultMinutes"
-                   [readonly]="!isEditing.notifyinterviewer" />
+            <input
+              type="text"
+              id="tlReviewMinutes"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="noticeTimerInterviewer.noticeInterviewResultMinutes"
+              [readonly]="!isEditing.notifyinterviewer"
+            />
             <span>minutes</span>
           </div>
-          <label for="tlIsToChannel"
-                 class="label-title">
-            {{ "Notify To" | localize }}</label>
+          <label for="tlIsToChannel" class="label-title">
+            {{ "Notify To" | localize }}
+          </label>
           <div class="d-flex flex-row">
             <div class="field-radiobutton">
-              <p-radioButton name="toUser"
-                             value="false"
-                             [(ngModel)]="noticeTimerInterviewer.isToChannel"
-                             [disabled]="!isEditing.notifyinterviewer"></p-radioButton>
+              <p-radioButton
+                name="toUser"
+                value="false"
+                [(ngModel)]="noticeTimerInterviewer.isToChannel"
+                [disabled]="!isEditing.notifyinterviewer">
+              </p-radioButton>
               <label for="toUser">&nbsp;User</label>
             </div>
             <div class="field-radiobutton ml-3">
-              <p-radioButton name="toChannel"
-                             value="true"
-                             [(ngModel)]="noticeTimerInterviewer.isToChannel"
-                             [disabled]="!isEditing.notifyinterviewer"></p-radioButton>
+              <p-radioButton
+                name="toChannel"
+                value="true"
+                [(ngModel)]="noticeTimerInterviewer.isToChannel"
+                [disabled]="!isEditing.notifyinterviewer">
+              </p-radioButton>
               <label for="toChannel">&nbsp;Channel</label>
             </div>
           </div>
-          <label for="tlChannelScheduleId"
-                 class="label-title">
-            {{ "Interviewing channel ID " | localize }}</label>
-          <input type="text"
-                 id="tlChannelScheduleId"
-                 pInputText
-                 class="w-75 p-0"
-                 [(ngModel)]="noticeTimerInterviewer.scheduleChannel"
-                 [readonly]="!isEditing.notifyinterviewer" />
-          <label for="tlChannelResultId"
-                 class="label-title">
-            {{ "Interviewing RESULT channel ID " | localize }}</label>
-          <input type="text"
-                 id="tlChannelResultId"
-                 pInputText
-                 class="w-75 p-0"
-                 [(ngModel)]="noticeTimerInterviewer.resultChannel"
-                 [readonly]="!isEditing.notifyinterviewer" />
-
+          <label for="tlChannelScheduleId" class="label-title">
+            {{ "Interviewing channel ID " | localize }}
+          </label>
+          <input
+            type="text"
+            id="tlChannelScheduleId"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="noticeTimerInterviewer.scheduleChannel"
+            [readonly]="!isEditing.notifyinterviewer"
+          />
+          <label for="tlChannelResultId" class="label-title">
+            {{ "Interviewing RESULT channel ID " | localize }}
+          </label>
+          <input
+            type="text"
+            id="tlChannelResultId"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="noticeTimerInterviewer.resultChannel"
+            [readonly]="!isEditing.notifyinterviewer"
+          />
           <label for="tlGeneralChannelId" class="label-title">
             {{ "Talent General Channel ID " | localize }}
           </label>
@@ -809,6 +824,168 @@
             [readonly]="!isEditing.notifyinterviewer"
           />
         </div>
+      </div>
+    </p-panel>
+  </div>
+
+  <div class="panel panel--notify-interviewer-setting" *ngIf="notifyCVAutomation">
+    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.notifyCVAutomation">
+      <ng-template pTemplate="header">
+        <div class="d-flex align-items-center">
+          <span class="panel-title">
+            {{ "Notify Discord CV Automation Settings" | localize }}
+          </span>
+          <div class="action" *ngIf="!isPanelCollapse.notifyCVAutomation">
+            <p-button
+              *ngIf="!isEditing.notifyCVAutomation && isGranted(PS.Pages_Configurations_EditTalentNotifyCVAutomationSettings)"
+              icon="fas fa-edit"
+              title="Edit"
+              styleClass="p-button-sm ml-4"
+              (onClick)="toggleEditing(SETTING_TYPE.NOTIFY_CV_AUTOMATION)">
+            </p-button>
+
+            <p-button
+              *ngIf="isEditing.notifyCVAutomation"
+              icon="pi pi-check"
+              title="Save"
+              styleClass="p-button-sm ml-3"
+              (onClick)="saveNotifyDiscordCVAutomationSettings()">
+            </p-button>
+
+            <p-button
+              *ngIf="isEditing.notifyCVAutomation"
+              icon="pi pi-times"
+              title="Cancel Edit"
+              styleClass="p-button-sm p-button-secondary ml-3"
+              (click)="cancelEditing(SETTING_TYPE.NOTIFY_CV_AUTOMATION)">
+            </p-button>
+          </div>
+        </div>
+      </ng-template>
+
+      <div class="panel-body flex-column">
+        <div class="d-flex">
+          <p-checkbox
+            [(ngModel)]="notifyCVAutomation.enabled"
+            [binary]="true"
+            [disabled]="!isEditing.notifyCVAutomation"
+            inputId="enableNotifyCVAutomation"
+          ></p-checkbox>
+          <label for="enableNotifyCVAutomation" class="label-checkbox">
+            {{ "Enable" | localize }}
+          </label>
+        </div>
+
+        <div>
+          <label for="CVAutomationStartAtHour" class="label-title">
+            {{ "Start notify at" | localize }}
+          </label>
+          <div class="d-flex flex-row">
+            <input
+              type="number"
+              min="0"
+              max="23"
+              id="CVAutomationStartAtHour"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="notifyCVAutomation.noticeStartAtHour"
+              [readonly]="!isEditing.notifyCVAutomation"
+            />
+            <span>o'clock</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="CVAutomationEndAtHour" class="label-title">
+            {{ "End notify at" | localize }}
+          </label>
+          <div class="d-flex flex-row">
+            <input
+              type="number"
+              min="0"
+              max="23"
+              id="CVAutomationEndAtHour"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="notifyCVAutomation.noticeEndAtHour"
+              [readonly]="!isEditing.notifyCVAutomation"
+            />
+            <span>o'clock</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="CVAutomationRepeatTime" class="label-title">
+            {{ "Repeat time" | localize }}
+          </label>
+          <div class="d-flex flex-row">
+            <input
+              type="number"
+              min="0"
+              max="23"
+              id="CVAutomationRepeatTime"
+              pInputText
+              class="w-75 p-0"
+              [(ngModel)]="notifyCVAutomation.repeatTimeInMinutes"
+              [readonly]="!isEditing.notifyCVAutomation"
+            />
+            <span>minutes</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="tlIsToChannel" class="label-title">
+            {{ "Notify To" | localize }}
+          </label>
+
+          <div class="d-flex flex-row">
+            <div class="field-radiobutton">
+              <p-radioButton
+                name="notifyCVtoUser"
+                value="User"
+                [(ngModel)]="notifyCVAutomation.noticeMode"
+                [disabled]="!isEditing.notifyCVAutomation">
+              </p-radioButton>
+              <label for="notifyCVtoUser">&nbsp;User</label>
+            </div>
+            <div class="field-radiobutton ml-3">
+              <p-radioButton
+                name="notifyCVtoChannel"
+                value="Channel"
+                [(ngModel)]="notifyCVAutomation.noticeMode"
+                [disabled]="!isEditing.notifyCVAutomation">
+              </p-radioButton>
+              <label for="notifyCVtoChannel">&nbsp;Channel</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-column">
+          <label for="tlGeneralChannelId" class="label-title">
+            {{ "Channel Id" | localize }}
+          </label>
+          <input
+            type="text"
+            id="tlGeneralChannelId"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="notifyCVAutomation.noticeChannelId"
+            [readonly]="!isEditing.notifyCVAutomation"
+          />
+        </div>
+
+        <div class="flex-column">
+          <label for="tlGeneralChannelId" class="label-title">
+            {{ "User to notify" | localize }}
+          </label>
+          <p-chips
+            [(ngModel)]="notifyCVAutomation.userList"
+            [disabled]="!isEditing.notifyCVAutomation"
+            (ngModelChange)="onCVAutomationListUserChange($event)"
+            separator=",">
+          </p-chips>
+        </div>
+
       </div>
     </p-panel>
   </div>

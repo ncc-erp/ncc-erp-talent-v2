@@ -218,3 +218,8 @@ export enum ECandidateTypeCount {
     QuantityAcceptedOffer,
     TotalCandidateApply,
 }
+
+export enum ENoticeMode {
+    Channel = 'Channel',
+    User = 'User'
+}

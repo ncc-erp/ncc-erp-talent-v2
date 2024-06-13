@@ -85,7 +85,8 @@ export const MESSAGE = {
     REOPEN_SUCCESS: "Reopen was successfully",
     APPLY_CV_SUCCESS: "You have submitted the application form successfully!",
     EXTRACT_CV_WARN: "CV information extraction function is not configured. Please contact the administrator",
-    EXTRACTING_CV: "Extracting CV information...."
+    EXTRACTING_CV: "Extracting CV information....",
+    ERROR_EMAIL_FORMAT: "Wrong adding email format!"
 }
 
 export const DateFormat = {

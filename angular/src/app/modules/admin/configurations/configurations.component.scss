@@ -53,4 +53,10 @@
   font-weight: 600;
 }
 
+.panel-body {
+  &.flex-column {
+    gap: 1rem;
+  }
+}
+
 
