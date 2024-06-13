@@ -1,6 +1,10 @@
 .club-bt{
     display: flex;
-    justify-content: space-between;
+    gap: 16px;
+
+    button:first-child {
+        margin-left: auto;
+    }
 }
 .p-inputtext {
     border: 1px solid #ced4da;
@@ -44,8 +48,7 @@
     .export-form-container {
         gap: 16px;
         .flex-center-vertical {
-            justify-content: space-between;
-            gap: 18px;
+            gap: 12px;
         }
         .input-wrapper {
             flex: 1;
@@ -53,9 +56,36 @@
     }
 
     @media (max-width: 991px) {
-        .flex-center-vertical {
+        .flex-center-vertical:not(:has(.status-switch)) {
             align-items: unset;
             flex-direction: column;
+        }
+    }
+
+    hr {
+        margin: 0 10px;
+        width: auto;
+        border-top: 1px solid #c7c7c7;;
+    }
+
+    ::ng-deep {
+        p-inputSwitch.status-switch {
+            height: 1.2rem !important;
+            .p-inputswitch {
+                width: 2rem !important;
+                height: 1.2rem !important;
+
+                .p-inputswitch-slider:before {
+                    width: 0.75rem !important;
+                    height: 0.75rem !important;
+                    left: 0.25rem !important;
+                    margin-top: -0.4rem !important;
+                }
+
+                &.p-inputswitch-checked .p-inputswitch-slider:before {
+                    transform: translateX(0.75rem) !important;
+                }
+            }
         }
     }
 }
