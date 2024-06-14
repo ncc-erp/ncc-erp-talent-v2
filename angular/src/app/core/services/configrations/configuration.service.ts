@@ -1,4 +1,4 @@
-import { DiscordChannelSettings, TalentSecretCode, NoticeInterviewSettingDto, TalentContestUrl } from '@app/core/models/configuration/configuration.model';
+import { DiscordChannelSettings, TalentSecretCode, NoticeInterviewSettingDto, TalentContestUrl, INoticeCVAutomationDto } from '@app/core/models/configuration/configuration.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { nullToEmpty } from '@app/core/helpers/utils.helper';
@@ -57,6 +57,10 @@ export class ConfigurationService extends BaseApiService {
     return this.get("/GetNoticeInterviewSetting");
   }
 
+  getNotifyDiscordCVAutomationSettings(): Observable<ApiResponse<INoticeCVAutomationDto>> {
+    return this.get("/GetNoticeCVAutomationSettings");
+  }
+
   setKomuSetting(isSendNotify: boolean): Observable<ApiResponse<string>> {
     return this.create({ isSendNotify: isSendNotify }, '/SetKomuSettings');
   }
@@ -87,6 +91,11 @@ export class ConfigurationService extends BaseApiService {
   setTimeNoticeInterviewer(payload: NoticeInterviewSettingDto): Observable<ApiResponse<NoticeInterviewSettingDto>> {
     return this.create(payload, `/SetNoticeInterviewSetting`);
   }
+
+  setNotifyDiscordCVAutomationSettings(payload: INoticeCVAutomationDto): Observable<ApiResponse<INoticeCVAutomationDto>> {
+    return this.create(payload, `/SetNoticeCVAutomationSettings`);
+  }
+
   testLMSConnection(): Observable<ApiResponse<GetResultConnectDto>> {
     return this.get(`/CheckConnectToLMS`);
   }

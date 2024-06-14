@@ -169,7 +169,7 @@ body {
 }
 
 .custom-tooltip {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   max-width: 300px;
   position: absolute;
@@ -177,7 +177,7 @@ body {
   color: #fff;
   padding: 5px;
   border-radius: 3px;
-  z-index: 1000;
+  z-index: 10000;
   pointer-events: none;
 }
 

@@ -38,6 +38,8 @@ export const PERMISSIONS_CONSTANT = {
     Pages_Configurations_EditTalentSecretCode: "Pages.Configurations.EditTalentSecretCode",
     Pages_Configurations_ViewTalentNotifyInterviewSettings: "Pages.Configurations.ViewTalentNotifyInterviewSettings",
     Pages_Configurations_EditTalentNotifyInterviewSettings: "Pages.Configurations.EditTalentNotifyInterviewSettings",
+    Pages_Configurations_ViewTalentNotifyCVAutomationSettings: "Pages.Configurations.ViewTalentNotifyCVAutomationSettings",
+    Pages_Configurations_EditTalentNotifyCVAutomationSettings: "Pages.Configurations.EditTalentNotifyCVAutomationSettings",
     PermissionNames_Pages_Configurations_ConfigureContestUrl: "PermissionNames.Pages_Configurations.ConfigureContestUrl",
 
     TabCategory: "Category",
