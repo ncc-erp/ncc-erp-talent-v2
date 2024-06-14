@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.ModelExtends;
@@ -37,5 +35,6 @@ namespace TalentV2.DomainServices.Candidates.Dtos
             }
         }
         public long? ProjectToolRequestId { get; set; }
+        public List<RequestCVCapabilityResultDto> CapabilityResults { get; set; }
     }
 }

@@ -1039,7 +1039,12 @@ namespace TalentV2.DomainServices.Candidates
                                 RequestStatus = x.Request.Status,
                                 RequestCVStatus = x.Status,
                                 LastModifiedTime = x.LastModificationTime,
-                                ProjectToolRequestId = x.Request.ProjectToolRequestId
+                                ProjectToolRequestId = x.Request.ProjectToolRequestId,
+                                CapabilityResults = x.RequestCVCapabilityResults.Select(c => new RequestCVCapabilityResultDto
+                                {
+                                    Score = c.Score,
+                                    Factor = c.Factor,
+                                }).ToList(),
                             })
                             .ToList(),
                             MailStatusHistories = candidate.EmailStatusHistories.Select(s => new MailStatusHistoryDto
@@ -1314,7 +1319,6 @@ namespace TalentV2.DomainServices.Candidates
 
         #region export infomation
 
-
         public async Task<FileContentResult> ExportReport(Dtos.ExportReport input)
         {
             var clientUrl = _configuration.GetValue<string>($"App:ClientRootAddress");
@@ -1329,6 +1333,21 @@ namespace TalentV2.DomainServices.Candidates
             var timeRequestCvsId = cvs
                  .Where(t => t.LastModificationTime != null)
                  .ToList();
+            Func<List<RequestCVCapabilityResultDto>, double> calculateScore = (capabilityResults) =>
+            {
+                if (capabilityResults != null && capabilityResults.Count > 0)
+                {
+                    double evaluationScore = 0;
+                    double totalScore = 0;
+                    capabilityResults.ForEach(result =>
+                    {
+                        evaluationScore += (result.Score * result.Factor);
+                        totalScore += (5 * result.Factor);
+                    });
+                    return Math.Round((evaluationScore / totalScore) * 5, 2);
+                }
+                return 0;
+            };
             var listExportCandidate = await IQGetAllCVs()
                .Where(q => q.UserType.Equals(input.userType))
                .WhereIf(input.reqCvStatus.HasValue, q => q.RequisitionInfos.Any(s => s.RequestCVStatus == input.reqCvStatus))
@@ -1357,6 +1376,9 @@ namespace TalentV2.DomainServices.Candidates
                                          into requestCvGroup
                                          where requestCv.CVId.Equals(u.Id)
                                          select requestCvGroup.FirstOrDefault()?.StandardName;
+
+                    var capabilityResults = u.RequisitionInfos.FirstOrDefault()?.CapabilityResults;
+
                     return new CadidateReport()
                     {
                         No = index++,
@@ -1373,6 +1395,7 @@ namespace TalentV2.DomainServices.Candidates
                         ApplyLevel = applyLevel.FirstOrDefault(),
                         FinalLevel = finalLevel.FirstOrDefault(),
                         InterviewLevel = interviewLevel.FirstOrDefault(),
+                        Score = calculateScore(capabilityResults),
                         Note = u.Note,
                         TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
                     };
@@ -1385,7 +1408,7 @@ namespace TalentV2.DomainServices.Candidates
                 .Where(q => q.UserType.Equals(input.userType))
                 .Where(s => requestCvsIdInterviewed.Contains(s.Id))
                 .ToListAsync();
-            var resultsInterViewed = listInterviewed
+            var resultsInterviewed = listInterviewed
                 .Select((u, index) =>
                 {
                     var applyLevel = from requestCv in requestCvs
@@ -1405,6 +1428,9 @@ namespace TalentV2.DomainServices.Candidates
                                          into requestCvGroup
                                          where requestCv.CVId.Equals(u.Id)
                                          select requestCvGroup.FirstOrDefault()?.StandardName;
+
+                    var capabilityResults = u.RequisitionInfos.FirstOrDefault()?.CapabilityResults;
+
                     return new InterView()
                     {
                         No = index++,
@@ -1417,6 +1443,7 @@ namespace TalentV2.DomainServices.Candidates
                         ApplyLevel = applyLevel.FirstOrDefault(),
                         FinalLevel = finalLevel.FirstOrDefault(),
                         InterviewLevel = interviewLevel.FirstOrDefault(),
+                        Score = calculateScore(capabilityResults),
                         TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
                     };
                 })
@@ -1448,13 +1475,13 @@ namespace TalentV2.DomainServices.Candidates
                 worksheetReport.Cells.AutoFitColumns();
                 worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-                var worksheetInterViewed = package.Workbook.Worksheets.Add("Interview");
-                worksheetInterViewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterViewed, true, TableStyles.Light9);
-                var interViewedRow = worksheetInterViewed.Dimension.Start.Row;
-                worksheetInterViewed.Column(4).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
-                resultsInterViewed.ForEach(s =>
+                var worksheetInterviewed = package.Workbook.Worksheets.Add("Interview");
+                worksheetInterviewed.Cells[$"{columnKey}{startRow}"].LoadFromCollection(resultsInterviewed, true, TableStyles.Light9);
+                var interviewedRow = worksheetInterviewed.Dimension.Start.Row;
+                worksheetInterviewed.Column(4).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
+                resultsInterviewed.ForEach(s =>
                 {
-                    var talentLinkCell = worksheetInterViewed.Cells[++interViewedRow, worksheetInterViewed.Dimension.End.Column];
+                    var talentLinkCell = worksheetInterviewed.Cells[++interviewedRow, worksheetInterviewed.Dimension.End.Column];
                     if (!string.IsNullOrWhiteSpace(s.TalentLink))
                     {
                         talentLinkCell.Hyperlink = new ExcelHyperLink(s.TalentLink) { Display = "Talent link" };
@@ -1462,8 +1489,8 @@ namespace TalentV2.DomainServices.Candidates
                         talentLinkCell.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
                     }
                 });
-                worksheetReport.Cells.AutoFitColumns();
-                worksheetReport.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheetInterviewed.Cells.AutoFitColumns();
+                worksheetInterviewed.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var stream = new MemoryStream();
                 package.SaveAs(stream);

@@ -34,7 +34,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string ApplyLevel { get; set; }
         public string FinalLevel { get; set; }
         public string InterviewLevel { get; set; }
-        public string Score { get; set; }
+        public double Score { get; set; }
         public string TalentLink { get; set; }
     }
     public class CadidateReport
@@ -53,7 +53,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string ApplyLevel { get; set; }
         public string FinalLevel { get; set; }
         public string InterviewLevel { get; set; }
-        public string Score { get; set; }
+        public double Score { get; set; }
         public string Note { get; set; }
         public string TalentLink { get; set; }
     }
