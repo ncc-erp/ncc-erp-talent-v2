@@ -824,14 +824,15 @@
 <ng-template #connectStatus let-message="message" let-connected="connected" let-section="section">
   <div class="d-flex flex-row align-items-center ml-3">
     <p-chip [styleClass]="getChipStyleClass(connected, message)">
-        <i
-            class="fas fa-sync-alt"
-            [ngClass]="{'fa-spin': !message}"
-            (click)="testConnection(section)">
-        </i>
-        <div class="white-space-nowrap" [tooltip]="message">
-          {{ getStatusText(connected, message) }}
-        </div>
+      <i
+        class="fas fa-sync-alt pointer"
+        alt="Check connect"
+        [ngClass]="{'fa-spin': !message}"
+        (click)="testConnection(section)">
+      </i>
+      <div class="white-space-nowrap" [tooltip]="message">
+        {{ getStatusText(connected, message) }}
+      </div>
     </p-chip>
   </div>
 </ng-template>

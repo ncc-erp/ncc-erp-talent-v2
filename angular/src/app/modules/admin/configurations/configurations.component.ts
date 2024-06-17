@@ -280,16 +280,27 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   }
 
   testConnection(type: SECTION_TYPE) {
-    switch (type) {
-      case SECTION_TYPE.HRM:
-        this.testHRMConnection();
-        return;
-      case SECTION_TYPE.LMS:
-        this.testLMSConnection();
-        return;
-      case SECTION_TYPE.AUTOBOT:
-        this.testAutoBotConnection();
-        return;
+    const typeMapping = {
+      [SECTION_TYPE.HRM]: {
+        data: this.hrmResult,
+        function: () => this.testHRMConnection()
+      },
+      [SECTION_TYPE.LMS]: {
+        data: this.lmsResult,
+        function: () => this.testLMSConnection()
+      },
+      [SECTION_TYPE.AUTOBOT]: {
+        data: this.autoBotConnectionStatus,
+        function: () => this.testAutoBotConnection()
+      }
+    };
+
+    if (type in typeMapping) {
+      typeMapping[type].data.message = null;
+
+      setTimeout(() => {
+        typeMapping[type].function();
+      }, 1000);
     }
   }
 
@@ -505,14 +516,12 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
 
   getChipStyleClass(connected: boolean, message: string): string {
     let baseClass = 'configuration-chip';
-    if (message) {
-        baseClass += connected ? ' success' : ' failed';
-    }
+    baseClass += message ? connected ? ' success' : ' failed' : ' disabled';
     return baseClass;
   }
 
   getStatusText(connected: boolean, message: string): string {
-    if (!message) return 'Is connecting...';
-    return connected ? 'Connected' : 'Fail connected';
+    if (!message) return 'Connecting...';
+    return connected ? 'Connected' : 'Failed to connect';
   }
 }
