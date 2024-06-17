@@ -77,6 +77,15 @@
     &.failed {
       color: $color-warning-danger;
     }
+
+    &.disabled {
+      pointer-events: none;
+      color: #8d8d8d;
+    }
+
+    .white-space-nowrap {
+      cursor: default;
+    }
   }
 }
 
