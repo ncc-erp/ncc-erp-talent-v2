@@ -36,5 +36,9 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         }
         public long? ProjectToolRequestId { get; set; }
         public List<RequestCVCapabilityResultDto> CapabilityResults { get; set; }
+        public Level? ApplyLevel { get; set; }
+        public Level? InterviewLevel { get; set; }
+        public Level? FinalLevel { get; set; }
+        public DateTime? InterviewTime;
     }
 }

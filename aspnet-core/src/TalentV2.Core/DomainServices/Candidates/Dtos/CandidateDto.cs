@@ -16,6 +16,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public List<RequisitionInfoDto> RequisitionInfos { get; set; }
         public List<MailStatusHistoryDto> MailStatusHistories { get; set; }
         public List<HistoryChangeStatusesDto> HistoryChangeStatuses { get; set; }
+        public List<CVEducationDto> CVEducations { get; set; }
         public ProcessCVStatus ProcessCVStatus { get; set; }
         public DateTime? LatestModifiedTime { get; set; }
     }

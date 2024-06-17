@@ -22,7 +22,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string Note { get; set; }
         public string CV { get; set; }
     }
-    public class InterView
+    public class InterviewReport
     {
         public int No { get; set; }
         public string Name { get; set; }
@@ -31,13 +31,13 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string Positon { get; set; }
         public string Branch { get; set; }
         public RequestCVStatus Status { get; set; }
+        public string InterviewLevel { get; set; }
         public string ApplyLevel { get; set; }
         public string FinalLevel { get; set; }
-        public string InterviewLevel { get; set; }
-        public double Score { get; set; }
+        public double? Score { get; set; }
         public string TalentLink { get; set; }
     }
-    public class CadidateReport
+    public class CandidateReport
     {
         public int No { get; set; }
         public string Name { get; set; }
@@ -50,10 +50,10 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string Positon { get; set; }
         public string Branch { get; set; }
         public RequestCVStatus Status { get; set; }
+        public string InterviewLevel { get; set; }
         public string ApplyLevel { get; set; }
         public string FinalLevel { get; set; }
-        public string InterviewLevel { get; set; }
-        public double Score { get; set; }
+        public double? Score { get; set; }
         public string Note { get; set; }
         public string TalentLink { get; set; }
     }

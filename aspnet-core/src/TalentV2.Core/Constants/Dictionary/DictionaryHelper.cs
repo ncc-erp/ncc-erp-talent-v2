@@ -278,6 +278,16 @@ namespace TalentV2.Constants.Dictionary
                     ShortName = "A"
                 }
             },
+            {
+                Level.Fail,
+                new LevelDto
+                {
+                    Id = Level.Fail.GetHashCode(),
+                    DefaultName = Level.Fail.ToString(),
+                    StandardName = "Fail",
+                    ShortName = "F"
+                }
+            },
         };
     }
 }
