@@ -5,41 +5,18 @@
   <div class="panel panel--google-setting" *ngIf="googleClientAppSetting">
     <p-panel
       [toggleable]="true"
-      [(collapsed)]="isPanelCollapse.googleClientAppSetting"
+      [(collapsed)]="isPanelCollapse.google"
     >
       <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <span class="panel-title">
             {{ "Google Login Setting" | localize }}
           </span>
-          <div class="action" *ngIf="!isPanelCollapse.googleClientAppSetting">
-            <p-button
-              *ngIf="
-                !isEditing.google &&
-                isGranted(PS.Pages_Configurations_EditGoogleClientAppSettings)
-              "
-              icon="fas fa-edit"
-              title="Edit"
-              styleClass="p-button-sm ml-4"
-              (onClick)="toggleEditing(SETTING_TYPE.GOOGLE_LOGIN)"
-            ></p-button>
 
-            <p-button
-              *ngIf="isEditing.google"
-              icon="pi pi-check"
-              title="Save"
-              styleClass="p-button-sm ml-3"
-              (onClick)="saveGoogleLoginSetting()"
-            ></p-button>
-
-            <p-button
-              *ngIf="isEditing.google"
-              icon="pi pi-times"
-              title="Cancel Edit"
-              styleClass="p-button-sm p-button-secondary ml-3"
-              (click)="cancelEditing(SETTING_TYPE.GOOGLE_LOGIN)"
-            ></p-button>
-          </div>
+          <ng-container *ngTemplateOutlet="editAction; context: {
+            type: SETTING_TYPE.GOOGLE_LOGIN,
+            hasPermission: isGranted(PS.Pages_Configurations_EditGoogleClientAppSettings)
+          }"></ng-container>
         </div>
       </ng-template>
 
@@ -80,38 +57,15 @@
       *ngIf="isGranted(PS.Pages_Configurations_ViewChannelHRITSettings)"
     >
       <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <span class="panel-title">
             {{ "Discord channels" | localize }}
           </span>
-          <div class="action" *ngIf="!isPanelCollapse.discordChanel">
-            <p-button
-              *ngIf="
-                !isEditing.discordChanel &&
-                isGranted(PS.Pages_Configurations_EditChannelHRITSettings)
-              "
-              icon="fas fa-edit"
-              title="Edit"
-              styleClass="p-button-sm ml-4"
-              (onClick)="toggleEditing(SETTING_TYPE.DISCORD_CHANEL)"
-            ></p-button>
 
-            <p-button
-              *ngIf="isEditing.discordChanel"
-              icon="pi pi-check"
-              title="Save"
-              styleClass="p-button-sm ml-3"
-              (onClick)="saveDisChanelSetting()"
-            ></p-button>
-
-            <p-button
-              *ngIf="isEditing.discordChanel"
-              icon="pi pi-times"
-              title="Cancel Edit"
-              styleClass="p-button-sm p-button-secondary ml-3"
-              (click)="cancelEditing(SETTING_TYPE.DISCORD_CHANEL)"
-            ></p-button>
-          </div>
+          <ng-container *ngTemplateOutlet="editAction; context: {
+            type: SETTING_TYPE.DISCORD_CHANEL,
+            hasPermission: isGranted(PS.Pages_Configurations_EditChannelHRITSettings)
+          }"></ng-container>
         </div>
       </ng-template>
 
@@ -164,29 +118,21 @@
   <div class="panel panel--hrm-setting" *ngIf="hrmSetting">
     <p-panel
       [toggleable]="true"
-      [(collapsed)]="isPanelCollapse.hrmSetting"
+      [(collapsed)]="isPanelCollapse.hrm"
     >
     <ng-template pTemplate="header">
       <div class="d-flex align-items-center">
         <span class="panel-title">
           {{ "HRM Settings" | localize }}
         </span>
-        <div class="action d-flex justify-content-around"
-             *ngIf="!isPanelCollapse.hrmSetting">
-          <p-button class="mr-2"
-                    icon="pi pi-sync"
-                    pTooltip="Check connection."
-                    styleClass="p-button-sm ml-4"
-                    (onClick)="testHRMConnection()"></p-button>
-          <div *ngIf="!hrmResult?.message"
-               class="mt-1"><i class="pi pi-spin pi-spinner"></i>Is connecting ...
-          </div>
-          <div *ngIf="hrmResult?.isConnected"
-               class="text-success mt-1"><i class="pi pi-check mr-2"></i> Connected</div>
-          <div *ngIf="hrmResult?.isConnected == false"
-               class="text-danger mt-1"
-               [pTooltip]="hrmResult?.message"><i class="pi pi-times fa-x mr-2"></i>Fail connected</div>
-        </div>
+
+        <ng-container *ngIf="!isPanelCollapse.hrm">
+          <ng-container *ngTemplateOutlet="connectStatus; context: {
+            message: hrmResult?.message,
+            connected: hrmResult?.isConnected,
+            section: SECTION_TYPE.HRM
+          }"></ng-container>
+        </ng-container>
       </div>
     </ng-template>
       <div class="panel-body">
@@ -222,7 +168,7 @@
   </div>
 
   <div class="panel panel--komu-setting" *ngIf="komuSetting">
-    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.komuSetting">
+    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.komu">
       <ng-template pTemplate="header">
         <div class="d-flex align-items-center">
           <span class="panel-title">
@@ -291,31 +237,21 @@
   <div class="panel panel--lms-setting" *ngIf="lmsSetting">
     <p-panel
       [toggleable]="true"
-      [(collapsed)]="isPanelCollapse.lmsSetting"
+      [(collapsed)]="isPanelCollapse.lms"
     >
     <ng-template pTemplate="header">
       <div class="d-flex align-items-center">
         <span class="panel-title">
           {{ "LMS Settings" | localize }}
         </span>
-        <div class="action d-flex flex-row"
-             *ngIf="!isPanelCollapse.lmsSetting">
-          <p-button icon="pi pi-sync "
-                    pTooltip="Check connection."
-                    class="mr-2"
-                    styleClass="p-button-sm ml-4"
-                    (onClick)="testLMSConnection()"></p-button>
-          <div *ngIf="!lmsResult?.message"
-               class="mt-1"><i class="pi pi-spin pi-spinner "></i>Is connecting ...
-          </div>
-          <div *ngIf="lmsResult?.isConnected"
-               class="text-success mt-1"><i class="pi pi-check mr-2 "></i> Connected</div>
-          <div class=" mt-1"
-               *ngIf="lmsResult?.isConnected == false"
-               class="text-danger mt-1"
-               [pTooltip]="lmsResult?.message"><i class="pi pi-times fa-x mr-2"></i>Fail connected</div>
 
-        </div>
+        <ng-container *ngIf="!isPanelCollapse.lms">
+          <ng-container *ngTemplateOutlet="connectStatus; context: {
+            message: lmsResult?.message,
+            connected: lmsResult?.isConnected,
+            section: SECTION_TYPE.LMS
+          }"></ng-container>
+        </ng-container>
       </div>
     </ng-template>
       <div class="panel-body">
@@ -367,41 +303,18 @@
   <div class="panel panel--talent-setting" *ngIf="talentSecretCode">
     <p-panel
       [toggleable]="true"
-      [(collapsed)]="isPanelCollapse.talentSecretCode"
+      [(collapsed)]="isPanelCollapse.talent"
     >
       <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <span class="panel-title">
             {{ "Talent Setting" | localize }}
           </span>
-          <div class="action" *ngIf="!isPanelCollapse.talentSecretCode">
-            <p-button
-              *ngIf="
-                !isEditing.talent &&
-                isGranted(PS.Pages_Configurations_EditTalentSecretCode)
-              "
-              icon="fas fa-edit"
-              title="Edit"
-              styleClass="p-button-sm ml-4"
-              (onClick)="toggleEditing(SETTING_TYPE.TALENT)"
-            ></p-button>
 
-            <p-button
-              *ngIf="isEditing.talent"
-              icon="pi pi-check"
-              title="Save"
-              styleClass="p-button-sm ml-3"
-              (onClick)="saveTalentSecretCode()"
-            ></p-button>
-
-            <p-button
-              *ngIf="isEditing.talent"
-              icon="pi pi-times"
-              title="Cancel Edit"
-              styleClass="p-button-sm p-button-secondary ml-3"
-              (click)="cancelEditing(SETTING_TYPE.TALENT)"
-            ></p-button>
-          </div>
+          <ng-container *ngTemplateOutlet="editAction; context: {
+            type: SETTING_TYPE.TALENT,
+            hasPermission: isGranted(PS.Pages_Configurations_EditTalentSecretCode)
+          }"></ng-container>
         </div>
       </ng-template>
 
@@ -426,21 +339,13 @@
   <div class="panel panel--hrm-setting" *ngIf="talentContestUrl">
     <p-panel
       [toggleable]="true"
-      [(collapsed)]="isPanelCollapse.talentContestUrl"
+      [(collapsed)]="isPanelCollapse.contest"
     >
     <ng-template pTemplate="header">
       <div class="d-flex align-items-center">
         <span class="panel-title">
           {{ "Contest Setting" | localize }}
         </span>
-        <div class="action d-flex justify-content-around"
-             *ngIf="!isPanelCollapse.talentContestUrl">
-          <p-button class="mr-2"
-                    icon="pi pi-sync"
-                    pTooltip="Check connection."
-                    styleClass="p-button-sm ml-4"
-                    (onClick)="testHRMConnection()"></p-button>
-        </div>
       </div>
     </ng-template>
       <div class="panel-body">
@@ -463,14 +368,14 @@
   </div>
 
   <div class="panel panel--hrm-setting" *ngIf="autoBotSettings">
-    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.autoBotSetting">
+    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.autoBot">
       <ng-template pTemplate="header">
         <div class="d-flex align-items-center">
           <span class="panel-title">
             {{ "AutoBot Setting" | localize }}
           </span>
 
-          <ng-container *ngIf="!isPanelCollapse.autoBotSetting">
+          <ng-container *ngIf="!isPanelCollapse.autoBot">
             <ng-container *ngTemplateOutlet="connectStatus; context: {
               message: autoBotConnectionStatus?.message,
               connected: autoBotConnectionStatus?.isConnected,
@@ -515,40 +420,17 @@
 
 <section class="content setting-grid">
   <div class="panel panel--email-setting" *ngIf="emailSetting">
-    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.emailSetting">
+    <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.email">
       <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <span class="panel-title">
             {{ "Email Setting" | localize }}
           </span>
-          <div class="action" *ngIf="!isPanelCollapse.emailSetting">
-            <p-button
-              *ngIf="
-                !isEditing.email &&
-                isGranted(PS.Pages_Configurations_EditEmailSettings)
-              "
-              icon="fas fa-edit"
-              title="Edit"
-              styleClass="p-button-sm ml-4"
-              (onClick)="toggleEditing(SETTING_TYPE.EMAIL)"
-            ></p-button>
 
-            <p-button
-              *ngIf="isEditing.email"
-              icon="pi pi-check"
-              title="Save"
-              styleClass="p-button-sm ml-3"
-              (onClick)="saveEmailSetting()"
-            ></p-button>
-
-            <p-button
-              *ngIf="isEditing.email"
-              icon="pi pi-times"
-              title="Cancel Edit"
-              styleClass="p-button-sm p-button-secondary ml-3"
-              (click)="cancelEditing(SETTING_TYPE.EMAIL)"
-            ></p-button>
-          </div>
+          <ng-container *ngTemplateOutlet="editAction; context: {
+            type: SETTING_TYPE.EMAIL,
+            hasPermission: isGranted(PS.Pages_Configurations_EditEmailSettings)
+          }"></ng-container>
         </div>
       </ng-template>
 
@@ -673,35 +555,15 @@
   <div class="panel panel--notify-interviewer-setting" *ngIf="noticeTimerInterviewer">
     <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.noticeTimerInterviewer">
       <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <span class="panel-title">
             {{ "Notify Discord Interview Settings" | localize }}
           </span>
-          <div class="action" *ngIf="!isPanelCollapse.noticeTimerInterviewer">
-            <p-button
-              *ngIf="!isEditing.notifyinterviewer && isGranted(PS.Pages_Configurations_EditTalentNotifyInterviewSettings)"
-              icon="fas fa-edit"
-              title="Edit"
-              styleClass="p-button-sm ml-4"
-              (onClick)="toggleEditing(SETTING_TYPE.NOTIFYINTERVIEWER)">
-            </p-button>
 
-            <p-button
-              *ngIf="isEditing.notifyinterviewer"
-              icon="pi pi-check"
-              title="Save"
-              styleClass="p-button-sm ml-3"
-              (onClick)="saveNotifyInterviewerChannelId()">
-            </p-button>
-
-            <p-button
-              *ngIf="isEditing.notifyinterviewer"
-              icon="pi pi-times"
-              title="Cancel Edit"
-              styleClass="p-button-sm p-button-secondary ml-3"
-              (click)="cancelEditing(SETTING_TYPE.NOTIFYINTERVIEWER)">
-            </p-button>
-          </div>
+          <ng-container *ngTemplateOutlet="editAction; context: {
+            type: SETTING_TYPE.NOTIFY_TIMER_INTERVIEWER,
+            hasPermission: isGranted(PS.Pages_Configurations_EditTalentNotifyInterviewSettings)
+          }"></ng-container>
         </div>
       </ng-template>
 
@@ -719,7 +581,7 @@
               pInputText
               class="w-75 p-0"
               [(ngModel)]="noticeTimerInterviewer.noticeInterviewStartAtHour"
-              [readonly]="!isEditing.notifyinterviewer"
+              [readonly]="!isEditing.noticeTimerInterviewer"
             />
             <span>o'clock</span>
           </div>
@@ -735,7 +597,7 @@
               pInputText
               class="w-75 p-0"
               [(ngModel)]="noticeTimerInterviewer.noticeInterviewEndAtHour"
-              [readonly]="!isEditing.notifyinterviewer"
+              [readonly]="!isEditing.noticeTimerInterviewer"
             />
             <span>o'clock</span>
           </div>
@@ -749,7 +611,7 @@
               pInputText
               class="w-75 p-0"
               [(ngModel)]="noticeTimerInterviewer.noticeInterviewMinutes"
-              [readonly]="!isEditing.notifyinterviewer"
+              [readonly]="!isEditing.noticeTimerInterviewer"
             />
             <span>minutes</span>
           </div>
@@ -763,7 +625,7 @@
               pInputText
               class="w-75 p-0"
               [(ngModel)]="noticeTimerInterviewer.noticeInterviewResultMinutes"
-              [readonly]="!isEditing.notifyinterviewer"
+              [readonly]="!isEditing.noticeTimerInterviewer"
             />
             <span>minutes</span>
           </div>
@@ -776,7 +638,7 @@
                 name="toUser"
                 value="false"
                 [(ngModel)]="noticeTimerInterviewer.isToChannel"
-                [disabled]="!isEditing.notifyinterviewer">
+                [disabled]="!isEditing.noticeTimerInterviewer">
               </p-radioButton>
               <label for="toUser">&nbsp;User</label>
             </div>
@@ -785,7 +647,7 @@
                 name="toChannel"
                 value="true"
                 [(ngModel)]="noticeTimerInterviewer.isToChannel"
-                [disabled]="!isEditing.notifyinterviewer">
+                [disabled]="!isEditing.noticeTimerInterviewer">
               </p-radioButton>
               <label for="toChannel">&nbsp;Channel</label>
             </div>
@@ -799,7 +661,7 @@
             pInputText
             class="w-75 p-0"
             [(ngModel)]="noticeTimerInterviewer.scheduleChannel"
-            [readonly]="!isEditing.notifyinterviewer"
+            [readonly]="!isEditing.noticeTimerInterviewer"
           />
           <label for="tlChannelResultId" class="label-title">
             {{ "Interviewing RESULT channel ID " | localize }}
@@ -810,18 +672,7 @@
             pInputText
             class="w-75 p-0"
             [(ngModel)]="noticeTimerInterviewer.resultChannel"
-            [readonly]="!isEditing.notifyinterviewer"
-          />
-          <label for="tlGeneralChannelId" class="label-title">
-            {{ "Talent General Channel ID " | localize }}
-          </label>
-          <input
-            type="text"
-            id="tlGeneralChannelId"
-            pInputText
-            class="w-75 p-0"
-            [(ngModel)]="noticeTimerInterviewer.talentGeneralChannel"
-            [readonly]="!isEditing.notifyinterviewer"
+            [readonly]="!isEditing.noticeTimerInterviewer"
           />
         </div>
       </div>
@@ -831,35 +682,15 @@
   <div class="panel panel--notify-interviewer-setting" *ngIf="notifyCVAutomation">
     <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.notifyCVAutomation">
       <ng-template pTemplate="header">
-        <div class="d-flex align-items-center">
-          <span class="panel-title">
+        <div class="d-flex align-items-center justify-content-between w-100">
+          <span class="panel-title" tooltip="Notify Discord CV Automation Settings">
             {{ "Notify Discord CV Automation Settings" | localize }}
           </span>
-          <div class="action" *ngIf="!isPanelCollapse.notifyCVAutomation">
-            <p-button
-              *ngIf="!isEditing.notifyCVAutomation && isGranted(PS.Pages_Configurations_EditTalentNotifyCVAutomationSettings)"
-              icon="fas fa-edit"
-              title="Edit"
-              styleClass="p-button-sm ml-4"
-              (onClick)="toggleEditing(SETTING_TYPE.NOTIFY_CV_AUTOMATION)">
-            </p-button>
 
-            <p-button
-              *ngIf="isEditing.notifyCVAutomation"
-              icon="pi pi-check"
-              title="Save"
-              styleClass="p-button-sm ml-3"
-              (onClick)="saveNotifyDiscordCVAutomationSettings()">
-            </p-button>
-
-            <p-button
-              *ngIf="isEditing.notifyCVAutomation"
-              icon="pi pi-times"
-              title="Cancel Edit"
-              styleClass="p-button-sm p-button-secondary ml-3"
-              (click)="cancelEditing(SETTING_TYPE.NOTIFY_CV_AUTOMATION)">
-            </p-button>
-          </div>
+          <ng-container *ngTemplateOutlet="editAction; context: {
+            type: SETTING_TYPE.NOTIFY_CV_AUTOMATION,
+            hasPermission: isGranted(PS.Pages_Configurations_EditTalentNotifyCVAutomationSettings)
+          }"></ng-container>
         </div>
       </ng-template>
 
@@ -922,7 +753,6 @@
             <input
               type="number"
               min="0"
-              max="23"
               id="CVAutomationRepeatTime"
               pInputText
               class="w-75 p-0"
@@ -992,37 +822,51 @@
 </section>
 
 <ng-template #connectStatus let-message="message" let-connected="connected" let-section="section">
-  <div class="action d-flex flex-row align-items-center">
-    <p-button
-      icon="pi pi-sync"
-      pTooltip="Check connection."
-      class="mr-2"
-      styleClass="p-button-sm ml-4"
-      (onClick)="testConnection(section)">
-    </p-button>
+  <div class="d-flex flex-row align-items-center ml-3">
+    <p-chip [styleClass]="getChipStyleClass(connected, message)">
+      <i
+        class="fas fa-sync-alt pointer"
+        alt="Check connect"
+        [ngClass]="{'fa-spin': !message}"
+        (click)="testConnection(section)">
+      </i>
+      <div class="white-space-nowrap" [tooltip]="message">
+        {{ getStatusText(connected, message) }}
+      </div>
+    </p-chip>
+  </div>
+</ng-template>
 
-    <ng-container *ngIf="message; else connectingStatus">
-      <ng-container *ngIf="connected; else connectFail">
-        <div class="text-success">
-          <i class="pi pi-check mr-2"></i>Connected
-        </div>
-      </ng-container>
+<ng-template #editAction let-type="type" let-hasPermission="hasPermission">
+  <div class="d-flex" *ngIf="!isPanelCollapse[type]">
+    <button
+      *ngIf="!isEditing[type] && hasPermission"
+      pButton
+      pRipple
+      type="button"
+      icon="fas fa-edit"
+      class="p-button-rounded p-button-plain p-button-text"
+      (click)="toggleEditing(type)">
+    </button>
+
+    <ng-container *ngIf="isEditing[type]">
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="fas fa-save"
+        class="p-button-rounded p-button-plain p-button-text"
+        (click)="handleSaveSetting(type)">
+      </button>
+
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="fas fa-times"
+        class="p-button-rounded p-button-plain p-button-text"
+        (click)="cancelEditing(type)">
+      </button>
     </ng-container>
-
-    <ng-template #connectingStatus>
-      <div>
-        <i class="pi pi-spin pi-spinner mr-2"></i>Is connecting...
-      </div>
-    </ng-template>
-
-    <ng-template #connectFail>
-      <div
-        class="text-danger"
-        [pTooltip]="message"
-      >
-        <i class="pi pi-times fa-x mr-2"></i>Fail connected
-      </div>
-    </ng-template>
-
   </div>
 </ng-template>

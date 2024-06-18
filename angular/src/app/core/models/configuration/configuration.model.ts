@@ -58,7 +58,6 @@ export class NoticeInterviewSettingDto {
   isToChannel: string;
   scheduleChannel: string;
   resultChannel: string;
-  talentGeneralChannel: string;
 }
 
 export class GetResultConnectDto{
@@ -67,7 +66,7 @@ export class GetResultConnectDto{
 }
 
 export interface INoticeCVAutomationDto {
-  enabled: boolean;
+  enabled: boolean | string;
   noticeStartAtHour: string;
   noticeEndAtHour: string;
   repeatTimeInMinutes: string;
