@@ -40,7 +40,8 @@ namespace TalentV2.BackgroundWorker
             InternResult = new AutomationResult();
             StaffResult = new AutomationResult();
 
-            Timer.Period = 1000 * 60 * 5; // repeat each 5 minutes
+            int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out int repeatTimeInMinutes);
+            Timer.Period = 1000 * 60 * repeatTimeInMinutes;
         }
 
         [UnitOfWork]
@@ -78,8 +79,8 @@ namespace TalentV2.BackgroundWorker
         {
             DateTime now = DateTimeUtils.GetNow();
             int startAtHour, endAtHour;
-            var canStart = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeInterviewStartAtHour), out startAtHour);
-            var canEnd = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeInterviewEndAtHour), out endAtHour);
+            var canStart = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeStartAtHour), out startAtHour);
+            var canEnd = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeEndAtHour), out endAtHour);
 
             if ((canStart && canEnd) == false)
             {
