@@ -8,7 +8,7 @@
               {{ headerCurrentReq }}</a>
             <div>
               <p-button *ngIf="
-                  validPermissionUserType( 
+                  validPermissionUserType(
                     userType,
                     PS.Pages_CandidateIntern_ViewDetail_RequestCV_Create,
                     PS.Pages_CandidateStaff_ViewDetail_RequestCV_Create
@@ -289,12 +289,12 @@
                 <span for="interviewLevel" class="interview-level lb-item mr-3">
                   {{ "Interviewer suggest level: " | localize }}
                 </span>
-                <div class="input-item itv-level mr-3" *ngIf="userType !== USER_TYPE.INTERN">
+                <div class="input-item itv-level mr-3" *ngIf="userType === USER_TYPE.STAFF">
                   <p-dropdown inputId="itvLevel" [options]="catStaffLevels" formControlName="interviewLevel"
                     placeholder="Select level" optionLabel="standardName" optionValue="id"
                     styleClass="w-100"></p-dropdown>
                 </div>
-                <div class="input-item itv-level mr-3" *ngIf="userType !== USER_TYPE.STAFF">
+                <div class="input-item itv-level mr-3" *ngIf="userType === USER_TYPE.INTERN">
                   <p-dropdown inputId="itvLevel" [options]="catInternLevels" formControlName="interviewLevel"
                     placeholder="Select level" optionLabel="standardName" optionValue="id"
                     styleClass="w-100"></p-dropdown>
@@ -348,7 +348,7 @@
             " label="{{ 'Edit Results' | localize }}" icon="pi pi-pencil"
               styleClass="p-button-sm p-button-secondary mr-4" (onClick)="onEditAllCapability()"></p-button>
             <p-button *ngIf="
-            !isEditingFactors && isGrantedEditFactor() && !isEditingAll 
+            !isEditingFactors && isGrantedEditFactor() && !isEditingAll
           " label="{{ 'Edit Factors' | localize }}" icon="pi pi-pencil" styleClass="p-button-sm p-button-primary mr-4"
               (onClick)="onEditFactors()"></p-button>
             <p-button *ngIf="isEditingAll" label="{{ 'Cancel Editing' | localize }}" icon="pi pi-times"
@@ -437,7 +437,7 @@
                       (onClick)="saveCapability(item)"></p-button>
 
                     <p-button *ngIf="
-                        !editing && !isEditingFactors && 
+                        !editing && !isEditingFactors &&
                         validPermissionUserType(
                           userType,
                           PS.Pages_CandidateIntern_ViewDetail_RequestCV_EditCapability,
@@ -656,7 +656,7 @@
                   <div class="mb-3">
                     <div class="d-flex">
                     <span class="mt-2 mr-2" for="lmsEditor"> {{ "Create" | localize }}</span>
-                    <div class="w-50" 
+                    <div class="w-50"
                       *ngIf="
                         candidateRequisiton?.applicationResult.status ===
                           REQUEST_CV_STATUS.ScheduledTest &&
@@ -664,9 +664,9 @@
                           userType,
                           PS.Pages_CandidateIntern_ViewDetail_RequestCV_CreateAccountLMS,
                           PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS)">
-                        <p-dropdown 
-                         formControlName="createAccout"
-                         [options]="createAccout"
+                        <p-dropdown
+                         formControlName="createAccount"
+                         [options]="createAccountOption"
                          placeholder="All"
                          optionLabel="name"
                          optionValue="id"

@@ -1,5 +1,4 @@
 ﻿using Abp.Configuration;
-using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
 namespace TalentV2.Configuration
@@ -61,12 +60,6 @@ namespace TalentV2.Configuration
                     _defaultValue.TalentContestUrl,
                     scopes:SettingScopes.Application| SettingScopes.Tenant
                 ),
-                new SettingDefinition
-                (
-                    AppSettingNames.NoticeCVCreatedToHR,
-                    _defaultValue.NoticeCVCreatedToHR,
-                    scopes:SettingScopes.Application| SettingScopes.Tenant
-                ),
                 #endregion 
 
                 #region NotifyInterViewing
@@ -96,11 +89,6 @@ namespace TalentV2.Configuration
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                 ),
                 new SettingDefinition(
-                    AppSettingNames.NoticeTalentGeneralChannel,
-                    _defaultValue.NoticeTalentGeneralChannel,
-                    scopes:SettingScopes.Application | SettingScopes.Tenant
-                ),
-                new SettingDefinition(
                     AppSettingNames.NoticeInterviewScheduleChannel,
                     _defaultValue.NoticeInterviewScheduleChannel,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
@@ -110,6 +98,44 @@ namespace TalentV2.Configuration
                     _defaultValue.NoticeInterviewResultChannel,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                 ),
+                #endregion
+
+                #region CVAutomationSettings
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationEnabled,
+                    _defaultValue.CVAutomationEnabled,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationRepeatTimeInMinutes,
+                    _defaultValue.CVAutomationRepeatTimeInMinutes,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationNoticeStartAtHour,
+                    _defaultValue.CVAutomationNoticeStartAtHour,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationNoticeEndAtHour,
+                    _defaultValue.CVAutomationNoticeEndAtHour,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationNoticeMode,
+                    _defaultValue.CVAutomationNoticeMode,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationNoticeChannelId,
+                    _defaultValue.CVAutomationNoticeChannelId,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationNotifyToUser,
+                    _defaultValue.CVAutomationNotifyToUser,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
                 #endregion
 
                 #region Internal Tools

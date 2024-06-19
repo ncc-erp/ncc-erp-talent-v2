@@ -1,4 +1,5 @@
-﻿using Abp.Dependency;
+﻿using Abp.Configuration;
+using Abp.Dependency;
 using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Threading;
@@ -31,7 +32,8 @@ namespace TalentV2.BackgroundWorker
             AbpTimer timer,
             KomuService komuService,
             ICVAutomationManager cvAutomationService,
-            IConfiguration configuration) : base(timer)
+            IConfiguration configuration,
+            ISettingManager settingManager) : base(timer)
         {
             _komuService = komuService;
             _cvAutomationService = cvAutomationService;
@@ -40,7 +42,14 @@ namespace TalentV2.BackgroundWorker
             InternResult = new AutomationResult();
             StaffResult = new AutomationResult();
 
-            Timer.Period = 1000 * 60 * 5; // repeat each 5 minutes
+            if (int.TryParse(settingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out var repeatTimeInMinutes))
+            {
+                Timer.Period = 1000 * 60 * repeatTimeInMinutes;
+            }
+            else
+            {
+                Timer.Period = 1000 * 60 * 60 * 24; // default repeat each 24 hour
+            }
         }
 
         [UnitOfWork]
@@ -48,13 +57,13 @@ namespace TalentV2.BackgroundWorker
         {
             Logger.Info("CrawlCVFromAWSWorker start");
             DateTime now = DateTimeUtils.GetNow();
-            if (now.DayOfWeek == DayOfWeek.Sunday)
+            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
             {
                 Logger.Info("Today is DayOff => stop");
                 return;
             }
 
-            AsyncHelper.RunSync(async () => 
+            AsyncHelper.RunSync(async () =>
             {
                 var internResult = await _cvAutomationService.AutoCreateInternCV();
                 if (internResult != null)
@@ -70,15 +79,16 @@ namespace TalentV2.BackgroundWorker
                 }
             });
 
-            PreNotify();
+            bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
+            if (enableNotify && (InternResult.Total > 0 || StaffResult.Total > 0)) PreNotify();
         }
 
         private void PreNotify()
         {
             DateTime now = DateTimeUtils.GetNow();
             int startAtHour, endAtHour;
-            var canStart = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeInterviewStartAtHour), out startAtHour);
-            var canEnd = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeInterviewEndAtHour), out endAtHour);
+            var canStart = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeStartAtHour), out startAtHour);
+            var canEnd = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeEndAtHour), out endAtHour);
 
             if ((canStart && canEnd) == false)
             {
@@ -89,41 +99,37 @@ namespace TalentV2.BackgroundWorker
             if (now.Hour.IsBetween(startAtHour, endAtHour))
             {
                 Logger.Info($"The current time is within the notification configuration period ({startAtHour} - {endAtHour}).");
-                if (InternResult.Success != 0 || StaffResult.Success != 0)
-                {
-                    Notify();
-                    InternResult.Success = StaffResult.Success = 0;
-                    InternResult.Total = StaffResult.Total = 0;
-                }
+                Notify();
+                InternResult.Success = StaffResult.Success = 0;
+                InternResult.Total = StaffResult.Total = 0;
             }
         }
 
         private void Notify()
         {
-            var isToChannel = SettingManager.GetSettingValueForApplication(AppSettingNames.IsNoticeInterviewViaChannel);
-            var talentGeneralChannelId = SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeTalentGeneralChannel);
-            var user = SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeCVCreatedToHR);
-            if (string.IsNullOrEmpty(user))
-            {
-                return;
-            }
-            var emails = user.Split(',').Select(x => x.Trim()).ToList();
-            if (emails.Count == 0)
-            {
-                return;
-            }
+            string notifyEmailsString = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNotifyToUser);
+            List<string> notifyEmailsList = string.IsNullOrEmpty(notifyEmailsString)
+                ? new List<string>()
+                : notifyEmailsString.Split(',').Select(x => x.Trim()).ToList();
 
-            if (isToChannel.ToLower().Equals(bool.TrueString.ToLower()))
+            string noticeMode = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeMode);
+            switch (noticeMode)
             {
-                _komuService.NotifyToChannel(BuildMessage(emails), talentGeneralChannelId);
-            }
-            else
-            {
-                var message = BuildMessage();
-                foreach (var email in emails)
-                {
-                    _komuService.SendMessageToUser(CommonUtils.GetUserNameByEmail(email), message);
-                }
+                case "Channel":
+                    string channelId = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeChannelId);
+                    string messageToChannel = BuildMessage(notifyEmailsList);
+                    _komuService.NotifyToChannel(messageToChannel, channelId);
+                    break;
+                case "User":
+                    string messageToUser = BuildMessage();
+                    var discordUsers = notifyEmailsList.Select(email => CommonUtils.GetUserNameByEmail(email));
+                    foreach (string discordUser in discordUsers)
+                    {
+                        _komuService.SendMessageToUser(discordUser, messageToUser);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 

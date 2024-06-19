@@ -1,11 +1,12 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
-import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentContestUrl } from '@app/core/models/configuration/configuration.model';
+import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentContestUrl, INoticeCVAutomationDto } from '@app/core/models/configuration/configuration.model';
 import { MESSAGE } from '@shared/AppConsts';
 import { DefaultRoute, ToastMessageType } from '@shared/AppEnums';
 import { NccAppComponentBase } from '@shared/ncc-component-base';
 import * as _ from 'lodash';
 import { ConfigurationService } from './../../../core/services/configrations/configuration.service';
+import { isValidEmail } from '@app/core/helpers/utils.helper';
 
 
 enum SETTING_TYPE {
@@ -15,8 +16,11 @@ enum SETTING_TYPE {
   EMAIL = 'email',
   GOOGLE_LOGIN = 'google',
   TALENT = 'talent',
-  NOTIFYINTERVIEWER = 'notifyinterviewer',
+  NOTIFY_TIMER_INTERVIEWER = 'noticeTimerInterviewer',
   CONTEST = 'contest',
+  NOTIFY_CV_AUTOMATION = 'notifyCVAutomation',
+  LMS = 'lms',
+  AUTO_BOT = 'autoBot'
 }
 
 enum SECTION_TYPE {
@@ -43,12 +47,14 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   talentSecretCode: TalentSecretCode;
   talentContestUrl: TalentContestUrl;
   noticeTimerInterviewer: NoticeInterviewSettingDto;
+  notifyCVAutomation: INoticeCVAutomationDto;
+
   autoBotSettings: ConfigurationSetting;
   public hrmResult: GetResultConnectDto = {} as GetResultConnectDto;
   public lmsResult: GetResultConnectDto = {} as GetResultConnectDto;
   public autoBotConnectionStatus: GetResultConnectDto = {} as GetResultConnectDto;
 
-  isEditing = {
+  public isEditing: Partial<Record<SETTING_TYPE, boolean>> = {
     komu: false,
     discordChanel: false,
     hrm: false,
@@ -56,33 +62,36 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     email: false,
     google: false,
     talent: false,
-    notifyinterviewer: false,
-    contest: false
+    noticeTimerInterviewer: false,
+    contest: false,
+    notifyCVAutomation: false,
   }
 
-  originalData = {
+  originalData: Partial<Record<SETTING_TYPE, any>> = {
     komu: null,
     discordChanel: null,
     hrm: null,
-    lms: null,
     email: null,
     google: null,
     talent: null,
-    notifyinterviewer: null,
-    contest: null
+    lms: null,
+    noticeTimerInterviewer: null,
+    contest: null,
+    notifyCVAutomation: null
   }
 
-  public isPanelCollapse = {
-    komuSetting: false,
+  public isPanelCollapse: Partial<Record<SETTING_TYPE, boolean>> = {
+    komu: false,
     discordChanel: false,
-    hrmSetting: false,
-    lmsSetting: false,
-    emailSetting: false,
-    googleClientAppSetting: false,
-    talentSecretCode: false,
-    talentContestUrl: false,
+    hrm: false,
+    lms: false,
+    email: false,
+    google: false,
+    talent: false,
+    contest: false,
     noticeTimerInterviewer: false,
-    autoBotSetting: false
+    autoBot: false,
+    notifyCVAutomation: false
   }
   constructor(
     injector: Injector,
@@ -117,10 +126,45 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
         return this.googleClientAppSetting = { ...this.originalData[settingType] };
       case SETTING_TYPE.TALENT:
         return this.talentSecretCode = { ...this.originalData[settingType] };
-      case SETTING_TYPE.NOTIFYINTERVIEWER:
+      case SETTING_TYPE.NOTIFY_TIMER_INTERVIEWER:
         return this.noticeTimerInterviewer = { ...this.originalData[settingType] };
       case SETTING_TYPE.CONTEST:
         return this.talentContestUrl = { ...this.originalData[settingType] };
+      case SETTING_TYPE.NOTIFY_CV_AUTOMATION:
+        return this.notifyCVAutomation = { ...this.originalData[settingType] };
+      default: return;
+    }
+  }
+
+  handleSaveSetting(settingType: SETTING_TYPE) {
+    switch (settingType) {
+      case SETTING_TYPE.KOMU:
+
+        return;
+      case SETTING_TYPE.DISCORD_CHANEL:
+        this.saveDisChanelSetting();
+        return;
+      case SETTING_TYPE.HRM:
+
+        return;
+      case SETTING_TYPE.EMAIL:
+        this.saveEmailSetting();
+        return;
+      case SETTING_TYPE.GOOGLE_LOGIN:
+        this.saveGoogleLoginSetting();
+        return;
+      case SETTING_TYPE.TALENT:
+        this.saveTalentSecretCode();
+        return;
+      case SETTING_TYPE.NOTIFY_TIMER_INTERVIEWER:
+        this.saveNotifyInterviewerChannelId();
+        return;
+      case SETTING_TYPE.CONTEST:
+
+        return;
+      case SETTING_TYPE.NOTIFY_CV_AUTOMATION:
+        this.saveNotifyDiscordCVAutomationSettings();
+        return;
       default: return;
     }
   }
@@ -207,22 +251,56 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
       this._configuration.setTimeNoticeInterviewer(this.noticeTimerInterviewer).subscribe(res => {
         this.isLoading = res.loading;
         if (res.success) {
-          this.originalData.notifyinterviewer = _.cloneDeep(res.result);
+          this.originalData.noticeTimerInterviewer = _.cloneDeep(res.result);
           this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Timer Notify Interviewer Saved!');
-          this.toggleEditing(SETTING_TYPE.NOTIFYINTERVIEWER);
+          this.toggleEditing(SETTING_TYPE.NOTIFY_TIMER_INTERVIEWER);
+        }
+      })
+    );
+  }
+
+  onCVAutomationListUserChange(listUser: string[]) {
+    const invalidEmail = listUser.some(user => !isValidEmail(user));
+    invalidEmail && this.showToastMessage(ToastMessageType.ERROR, MESSAGE.ERROR_EMAIL_FORMAT);
+    this.notifyCVAutomation.userList = listUser?.filter(user => isValidEmail(user));
+  }
+
+  saveNotifyDiscordCVAutomationSettings() {
+    this.subs.add(
+      this._configuration.setNotifyDiscordCVAutomationSettings(this.notifyCVAutomation).subscribe(res => {
+        this.isLoading = res.loading;
+        if (res.success) {
+          const rawData = this.mapCVAutomationDTOData(res.result);
+          this.originalData.notifyCVAutomation = _.cloneDeep(rawData);
+          this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Notify Discord CV Automation Settings Saved!');
+          this.toggleEditing(SETTING_TYPE.NOTIFY_CV_AUTOMATION);
         }
       })
     );
   }
 
   testConnection(type: SECTION_TYPE) {
-    switch (type) {
-      case SECTION_TYPE.HRM:
-        this.testHRMConnection()
-      case SECTION_TYPE.LMS:
-        this.testLMSConnection()
-      case SECTION_TYPE.AUTOBOT:
-        this.testAutoBotConnection()
+    const typeMapping = {
+      [SECTION_TYPE.HRM]: {
+        data: this.hrmResult,
+        function: () => this.testHRMConnection()
+      },
+      [SECTION_TYPE.LMS]: {
+        data: this.lmsResult,
+        function: () => this.testLMSConnection()
+      },
+      [SECTION_TYPE.AUTOBOT]: {
+        data: this.autoBotConnectionStatus,
+        function: () => this.testAutoBotConnection()
+      }
+    };
+
+    if (type in typeMapping) {
+      typeMapping[type].data.message = null;
+
+      setTimeout(() => {
+        typeMapping[type].function();
+      }, 1000);
     }
   }
 
@@ -276,6 +354,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     this.getNotifyInterViewerTimerSetting();
     this.getContestUrl();
     this.getAutoBotSettings();
+    this.getNotifyDiscordCVAutomationSettings();
   }
 
   private getAutoBotSettings() {
@@ -406,9 +485,43 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
         this.isLoading = res.loading;
         if (res.success) {
           this.noticeTimerInterviewer = res.result;
-          this.originalData.notifyinterviewer = _.cloneDeep(res.result);
+          this.originalData.noticeTimerInterviewer = _.cloneDeep(res.result);
         }
       })
     );
+  }
+
+  private getNotifyDiscordCVAutomationSettings() {
+    if (!this.isGranted(this.PS.Pages_Configurations_ViewTalentNotifyCVAutomationSettings)) return;
+
+    this.subs.add(
+      this._configuration.getNotifyDiscordCVAutomationSettings().subscribe(res => {
+        this.isLoading = res.loading;
+        if (res.success) {
+          const rawData = this.mapCVAutomationDTOData(res.result);
+          this.notifyCVAutomation = rawData;
+          this.originalData.notifyCVAutomation = _.cloneDeep(rawData);
+        }
+      })
+    );
+  }
+
+  mapCVAutomationDTOData(data: INoticeCVAutomationDto): INoticeCVAutomationDto{
+    return {
+      ...data,
+      enabled:  data?.enabled === 'true',
+      userList: data?.notifyToUser?.split(', ') || []
+    }
+  }
+
+  getChipStyleClass(connected: boolean, message: string): string {
+    let baseClass = 'configuration-chip';
+    baseClass += message ? connected ? ' success' : ' failed' : ' disabled';
+    return baseClass;
+  }
+
+  getStatusText(connected: boolean, message: string): string {
+    if (!message) return 'Connecting...';
+    return connected ? 'Connected' : 'Failed to connect';
   }
 }

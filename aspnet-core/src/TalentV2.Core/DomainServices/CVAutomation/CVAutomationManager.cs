@@ -192,7 +192,7 @@ namespace TalentV2.DomainServices.CVAutomation
                 cv.IsFemale = true;
             }
 
-            var user = SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeCVCreatedToHR);
+            var user = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNotifyToUser);
             if (!string.IsNullOrEmpty(user))
             {
                 var email = user.Split(',').Select(x => x.Trim()).FirstOrDefault();
