@@ -40,8 +40,14 @@ namespace TalentV2.BackgroundWorker
             InternResult = new AutomationResult();
             StaffResult = new AutomationResult();
 
-            int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out int repeatTimeInMinutes);
-            Timer.Period = 1000 * 60 * repeatTimeInMinutes;
+            if (int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out var repeatTimeInMinutes))
+            {
+                Timer.Period = 1000 * 60 * repeatTimeInMinutes;
+            }
+            else
+            {
+                Timer.Period = 1000 * 60 * 60 * 24; // default repeat each 24 hour
+            }
         }
 
         [UnitOfWork]
@@ -49,7 +55,7 @@ namespace TalentV2.BackgroundWorker
         {
             Logger.Info("CrawlCVFromAWSWorker start");
             DateTime now = DateTimeUtils.GetNow();
-            if (now.DayOfWeek == DayOfWeek.Sunday)
+            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
             {
                 Logger.Info("Today is DayOff => stop");
                 return;
