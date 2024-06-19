@@ -1,4 +1,5 @@
-﻿using Abp.Dependency;
+﻿using Abp.Configuration;
+using Abp.Dependency;
 using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Threading;
@@ -31,7 +32,8 @@ namespace TalentV2.BackgroundWorker
             AbpTimer timer,
             KomuService komuService,
             ICVAutomationManager cvAutomationService,
-            IConfiguration configuration) : base(timer)
+            IConfiguration configuration,
+            ISettingManager settingManager) : base(timer)
         {
             _komuService = komuService;
             _cvAutomationService = cvAutomationService;
@@ -40,7 +42,7 @@ namespace TalentV2.BackgroundWorker
             InternResult = new AutomationResult();
             StaffResult = new AutomationResult();
 
-            if (int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out var repeatTimeInMinutes))
+            if (int.TryParse(settingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out var repeatTimeInMinutes))
             {
                 Timer.Period = 1000 * 60 * repeatTimeInMinutes;
             }
