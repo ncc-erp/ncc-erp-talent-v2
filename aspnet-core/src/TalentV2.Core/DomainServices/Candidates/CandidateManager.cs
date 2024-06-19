@@ -1349,7 +1349,7 @@ namespace TalentV2.DomainServices.Candidates
             var candidatesResult = exportCandidates
                 .Select((u, index) => new CandidateReport
                 {
-                    No = index++,
+                    No = 1 + index++,
                     Name = u.FullName,
                     Phone = u.Phone,
                     Email = u.Email,
@@ -1388,7 +1388,7 @@ namespace TalentV2.DomainServices.Candidates
                 })
                 .Select((u, index) => new InterviewReport
                 {
-                    No = index++,
+                    No = 1 + index++,
                     Name = u.FullName,
                     Email = u.Email,
                     Branch = u.BranchName,
