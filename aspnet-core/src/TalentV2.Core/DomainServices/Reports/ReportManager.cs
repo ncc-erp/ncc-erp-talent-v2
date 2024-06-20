@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Abp.Collections.Extensions;
+using Abp.Linq.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml;
+using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.Style;
+using OfficeOpenXml.Table;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,19 +13,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
+using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Reports.Dtos;
 using TalentV2.Entities;
 using TalentV2.Utils;
-using OfficeOpenXml.Style;
-using OfficeOpenXml.Table;
-using Abp.Authorization.Users;
-using TalentV2.DomainServices.Candidates.Dtos;
 
 namespace TalentV2.DomainServices.Reports
 {
     public class ReportManager : BaseManager, IReportManager
     {
-        public ReportManager() { }
         public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId, long? userId)
         {
             var fromDate = fd.Date;
@@ -108,6 +108,167 @@ namespace TalentV2.DomainServices.Reports
 
             return overviewHiring;
         }
+
+        public async Task<List<RecruitmentOverviewResponseDto>> GetRecruitmentOverview(RecruitmentOverviewRequestDto request)
+        {
+            var fromDate = request.FromDate.Date;
+            var toDate = request.ToDate.Date;
+
+            var recruitmentOverviewResult = new List<RecruitmentOverviewResponseDto>();
+            if (request.IsGetAllBranch)
+            {
+                var allBranchHasCVReport = await IQGetRecruitmentOverviewByCVs(fromDate, toDate, request.UserType, null, request.UserId).ToListAsync();
+                var allBranchRequestReport = await IQGetRecruitmentOverviewByRequests(fromDate, toDate, request.UserType, null, request.UserId).ToListAsync();
+                recruitmentOverviewResult.AddRange(AddRequestHasNotCVToRecruitmentOverviewResult(allBranchRequestReport, allBranchHasCVReport));
+            }
+            if (request.BranchIds != null && request.BranchIds.Any())
+            {
+                var detailBranchHasCVReport = await IQGetRecruitmentOverviewByCVs(fromDate, toDate, request.UserType, request.BranchIds, request.UserId).ToListAsync();
+                var detailBranchRequestReport = await IQGetRecruitmentOverviewByRequests(fromDate, toDate, request.UserType, request.BranchIds, request.UserId).ToListAsync();
+                recruitmentOverviewResult.AddRange(AddRequestHasNotCVToRecruitmentOverviewResult(detailBranchRequestReport, detailBranchHasCVReport));
+            }
+
+            return recruitmentOverviewResult;
+        }
+
+        private List<RecruitmentOverviewResponseDto> AddRequestHasNotCVToRecruitmentOverviewResult(List<RecruitmentOverviewResponseDto> requests, List<RecruitmentOverviewResponseDto> result)
+        {
+            foreach (var request in requests)
+            {
+                var existPosition = result
+                    .Where(branch => branch.BranchId == request.BranchId)
+                    .Select(branch => branch.SubPositionStatistics)
+                    .FirstOrDefault();
+                var existPositionIds = existPosition.Select(position => position.SubPositionId);
+                foreach (var requestPosition in request.SubPositionStatistics)
+                {
+                    if (!existPositionIds.Contains(requestPosition.SubPositionId))
+                    {
+                        existPosition.Add(requestPosition);
+                    }
+                }
+            }
+            return result;
+        }
+
+        private IQueryable<RecruitmentOverviewResponseDto> IQGetRecruitmentOverviewByCVs(DateTime fromDate, DateTime toDate, UserType? userType, List<long> branchIds, long? userId)
+        {
+            bool isGetDetailBranch = branchIds != null && branchIds.Any();
+            return WorkScope.GetAll<CV>()
+                .Where(cv => cv.LastModificationTime >= fromDate && cv.LastModificationTime < toDate.AddDays(1) && !cv.IsDeleted)
+                .WhereIf(userType.HasValue, cv => cv.UserType.Equals(userType))
+                .WhereIf(isGetDetailBranch, cv => branchIds.Contains(cv.BranchId))
+                .WhereIf(userId.HasValue, cv => cv.CreatorUserId.Equals(userId))
+                .GroupBy(cv => isGetDetailBranch ? cv.BranchId : 0)
+                .Select(branchGroup => new RecruitmentOverviewResponseDto
+                {
+                    BranchId = isGetDetailBranch ? branchGroup.Key : null,
+                    BranchName = isGetDetailBranch ? branchGroup.Select(cv => cv.Branch.Name).FirstOrDefault() : "All Company",
+                    SubPositionStatistics = branchGroup.GroupBy(cv => cv.SubPositionId).Select(positionGroup => new SubPositionStatisticV2
+                    {
+                        SubPositionId = positionGroup.Key,
+                        SubPositionName = positionGroup.Select(cv => cv.SubPosition.Name).FirstOrDefault(),
+                        RequestQuantity = IQGetRequests(fromDate, toDate, userType, branchIds, userId)
+                        .Where(request => request.SubPositionId == positionGroup.Key && (isGetDetailBranch ? request.BranchId.Equals(branchGroup.Key) : true))
+                        .Select(request => request.Quantity)
+                        .Sum(),
+                        ApplyQuantity = positionGroup.Count(),
+                        CVStatusStatistics = positionGroup.GroupBy(cv => cv.CVStatus).Select(CVStatusGroup => new CVStatusStatistic
+                        {
+                            Id = CVStatusGroup.Key,
+                            Name = CVStatusGroup.Key.ToString(),
+                            Quantity = CVStatusGroup.Count()
+                        }).ToList(),
+                        CVSourceStatistics = positionGroup.GroupBy(cv => cv.CVSourceId).Select(CVSourceGroup => new CVSourceStatisticV2
+                        {
+                            Id = CVSourceGroup.Key,
+                            Name = CVSourceGroup.Select(cv => cv.CVSource.Name).FirstOrDefault(),
+                            Quantity = CVSourceGroup.Count()
+                        }).ToList(),
+                        CandidateStatusStatistics = positionGroup
+                        .Select(cv => cv.RequestCVs.Where(requestCV => !requestCV.IsDeleted).OrderByDescending(requestCV => requestCV.LastModificationTime).FirstOrDefault())
+                        .GroupBy(requestCV => requestCV.Status)
+                        .Select(requestCVStatusGroup => new RequestCVStatusStatistic
+                        {
+                            Id = requestCVStatusGroup.Key,
+                            Name = requestCVStatusGroup.Key.ToString(),
+                            Quantity = requestCVStatusGroup.Count()
+                        }).ToList(),
+                    }).ToList(),
+                    Total = new TotalStatistics
+                    {
+                        RequestQuantity = IQGetRequests(fromDate, toDate, userType, branchIds, userId)
+                        .Where(request => isGetDetailBranch ? request.BranchId.Equals(branchGroup.Key) : true)
+                        .Select(request => request.Quantity)
+                        .Sum(),
+                        ApplyQuantity = branchGroup.Count(),
+                        CVStatusStatistics = branchGroup.GroupBy(cv => cv.CVStatus).Select(CVStatusGroup => new CVStatusStatistic
+                        {
+                            Id = CVStatusGroup.Key,
+                            Name = CVStatusGroup.Key.ToString(),
+                            Quantity = CVStatusGroup.Count()
+                        }).ToList(),
+                        CVSourceStatistics = branchGroup.GroupBy(cv => cv.CVSourceId).Select(CVSourceGroup => new CVSourceStatisticV2
+                        {
+                            Id = CVSourceGroup.Key,
+                            Name = CVSourceGroup.Select(cv => cv.CVSource.Name).FirstOrDefault(),
+                            Quantity = CVSourceGroup.Count()
+                        }).ToList(),
+                        CandidateStatusStatistics = branchGroup
+                        .Select(cv => cv.RequestCVs.Where(requestCV => !requestCV.IsDeleted).OrderByDescending(requestCV => requestCV.LastModificationTime).FirstOrDefault())
+                        .GroupBy(requestCV => requestCV.Status)
+                        .Select(requestCVGroup => new RequestCVStatusStatistic
+                        {
+                            Id = requestCVGroup.Key,
+                            Name = requestCVGroup.Key.ToString(),
+                            Quantity = requestCVGroup.Count()
+                        }).ToList(),
+                    }
+                });
+        }
+
+        private IQueryable<RequestStatistic> IQGetRequests(DateTime fromDate, DateTime toDate, UserType? userType, List<long> branchIds, long? userId)
+        {
+            bool isGetDetailBranch = branchIds != null && branchIds.Any();
+            return WorkScope.GetAll<Request>()
+                .Where(request => request.CreationTime >= fromDate && request.CreationTime < toDate.AddDays(1) && !request.IsDeleted)
+                .WhereIf(userType.HasValue, request => request.UserType.Equals(userType))
+                .WhereIf(isGetDetailBranch, request => branchIds.Contains(request.BranchId))
+                .WhereIf(userId.HasValue, request => request.CreatorUserId.Equals(userId))
+                .Select(request => new RequestStatistic
+                {
+                    BranchId = request.BranchId,
+                    BranchName = request.Branch.Name,
+                    SubPositionId = request.SubPositionId,
+                    SubPositionName = request.SubPosition.Name,
+                    Quantity = request.Quantity,
+                });
+        }
+
+        private IQueryable<RecruitmentOverviewResponseDto> IQGetRecruitmentOverviewByRequests(DateTime fromDate, DateTime toDate, UserType? userType, List<long> branchIds, long? userId)
+        {
+            bool isGetDetailBranch = branchIds != null && branchIds.Any();
+            return WorkScope.GetAll<Request>()
+                .Where(request => request.CreationTime >= fromDate && request.CreationTime < toDate.AddDays(1) && !request.IsDeleted)
+                .WhereIf(userType.HasValue, request => request.UserType.Equals(userType))
+                .WhereIf(isGetDetailBranch, request => branchIds.Contains(request.BranchId))
+                .WhereIf(userId.HasValue, request => request.CreatorUserId.Equals(userId))
+                .GroupBy(request => isGetDetailBranch ? request.BranchId : 0)
+                .Select(branchGroup => new RecruitmentOverviewResponseDto
+                {
+                    BranchId = isGetDetailBranch ? branchGroup.Key : null,
+                    BranchName = isGetDetailBranch ? branchGroup.Select(request => request.Branch.Name).FirstOrDefault() : "All",
+                    SubPositionStatistics = branchGroup
+                    .GroupBy(request => request.SubPositionId)
+                    .Select(subPositionGroup => new SubPositionStatisticV2
+                    {
+                        SubPositionId = subPositionGroup.Key,
+                        SubPositionName = subPositionGroup.Select(request => request.SubPosition.Name).FirstOrDefault(),
+                        RequestQuantity = subPositionGroup.Select(request => request.Quantity).Sum(),
+                    }).ToList()
+                });
+        }
+
         private async Task<OverviewHiringDto> GetResultOverviewHiring(long? branchId, List<SubPositionStatistic> subPositionStatistics)
         {
             var overviewHiring = new OverviewHiringDto();

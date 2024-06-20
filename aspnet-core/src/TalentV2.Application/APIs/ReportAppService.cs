@@ -1,21 +1,13 @@
 ﻿using Abp.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Reports;
 using TalentV2.DomainServices.Reports.Dtos;
-using TalentV2.DomainServices.Requisitions.Dtos;
-using TalentV2.Entities;
 
 namespace TalentV2.APIs
 {
@@ -33,6 +25,14 @@ namespace TalentV2.APIs
         {
             return await _reportManager.GetOverviewHiring(fd, td, userType, branchId, userId);
         }
+
+        [HttpPost]
+        [AbpAuthorize(PermissionNames.Pages_Reports_Overview)]
+        public async Task<List<RecruitmentOverviewResponseDto>> GetRecruitmentOverview(RecruitmentOverviewRequestDto request)
+        {
+            return await _reportManager.GetRecruitmentOverview(request);
+        }
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Reports_Staff_Performance)]
         public async Task<CVSourceStatisticDto> GetPerformanceStaffCVSource(DateTime fd, DateTime td, long? branchId)
