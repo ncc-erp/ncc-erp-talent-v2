@@ -33,8 +33,8 @@ namespace TalentV2.DomainServices.Reports.Dtos
 
     public class TotalStatistics
     {
-        public long RequestQuantity { get; set; }
-        public long ApplyQuantity { get; set; }
+        public int RequestQuantity { get; set; }
+        public int ApplyQuantity { get; set; }
         public List<CVStatusStatistic> CVStatusStatistics { get; set; }
         public List<CVSourceStatisticV2> CVSourceStatistics { get; set; }
         public List<RequestCVStatusStatistic> CandidateStatusStatistics { get; set; }
