@@ -1,4 +1,5 @@
-﻿using Abp.Dependency;
+﻿using Abp.Configuration;
+using Abp.Dependency;
 using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Threading;
@@ -31,7 +32,8 @@ namespace TalentV2.BackgroundWorker
             AbpTimer timer,
             KomuService komuService,
             ICVAutomationManager cvAutomationService,
-            IConfiguration configuration) : base(timer)
+            IConfiguration configuration,
+            ISettingManager settingManager) : base(timer)
         {
             _komuService = komuService;
             _cvAutomationService = cvAutomationService;
@@ -40,7 +42,14 @@ namespace TalentV2.BackgroundWorker
             InternResult = new AutomationResult();
             StaffResult = new AutomationResult();
 
-            Timer.Period = 1000 * 60 * 5; // repeat each 5 minutes
+            if (int.TryParse(settingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out var repeatTimeInMinutes))
+            {
+                Timer.Period = 1000 * 60 * repeatTimeInMinutes;
+            }
+            else
+            {
+                Timer.Period = 1000 * 60 * 60 * 24; // default repeat each 24 hour
+            }
         }
 
         [UnitOfWork]
@@ -48,7 +57,7 @@ namespace TalentV2.BackgroundWorker
         {
             Logger.Info("CrawlCVFromAWSWorker start");
             DateTime now = DateTimeUtils.GetNow();
-            if (now.DayOfWeek == DayOfWeek.Sunday)
+            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
             {
                 Logger.Info("Today is DayOff => stop");
                 return;
@@ -78,8 +87,8 @@ namespace TalentV2.BackgroundWorker
         {
             DateTime now = DateTimeUtils.GetNow();
             int startAtHour, endAtHour;
-            var canStart = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeInterviewStartAtHour), out startAtHour);
-            var canEnd = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.NoticeInterviewEndAtHour), out endAtHour);
+            var canStart = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeStartAtHour), out startAtHour);
+            var canEnd = int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeEndAtHour), out endAtHour);
 
             if ((canStart && canEnd) == false)
             {
