@@ -19,6 +19,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public List<CVEducationDto> CVEducations { get; set; }
         public ProcessCVStatus ProcessCVStatus { get; set; }
         public DateTime? LatestModifiedTime { get; set; }
+        public bool IsDeleted { get; set; }
     }
     public class SkillCandidatePagingDto
     {

@@ -1080,6 +1080,7 @@ namespace TalentV2.DomainServices.Candidates
                             .Where(s => !s.Request.IsDeleted)
                             .Select(s => s.LastModificationTime)
                             .FirstOrDefault() ?? candidate.LastModificationTime,
+                            IsDeleted = candidate.IsDeleted,
                         };
             return query;
         }
@@ -1338,7 +1339,7 @@ namespace TalentV2.DomainServices.Candidates
             var bulletPoint = "\u002B" + "\x20";
 
             var exportCandidates = await IQGetAllCVs()
-               .Where(q => q.UserType.Equals(input.userType))
+               .Where(q => q.UserType.Equals(input.userType) && !q.IsDeleted)
                .WhereIf(input.reqCvStatus.HasValue, q => q.RequisitionInfos.Any(s => s.RequestCVStatus == input.reqCvStatus))
                .WhereIf(input.FromStatus.HasValue, q => q.HistoryChangeStatuses.Any(s => s.FromStatus == input.FromStatus))
                .WhereIf(input.ToStatus.HasValue, q => q.HistoryChangeStatuses.Any(s => s.ToStatus == input.ToStatus))
