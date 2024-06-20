@@ -17,6 +17,7 @@ namespace TalentV2.Notifications.Templates
             $"will onboard on {(!string.IsNullOrEmpty(input.OnboardDate) ? ("**" + input.OnboardDate + "**") : "")} with following info {(isFirstAcceptedOffer ? "" : "**[UPDATE]**")}: \n" +
             $"```"+
             $"User type: {input.UserTypeName} \n" +
+            $"Posistion : {input.SubPositionName} \n" +
             $"Branch: {input.BranchName} \n" + 
             $"Phone: {input.Phone} \n" + 
             $"Email: {input.Email} \n" +
