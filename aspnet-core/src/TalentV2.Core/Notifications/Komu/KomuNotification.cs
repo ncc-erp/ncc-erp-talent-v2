@@ -46,6 +46,7 @@ namespace TalentV2.Notifications.Komu
                         NCCEmail = s.CV.NCCEmail,
                         UserType = s.CV.UserType,
                         Phone = s.CV.Phone,
+                        SubPositionName = s.CV.SubPosition.Name
                     }).FirstOrDefault();
 
             var channelId = _settingManager.GetSettingValueForApplication(AppSettingNames.KomuHRITChannelId);

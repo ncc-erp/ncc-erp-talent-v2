@@ -1,15 +1,10 @@
-﻿using Abp.Domain.Entities;
-using Abp.Domain.Services;
+﻿using Abp.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
-using TalentV2.DomainServices.Categories.Dtos;
-using TalentV2.Entities;
 using TalentV2.Notifications.Mail.Dtos;
 
 namespace TalentV2.DomainServices.Candidates

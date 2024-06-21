@@ -1,13 +1,9 @@
 ﻿using Abp.Domain.Entities;
-using Abp.Domain.Entities.Auditing;
-using TalentV2.Constants.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
+using TalentV2.Constants.Enum;
 
 namespace TalentV2.Entities
 {

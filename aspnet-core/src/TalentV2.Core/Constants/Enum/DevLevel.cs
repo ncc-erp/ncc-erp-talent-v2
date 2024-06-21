@@ -18,6 +18,7 @@
         SeniorMinus = 13,
         Senior = 14,
         Principal = 15,
-        AnyLevel = 100
+        AnyLevel = 100,
+        Fail = 101,
     }
 }
