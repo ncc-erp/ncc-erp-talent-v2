@@ -19,42 +19,44 @@
             class="status-switch">
           </p-inputSwitch>
         </div>
-        <div class="flex-center-vertical w-100">
-          <div class="input-wrapper">
-            <label for="fromStatus">From Status</label>
-            <p-dropdown
-              inputId="fromStatus"
-              [options]="_utilities.catReqCvStatus"
-              placeholder="All"
-              optionLabel="name"
-              optionValue="id"
-              styleClass="w-100"
-              [filter]="true"
-              filterBy="name"
-              [showClear]="true"
-              (onChange)="onDropdownFromStatus($event)"
-              [disabled]="!statusHistory"
-            ></p-dropdown>
+        <ng-container *ngIf="statusHistory">
+          <div class="flex-center-vertical w-100" >
+            <div class="input-wrapper">
+              <label for="fromStatus">From Status</label>
+              <p-dropdown
+                inputId="fromStatus"
+                [options]="_utilities.catReqCvStatus"
+                placeholder="All"
+                optionLabel="name"
+                optionValue="id"
+                styleClass="w-100"
+                [filter]="true"
+                filterBy="name"
+                [showClear]="true"
+                (onChange)="onDropdownFromStatus($event)"
+                [disabled]="!statusHistory"
+              ></p-dropdown>
+            </div>
+            <div class="input-wrapper">
+              <label for="fromStatus">To Status</label>
+              <p-dropdown
+                inputId="fromStatus"
+                [options]="_utilities.catReqCvStatus"
+                placeholder="All"
+                optionLabel="name"
+                optionValue="id"
+                styleClass="w-100"
+                [filter]="true"
+                filterBy="name"
+                [showClear]="true"
+                (onChange)="onDropdownToStatus($event)"
+                [disabled]="!statusHistory"
+              ></p-dropdown>
+            </div>
           </div>
-          <div class="input-wrapper">
-            <label for="fromStatus">To Status</label>
-            <p-dropdown
-              inputId="fromStatus"
-              [options]="_utilities.catReqCvStatus"
-              placeholder="All"
-              optionLabel="name"
-              optionValue="id"
-              styleClass="w-100"
-              [filter]="true"
-              filterBy="name"
-              [showClear]="true"
-              (onChange)="onDropdownToStatus($event)"
-              [disabled]="!statusHistory"
-            ></p-dropdown>
-          </div>
-        </div>
 
-        <hr>
+          <hr>
+        </ng-container>
 
         <div class="flex-center-vertical w-100">
           <div class="input-wrapper flex-column">

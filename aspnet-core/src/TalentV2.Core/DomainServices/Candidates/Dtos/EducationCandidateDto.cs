@@ -1,9 +1,4 @@
 ﻿using Abp.AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TalentV2.Entities;
 using TalentV2.ModelExtends;
 
@@ -24,5 +19,10 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public long Id { get; set; }
         public long CVId { get; set; }
         public long EducationId { get; set; }
+    }
+    public class CVEducationDto
+    {
+        public long Id { get; set; }
+        public string EducationName { get; set; }
     }
 }

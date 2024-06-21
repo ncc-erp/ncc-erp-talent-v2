@@ -99,23 +99,23 @@ namespace TalentV2.Utils
 
         public static List<LevelDto> ListLevel = new List<LevelDto>
         {
-            new LevelDto{ Id = Level.Intern_0.GetHashCode(), DefaultName = Level.Intern_0.ToString(), StandardName = Level.Intern_0.ToString(), ShortName = "I0"},
-            new LevelDto{ Id = Level.Intern_1.GetHashCode(), DefaultName = Level.Intern_1.ToString(), StandardName = Level.Intern_1.ToString(), ShortName = "I1"},
-            new LevelDto{ Id = Level.Intern_2.GetHashCode(), DefaultName = Level.Intern_2.ToString(), StandardName = Level.Intern_2.ToString(), ShortName = "I2"},
-            new LevelDto{ Id = Level.Intern_3.GetHashCode(), DefaultName = Level.Intern_3.ToString(), StandardName = Level.Intern_3.ToString(), ShortName = "I3"},
-            new LevelDto{ Id = Level.FresherMinus.GetHashCode(), DefaultName = Level.FresherMinus.ToString(), StandardName = "Fresher-", ShortName = "F-"},
-            new LevelDto{ Id = Level.Fresher.GetHashCode(), DefaultName = Level.Fresher.ToString(), StandardName = "Fresher", ShortName = "F"},
-            new LevelDto{ Id = Level.FresherPlus.GetHashCode(), DefaultName = Level.FresherPlus.ToString(), StandardName = "Fresher+", ShortName = "F+"},
-            new LevelDto{ Id = Level.JuniorMinus.GetHashCode(), DefaultName = Level.JuniorMinus.ToString(), StandardName = "Junior-", ShortName = "J-"},
-            new LevelDto{ Id = Level.Junior.GetHashCode(), DefaultName = Level.Junior.ToString(), StandardName = "Junior", ShortName = "J"},
-            new LevelDto{ Id = Level.JuniorPlus.GetHashCode(), DefaultName = Level.JuniorPlus.ToString(), StandardName = "Junior+", ShortName = "J+"},
-            new LevelDto{ Id = Level.MiddleMinus.GetHashCode(), DefaultName = Level.MiddleMinus.ToString(), StandardName = "Middle-", ShortName = "M-"},
-            new LevelDto{ Id = Level.Middle.GetHashCode(), DefaultName = Level.Middle.ToString(), StandardName = "Middle", ShortName = "M"},
-            new LevelDto{ Id = Level.MiddlePlus.GetHashCode(), DefaultName = Level.MiddlePlus.ToString(), StandardName = "Middle+", ShortName = "M+"},
-            new LevelDto{ Id = Level.SeniorMinus.GetHashCode(), DefaultName = Level.SeniorMinus.ToString(), StandardName = "Senior-", ShortName = "S-"},
-            new LevelDto{ Id = Level.Senior.GetHashCode(), DefaultName = Level.Senior.ToString(), StandardName = Level.Senior.ToString(), ShortName = "S"},
-            new LevelDto{ Id = Level.Principal.GetHashCode(), DefaultName = Level.Principal.ToString(), StandardName = Level.Principal.ToString(), ShortName = "P"},
-            new LevelDto{ Id = Level.AnyLevel.GetHashCode(), DefaultName = Level.AnyLevel.ToString(), StandardName = Level.AnyLevel.ToString(), ShortName = "A"},
+            DictionaryHelper.LevelDict[Level.Intern_0],
+            DictionaryHelper.LevelDict[Level.Intern_1],
+            DictionaryHelper.LevelDict[Level.Intern_2],
+            DictionaryHelper.LevelDict[Level.Intern_3],
+            DictionaryHelper.LevelDict[Level.FresherMinus],
+            DictionaryHelper.LevelDict[Level.Fresher],
+            DictionaryHelper.LevelDict[Level.FresherPlus],
+            DictionaryHelper.LevelDict[Level.JuniorMinus],
+            DictionaryHelper.LevelDict[Level.Junior],
+            DictionaryHelper.LevelDict[Level.JuniorPlus],
+            DictionaryHelper.LevelDict[Level.MiddleMinus],
+            DictionaryHelper.LevelDict[Level.Middle],
+            DictionaryHelper.LevelDict[Level.MiddlePlus],
+            DictionaryHelper.LevelDict[Level.SeniorMinus],
+            DictionaryHelper.LevelDict[Level.Senior],
+            DictionaryHelper.LevelDict[Level.Principal],
+            DictionaryHelper.LevelDict[Level.AnyLevel],
         };
 
         public static List<CategoryDto> ListPriority = Enum.GetValues(typeof(Priority))
@@ -128,52 +128,80 @@ namespace TalentV2.Utils
 
         public static List<CategoryDto> ListRequestLevel = new List<CategoryDto>()
         {
-            new CategoryDto { Id = Level.AnyLevel.GetHashCode(), Name = "Any Level" },
-            new CategoryDto { Id = Level.Fresher.GetHashCode(), Name = "Fresher" },
-            new CategoryDto { Id = Level.Junior.GetHashCode(), Name = "Junior" },
-            new CategoryDto { Id = Level.Middle.GetHashCode(), Name = "Middle" },
-            new CategoryDto { Id = Level.Senior.GetHashCode(), Name = "Senior" }
+            new CategoryDto { Id = Level.AnyLevel.GetHashCode(), Name = DictionaryHelper.LevelDict[Level.AnyLevel].StandardName },
+            new CategoryDto { Id = Level.Fresher.GetHashCode(), Name = DictionaryHelper.LevelDict[Level.Fresher].StandardName },
+            new CategoryDto { Id = Level.Junior.GetHashCode(), Name = DictionaryHelper.LevelDict[Level.Junior].StandardName },
+            new CategoryDto { Id = Level.Middle.GetHashCode(), Name = DictionaryHelper.LevelDict[Level.Middle].StandardName },
+            new CategoryDto { Id = Level.Senior.GetHashCode(), Name = DictionaryHelper.LevelDict[Level.Senior].StandardName }
         };
 
         public static List<InternSalaryDto> ListSalaryIntern = new List<InternSalaryDto>()
         {
-            new InternSalaryDto{ Id = Level.Intern_0.GetHashCode(), DefaultName = Level.Intern_0.ToString(), StandardName = Level.Intern_0.ToString(), ShortName = "I0", Salary = 0},
-            new InternSalaryDto{ Id = Level.Intern_1.GetHashCode(), DefaultName = Level.Intern_1.ToString(), StandardName = Level.Intern_1.ToString(), ShortName = "I1", Salary = 1000000},
-            new InternSalaryDto{ Id = Level.Intern_2.GetHashCode(), DefaultName = Level.Intern_2.ToString(), StandardName = Level.Intern_2.ToString(), ShortName = "I2", Salary = 2000000},
-            new InternSalaryDto{ Id = Level.Intern_3.GetHashCode(), DefaultName = Level.Intern_3.ToString(), StandardName = Level.Intern_3.ToString(), ShortName = "I3", Salary = 4000000},
+            new InternSalaryDto
+            {
+                Id = Level.Intern_0.GetHashCode(),
+                DefaultName = DictionaryHelper.LevelDict[Level.Intern_0].DefaultName,
+                StandardName = DictionaryHelper.LevelDict[Level.Intern_0].StandardName,
+                ShortName = DictionaryHelper.LevelDict[Level.Intern_0].ShortName,
+                Salary = 0
+            },
+            new InternSalaryDto
+            {
+                Id = Level.Intern_1.GetHashCode(),
+                DefaultName = DictionaryHelper.LevelDict[Level.Intern_1].DefaultName,
+                StandardName = DictionaryHelper.LevelDict[Level.Intern_1].StandardName,
+                ShortName = DictionaryHelper.LevelDict[Level.Intern_1].ShortName,
+                Salary = 1000000
+            },
+            new InternSalaryDto
+            {
+                Id = Level.Intern_2.GetHashCode(),
+                DefaultName = DictionaryHelper.LevelDict[Level.Intern_2].DefaultName,
+                StandardName = DictionaryHelper.LevelDict[Level.Intern_2].StandardName,
+                ShortName = DictionaryHelper.LevelDict[Level.Intern_2].ShortName,
+                Salary = 2000000
+            },
+            new InternSalaryDto
+            {
+                Id = Level.Intern_3.GetHashCode(),
+                DefaultName = DictionaryHelper.LevelDict[Level.Intern_3].DefaultName,
+                StandardName = DictionaryHelper.LevelDict[Level.Intern_3].StandardName,
+                ShortName = DictionaryHelper.LevelDict[Level.Intern_3].ShortName,
+                Salary = 4000000
+            }
         };
 
         public static List<LevelDto> ListLevelStaff = new List<LevelDto>()
         {
-            new LevelDto{ Id = Level.FresherMinus.GetHashCode(), DefaultName = Level.FresherMinus.ToString(), StandardName = "Fresher-", ShortName = "F-"},
-            new LevelDto{ Id = Level.Fresher.GetHashCode(), DefaultName = Level.Fresher.ToString(), StandardName = "Fresher", ShortName = "F"},
-            new LevelDto{ Id = Level.FresherPlus.GetHashCode(), DefaultName = Level.FresherPlus.ToString(), StandardName = "Fresher+", ShortName = "F+"},
-            new LevelDto{ Id = Level.JuniorMinus.GetHashCode(), DefaultName = Level.JuniorMinus.ToString(), StandardName = "Junior-", ShortName = "J-"},
-            new LevelDto{ Id = Level.Junior.GetHashCode(), DefaultName = Level.Junior.ToString(), StandardName = "Junior", ShortName = "J"},
-            new LevelDto{ Id = Level.JuniorPlus.GetHashCode(), DefaultName = Level.JuniorPlus.ToString(), StandardName = "Junior+", ShortName = "J+"},
-            new LevelDto{ Id = Level.MiddleMinus.GetHashCode(), DefaultName = Level.MiddleMinus.ToString(), StandardName = "Middle-", ShortName = "M-"},
-            new LevelDto{ Id = Level.Middle.GetHashCode(), DefaultName = Level.Middle.ToString(), StandardName = "Middle", ShortName = "M"},
-            new LevelDto{ Id = Level.MiddlePlus.GetHashCode(), DefaultName = Level.MiddlePlus.ToString(), StandardName = "Middle+", ShortName = "M+"},
-            new LevelDto{ Id = Level.SeniorMinus.GetHashCode(), DefaultName = Level.SeniorMinus.ToString(), StandardName = "Senior-", ShortName = "S-"},
-            new LevelDto{ Id = Level.Senior.GetHashCode(), DefaultName = Level.Senior.ToString(), StandardName = Level.Senior.ToString(), ShortName = "S"},
-            new LevelDto{ Id = Level.Principal.GetHashCode(), DefaultName = Level.Principal.ToString(), StandardName = Level.Principal.ToString(), ShortName = "P"},
-            new LevelDto{ Id = Level.AnyLevel.GetHashCode(), DefaultName = Level.AnyLevel.ToString(), StandardName = Level.AnyLevel.ToString(), ShortName = "A"},
+            DictionaryHelper.LevelDict[Level.FresherMinus],
+            DictionaryHelper.LevelDict[Level.Fresher],
+            DictionaryHelper.LevelDict[Level.FresherPlus],
+            DictionaryHelper.LevelDict[Level.JuniorMinus],
+            DictionaryHelper.LevelDict[Level.Junior],
+            DictionaryHelper.LevelDict[Level.JuniorPlus],
+            DictionaryHelper.LevelDict[Level.MiddleMinus],
+            DictionaryHelper.LevelDict[Level.Middle],
+            DictionaryHelper.LevelDict[Level.MiddlePlus],
+            DictionaryHelper.LevelDict[Level.SeniorMinus],
+            DictionaryHelper.LevelDict[Level.Senior],
+            DictionaryHelper.LevelDict[Level.Principal],
+            DictionaryHelper.LevelDict[Level.AnyLevel],
         };
 
         public static List<LevelDto> ListLevelInterviewStaff = new List<LevelDto>(ListLevelStaff)
         {
-            new LevelDto{ Id = Level.Intern_0.GetHashCode(), DefaultName = Level.Intern_0.ToString(), StandardName = Level.Intern_0.ToString(), ShortName = "I0"},
-            new LevelDto{ Id = Level.Intern_1.GetHashCode(), DefaultName = Level.Intern_1.ToString(), StandardName = Level.Intern_1.ToString(), ShortName = "I1"},
-            new LevelDto{ Id = Level.Intern_2.GetHashCode(), DefaultName = Level.Intern_2.ToString(), StandardName = Level.Intern_2.ToString(), ShortName = "I2"},
-            new LevelDto{ Id = Level.Intern_3.GetHashCode(), DefaultName = Level.Intern_3.ToString(), StandardName = Level.Intern_3.ToString(), ShortName = "I3"},
+            DictionaryHelper.LevelDict[Level.Intern_0],
+            DictionaryHelper.LevelDict[Level.Intern_1],
+            DictionaryHelper.LevelDict[Level.Intern_2],
+            DictionaryHelper.LevelDict[Level.Intern_3],
         };
 
         public static List<LevelDto> ListLevelFinalStaff = new List<LevelDto>(ListLevelStaff)
         {
-            new LevelDto{ Id = Level.Intern_0.GetHashCode(), DefaultName = Level.Intern_0.ToString(), StandardName = Level.Intern_0.ToString(), ShortName = "I0"},
-            new LevelDto{ Id = Level.Intern_1.GetHashCode(), DefaultName = Level.Intern_1.ToString(), StandardName = Level.Intern_1.ToString(), ShortName = "I1"},
-            new LevelDto{ Id = Level.Intern_2.GetHashCode(), DefaultName = Level.Intern_2.ToString(), StandardName = Level.Intern_2.ToString(), ShortName = "I2"},
-            new LevelDto{ Id = Level.Intern_3.GetHashCode(), DefaultName = Level.Intern_3.ToString(), StandardName = Level.Intern_3.ToString(), ShortName = "I3"},
+            DictionaryHelper.LevelDict[Level.Intern_0],
+            DictionaryHelper.LevelDict[Level.Intern_1],
+            DictionaryHelper.LevelDict[Level.Intern_2],
+            DictionaryHelper.LevelDict[Level.Intern_3],
         };
 
         public static List<InternSalaryDto> ListLevelFinalIntern = new List<InternSalaryDto>(ListSalaryIntern)
