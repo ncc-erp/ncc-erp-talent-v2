@@ -263,6 +263,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     const invalidEmail = listUser.some(user => !isValidEmail(user));
     invalidEmail && this.showToastMessage(ToastMessageType.ERROR, MESSAGE.ERROR_EMAIL_FORMAT);
     this.notifyCVAutomation.userList = listUser?.filter(user => isValidEmail(user));
+    this.notifyCVAutomation.notifyToUser = listUser.join(', ');
   }
 
   saveNotifyDiscordCVAutomationSettings() {
