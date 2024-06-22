@@ -29,10 +29,7 @@
         public const string NoticeInterviewMinutes = "App.NoticeInterviewMinutes";
         public const string NoticeInterviewResultMinutes = "App.NoticeInterviewResultMinutes";
 
-        public const string NoticeCVCreatedToHR = "App.NoticeCVCreatedToHR";
-
         public const string IsNoticeInterviewViaChannel = "App.IsNoticeInterviewViaChannel";
-        public const string NoticeTalentGeneralChannel = "App.NoticeTalentGeneralChannel";
         public const string NoticeInterviewScheduleChannel = "App.NoticeInterviewScheduleChannel";
         public const string NoticeInterviewResultChannel = "App.NoticeInterviewResultChannel";
 
@@ -41,5 +38,14 @@
 
 
         public const string TalentContestUrl = "App.TalentContestUrl";
+
+        //CV Automation Settings
+        public const string CVAutomationEnabled = "App.CVAutomation:Enabled";
+        public const string CVAutomationRepeatTimeInMinutes = "App.CVAutomation:RepeatTimeInMinutes";
+        public const string CVAutomationNoticeStartAtHour = "App.CVAutomation:NoticeStartAtHour";
+        public const string CVAutomationNoticeEndAtHour = "App.CVAutomation:NoticeEndAtHour";
+        public const string CVAutomationNoticeMode = "App.CVAutomation:NoticeMode";
+        public const string CVAutomationNoticeChannelId = "App.CVAutomation:NoticeChannelId";
+        public const string CVAutomationNotifyToUser = "App.CVAutomation:NotifyToUser";
     }
 }

@@ -81,6 +81,15 @@
   align-items: center;
 }
 
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.white-space-nowrap {
+  white-space: nowrap;
+}
+
 .card-body {
   margin-bottom: 3rem !important;
 }

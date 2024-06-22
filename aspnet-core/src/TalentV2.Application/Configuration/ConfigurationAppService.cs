@@ -1,19 +1,15 @@
-﻿using System.Threading.Tasks;
-using Abp.Authorization;
+﻿using Abp.Authorization;
 using Abp.Net.Mail;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 using TalentV2.Authorization;
 using TalentV2.Configuration.Dto;
-using Microsoft.Extensions.Configuration;
-using TalentV2.WebServices.InternalServices.LMS;
-using TalentV2.WebServices.InternalServices.LMS.Dtos;
-using Microsoft.AspNetCore.Server.IIS.Core;
-using Abp.UI;
-using TalentV2.InternalTools;
-using TalentV2.WebServices.InternalServices.HRM;
 using TalentV2.DomainServices.Dto;
 using TalentV2.WebServices.ExternalServices.Autobot;
+using TalentV2.WebServices.InternalServices.HRM;
+using TalentV2.WebServices.InternalServices.LMS;
 
 namespace TalentV2.Configuration
 {
@@ -32,6 +28,7 @@ namespace TalentV2.Configuration
             _hrmService = hrmService;
             _autobotService = autobotService;
         }
+
         [AbpAuthorize]
         public async Task ChangeUiTheme(ChangeUiThemeInput input)
         {
@@ -42,6 +39,7 @@ namespace TalentV2.Configuration
         {
             return await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.GoogleClientAppId);
         }
+
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditEmailSettings)]
         public async Task<EmailConfigurationInput> SetEmailSetting(EmailConfigurationInput input)
@@ -66,6 +64,7 @@ namespace TalentV2.Configuration
                 UseDefaultCredentials = await SettingManager.GetSettingValueForApplicationAsync(EmailSettingNames.Smtp.UseDefaultCredentials)
             };
         }
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Configurations_ViewEmailSettings)]
         public async Task<EmailConfigurationInput> GetEmailSetting()
@@ -82,6 +81,7 @@ namespace TalentV2.Configuration
                 UseDefaultCredentials = await SettingManager.GetSettingValueForApplicationAsync(EmailSettingNames.Smtp.UseDefaultCredentials)
             };
         }
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Configurations_ViewKomuSettings)]
         public async Task<KomuSettingsInput> GetKomuSettings()
@@ -106,6 +106,7 @@ namespace TalentV2.Configuration
                 KomuResourceRequestStaffChannelId = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.KomuResourceRequestStaffChannelId)
             };
         }
+
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditChannelHRITSettings)]
         public async Task<DiscordChannelInput> SetDiscordChannelHRIT(DiscordChannelInput input)
@@ -156,6 +157,7 @@ namespace TalentV2.Configuration
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.TimesheetSecurityCodeSetting, input.SecurityCode);
             return input;
         }
+
         [HttpGet]
         //[AbpAuthorize(PermissionNames.Pages_Configurations_ViewProjectSettings)]
         public async Task<InternalToolSettingInput> GetProjectSettings()
@@ -166,6 +168,7 @@ namespace TalentV2.Configuration
                 SecurityCode = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.ProjectSecurityCodeSetting)
             };
         }
+
         [HttpPost]
         //[AbpAuthorize(PermissionNames.Pages_Configurations_EditProjectSettings)]
         public async Task<InternalToolSettingInput> SetProjectSettings(InternalToolSettingInput input)
@@ -198,6 +201,7 @@ namespace TalentV2.Configuration
                 EnableNormalLogin = textEnableNormalLogin == "true" ? true : false
             };
         }
+
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditGoogleClientAppSettings)]
         public async Task<GoogleClientAppSettingDto> SetGoogleClientAppSettings(GoogleClientAppSettingDto input)
@@ -215,6 +219,7 @@ namespace TalentV2.Configuration
         {
             return await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableNormalLogin) == "true" ? true : false;
         }
+
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditTalentSecretCode)]
         public async Task<SecretCodeTalentInput> SetTalentSecretCode(SecretCodeTalentInput input)
@@ -222,6 +227,7 @@ namespace TalentV2.Configuration
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.TalentSecurityCode, input.SecretCode);
             return input;
         }
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Configurations_ViewTalentSecretCode)]
         public async Task<SecretCodeTalentInput> GetTalentSecretCode()
@@ -231,6 +237,7 @@ namespace TalentV2.Configuration
                 SecretCode = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.TalentSecurityCode)
             };
         }
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Configurations_ViewTalentNotifyInterviewSettings)]
         public async Task<NoticeInterviewSettingDto> GetNoticeInterviewSetting()
@@ -244,9 +251,9 @@ namespace TalentV2.Configuration
                 IsToChannel = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.IsNoticeInterviewViaChannel),
                 ScheduleChannel = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.NoticeInterviewScheduleChannel),
                 ResultChannel = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.NoticeInterviewResultChannel),
-                TalentGeneralChannel = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.NoticeTalentGeneralChannel),
             };
         }
+
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditTalentNotifyInterviewSettings)]
         public async Task<NoticeInterviewSettingDto> SetNoticeInterviewSetting(NoticeInterviewSettingDto input)
@@ -258,9 +265,39 @@ namespace TalentV2.Configuration
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.IsNoticeInterviewViaChannel, input.IsToChannel);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.NoticeInterviewScheduleChannel, input.ScheduleChannel);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.NoticeInterviewResultChannel, input.ResultChannel);
-            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.NoticeTalentGeneralChannel, input.TalentGeneralChannel);
             return input;
         }
+
+        [HttpGet]
+        [AbpAuthorize(PermissionNames.Pages_Configurations_ViewTalentNotifyCVAutomationSettings)]
+        public async Task<NoticeCVAutomationSettingDto> GetNoticeCVAutomationSettings()
+        {
+            return new NoticeCVAutomationSettingDto
+            {
+                Enabled = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationEnabled),
+                RepeatTimeInMinutes = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationRepeatTimeInMinutes),
+                NoticeStartAtHour = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeStartAtHour),
+                NoticeEndAtHour = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeEndAtHour),
+                NoticeMode = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeMode),
+                NoticeChannelId = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeChannelId),
+                NotifyToUser = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNotifyToUser),
+            };
+        }
+
+        [HttpPost]
+        [AbpAuthorize(PermissionNames.Pages_Configurations_EditTalentNotifyCVAutomationSettings)]
+        public async Task<NoticeCVAutomationSettingDto> SetNoticeCVAutomationSettings(NoticeCVAutomationSettingDto input)
+        {
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationEnabled, input.Enabled);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationRepeatTimeInMinutes, input.RepeatTimeInMinutes);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeStartAtHour, input.NoticeStartAtHour);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeEndAtHour, input.NoticeEndAtHour);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeMode, input.NoticeMode);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeChannelId, input.NoticeChannelId);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNotifyToUser, input.NotifyToUser);
+            return input;
+        }
+
         [HttpGet]
         public GetResultConnectDto CheckConnectToHRM()
         {

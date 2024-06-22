@@ -1,9 +1,6 @@
-﻿using NccCore.Anotations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.ModelExtends;
@@ -19,8 +16,10 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public List<RequisitionInfoDto> RequisitionInfos { get; set; }
         public List<MailStatusHistoryDto> MailStatusHistories { get; set; }
         public List<HistoryChangeStatusesDto> HistoryChangeStatuses { get; set; }
+        public List<CVEducationDto> CVEducations { get; set; }
         public ProcessCVStatus ProcessCVStatus { get; set; }
         public DateTime? LatestModifiedTime { get; set; }
+        public bool IsDeleted { get; set; }
     }
     public class SkillCandidatePagingDto
     {

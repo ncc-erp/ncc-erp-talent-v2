@@ -6,22 +6,23 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 import { ToastMessageType, UserType } from '@shared/AppEnums';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { CandidateReportPayload } from '@app/core/models/candidate/candidate.model';
+import { finalize } from 'rxjs/operators';
 @Component({
   selector: 'talent-export-candidate',
   templateUrl: './export-candidate.component.html',
   styleUrls: ['./export-candidate.component.scss']
-  
+
 })
 export class ExportCandidateComponent extends AppComponentBase implements OnInit {
-  fromDate: string ='' ; 
-  toDate: string ='' ;   
-  exportForm: FormGroup; 
+  fromDate: string ='' ;
+  toDate: string ='' ;
+  exportForm: FormGroup;
   loading = false;
   infomation:boolean = false ;
-  report: boolean = false ;
   reqCvStatus: number;
   reqCvToStatus: number;
   reqCvFromStatus: number;
+  statusHistory: boolean = false;
 
   @Input() userType: UserType.INTERN | UserType.STAFF;
 
@@ -43,7 +44,7 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
 
   formatDate(dateObj) {
   const year = dateObj.getFullYear();
-  const month = String(dateObj.getMonth() + 1).padStart(2, '0'); 
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
   const day = String(dateObj.getDate()).padStart(2, '0');
   return `${year}/${month}/${day}`;
   }
@@ -60,20 +61,8 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
   onDropdownToStatus(tostatus: any) {
     this.reqCvToStatus = tostatus.value;
   }
-  public exportCandidate(){
-    let requestsCount = 0;
-    if(this.report){
-      requestsCount++;
-     this.onExportReport(requestsCount );
-    }
-    if(!this.report){
-      this.showToastMessage(ToastMessageType.ERROR, 'No checkbox selected.');
-      this.loading = false;
-      return;
-    }
-   }
 
-  public onExportReport(requestsCount: number) {  
+  public onExportReport() {
     this.loading = true;
     const userType = this.userType === UserType.INTERN ? 0 : 1;
     if (!this.fromDate || !this.toDate) {
@@ -88,20 +77,20 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
      const fromDateDay = 1;
      const startDate = this.formatDate(new Date(fromDateYear, fromDateMonth - 1, fromDateDay)) ;
      const formattedFromDate = startDate.split('T')[0];
-    
+
      const toDateParts = this.toDate.split('-');
      const toDateYear = Number(toDateParts[0]);
      const toDateMonth = Number(toDateParts[1]);
-     const toDateDay = new Date(toDateYear, toDateMonth, 0).getDate(); 
+     const toDateDay = new Date(toDateYear, toDateMonth, 0).getDate();
      const endDate = this.formatDate(new Date(toDateYear, toDateMonth - 1, toDateDay)) ;
      const formattedToDate = endDate.split('T')[0];
-  
+
     if (fromDateYear > toDateYear) {
       this.showToastMessage(ToastMessageType.ERROR,'Year from date cannot be greater than year to date.');
       this.loading = false;
       return;
     }
-  
+
     if (fromDateYear === toDateYear && parseInt(fromDateParts[1]) > parseInt(toDateParts[1])) {
       this.showToastMessage(ToastMessageType.ERROR,'Month from date must not be greater than month to day in the same year.');
       this.loading = false;
@@ -114,11 +103,11 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
       fromDate: formattedFromDate,
       toDate: formattedToDate,
       reqCvStatus: this?.reqCvStatus,
-      toStatus: this?.reqCvToStatus,
-      fromStatus: this?.reqCvFromStatus,
+      toStatus: this.statusHistory ? this.reqCvToStatus : null,
+      fromStatus: this.statusHistory ? this.reqCvFromStatus : null,
     };
     this.subs.add(
-      this._candidateIntern.exportReport(payload).subscribe(
+      this._candidateIntern.exportReport(payload).pipe(finalize(() => this.loading = false)).subscribe(
        (result: Blob) => {
         if (result.size > 0) {
           const blob = new Blob([result], { type: 'application/octet-stream' });
@@ -131,12 +120,8 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
           document.body.removeChild(a);
           window.URL.revokeObjectURL(url);
         }
-        requestsCount --;
-        if ( requestsCount === 0) {
-          this.loading = false;
-        }
       },
     ));
   }
-  
+
 }

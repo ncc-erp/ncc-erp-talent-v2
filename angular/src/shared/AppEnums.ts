@@ -208,8 +208,8 @@ export enum MAIL_TYPE {
 }
 
 export enum StatusCreateAccount {
-    CREATE_LMS_ACCOUT = 0,
-    CREATE_URL_CONTEST = 1
+    CREATE_LMS_ACCOUNT = 'CREATE_LMS_ACCOUNT',
+    CREATE_URL_CONTEST = 'CREATE_URL_CONTEST'
 }
 
 export enum ECandidateTypeCount {
@@ -217,4 +217,9 @@ export enum ECandidateTypeCount {
     QuantityFail,
     QuantityAcceptedOffer,
     TotalCandidateApply,
+}
+
+export enum ENoticeMode {
+    Channel = 'Channel',
+    User = 'User'
 }

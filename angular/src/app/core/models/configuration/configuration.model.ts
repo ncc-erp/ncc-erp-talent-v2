@@ -1,3 +1,5 @@
+import { ENoticeMode } from "@shared/AppEnums";
+
 export class ConfigurationSetting {
   url: string;
   securityCode: string;
@@ -56,11 +58,21 @@ export class NoticeInterviewSettingDto {
   isToChannel: string;
   scheduleChannel: string;
   resultChannel: string;
-  talentGeneralChannel: string;
 }
 
 export class GetResultConnectDto{
   isConnected: boolean;
   message: string;
+}
+
+export interface INoticeCVAutomationDto {
+  enabled: boolean | string;
+  noticeStartAtHour: string;
+  noticeEndAtHour: string;
+  repeatTimeInMinutes: string;
+  noticeMode: ENoticeMode;
+  notifyToUser: string;
+  noticeChannelId: string;
+  userList?: string[];
 }
 

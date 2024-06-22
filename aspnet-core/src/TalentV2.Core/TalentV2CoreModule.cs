@@ -82,10 +82,8 @@ namespace TalentV2
                 appSettingProviderDefaultValue.NoticeInterviewMinutes = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeInterviewMinutes);
                 appSettingProviderDefaultValue.NoticeInterviewResultChannel = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeInterviewResultChannel);
                 appSettingProviderDefaultValue.NoticeInterviewResultMinutes = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeInterviewResultMinutes);
-                appSettingProviderDefaultValue.NoticeTalentGeneralChannel = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeTalentGeneralChannel);
                 appSettingProviderDefaultValue.NoticeInterviewScheduleChannel = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeInterviewScheduleChannel);
                 appSettingProviderDefaultValue.NoticeInterviewStartAtHour = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeInterviewStartAtHour);
-                appSettingProviderDefaultValue.NoticeCVCreatedToHR = appSettingValueProvider.GetValue<string>(AppSettingNames.NoticeCVCreatedToHR);
                 appSettingProviderDefaultValue.ProjectSecurityCodeSetting = appSettingValueProvider.GetValue<string>(AppSettingNames.ProjectSecurityCodeSetting);
                 appSettingProviderDefaultValue.ProjectURLSetting = appSettingValueProvider.GetValue<string>(AppSettingNames.ProjectURLSetting);
                 appSettingProviderDefaultValue.StorageLocation = appSettingValueProvider.GetValue<string>(AppSettingNames.StorageLocation);
@@ -95,6 +93,13 @@ namespace TalentV2
                 appSettingProviderDefaultValue.TimesheetURLSetting = appSettingValueProvider.GetValue<string>(AppSettingNames.TimesheetURLSetting);
                 appSettingProviderDefaultValue.UiTheme = appSettingValueProvider.GetValue<string>(AppSettingNames.UiTheme);
                 appSettingProviderDefaultValue.TalentContestUrl = appSettingValueProvider.GetValue<string>(AppSettingNames.TalentContestUrl);
+                appSettingProviderDefaultValue.CVAutomationEnabled = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationEnabled);
+                appSettingProviderDefaultValue.CVAutomationRepeatTimeInMinutes = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationRepeatTimeInMinutes);
+                appSettingProviderDefaultValue.CVAutomationNoticeStartAtHour = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeStartAtHour);
+                appSettingProviderDefaultValue.CVAutomationNoticeEndAtHour = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeEndAtHour);
+                appSettingProviderDefaultValue.CVAutomationNoticeMode = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeMode);
+                appSettingProviderDefaultValue.CVAutomationNoticeChannelId = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeChannelId);
+                appSettingProviderDefaultValue.CVAutomationNotifyToUser = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNotifyToUser);
             }
             Configuration.Settings.Providers.Add<AppSettingProvider>();
         }
