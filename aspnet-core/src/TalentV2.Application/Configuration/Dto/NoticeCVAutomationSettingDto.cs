@@ -2,8 +2,10 @@
 {
     public class NoticeCVAutomationSettingDto
     {
-        public string Enabled { get; set; }
         public string RepeatTimeInMinutes { get; set; }
+        public string CrawlCVStartAtHour { get; set; }
+        public string CrawlCVEndAtHour { get; set; }
+        public string Enabled { get; set; }
         public string NoticeStartAtHour { get; set; }
         public string NoticeEndAtHour { get; set; }
         public string NoticeMode { get; set; }

@@ -6,6 +6,7 @@ using Abp.Threading;
 using Abp.Threading.BackgroundWorkers;
 using Abp.Threading.Timers;
 using Microsoft.Extensions.Configuration;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,10 +57,8 @@ namespace TalentV2.BackgroundWorker
         protected override void DoWork()
         {
             Logger.Info("CrawlCVFromAWSWorker start");
-            DateTime now = DateTimeUtils.GetNow();
-            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
+            if (!CheckTimeRule())
             {
-                Logger.Info("Today is DayOff => stop");
                 return;
             }
 
@@ -81,6 +80,35 @@ namespace TalentV2.BackgroundWorker
 
             bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
             if (enableNotify && (InternResult.Total > 0 || StaffResult.Total > 0)) PreNotify();
+        }
+
+        private bool CheckTimeRule()
+        {
+            DateTime now = DateTimeUtils.GetNow();
+            if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
+            {
+                Logger.Info("Today is DayOff => stop");
+                return false;
+            }
+
+            if (!int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationCrawlCVStartAtHour), out int automationStartAtHour))
+            {
+                automationStartAtHour = 7;
+            }
+
+            if (!int.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationCrawlCVEndAtHour), out int automationEndAtHour))
+            {
+                automationEndAtHour = 19;
+            }
+
+            if (!now.Hour.IsBetween(automationStartAtHour, automationEndAtHour))
+            {
+                Logger.Info($"The current time is outside the time range configured for automatic CV creation.");
+                Logger.Info($"CV will be automatically generated between {automationStartAtHour}:00 and {automationEndAtHour}:00 every day.");
+                return false;
+            }
+
+            return true;
         }
 
         private void PreNotify()

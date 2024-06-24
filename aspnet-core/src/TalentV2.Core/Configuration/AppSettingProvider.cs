@@ -102,13 +102,23 @@ namespace TalentV2.Configuration
 
                 #region CVAutomationSettings
                 new SettingDefinition(
-                    AppSettingNames.CVAutomationEnabled,
-                    _defaultValue.CVAutomationEnabled,
+                    AppSettingNames.CVAutomationRepeatTimeInMinutes,
+                    _defaultValue.CVAutomationRepeatTimeInMinutes,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                     ),
                 new SettingDefinition(
-                    AppSettingNames.CVAutomationRepeatTimeInMinutes,
-                    _defaultValue.CVAutomationRepeatTimeInMinutes,
+                    AppSettingNames.CVAutomationCrawlCVStartAtHour,
+                    _defaultValue.CVAutomationCrawlCVStartAtHour,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationCrawlCVEndAtHour,
+                    _defaultValue.CVAutomationCrawlCVEndAtHour,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                    ),
+                new SettingDefinition(
+                    AppSettingNames.CVAutomationEnabled,
+                    _defaultValue.CVAutomationEnabled,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                     ),
                 new SettingDefinition(

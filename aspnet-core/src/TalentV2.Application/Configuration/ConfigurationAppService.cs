@@ -274,8 +274,10 @@ namespace TalentV2.Configuration
         {
             return new NoticeCVAutomationSettingDto
             {
-                Enabled = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationEnabled),
                 RepeatTimeInMinutes = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationRepeatTimeInMinutes),
+                CrawlCVStartAtHour = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationCrawlCVStartAtHour),
+                CrawlCVEndAtHour = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationCrawlCVEndAtHour),
+                Enabled = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationEnabled),
                 NoticeStartAtHour = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeStartAtHour),
                 NoticeEndAtHour = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeEndAtHour),
                 NoticeMode = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.CVAutomationNoticeMode),
@@ -289,7 +291,6 @@ namespace TalentV2.Configuration
         public async Task<NoticeCVAutomationSettingDto> SetNoticeCVAutomationSettings(NoticeCVAutomationSettingDto input)
         {
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationEnabled, input.Enabled);
-            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationRepeatTimeInMinutes, input.RepeatTimeInMinutes);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeStartAtHour, input.NoticeStartAtHour);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeEndAtHour, input.NoticeEndAtHour);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeMode, input.NoticeMode);
