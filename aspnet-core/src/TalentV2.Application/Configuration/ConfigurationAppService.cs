@@ -15,7 +15,6 @@ namespace TalentV2.Configuration
 {
     public class ConfigurationAppService : TalentV2AppServiceBase, IConfigurationAppService
     {
-
         private static IConfiguration _appConfiguration;
         private readonly LMSService _lMSService;
         private readonly HRMService _hrmService;
@@ -34,6 +33,7 @@ namespace TalentV2.Configuration
         {
             await SettingManager.ChangeSettingForUserAsync(AbpSession.ToUserIdentifier(), AppSettingNames.UiTheme, input.Theme);
         }
+
         [AbpAllowAnonymous]
         public async Task<string> GetGoogleClientAppId()
         {
@@ -145,7 +145,6 @@ namespace TalentV2.Configuration
         }
 
         [HttpPost]
-        //[AbpAuthorize(PermissionNames.Pages_Configurations_EditTimesheetSettings)]
         public async Task<TimesheetSettingInput> SetTimesheetSettings(TimesheetSettingInput input)
         {
             string textIsAuto = "false";
@@ -159,7 +158,6 @@ namespace TalentV2.Configuration
         }
 
         [HttpGet]
-        //[AbpAuthorize(PermissionNames.Pages_Configurations_ViewProjectSettings)]
         public async Task<InternalToolSettingInput> GetProjectSettings()
         {
             return new InternalToolSettingInput
@@ -170,7 +168,6 @@ namespace TalentV2.Configuration
         }
 
         [HttpPost]
-        //[AbpAuthorize(PermissionNames.Pages_Configurations_EditProjectSettings)]
         public async Task<InternalToolSettingInput> SetProjectSettings(InternalToolSettingInput input)
         {
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.ProjectURLSetting, input.URL);
@@ -290,6 +287,8 @@ namespace TalentV2.Configuration
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditTalentNotifyCVAutomationSettings)]
         public async Task<NoticeCVAutomationSettingDto> SetNoticeCVAutomationSettings(NoticeCVAutomationSettingDto input)
         {
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationCrawlCVStartAtHour, input.CrawlCVStartAtHour);
+            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationCrawlCVEndAtHour, input.CrawlCVEndAtHour);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationEnabled, input.Enabled);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeStartAtHour, input.NoticeStartAtHour);
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.CVAutomationNoticeEndAtHour, input.NoticeEndAtHour);
