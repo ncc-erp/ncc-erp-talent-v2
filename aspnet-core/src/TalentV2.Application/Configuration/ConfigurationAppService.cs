@@ -145,6 +145,7 @@ namespace TalentV2.Configuration
         }
 
         [HttpPost]
+        //[AbpAuthorize(PermissionNames.Pages_Configurations_EditTimesheetSettings)]
         public async Task<TimesheetSettingInput> SetTimesheetSettings(TimesheetSettingInput input)
         {
             string textIsAuto = "false";
@@ -158,6 +159,7 @@ namespace TalentV2.Configuration
         }
 
         [HttpGet]
+        //[AbpAuthorize(PermissionNames.Pages_Configurations_ViewProjectSettings)]
         public async Task<InternalToolSettingInput> GetProjectSettings()
         {
             return new InternalToolSettingInput
@@ -168,6 +170,7 @@ namespace TalentV2.Configuration
         }
 
         [HttpPost]
+        //[AbpAuthorize(PermissionNames.Pages_Configurations_EditProjectSettings)]
         public async Task<InternalToolSettingInput> SetProjectSettings(InternalToolSettingInput input)
         {
             await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.ProjectURLSetting, input.URL);
