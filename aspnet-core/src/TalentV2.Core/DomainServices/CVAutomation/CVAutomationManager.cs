@@ -33,7 +33,7 @@ namespace TalentV2.DomainServices.CVAutomation
         private readonly IConfiguration _configuration;
         private readonly AutobotService _autobotService;
         private readonly ILogger _logger;
-        
+
         public CVAutomationManager(
             IAbpSession session,
             IFileProvider fileService,
@@ -68,7 +68,7 @@ namespace TalentV2.DomainServices.CVAutomation
                 List<string> failedPaths = new List<string>();
                 failedPaths.AddRange(paths);
                 failedPaths.Add(FAILED_FOLDER);
-                
+
                 var fileNamesInPath = await _fileService.GetFileNamesAsync(paths);
                 result.Total += fileNamesInPath.Count;
 
@@ -81,7 +81,7 @@ namespace TalentV2.DomainServices.CVAutomation
                         var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
 
                         if (cvExtractionData == null
-                            || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
+                            || (string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname)))
                         {
                             await _fileService.MoveFileAsync(paths, failedPaths, fileName, true);
                             continue;
@@ -136,7 +136,7 @@ namespace TalentV2.DomainServices.CVAutomation
                         var cvExtractionData = await _autobotService.ExtractCVInformationAsync<CVExtractionData>(responseStream, fileName);
 
                         if (cvExtractionData == null
-                            || string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname))
+                            || (string.IsNullOrEmpty(cvExtractionData.Email) && string.IsNullOrEmpty(cvExtractionData.PhoneNumber) && string.IsNullOrEmpty(cvExtractionData.Fullname)))
                         {
                             await _fileService.MoveFileAsync(paths, failedPaths, fileName, true);
                             continue;
@@ -163,7 +163,7 @@ namespace TalentV2.DomainServices.CVAutomation
         {
             var cv = new CV
             {
-                TenantId = _session.TenantId,
+                TenantId = _session?.TenantId,
                 Name = StringExtensions.FormatName(cvExtractionData.Fullname),
                 Email = cvExtractionData.Email,
                 Phone = StringExtensions.FormatPhoneNumber(cvExtractionData.PhoneNumber),

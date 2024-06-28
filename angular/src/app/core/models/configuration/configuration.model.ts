@@ -66,10 +66,12 @@ export class GetResultConnectDto{
 }
 
 export interface INoticeCVAutomationDto {
+  repeatTimeInMinutes: string;
+  crawlCVStartAtHour: string;
+  crawlCVEndAtHour: string;
   enabled: boolean | string;
   noticeStartAtHour: string;
   noticeEndAtHour: string;
-  repeatTimeInMinutes: string;
   noticeMode: ENoticeMode;
   notifyToUser: string;
   noticeChannelId: string;
