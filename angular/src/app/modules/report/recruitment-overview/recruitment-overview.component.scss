@@ -28,3 +28,51 @@
     background-color: #FCFCF5 !important;
 }
 
+.recruitment-overview-wrapping {
+    padding: 20px;
+
+    .branch-title {
+        font-weight: bold;
+        font-size: 27px;
+    }
+
+    table {
+        border-collapse: separate;
+        width: 100%;
+
+        th,
+        td {
+            // border: solid 1px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .header-item {
+            font-size: 12px;
+        }
+
+        .background-color-1 {
+            background-color: #F5F5F5;
+        }
+
+        .background-color-2 {
+            background-color: #9DE0FA;
+        }
+
+        .background-color-3 {
+            background-color: #FFDDB4;
+        }
+
+        .background-color-4 {
+            background-color: #FFB5BA;
+        }
+
+        .sub-position-name {
+            text-align: left;
+        }
+
+        .total {
+            font-weight: bold;
+        }
+    }
+}

@@ -46,3 +46,43 @@ export class TotalStatus {
     totalCV: number;
     id: number;
 }
+
+export interface RecruitmentOverviewRequest {
+  fromDate: Date;
+  toDate: Date;
+  userType: number;
+  isGetAllBranch: boolean;
+  branchIds: number[];
+  userId: number;
+}
+
+export interface RecruitmentOverview {
+  branchId: number;
+  branchName: string;
+  subPositionStatistics: SubPositionStatistic[];
+  total: TotalStatistics[];
+}
+
+export interface SubPositionStatistic {
+  subPositionId: number;
+  subPositionName: string;
+  requestQuantity: number;
+  applyQuantity: number;
+  cvStatusStatistics: OverviewStatistic[];
+  cvSourceStatistics: OverviewStatistic[];
+  candidateStatusStatistics: OverviewStatistic[];
+}
+
+export interface TotalStatistics {
+  requestQuantity: number;
+  applyQuantity: number;
+  cvStatusStatistics: OverviewStatistic[];
+  cvSourceStatistics: OverviewStatistic[];
+  candidateStatusStatistics: OverviewStatistic[];
+}
+
+export interface OverviewStatistic {
+  id: number;
+  name: string;
+  quantity: number;
+}

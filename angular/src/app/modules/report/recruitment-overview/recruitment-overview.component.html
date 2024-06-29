@@ -5,15 +5,17 @@
       </talent-section-breadcrumb>
     </div>
     <div class="btexport">
-      <button class="btn btn-success ml-2"
-      *ngIf="permission.isGranted(PS.Pages_Reports_Overview_Export)"
-      (click)="exporOverviewHiring()"  >
+      <button
+        class="btn btn-success ml-2"
+        *ngIf="permission.isGranted(PS.Pages_Reports_Overview_Export)"
+        (click)="exportOverviewHiring()"
+      >
         <i class="pi pi-download fa-download mr-1"></i>
         Export
       </button>
-      </div>
     </div>
- </div>
+  </div>
+</div>
 
 <section class="section-table" id="staff-recruit-overview">
   <div class="card">
@@ -21,27 +23,27 @@
       <div class="row">
         <div class="col-12 col-md-2">
           <div class="col item-group">
-          <label for="createdBy">
-            {{ "Assign to" | localize }}
-          </label>
-          <div class="w-100">
-            <p-dropdown
-              [options]="userList"
-              [(ngModel)]="filterUser"
-              placeholder="Select a User"
-              optionLabel="name"
-              styleClass="w-100"
-              (onChange)="onSelectChangeUser($event)"
-            ></p-dropdown>
+            <label for="createdBy">
+              {{ "Assign to" | localize }}
+            </label>
+            <div class="w-100">
+              <p-dropdown
+                [options]="userList"
+                [(ngModel)]="filterAssignTo"
+                placeholder="Select a User"
+                optionLabel="name"
+                styleClass="w-100"
+                (onChange)="onChangeFilterAssignTo()"
+              ></p-dropdown>
+            </div>
           </div>
         </div>
-      </div>
         <div class="col-12 col-md-4">
           <div class="col item-group item-group--creation-time p-0">
             <talent-date-selector
-              [label]="'Time'"
+              label="Date"
               [defaultOption]="defaultOptionTime"
-              (selectChange)="onTalentDateChange($event)"
+              (selectChange)="onChangeFilterDate($event)"
               class="talent-date"
             ></talent-date-selector>
           </div>
@@ -53,10 +55,10 @@
               <p-multiSelect
                 class="w-inherit msl"
                 [options]="branches"
-                [(ngModel)]="filterBranch"
+                [(ngModel)]="filterBranches"
                 defaultLabel="Select a Branch"
                 optionLabel="name"
-                (onChange)="onSelectChangeBranch($event)"
+                (onPanelHide)="onChangeFilterBranches()"
               ></p-multiSelect>
             </div>
           </div>
@@ -64,16 +66,16 @@
         <div class="col-12 col-md-3">
           <div class="col item-group">
             <label for="usertype" class="mr-2">{{
-              "UserType" | localize
+              "Candidate type" | localize
             }}</label>
             <div class="w-100">
               <p-dropdown
                 class="w-inherit msl"
-                [options]="usertypes"
-                [(ngModel)]="filterUserType"
-                defaultLabel="Select a User Type"
+                [options]="candidateTypes"
+                [(ngModel)]="filterCandidateTypes"
+                defaultLabel="Select a candidate type"
                 optionLabel="name"
-                (onChange)="onSelectChangeUserType($event)"
+                (onChange)="onChangeFilterCandidateTypes()"
               ></p-dropdown>
             </div>
           </div>
@@ -82,166 +84,158 @@
     </div>
 
     <ng-template [ngIf]="!isLoading">
-      <ng-container *ngFor="let report of reports">
-        <div class="card-body mb-0">
-          <div class="row">
-            <div class="col-12 col-md-6">
-              <h4>
-                {{ "Branch" | localize }}:
-                {{ report.branchName | localize }}
-              </h4>
-            </div>
+      <ng-container *ngFor="let branch of overviewReport">
+        <div class="recruitment-overview-wrapping">
+          <div class="branch-title">
+            {{ branch.branchName | uppercase }}
           </div>
-          <p-table
-            [value]="report.subPositionStatistics"
-            responsiveLayout="scroll"
-            currentPageReportTemplate="Total: {totalRecords}"
-            styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm"
-          >
-            <ng-template pTemplate="header">
+          <table>
+            <thead>
               <tr>
-                <th rowspan="2" class="text-center w-70px">
-                  {{ "No" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "Position" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "Request CV" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "Apply CV" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "New CV" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "Pass CV" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "Fail CV" | localize }}
-                </th>
-                <th rowspan="2">
-                  {{ "Contact CV" | localize }}
+                <th rowspan="2" class="background-color-1">NO</th>
+                <th rowspan="2" class="background-color-1">POSITION</th>
+                <th rowspan="2" class="background-color-1">REQUEST</th>
+                <th rowspan="2" class="background-color-1">APPLY</th>
+                <th
+                  [colSpan]="cvStatusHeaders.length"
+                  class="background-color-2"
+                >
+                  CV STATUS
                 </th>
                 <th
-                  class="text-center bg-yellow-1"
-                  [colSpan]="_utilities.catCvSource.length"
+                  [colSpan]="cvSourceHeaders.length"
+                  class="background-color-3"
                 >
-                  {{ "CV Source" | localize }}
+                  CV SOURCE
                 </th>
                 <th
-                  class="text-center bg-primary-1"
-                  [colSpan]="_utilities.catReqCvStatus.length"
+                  [colSpan]="candidateStatusHeaders.length"
+                  class="background-color-4"
                 >
-                  {{ "Candidate Status" | localize }}
+                  CANDIDATE STATUS
                 </th>
               </tr>
-              <tr>
+              <tr class="header-item">
                 <th
-                  class="bg-yellow-1"
-                  *ngFor="let item of _utilities.catCvSource"
+                  *ngFor="let cvStatus of cvStatusHeaders"
+                  class="background-color-2"
                 >
-                  {{ item.name }}
+                  {{ cvStatus.name | uppercase }}
                 </th>
                 <th
-                  class="bg-primary-1"
-                  *ngFor="let item of _utilities.catReqCvStatus"
+                  *ngFor="let cvSource of cvSourceHeaders"
+                  class="background-color-3"
                 >
-                  {{ item.name }}
+                  {{ cvSource.name | uppercase }}
+                </th>
+                <th
+                  *ngFor="let candidateStatus of candidateStatusHeaders"
+                  class="background-color-4"
+                >
+                  {{ candidateStatus.name | uppercase }}
                 </th>
               </tr>
-              <tr class="th-total-report">
-                <th [colSpan]="colLabel">Tổng cộng</th>
-                <th class="text-center">
-                  {{ getValueOrNone(report.totalOverviewHiring.totalHiring) }}
-                </th>
-                <th class="text-center">
-                  {{ getValueOrNone(report.totalOverviewHiring.totalApply) }}
-                </th>
-                <th class="text-center">
-                  {{ getValueOrNone(report.totalOverviewHiring.totalNewCV) }}
-                </th>
-                <th class="text-center text-primary">
-                  {{ getValueOrNone(report.totalOverviewHiring.totalPassed) }}
-                </th>
-                <th class="text-center text-danger">
-                  {{ getValueOrNone(report.totalOverviewHiring.totalFailed) }}
-                </th>
-                <th class="text-center">
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="
+                  let subPosition of branch?.subPositionStatistics;
+                  index as i
+                "
+              >
+                <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
+                  {{ i + 1 }}
+                </td>
+                <td
+                  class="sub-position-name"
+                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                >
+                  {{ subPosition.subPositionName }}
+                </td>
+                <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
+                  {{ subPosition.requestQuantity }}
+                </td>
+                <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
+                  {{ subPosition.applyQuantity }}
+                </td>
+                <td
+                  *ngFor="let cvStatus of cvStatusHeaders"
+                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                >
                   {{
-                    getValueOrNone(report.totalOverviewHiring.totalContacting)
+                    getQuantityById(
+                      subPosition?.cvStatusStatistics,
+                      cvStatus.id
+                    )
                   }}
-                </th>
-                <ng-container
-                  *ngFor="
-                    let item of report.totalOverviewHiring.totalCVSources
-                      | loopArray
-                  "
+                </td>
+                <td
+                  *ngFor="let cvSource of cvSourceHeaders"
+                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
                 >
-                  <th class="text-center bg-yellow-2">
-                    {{ getValueOrNone(item.value) }}
-                  </th>
-                </ng-container>
-                <ng-container
-                  *ngFor="let item of report.totalOverviewHiring.totalStatuses"
+                  {{
+                    getQuantityById(
+                      subPosition?.cvSourceStatistics,
+                      cvSource.id
+                    )
+                  }}
+                </td>
+                <td
+                  *ngFor="let candidateStatus of candidateStatusHeaders"
+                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
                 >
-                  <th
-                    class="text-center bg-primary-2"
-                    [ngClass]="getColorStatus(item.id)"
-                  >
-                    {{ getValueOrNone(item.totalCV) }}
-                  </th>
-                </ng-container>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-item let-i="rowIndex">
-              <tr>
-                <td class="text-center">{{ i + 1 }}</td>
-                <td>{{ item.subPositionName }}</td>
-                <td class="text-center text-bold">
-                  {{ getValueOrNone(item.quantityHiring) }}
-                </td>
-                <td class="text-center">
-                  {{ getValueOrNone(item.quantityApply) }}
-                </td>
-                <td class="text-center">
-                  {{ getValueOrNone(item.quantityNewCV) }}
-                </td>
-                <td class="text-center text-primary">
-                  {{ getValueOrNone(item.quantityPassed) }}
-                </td>
-                <td class="text-center text-danger">
-                  {{ getValueOrNone(item.quantityFailed) }}
-                </td>
-                <td class="text-center">
-                  {{ getValueOrNone(item.quantityContacting) }}
-                </td>
-                <ng-container *ngFor="let cvsource of item.cvSourceStatistics">
-                  <td class="text-center bg-yellow-2">
-                    {{ getValueOrNone(cvsource.totalCV) }}
-                  </td>
-                </ng-container>
-                <ng-container
-                  *ngFor="let status of item.statusStatistics; let i = index"
-                >
-                  <td
-                    class="text-center bg-primary-2"
-                    [ngClass]="getColorStatus(status.id)"
-                  >
-                    {{ getValueOrNone(status.totalCV) }}
-                  </td>
-                </ng-container>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td [colSpan]="lengthCVSourceAndStatus + 4" class="text-center">
-                  No Data.
+                  {{
+                    getQuantityById(
+                      subPosition?.candidateStatusStatistics,
+                      candidateStatus.id
+                    )
+                  }}
                 </td>
               </tr>
-            </ng-template>
-          </p-table>
+              <tr class="total">
+                <td colspan="2" class="background-color-1">TOTAL</td>
+                <td class="background-color-1">
+                  {{ branch.total.requestQuantity }}
+                </td>
+                <td class="background-color-1">
+                  {{ branch.total.applyQuantity }}
+                </td>
+                <td
+                  *ngFor="let cvStatus of cvStatusHeaders"
+                  class="background-color-2"
+                >
+                  {{
+                    getQuantityById(
+                      branch.total.cvStatusStatistics,
+                      cvStatus.id
+                    )
+                  }}
+                </td>
+                <td
+                  *ngFor="let cvSource of cvSourceHeaders"
+                  class="background-color-3"
+                >
+                  {{
+                    getQuantityById(
+                      branch.total.cvSourceStatistics,
+                      cvSource.id
+                    )
+                  }}
+                </td>
+                <td
+                  *ngFor="let candidateStatus of candidateStatusHeaders"
+                  class="background-color-4"
+                >
+                  {{
+                    getQuantityById(
+                      branch.total.candidateStatusStatistics,
+                      candidateStatus.id
+                    )
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </ng-container>
     </ng-template>

@@ -111,8 +111,8 @@ namespace TalentV2.DomainServices.Reports
 
         public async Task<List<RecruitmentOverviewResponseDto>> GetRecruitmentOverview(RecruitmentOverviewRequestDto request)
         {
-            var fromDate = request.FromDate.Date;
-            var toDate = request.ToDate.Date;
+            var fromDate = request.FromDate.ToLocalTime().Date;
+            var toDate = request.ToDate.ToLocalTime().Date;
 
             var recruitmentOverviewResult = new List<RecruitmentOverviewResponseDto>();
             if (request.IsGetAllBranch)
