@@ -1,56 +1,63 @@
 import { LoopArrayPipe } from './../../../../shared/pipes/loop-array.pipe';
-import { REQUEST_CV_STATUS, ToastMessageType, } from './../../../../shared/AppEnums';
-import { Observable, forkJoin, of } from 'rxjs';
-import { ReportOverview, StatusStatistic } from '../../../core/models/report/report.model';
+import { ToastMessageType } from './../../../../shared/AppEnums';
+import { Observable, Subject } from 'rxjs';
+import { OverviewStatistic, RecruitmentOverview, RecruitmentOverviewRequest } from '../../../core/models/report/report.model';
 import { ReportOverviewService } from '../../../core/services/report/report-overview.service';
-import { Injector } from '@angular/core';
+import { Injector, OnDestroy } from '@angular/core';
 import { AppComponentBase } from '@shared/app-component-base';
 import { CreationTimeEnum, DefaultRoute } from '@shared/AppEnums';
 import { Component, OnInit } from '@angular/core';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
 import { DateFormat } from '@shared/AppConsts';
-import { ApiResponse } from '@shared/paged-listing-component-base';
 import { LoopNumberPipe } from '@shared/pipes/loop-number.pipe';
 import { Branch } from '@app/core/models/categories/branch.model';
-import { catchError, map } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
+import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { CatalogModel } from '@app/core/models/common/common.dto';
 import { ExportDialogComponent } from '../../../../shared/components/export-dialog/export-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ExportDialogService } from '../../../core/services/export/export-dialog.service';
 
 @Component({
-  selector: 'talent-recruitment-overview',  
-  templateUrl: './recruitment-overview.component.html',
-  styleUrls: ['./recruitment-overview.component.scss'],
-  providers: [LoopNumberPipe, LoopArrayPipe]
+  selector: "talent-recruitment-overview",
+  templateUrl: "./recruitment-overview.component.html",
+  styleUrls: ["./recruitment-overview.component.scss"],
+  providers: [LoopNumberPipe, LoopArrayPipe],
 })
-export class RecruitmentOverviewComponent extends AppComponentBase implements OnInit {
-  reports: ReportOverview[] = [];
+export class RecruitmentOverviewComponent
+  extends AppComponentBase
+  implements OnInit, OnDestroy
+{
+  private getRecruitmentOverview$: Subject<void> = new Subject<void>();
+  private destroy$: Subject<void> = new Subject<void>();
   isLoading: boolean;
-  searchWithCreationTime: TalentDateTime;
-  lengthCVSourceAndStatus: number;
+  public overviewReport: RecruitmentOverview[] = [];
   defaultOptionTime: string = CreationTimeEnum.MONTH;
-  filterBranch?: Branch[] = [
+  filterDate: TalentDateTime;
+  filterBranches: Branch[] = [
     {
-      id: null, name: 'All', displayName: 'All'
-    } as Branch
+      id: null,
+      name: "All",
+      displayName: "All",
+    } as Branch,
   ];
-  filterUserType: CatalogModel = { id: null, name: 'All', } as CatalogModel;
-  filterUser: CatalogModel = { id: null, name: 'All', } as CatalogModel;
-
+  filterCandidateTypes: CatalogModel = {
+    id: null,
+    name: "All",
+  };
+  filterAssignTo: CatalogModel = { id: null, name: "All" };
   branches: Branch[] = [];
-  usertypes: CatalogModel[] = [];
+  candidateTypes: CatalogModel[] = [];
   userList: CatalogModel[] = [];
-  colOverview: number;
-  colQuantity: number = 5; //Col: QuatyHiring, QuatyApply, QuatyFailed, ...
-  colLabel: number = 2; //Col: No, PositionName
   isDialogOpen = false;
+  public cvStatusHeaders: CatalogModel[] = [];
+  public cvSourceHeaders: CatalogModel[] = [];
+  public candidateStatusHeaders: CatalogModel[] = [];
+
   constructor(
     injector: Injector,
-    public _utilities: UtilitiesService,
-    private _report: ReportOverviewService,
+    public _utilitiesService: UtilitiesService,
+    private _reportService: ReportOverviewService,
     public dialogService: MatDialog,
     private _exportService: ExportDialogService
   ) {
@@ -60,135 +67,150 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
   ngOnInit(): void {
     this.breadcrumbConfig = this.getBreadcrumbConfig();
     this.branches = this.getDropdownFilterBranch();
-    this.usertypes = this.getDropdownFilterUserType();
-    this.getDropdownFilterUser().subscribe(users => {
+    this.candidateTypes = this.getDropdownFilterUserType();
+    this.getDropdownFilterUser().subscribe((users) => {
       this.userList = users;
     });
-    this.lengthCVSourceAndStatus = this.getLengthCVSourceAndStatus();
-    this.colOverview = this.getColTotalOverview();
+    this.getRecruitmentOverviewStatistics();
   }
 
-  public lazyLoadingData($event) {
-    this.getOverviewStatistics();
+  onChangeFilterCandidateTypes() {
+    this.getRecruitmentOverview$.next();
   }
 
-  onSelectChangeUserType($event) {
-    this.getOverviewStatistics(false, true);
+  onChangeFilterAssignTo() {
+    this.getRecruitmentOverview$.next();
   }
 
-  onSelectChangeUser($event) {
-    this.getOverviewStatistics(false, true);
+  onChangeFilterBranches() {
+    this.getRecruitmentOverview$.next();
   }
 
-  onSelectChangeBranch($event) {
-    if (this.checkRemoveReport($event)) return;
-    this.getOverviewStatistics();
+  onChangeFilterDate(talentDateTime: TalentDateTime) {
+    this.filterDate = talentDateTime;
+    this.getRecruitmentOverview$.next();
   }
 
-  private checkRemoveReport($event) {
-    if ($event.value.length == 0) {
-      this.reports = [];
-      return true;
-    }
-
-    let valItemId = $event.itemValue?.id;
-    let index = this.reports.findIndex(s => s.branchId == valItemId ||
-      (s.branchId == 0 && valItemId == null));
-
-    if (index < 0) return false;
-    this.reports.splice(index, 1);
-    return true;
-  }
-
-  getOverviewStatistics(isChangeTime = false, isChangeUserType = false) {
-    let promises = [];
-    const fd = this.searchWithCreationTime?.fromDate.format(DateFormat.YYYY_MM_DD);
-    const td = this.searchWithCreationTime?.toDate.format(DateFormat.YYYY_MM_DD);
-
-    this.filterBranch.forEach((branch: Branch) => {
-      if (!isChangeTime && !isChangeUserType && this.reports.find(s => s.branchId == branch.id)) return;
-      promises.push(this._report.getOverviewStatistic(fd, td, branch.id, this.filterUserType.id, this.filterUser?.id));
-    });
-    this.isLoading = true;
-    forkJoin(promises)
+  private getRecruitmentOverviewStatistics() {
+    this.getRecruitmentOverview$
       .pipe(
-        catchError((err: HttpErrorResponse) => {
-          return of({ error: err.error.error });
+        takeUntil(this.destroy$),
+        switchMap(() => {
+          this.isLoading = true;
+          const branchIds = this.filterBranches.map((branch) => branch.id);
+          const payload: RecruitmentOverviewRequest = {
+            fromDate: this.filterDate?.fromDate.toDate(),
+            toDate: this.filterDate?.toDate.toDate(),
+            userType: this.filterCandidateTypes.id,
+            isGetAllBranch: branchIds.includes(null),
+            branchIds: branchIds.filter((id) => id),
+            userId: this.filterAssignTo.id,
+          };
+          return this._reportService.getRecruitmentOverview(payload);
         })
       )
-      .subscribe((res: ApiResponse<ReportOverview>[]) => {
-        if (isChangeTime || isChangeUserType) this.reports = [];
-        res.forEach((element) => {
-          this.reports.push(element.result)
-        });
+      .subscribe((res) => {
+        this.overviewReport = res.result;
+        this.resetHeaderItems();
+        this.getHeaderItems();
         this.isLoading = false;
       });
   }
 
+  private getHeaderItems() {
+    this.overviewReport?.forEach((branch) => {
+      branch.subPositionStatistics?.forEach((subPosition) => {
+        subPosition.cvStatusStatistics?.forEach((cvStatus) => {
+          if (!this.cvStatusHeaders.some((item) => item.id === cvStatus.id))
+            this.cvStatusHeaders.push({
+              id: cvStatus.id,
+              name: cvStatus.name,
+            });
+        });
+        subPosition.cvSourceStatistics?.forEach((cvSource) => {
+          if (!this.cvSourceHeaders.some((item) => item.id === cvSource.id))
+            this.cvSourceHeaders.push({
+              id: cvSource.id,
+              name: cvSource.name,
+            });
+        });
+        subPosition.candidateStatusStatistics?.forEach((candidateStatus) => {
+          if (
+            !this.candidateStatusHeaders.some(
+              (item) => item.id === candidateStatus.id
+            )
+          )
+            this.candidateStatusHeaders.push({
+              id: candidateStatus.id,
+              name: candidateStatus.name,
+            });
+        });
+      });
+    });
+  }
+
+  private resetHeaderItems(){
+    this.cvStatusHeaders = [];
+    this.cvSourceHeaders = [];
+    this.candidateStatusHeaders = [];
+  }
+
+  public getQuantityById(list: OverviewStatistic[], id: number): number {
+    return list?.find((item) => item.id === id)?.quantity;
+  }
+
   getDropdownFilterBranch() {
     return [
-      { id: null, name: 'All', displayName: 'All' } as Branch,
-      ...this._utilities.catBranch
-    ]
+      { id: null, name: "All", displayName: "All" } as Branch,
+      ...this._utilitiesService.catBranch,
+    ];
   }
 
   getDropdownFilterUserType() {
     return [
       {
-        id: null, name: 'All',
+        id: null,
+        name: "All",
       } as CatalogModel,
-      ...this._utilities.catUserType
-    ]
+      ...this._utilitiesService.catUserType,
+    ];
   }
   getDropdownFilterUser(): Observable<CatalogModel[]> {
-    return this._report.getAllUserCreated().pipe(
-        map(res => {
-          if (res?.result) {
-            const users = res.result;
-            users.unshift({ id: null, name: 'All' } as CatalogModel);
-          return users; 
-            } else {
-                return []; 
-            }
-        }),
+    return this._reportService.getAllUserCreated().pipe(
+      map((res) => {
+        if (res?.result) {
+          const users = res.result;
+          users.unshift({ id: null, name: "All" } as CatalogModel);
+          return users;
+        } else {
+          return [];
+        }
+      })
     );
-}
-
-  onTalentDateChange(talentDateTime: TalentDateTime) {
-    this.searchWithCreationTime = talentDateTime;
-    this.getOverviewStatistics(true);
   }
 
   getLengthCVSourceAndStatus() {
-    return this._utilities.catCvSource.length + this._utilities.catReqCvStatus.length;
-  }
-
-  getColTotalOverview() {
-    return this.lengthCVSourceAndStatus + this.colQuantity;
-  }
-
-  getColorStatus(id: REQUEST_CV_STATUS) {
-    if (id == REQUEST_CV_STATUS.AcceptedOffer || id == REQUEST_CV_STATUS.RejectedOffer)
-      return 'text-bold';
-
-    else if (id == REQUEST_CV_STATUS.Onboarded)
-      return 'text-success text-bold';
-  }
-
-  getValueOrNone(value: number) {
-    if (value == 0) return '';
-    return value;
+    return (
+      this._utilitiesService.catCvSource.length +
+      this._utilitiesService.catReqCvStatus.length
+    );
   }
 
   private getBreadcrumbConfig() {
     return {
-      menuItem: [{ label: "Reports", routerLink: DefaultRoute.Report, styleClass: 'menu-item-click' }, { label: "Recruitment Overview" }],
+      menuItem: [
+        {
+          label: "Reports",
+          routerLink: DefaultRoute.Report,
+          styleClass: "menu-item-click",
+        },
+        { label: "Recruitment Overview" },
+      ],
       homeItem: { icon: "pi pi-home", routerLink: "/" },
     };
   }
 
-
-  exporOverviewHiring() {
+  exportOverviewHiring() {
     const dialogConfig = {
       hasBackdrop: false,
       position: {
@@ -197,14 +219,10 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
       },
       panelClass: "custom-dialog",
     };
-    const userType = this.filterUserType?.id;
-    const fd = this.searchWithCreationTime?.fromDate.format(
-      DateFormat.YYYY_MM_DD
-    );
-    const td = this.searchWithCreationTime?.toDate.format(
-      DateFormat.YYYY_MM_DD
-    );
-    const branches = this.filterBranch.map((branch) => {
+    const userType = this.filterCandidateTypes?.id;
+    const fd = this.filterDate?.fromDate.format(DateFormat.YYYY_MM_DD);
+    const td = this.filterDate?.toDate.format(DateFormat.YYYY_MM_DD);
+    const branches = this.filterBranches.map((branch) => {
       return {
         id: branch.id !== null ? branch.id : "",
         displayName: branch.displayName,
@@ -216,7 +234,10 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
       return;
     }
     if (!this.isDialogOpen) {
-      const popup = this.dialogService.open(ExportDialogComponent, dialogConfig);
+      const popup = this.dialogService.open(
+        ExportDialogComponent,
+        dialogConfig
+      );
       const sendataOverview = {
         fromDate: fd,
         toDate: td,
@@ -229,5 +250,11 @@ export class RecruitmentOverviewComponent extends AppComponentBase implements On
         popup.close();
       }, 5000);
     }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.getRecruitmentOverview$.complete();
   }
 }
