@@ -40,8 +40,10 @@
         public const string TalentContestUrl = "App.TalentContestUrl";
 
         //CV Automation Settings
-        public const string CVAutomationEnabled = "App.CVAutomation:Enabled";
         public const string CVAutomationRepeatTimeInMinutes = "App.CVAutomation:RepeatTimeInMinutes";
+        public const string CVAutomationCrawlCVStartAtHour = "App.CVAutomation:CrawlCVStartAtHour";
+        public const string CVAutomationCrawlCVEndAtHour = "App.CVAutomation:CrawlCVEndAtHour";
+        public const string CVAutomationEnabled = "App.CVAutomation:Enabled";
         public const string CVAutomationNoticeStartAtHour = "App.CVAutomation:NoticeStartAtHour";
         public const string CVAutomationNoticeEndAtHour = "App.CVAutomation:NoticeEndAtHour";
         public const string CVAutomationNoticeMode = "App.CVAutomation:NoticeMode";

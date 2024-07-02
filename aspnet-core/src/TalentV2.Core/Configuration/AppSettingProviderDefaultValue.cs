@@ -28,8 +28,10 @@
         public string GoogleClientAppEnable { get; set; }
         public string EnableNormalLogin { get; set; }
         public string TalentContestUrl { get; set; }
-        public string CVAutomationEnabled { get; set; }
         public string CVAutomationRepeatTimeInMinutes { get; set; }
+        public string CVAutomationCrawlCVStartAtHour { get; set; }
+        public string CVAutomationCrawlCVEndAtHour { get; set; }
+        public string CVAutomationEnabled { get; set; }
         public string CVAutomationNoticeStartAtHour { get; set; }
         public string CVAutomationNoticeEndAtHour { get; set; }
         public string CVAutomationNoticeMode { get; set; }

@@ -1359,12 +1359,12 @@ namespace TalentV2.DomainServices.Candidates
                     Education = string.Join(Environment.NewLine, u.CVEducations.Select(e => bulletPoint + e.EducationName)),
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
-                    Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
+                    Status = u.RequisitionInfos.FirstOrDefault()?.RequestCVStatus,
                     Time = u.LastModifiedTime,
-                    ApplyLevel = getLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.ApplyLevel),
-                    FinalLevel = getLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.FinalLevel),
-                    InterviewLevel = getLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.InterviewLevel),
-                    Score = calculateScore(u.RequisitionInfos.FirstOrDefault()?.CapabilityResults),
+                    ApplyLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.ApplyLevel),
+                    FinalLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.FinalLevel),
+                    InterviewLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.InterviewLevel),
+                    Score = CalculateScore(u.RequisitionInfos.FirstOrDefault()?.CapabilityResults),
                     Note = u.Note,
                     TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
                 })
@@ -1383,8 +1383,8 @@ namespace TalentV2.DomainServices.Candidates
             var interviewedResult = exportCandidates
                 .Where(candidate =>
                 {
-                    var requisitionInfo = candidate.RequisitionInfos.FirstOrDefault();
-                    if (requisitionInfo != null) return interviewedRequestCVStatus.Contains(requisitionInfo.RequestCVStatus);
+                    var requestCVStatus = candidate.RequisitionInfos.FirstOrDefault()?.RequestCVStatus;
+                    if (requestCVStatus.HasValue) return interviewedRequestCVStatus.Contains(requestCVStatus.Value);
                     return false;
                 })
                 .Select((u, index) => new InterviewReport
@@ -1394,16 +1394,15 @@ namespace TalentV2.DomainServices.Candidates
                     Email = u.Email,
                     Branch = u.BranchName,
                     Positon = u.SubPositionName,
-                    Status = u.RequisitionInfos.Select(st => st.RequestCVStatus).FirstOrDefault(),
+                    Status = u.RequisitionInfos.FirstOrDefault()?.RequestCVStatus,
                     Time = u.RequisitionInfos.FirstOrDefault()?.InterviewTime,
-                    ApplyLevel = getLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.ApplyLevel),
-                    FinalLevel = getLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.FinalLevel),
-                    InterviewLevel = getLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.InterviewLevel),
-                    Score = calculateScore(u.RequisitionInfos.FirstOrDefault()?.CapabilityResults),
+                    ApplyLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.ApplyLevel),
+                    FinalLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.FinalLevel),
+                    InterviewLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.InterviewLevel),
+                    Score = CalculateScore(u.RequisitionInfos.FirstOrDefault()?.CapabilityResults),
                     TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
                 }
                 )
-                .OrderBy(q => q.Time)
                 .ToList();
 
             using (var package = new ExcelPackage())
@@ -1455,7 +1454,7 @@ namespace TalentV2.DomainServices.Candidates
             }
         }
 
-        private double? calculateScore(List<RequestCVCapabilityResultDto> capabilityResults)
+        private double? CalculateScore(List<RequestCVCapabilityResultDto> capabilityResults)
         {
             if (capabilityResults != null && capabilityResults.Count > 0)
             {
@@ -1471,7 +1470,7 @@ namespace TalentV2.DomainServices.Candidates
             return null;
         }
 
-        private string getLevelStandardName(Level? level)
+        private string GetLevelStandardName(Level? level)
         {
             if (level.HasValue) return DictionaryHelper.LevelDict[level.Value]?.StandardName;
             return null;
