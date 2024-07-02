@@ -85,4 +85,6 @@ export interface OverviewStatistic {
   id: number;
   name: string;
   quantity: number;
+  previousQuantity?: number;
+  currentQuantity?: number;
 }
