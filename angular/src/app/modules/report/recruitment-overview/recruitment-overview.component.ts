@@ -1,22 +1,26 @@
-import { LoopArrayPipe } from './../../../../shared/pipes/loop-array.pipe';
-import { ToastMessageType } from './../../../../shared/AppEnums';
-import { Observable, Subject } from 'rxjs';
-import { OverviewStatistic, RecruitmentOverview, RecruitmentOverviewRequest } from '../../../core/models/report/report.model';
-import { ReportOverviewService } from '../../../core/services/report/report-overview.service';
-import { Injector, OnDestroy } from '@angular/core';
-import { AppComponentBase } from '@shared/app-component-base';
-import { CreationTimeEnum, DefaultRoute } from '@shared/AppEnums';
-import { Component, OnInit } from '@angular/core';
-import { UtilitiesService } from '@app/core/services/utilities.service';
-import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
-import { DateFormat } from '@shared/AppConsts';
-import { LoopNumberPipe } from '@shared/pipes/loop-number.pipe';
-import { Branch } from '@app/core/models/categories/branch.model';
-import { map, switchMap, takeUntil } from 'rxjs/operators';
-import { CatalogModel } from '@app/core/models/common/common.dto';
-import { ExportDialogComponent } from '../../../../shared/components/export-dialog/export-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { ExportDialogService } from '../../../core/services/export/export-dialog.service';
+import { LoopArrayPipe } from "./../../../../shared/pipes/loop-array.pipe";
+import { ToastMessageType } from "./../../../../shared/AppEnums";
+import { Observable, Subject } from "rxjs";
+import {
+  OverviewStatistic,
+  RecruitmentOverview,
+  RecruitmentOverviewRequest,
+} from "../../../core/models/report/report.model";
+import { ReportOverviewService } from "../../../core/services/report/report-overview.service";
+import { Injector, OnDestroy } from "@angular/core";
+import { AppComponentBase } from "@shared/app-component-base";
+import { CreationTimeEnum, DefaultRoute } from "@shared/AppEnums";
+import { Component, OnInit } from "@angular/core";
+import { UtilitiesService } from "@app/core/services/utilities.service";
+import { TalentDateTime } from "@shared/components/date-selector/date-selector.component";
+import { DateFormat } from "@shared/AppConsts";
+import { LoopNumberPipe } from "@shared/pipes/loop-number.pipe";
+import { Branch } from "@app/core/models/categories/branch.model";
+import { map, switchMap, takeUntil } from "rxjs/operators";
+import { CatalogModel } from "@app/core/models/common/common.dto";
+import { ExportDialogComponent } from "../../../../shared/components/export-dialog/export-dialog.component";
+import { MatDialog } from "@angular/material/dialog";
+import { ExportDialogService } from "../../../core/services/export/export-dialog.service";
 
 @Component({
   selector: "talent-recruitment-overview",
@@ -53,6 +57,7 @@ export class RecruitmentOverviewComponent
   public cvStatusHeaders: CatalogModel[] = [];
   public cvSourceHeaders: CatalogModel[] = [];
   public candidateStatusHeaders: CatalogModel[] = [];
+  public hasNewCVStatus: boolean = false;
 
   constructor(
     injector: Injector,
@@ -128,7 +133,10 @@ export class RecruitmentOverviewComponent
             });
         });
         subPosition.cvSourceStatistics?.forEach((cvSource) => {
-          if (!this.cvSourceHeaders.some((item) => item.id === cvSource.id))
+          if (
+            !this.cvSourceHeaders.some((item) => item.id === cvSource.id) &&
+            cvSource.id
+          )
             this.cvSourceHeaders.push({
               id: cvSource.id,
               name: cvSource.name,
@@ -147,9 +155,14 @@ export class RecruitmentOverviewComponent
         });
       });
     });
+    this.cvStatusHeaders.sort((a, b) => a.id - b.id);
+    this.candidateStatusHeaders.sort((a, b) => a.id - b.id);
+    this.hasNewCVStatus = this.cvStatusHeaders.some(
+      (cvStatus) => cvStatus.id == 0
+    );
   }
 
-  private resetHeaderItems(){
+  private resetHeaderItems() {
     this.cvStatusHeaders = [];
     this.cvSourceHeaders = [];
     this.candidateStatusHeaders = [];
@@ -157,6 +170,14 @@ export class RecruitmentOverviewComponent
 
   public getQuantityById(list: OverviewStatistic[], id: number): number {
     return list?.find((item) => item.id === id)?.quantity;
+  }
+
+  public getPreviousQuantityById(list: OverviewStatistic[], id: number): number {
+    return list?.find((item) => item.id === id)?.previousQuantity;
+  }
+
+  public getCurrentQuantityById(list: OverviewStatistic[], id: number): number {
+    return list?.find((item) => item.id === id)?.currentQuantity;
   }
 
   getDropdownFilterBranch() {

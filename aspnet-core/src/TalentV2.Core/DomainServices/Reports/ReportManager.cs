@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Reports.Dtos;
@@ -51,7 +52,7 @@ namespace TalentV2.DomainServices.Reports
                     }
                 );
 
-            var cvStatistics = await GetDicSubPositionIdToStatisticQuantityCV(fd,td,userType,branchId, userId);
+            var cvStatistics = await GetDicSubPositionIdToStatisticQuantityCV(fd, td, userType, branchId, userId);
 
             var cvsources = await WorkScope.GetAll<CVSource>().OrderBy(s => s.Name).ToListAsync();
             var qstatisticIQCVSources = IQStatisticCVSources(fd, td, userType, branchId, cvsources, userId);
@@ -60,7 +61,7 @@ namespace TalentV2.DomainServices.Reports
             var statisticBySubPosition = qstatisticBySubPostion.ToDictionary
                 (
                     x => x.SubPositionId,
-                    x => new {x.StatusStatistics}
+                    x => new { x.StatusStatistics }
                 );
 
             var statisticCVSources = qstatisticIQCVSources.ToDictionary
@@ -96,8 +97,8 @@ namespace TalentV2.DomainServices.Reports
                 positionStatistic.QuantityPassed = cvStatistics[subPositionId].QuantityPassed;
                 positionStatistic.QuantityNewCV = cvStatistics[subPositionId].QuantityNewCV;
             }
-  
-            foreach(var key in listKeyHaveZeroValue)
+
+            foreach (var key in listKeyHaveZeroValue)
             {
                 subPositionStatistics.Remove(key);
             }
@@ -109,140 +110,186 @@ namespace TalentV2.DomainServices.Reports
             return overviewHiring;
         }
 
-        public async Task<List<RecruitmentOverviewResponseDto>> GetRecruitmentOverview(RecruitmentOverviewRequestDto request)
+        public async Task<List<RecruitmentOverviewResponseDto>> GetRecruitmentOverview(RecruitmentOverviewRequestDto payload)
         {
-            var fromDate = request.FromDate.ToLocalTime().Date;
-            var toDate = request.ToDate.ToLocalTime().Date;
+            var fromDate = payload.FromDate.ToLocalTime().Date;
+            var toDate = payload.ToDate.ToLocalTime().Date;
+            var hasBranches = payload.BranchIds != null && payload.BranchIds.Any();
+
+            var CVs = await WorkScope.GetAll<CV>()
+                .Where(CV => CV.LastModificationTime >= fromDate && CV.LastModificationTime < toDate.AddDays(1) && !CV.IsDeleted)
+                        .WhereIf(payload.UserType.HasValue, CV => CV.UserType.Equals(payload.UserType.Value))
+                        .WhereIf(payload.UserId.HasValue, CV => CV.CreatorUserId.Equals(payload.UserId.Value))
+                        .Select(CV => new CVStatistic
+                        {
+                            BranchId = CV.BranchId,
+                            SubPositionId = CV.SubPositionId,
+                            SubPositionName = CV.SubPosition.Name,
+                            CVStatusId = CV.CVStatus,
+                            CVSourceId = CV.CVSourceId,
+                            CVSourceName = CV.CVSource.Name,
+                            CandidateStatusId = CV.RequestCVs
+                            .Where(requestCV => !requestCV.IsDeleted)
+                            .OrderByDescending(requestCV => requestCV.LastModificationTime)
+                            .Select(requestCV => requestCV.Status)
+                            .FirstOrDefault(),
+                            LastModificationTime = CV.LastModificationTime
+                        })
+                        .ToListAsync();
+
+            var requests = await WorkScope.GetAll<Request>()
+                .Where(request => request.CreationTime >= fromDate && request.CreationTime < toDate.AddDays(1) && !request.IsDeleted)
+                .WhereIf(payload.UserType.HasValue, request => request.UserType.Equals(payload.UserType.Value))
+                .WhereIf(payload.UserId.HasValue, request => request.CreatorUserId.Equals(payload.UserId.Value))
+                .Select(request => new RequestStatistic
+                {
+                    BranchId = request.BranchId,
+                    SubPositionId = request.SubPositionId,
+                    SubPositionName = request.SubPosition.Name,
+                    Quantity = request.Quantity
+                })
+                .ToListAsync();
 
             var recruitmentOverviewResult = new List<RecruitmentOverviewResponseDto>();
-            if (request.IsGetAllBranch)
+
+            if (payload.IsGetAllBranch)
             {
-                var allBranchHasCVReport = await IQGetRecruitmentOverviewByCVs(fromDate, toDate, request.UserType, null, request.UserId).ToListAsync();
-                var allBranchRequestReport = await IQGetRecruitmentOverviewByRequests(fromDate, toDate, request.UserType, null, request.UserId).ToListAsync();
-                recruitmentOverviewResult.AddRange(AddRequestHasNotCVToRecruitmentOverviewResult(allBranchRequestReport, allBranchHasCVReport));
+                recruitmentOverviewResult.Add(StatisticRecruitmentOverviewByBranch(fromDate, toDate, CVs, requests, null));
             }
-            if (request.BranchIds != null && request.BranchIds.Any())
+            if (hasBranches)
             {
-                var detailBranchHasCVReport = await IQGetRecruitmentOverviewByCVs(fromDate, toDate, request.UserType, request.BranchIds, request.UserId).ToListAsync();
-                var detailBranchRequestReport = await IQGetRecruitmentOverviewByRequests(fromDate, toDate, request.UserType, request.BranchIds, request.UserId).ToListAsync();
-                recruitmentOverviewResult.AddRange(AddRequestHasNotCVToRecruitmentOverviewResult(detailBranchRequestReport, detailBranchHasCVReport));
+                foreach (var branchId in payload.BranchIds)
+                {
+                    recruitmentOverviewResult.Add(StatisticRecruitmentOverviewByBranch(fromDate, toDate, CVs, requests, branchId));
+                }
             }
 
             return recruitmentOverviewResult;
         }
 
-        private List<RecruitmentOverviewResponseDto> AddRequestHasNotCVToRecruitmentOverviewResult(List<RecruitmentOverviewResponseDto> requests, List<RecruitmentOverviewResponseDto> result)
+        private RecruitmentOverviewResponseDto StatisticRecruitmentOverviewByBranch(DateTime fromDate, DateTime toDate, List<CVStatistic> CVs, List<RequestStatistic> requests, long? branchId)
         {
-            foreach (var request in requests)
+            string branchName = "All company";
+            if (branchId.HasValue)
             {
-                var existPosition = result
-                    .Where(branch => branch.BranchId == request.BranchId)
-                    .Select(branch => branch.SubPositionStatistics)
-                    .FirstOrDefault();
-                var existPositionIds = existPosition.Select(position => position.SubPositionId);
-                foreach (var requestPosition in request.SubPositionStatistics)
+                branchName = WorkScope.GetAll<Branch>()
+                    .Where(branch => branch.Id == branchId && !branch.IsDeleted)
+                    .Select(branch => branch.Name).FirstOrDefault();
+            }
+
+            List<CVStatistic> filterCVs = branchId.HasValue ? CVs.FindAll(CV => CV.BranchId == branchId) : CVs;
+            List<RequestStatistic> filterRequests = branchId.HasValue ? requests.FindAll(request => request.BranchId == branchId) : requests;
+            
+            List<SubPositionDto> subPositions = new List<SubPositionDto>();
+            foreach (var CV in filterCVs)
+            {
+                if (!subPositions.Any(subPosition => subPosition.Id == CV.SubPositionId))
                 {
-                    if (!existPositionIds.Contains(requestPosition.SubPositionId))
+                    subPositions.Add(new SubPositionDto
                     {
-                        existPosition.Add(requestPosition);
-                    }
+                        Id = CV.SubPositionId,
+                        Name = CV.SubPositionName,
+                    });
                 }
             }
-            return result;
-        }
-
-        private IQueryable<RecruitmentOverviewResponseDto> IQGetRecruitmentOverviewByCVs(DateTime fromDate, DateTime toDate, UserType? userType, List<long> branchIds, long? userId)
-        {
-            bool isGetDetailBranch = branchIds != null && branchIds.Any();
-            return WorkScope.GetAll<CV>()
-                .Where(cv => cv.LastModificationTime >= fromDate && cv.LastModificationTime < toDate.AddDays(1) && !cv.IsDeleted)
-                .WhereIf(userType.HasValue, cv => cv.UserType.Equals(userType))
-                .WhereIf(isGetDetailBranch, cv => branchIds.Contains(cv.BranchId))
-                .WhereIf(userId.HasValue, cv => cv.CreatorUserId.Equals(userId))
-                .GroupBy(cv => isGetDetailBranch ? cv.BranchId : 0)
-                .Select(branchGroup => new RecruitmentOverviewResponseDto
+            foreach (var request in filterRequests)
+            {
+                if (!subPositions.Any(subPosition => subPosition.Id == request.SubPositionId))
                 {
-                    BranchId = isGetDetailBranch ? branchGroup.Key : null,
-                    BranchName = isGetDetailBranch ? branchGroup.Select(cv => cv.Branch.Name).FirstOrDefault() : "All Company",
-                    SubPositionStatistics = branchGroup.GroupBy(cv => cv.SubPositionId).Select(positionGroup => new SubPositionStatisticV2
+                    subPositions.Add(new SubPositionDto
                     {
-                        SubPositionId = positionGroup.Key,
-                        SubPositionName = positionGroup.Select(cv => cv.SubPosition.Name).FirstOrDefault(),
-                        RequestQuantity = IQGetRequests(fromDate, toDate, userType, branchIds, userId)
-                        .Where(request => request.SubPositionId == positionGroup.Key && (isGetDetailBranch ? request.BranchId.Equals(branchGroup.Key) : true))
-                        .Select(request => request.Quantity)
-                        .Sum(),
-                        ApplyQuantity = positionGroup.Count(),
-                        CVStatusStatistics = positionGroup.GroupBy(cv => cv.CVStatus).Select(CVStatusGroup => new CVStatusStatistic
-                        {
-                            Id = CVStatusGroup.Key,
-                            Name = CVStatusGroup.Key.ToString(),
-                            Quantity = CVStatusGroup.Count()
-                        }).ToList(),
-                        CVSourceStatistics = positionGroup.GroupBy(cv => cv.CVSourceId).Select(CVSourceGroup => new CVSourceStatisticV2
-                        {
-                            Id = CVSourceGroup.Key,
-                            Name = CVSourceGroup.Select(cv => cv.CVSource.Name).FirstOrDefault(),
-                            Quantity = CVSourceGroup.Count()
-                        }).ToList(),
-                        CandidateStatusStatistics = positionGroup
-                        .Select(cv => cv.RequestCVs.Where(requestCV => !requestCV.IsDeleted).OrderByDescending(requestCV => requestCV.LastModificationTime).FirstOrDefault())
-                        .GroupBy(requestCV => requestCV.Status)
-                        .Select(requestCVStatusGroup => new RequestCVStatusStatistic
-                        {
-                            Id = requestCVStatusGroup.Key,
-                            Name = requestCVStatusGroup.Key.ToString(),
-                            Quantity = requestCVStatusGroup.Count()
-                        }).ToList(),
+                        Id = request.SubPositionId,
+                        Name = request.SubPositionName,
+                    });
+                }
+            }
+            subPositions = subPositions.OrderBy(subPosition => subPosition.Name).ToList();
+
+            return new RecruitmentOverviewResponseDto
+            {
+                BranchId = branchId,
+                BranchName = branchName,
+                SubPositionStatistics = subPositions.Select(subPosition => new SubPositionStatisticV2
+                {
+                    SubPositionId = subPosition.Id,
+                    SubPositionName = subPosition.Name,
+                    RequestQuantity = filterRequests
+                    .Where(request => request.SubPositionId == subPosition.Id)
+                    .Select(request => request.Quantity)
+                    .Sum(),
+                    ApplyQuantity = filterCVs
+                    .Where(CV => CV.SubPositionId == subPosition.Id)
+                    .Count(),
+                    CVStatusStatistics = filterCVs
+                    .Where(CV => CV.SubPositionId == subPosition.Id)
+                    .GroupBy(CV => CV.CVStatusId)
+                    .Select(CVStatusGroup => new CVStatusStatistic
+                    {
+                        Id = CVStatusGroup.Key,
+                        Name = CVStatusGroup.Key.ToString(),
+                        Quantity = CVStatusGroup.Count(),
+                        PreviousQuantity = CVStatusGroup
+                        .Where(item => item.LastModificationTime < fromDate)
+                        .Count(),
+                        CurrentQuantity = CVStatusGroup
+                        .Where(item => item.LastModificationTime >= fromDate)
+                        .Count(),
                     }).ToList(),
-                    Total = new TotalStatistics
+                    CVSourceStatistics = filterCVs
+                    .Where(CV => CV.SubPositionId == subPosition.Id)
+                    .GroupBy(CV => new { CV.CVSourceId, CV.CVSourceName })
+                    .Select(CVSourceGroup => new CVSourceStatisticV2
                     {
-                        RequestQuantity = IQGetRequests(fromDate, toDate, userType, branchIds, userId)
-                        .Where(request => isGetDetailBranch ? request.BranchId.Equals(branchGroup.Key) : true)
-                        .Select(request => request.Quantity)
-                        .Sum(),
-                        ApplyQuantity = branchGroup.Count(),
-                        CVStatusStatistics = branchGroup.GroupBy(cv => cv.CVStatus).Select(CVStatusGroup => new CVStatusStatistic
+                        Id = CVSourceGroup.Key.CVSourceId,
+                        Name = CVSourceGroup.Key.CVSourceName,
+                        Quantity = CVSourceGroup.Count()
+                    }).ToList(),
+                    CandidateStatusStatistics = filterCVs
+                    .Where(CV => CV.SubPositionId == subPosition.Id)
+                    .GroupBy(CV => CV.CandidateStatusId)
+                    .Select(CVSourceGroup => new CandidateStatusStatistic
+                    {
+                        Id = CVSourceGroup.Key,
+                        Name = CVSourceGroup.Key.HasValue ? DictionaryHelper.RequestCVStatusDict[CVSourceGroup.Key.Value] : null,
+                        Quantity = CVSourceGroup.Count()
+                    }).ToList(),
+                }).ToList(),
+                Total = new TotalStatistics
+                {
+                    RequestQuantity = filterRequests.Select(request => request.Quantity).Sum(),
+                    ApplyQuantity = filterCVs.Count(),
+                    CVStatusStatistics = filterCVs
+                        .GroupBy(CV => CV.CVStatusId)
+                        .Select(CVStatusGroup => new CVStatusStatistic
                         {
                             Id = CVStatusGroup.Key,
                             Name = CVStatusGroup.Key.ToString(),
-                            Quantity = CVStatusGroup.Count()
+                            Quantity = CVStatusGroup.Count(),
+                            PreviousQuantity = CVStatusGroup
+                            .Where(item => item.LastModificationTime < fromDate)
+                            .Count(),
+                            CurrentQuantity = CVStatusGroup
+                            .Where(item => item.LastModificationTime >= fromDate)
+                            .Count(),
                         }).ToList(),
-                        CVSourceStatistics = branchGroup.GroupBy(cv => cv.CVSourceId).Select(CVSourceGroup => new CVSourceStatisticV2
+                    CVSourceStatistics = filterCVs
+                        .GroupBy(CV => new { CV.CVSourceId, CV.CVSourceName })
+                        .Select(CVSourceGroup => new CVSourceStatisticV2
                         {
-                            Id = CVSourceGroup.Key,
-                            Name = CVSourceGroup.Select(cv => cv.CVSource.Name).FirstOrDefault(),
+                            Id = CVSourceGroup.Key.CVSourceId,
+                            Name = CVSourceGroup.Key.CVSourceName,
                             Quantity = CVSourceGroup.Count()
                         }).ToList(),
-                        CandidateStatusStatistics = branchGroup
-                        .Select(cv => cv.RequestCVs.Where(requestCV => !requestCV.IsDeleted).OrderByDescending(requestCV => requestCV.LastModificationTime).FirstOrDefault())
-                        .GroupBy(requestCV => requestCV.Status)
-                        .Select(requestCVGroup => new RequestCVStatusStatistic
+                    CandidateStatusStatistics = filterCVs
+                        .GroupBy(CV => CV.CandidateStatusId)
+                        .Select(CVSourceGroup => new CandidateStatusStatistic
                         {
-                            Id = requestCVGroup.Key,
-                            Name = requestCVGroup.Key.ToString(),
-                            Quantity = requestCVGroup.Count()
+                            Id = CVSourceGroup.Key,
+                            Name = CVSourceGroup.Key.HasValue ? DictionaryHelper.RequestCVStatusDict[CVSourceGroup.Key.Value] : null,
+                            Quantity = CVSourceGroup.Count()
                         }).ToList(),
-                    }
-                });
-        }
-
-        private IQueryable<RequestStatistic> IQGetRequests(DateTime fromDate, DateTime toDate, UserType? userType, List<long> branchIds, long? userId)
-        {
-            bool isGetDetailBranch = branchIds != null && branchIds.Any();
-            return WorkScope.GetAll<Request>()
-                .Where(request => request.CreationTime >= fromDate && request.CreationTime < toDate.AddDays(1) && !request.IsDeleted)
-                .WhereIf(userType.HasValue, request => request.UserType.Equals(userType))
-                .WhereIf(isGetDetailBranch, request => branchIds.Contains(request.BranchId))
-                .WhereIf(userId.HasValue, request => request.CreatorUserId.Equals(userId))
-                .Select(request => new RequestStatistic
-                {
-                    BranchId = request.BranchId,
-                    BranchName = request.Branch.Name,
-                    SubPositionId = request.SubPositionId,
-                    SubPositionName = request.SubPosition.Name,
-                    Quantity = request.Quantity,
-                });
+                }
+            };
         }
 
         private IQueryable<RecruitmentOverviewResponseDto> IQGetRecruitmentOverviewByRequests(DateTime fromDate, DateTime toDate, UserType? userType, List<long> branchIds, long? userId)
@@ -274,7 +321,7 @@ namespace TalentV2.DomainServices.Reports
             var overviewHiring = new OverviewHiringDto();
             overviewHiring.SubPositionStatistics = subPositionStatistics;
 
-            await GetBranchInfo(overviewHiring,branchId);
+            await GetBranchInfo(overviewHiring, branchId);
 
             return overviewHiring;
         }
@@ -293,7 +340,7 @@ namespace TalentV2.DomainServices.Reports
                 total.TotalContacting += item.QuantityContacting;
                 total.TotalFailed += item.QuantityFailed;
                 total.TotalPassed += item.QuantityPassed;
-                for(int i = 0; i < sizeCVSource; i++)
+                for (int i = 0; i < sizeCVSource; i++)
                 {
                     total.TotalCVSources[i] += item.CVSourceStatistics[i].TotalCV;
                 }
@@ -308,7 +355,7 @@ namespace TalentV2.DomainServices.Reports
         private List<TotalStatus> ContructorListSize(int capacity)
         {
             var list = new List<TotalStatus>();
-            for(int i = 0; i < capacity; i++)
+            for (int i = 0; i < capacity; i++)
             {
                 list.Add(new TotalStatus());
             }
@@ -323,12 +370,12 @@ namespace TalentV2.DomainServices.Reports
           List<CVSource> cvsources,
           long? userId
           )
-         {
+        {
             Expression<Func<CV, bool>> predic = q => (q.CreationTime.Date >= fd.Date && q.CreationTime.Date <= td.Date) &&
                                                                          (userType.HasValue ? q.UserType == userType : true) &&
                                                                          (!q.IsDeleted && !q.IsDeleted && !q.IsDeleted) &&
                                                                          (branchId.HasValue ? q.BranchId == branchId.Value : true) &&
-                                                                         (userId.HasValue ? q.CreatorUserId == userId.Value: true);
+                                                                         (userId.HasValue ? q.CreatorUserId == userId.Value : true);
 
             var requestCVSources = WorkScope.GetAll<CV>()
             .Where(predic)
@@ -360,9 +407,9 @@ namespace TalentV2.DomainServices.Reports
         }
 
         private IEnumerable<StatisticRequestCVHistory> IQStatisticRequestCVHistory(
-            DateTime fd, 
-            DateTime td, 
-            UserType? userType, 
+            DateTime fd,
+            DateTime td,
+            UserType? userType,
             long? branchId,
             long? userId
             )
@@ -370,8 +417,8 @@ namespace TalentV2.DomainServices.Reports
             Expression<Func<RequestCVStatusHistory, bool>> predic = q => (q.TimeAt.Date >= fd.Date && q.TimeAt.Date <= td.Date) &&
                                                                          (userType.HasValue ? q.RequestCV.CV.UserType == userType : true) &&
                                                                          (!q.RequestCV.IsDeleted && !q.RequestCV.Request.IsDeleted && !q.RequestCV.CV.IsDeleted) &&
-                                                                         (branchId.HasValue ? q.RequestCV.CV.BranchId == branchId.Value : true)&&
-                                                                         (userId.HasValue ? q.RequestCV.CV.CreatorUserId == userId.Value : true);        
+                                                                         (branchId.HasValue ? q.RequestCV.CV.BranchId == branchId.Value : true) &&
+                                                                         (userId.HasValue ? q.RequestCV.CV.CreatorUserId == userId.Value : true);
 
             var requestCVStatusHistory = WorkScope.GetAll<RequestCVStatusHistory>()
             .Where(predic)
@@ -404,9 +451,9 @@ namespace TalentV2.DomainServices.Reports
             return qstatisticByPostion;
         }
         private async Task<Dictionary<long, StatisticQuantityCV>> GetDicSubPositionIdToStatisticQuantityCV(
-            DateTime fd, 
-            DateTime td, 
-            UserType? userType, 
+            DateTime fd,
+            DateTime td,
+            UserType? userType,
             long? branchId,
             long? userId)
         {
@@ -451,7 +498,7 @@ namespace TalentV2.DomainServices.Reports
             return cvsources.Select(x => new CVSourceStatistic
             {
                 Id = x.Id,
-                Name = x.Name,  
+                Name = x.Name,
                 TotalCV = 0
             }).ToList();
         }
@@ -476,8 +523,8 @@ namespace TalentV2.DomainServices.Reports
                                      select new SourcePerformance
                                      {
                                          SourceName = gr.Key,
-                                         TotalCV = gr.Where(q=> q.CreationTime.Date >= fd.Date && q.CreationTime.Date <= td.Date)
-                                                     .Where(q=>branchId.HasValue ? q.BranchId == branchId.Value : true)
+                                         TotalCV = gr.Where(q => q.CreationTime.Date >= fd.Date && q.CreationTime.Date <= td.Date)
+                                                     .Where(q => branchId.HasValue ? q.BranchId == branchId.Value : true)
                                                      .Where(q => q.UserType == userType)
                                                      .Count()
                                      };
@@ -493,49 +540,49 @@ namespace TalentV2.DomainServices.Reports
                                                                              (branchId.HasValue ? q.RequestCV.Request.BranchId == branchId.Value : true) &&
                                                                              (q.Status == RequestCVStatus.PassedTest);
 
-                var educationHaveCVPassTest = WorkScope.GetAll<RequestCVStatusHistory>()
-                    .Where(expression)
-                    .Select(s => new { s.RequestCV.CVId })
-                    .AsNoTracking()
-                    .AsEnumerable()
-                    .DistinctBy(s => s.CVId)
-                    .GroupBy(s => s.CVId)
-                    .Select(s => new
-                    {
-                        s.Key,
-                        TotalCV = s.Count()
-                    });
+            var educationHaveCVPassTest = WorkScope.GetAll<RequestCVStatusHistory>()
+                .Where(expression)
+                .Select(s => new { s.RequestCV.CVId })
+                .AsNoTracking()
+                .AsEnumerable()
+                .DistinctBy(s => s.CVId)
+                .GroupBy(s => s.CVId)
+                .Select(s => new
+                {
+                    s.Key,
+                    TotalCV = s.Count()
+                });
 
-                var educationSaveCVPassTest = educationHaveCVPassTest.ToDictionary(s => s.Key);
+            var educationSaveCVPassTest = educationHaveCVPassTest.ToDictionary(s => s.Key);
 
-                var educationIdsHaveCVPassTest = educationSaveCVPassTest.Keys.ToList();
-                var educations = WorkScope.GetAll<CVEducation>()
-                    .Where(s => educationIdsHaveCVPassTest.Contains(s.CVId))
-                    .Select(e => new EducationDto
-                    {
-                        Id = e.Education.Id,
-                        Name = e.Education.Name,
-                        CVId = e.CVId,
-                        ColorCode = e.Education.ColorCode
-                    })
-                    .AsNoTracking()
-                    .AsEnumerable()
-                    .ToList();
+            var educationIdsHaveCVPassTest = educationSaveCVPassTest.Keys.ToList();
+            var educations = WorkScope.GetAll<CVEducation>()
+                .Where(s => educationIdsHaveCVPassTest.Contains(s.CVId))
+                .Select(e => new EducationDto
+                {
+                    Id = e.Education.Id,
+                    Name = e.Education.Name,
+                    CVId = e.CVId,
+                    ColorCode = e.Education.ColorCode
+                })
+                .AsNoTracking()
+                .AsEnumerable()
+                .ToList();
 
-                var report = educations
-                    .GroupBy(e => e.Name)
-                    .Select(e => new ReportEducationHaveCVOnboardDto
-                    {
-                        EducationId = e.First().Id,
-                        EducationName = e.Key,
-                        ColorCode = e.First().ColorCode,
-                        TotalCV = e.Count()
-                    })
-                    .ToList();
-                var result = new ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>();
-                result.Educations = report;
-                await GetBranchInfo(result, branchId);
-                return result;
+            var report = educations
+                .GroupBy(e => e.Name)
+                .Select(e => new ReportEducationHaveCVOnboardDto
+                {
+                    EducationId = e.First().Id,
+                    EducationName = e.Key,
+                    ColorCode = e.First().ColorCode,
+                    TotalCV = e.Count()
+                })
+                .ToList();
+            var result = new ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>();
+            result.Educations = report;
+            await GetBranchInfo(result, branchId);
+            return result;
         }
         public async Task<ReportEducationByBranchDto<ReportEducationHaveCVOnboardDto>> GetEducationInternOnboarded(DateTime fd, DateTime td, long? branchId)
         {
@@ -649,7 +696,7 @@ namespace TalentV2.DomainServices.Reports
         public async Task<List<IdAndNameDto>> GetUserCreated()
         {
             var query = from cv in WorkScope.GetAll<CV>()
-                        where cv.CreatorUserId.HasValue  && !cv.CreatorUser.IsDeleted
+                        where cv.CreatorUserId.HasValue && !cv.CreatorUser.IsDeleted
                         select new IdAndNameDto
                         {
                             Id = cv.CreatorUserId.Value,
@@ -672,7 +719,7 @@ namespace TalentV2.DomainServices.Reports
             var pieChartCvSource = new Chart();
             var pieChartStatusStatistics = new Chart();
             pieChartCvSource.ModelCharts = new List<ModelChart>();
-            pieChartStatusStatistics.ModelCharts = new List<ModelChart>();     
+            pieChartStatusStatistics.ModelCharts = new List<ModelChart>();
             foreach (var branch in input.Branchs)
             {
                 var overviewHiring = await GetOverviewHiring(input.FromDate.Value, input.ToDate.Value, input.userType, branch.Id, input.userId);
@@ -748,7 +795,7 @@ namespace TalentV2.DomainServices.Reports
                 columChartOnbore.ModelCharts.Add(new ModelChart
                 {
                     BranchName = branch.DisplayName,
-                    Temaplates = pieCharts.Count() <= 0  ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } }: pieCharts,
+                    Temaplates = pieCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : pieCharts,
                 });
                 var listGetEducationPassTest = await GetEducationPassTest(input.FromDate.Value, input.ToDate.Value, branch.Id);
                 var educationPassTests = listGetEducationPassTest?.Educations.ToList();
@@ -764,8 +811,8 @@ namespace TalentV2.DomainServices.Reports
                 }).ToList();
                 columChartPassTest.ModelCharts.Add(new ModelChart
                 {
-                     BranchName = branch.DisplayName,
-                     Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : columnCharts,
+                    BranchName = branch.DisplayName,
+                    Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : columnCharts,
                 });
 
                 var listGetEducationPassInterView = await GetEducationPassInterView(input.FromDate.Value, input.ToDate.Value, branch.Id);

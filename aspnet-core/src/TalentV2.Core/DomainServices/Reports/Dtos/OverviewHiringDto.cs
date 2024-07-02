@@ -37,7 +37,7 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public int ApplyQuantity { get; set; }
         public List<CVStatusStatistic> CVStatusStatistics { get; set; }
         public List<CVSourceStatisticV2> CVSourceStatistics { get; set; }
-        public List<RequestCVStatusStatistic> CandidateStatusStatistics { get; set; }
+        public List<CandidateStatusStatistic> CandidateStatusStatistics { get; set; }
     }
 
     public class SubPositionStatisticV2
@@ -48,7 +48,13 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public int ApplyQuantity { get; set; }
         public List<CVStatusStatistic> CVStatusStatistics { get; set; }
         public List<CVSourceStatisticV2> CVSourceStatistics { get; set; }
-        public List<RequestCVStatusStatistic> CandidateStatusStatistics { get; set; }
+        public List<CandidateStatusStatistic> CandidateStatusStatistics { get; set; }
+    }
+
+    public class SubPositionDto
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class CVStatusStatistic
@@ -56,6 +62,8 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public CVStatus Id { get; set; }
         public string Name { get; set; }
         public int Quantity { get; set; }
+        public int PreviousQuantity { get; set; }
+        public int CurrentQuantity { get; set; }
     }
 
     public class CVSourceStatisticV2
@@ -65,9 +73,9 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public int Quantity { get; set; }
     }
 
-    public class RequestCVStatusStatistic
+    public class CandidateStatusStatistic
     {
-        public RequestCVStatus Id { get; set; }
+        public RequestCVStatus? Id { get; set; }
         public string Name { get; set; }
         public int Quantity { get; set; }
     }
@@ -75,10 +83,21 @@ namespace TalentV2.DomainServices.Reports.Dtos
     public class RequestStatistic
     {
         public long BranchId { get; set; }
-        public string BranchName { get; set; }
         public long SubPositionId { get; set; }
         public string SubPositionName { get; set; }
         public int Quantity { get; set; }
+    }
+
+    public class CVStatistic
+    {
+        public long BranchId { get; set; }
+        public long SubPositionId { get; set; }
+        public string SubPositionName { get; set; }
+        public CVStatus CVStatusId { get; set; }
+        public long? CVSourceId { get; set; }
+        public string CVSourceName { get; set; }
+        public RequestCVStatus? CandidateStatusId { get; set; }
+        public DateTime? LastModificationTime { get; set; }
     }
 
     public class SubPositionStatistic

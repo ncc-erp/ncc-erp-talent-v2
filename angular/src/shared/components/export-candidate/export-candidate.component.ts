@@ -1,4 +1,4 @@
-import { Component, Injector, Input, OnInit } from '@angular/core';
+import { Component, Injector, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { AppComponentBase } from '@shared/app-component-base';
@@ -13,7 +13,7 @@ import { finalize } from 'rxjs/operators';
   styleUrls: ['./export-candidate.component.scss']
 
 })
-export class ExportCandidateComponent extends AppComponentBase implements OnInit {
+export class ExportCandidateComponent extends AppComponentBase {
   fromDate: string ='' ;
   toDate: string ='' ;
   exportForm: FormGroup;
@@ -38,9 +38,6 @@ export class ExportCandidateComponent extends AppComponentBase implements OnInit
     this.fromDate = currentDate.toISOString().substr(0, 7);
     this.toDate = currentDate.toISOString().substr(0, 7);
   }
-
-  ngOnInit(): void {
-    }
 
   formatDate(dateObj) {
   const year = dateObj.getFullYear();

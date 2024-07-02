@@ -30,6 +30,7 @@
 
 .recruitment-overview-wrapping {
     padding: 20px;
+    overflow: auto;
 
     .branch-title {
         font-weight: bold;
@@ -42,7 +43,6 @@
 
         th,
         td {
-            // border: solid 1px;
             text-align: center;
             padding: 5px;
         }
