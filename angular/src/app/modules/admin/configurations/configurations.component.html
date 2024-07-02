@@ -694,6 +694,62 @@
         </div>
       </ng-template>
 
+      <div>
+        <label for="CVAutomationRepeatTime" class="label-title">
+          {{ "Crawl CV repeat time " | localize }}
+        </label>
+        <div class="d-flex flex-row">
+          <input
+            type="number"
+            min="0"
+            id="CVAutomationRepeatTime"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="notifyCVAutomation.repeatTimeInMinutes"
+            [readonly]="true"
+          />
+          <span>minutes</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="CrawlCVStartAtHour" class="label-title">
+          {{ "Crawl CV start at" | localize }}
+        </label>
+        <div class="d-flex flex-row">
+          <input
+            type="number"
+            min="0"
+            id="CrawlCVStartAtHour"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="notifyCVAutomation.crawlCVStartAtHour"
+            [readonly]="!isEditing.notifyCVAutomation"
+          />
+          <span>minutes</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="CrawlCVEndAtHour" class="label-title">
+          {{ "Crawl CV end at" | localize }}
+        </label>
+        <div class="d-flex flex-row">
+          <input
+            type="number"
+            min="0"
+            id="CrawlCVEndAtHour"
+            pInputText
+            class="w-75 p-0"
+            [(ngModel)]="notifyCVAutomation.crawlCVEndAtHour"
+            [readonly]="!isEditing.notifyCVAutomation"
+          />
+          <span>minutes</span>
+        </div>
+      </div>
+
+      <hr>
+
       <div class="panel-body flex-column">
         <div class="d-flex">
           <p-checkbox
@@ -745,23 +801,7 @@
           </div>
         </div>
 
-        <div>
-          <label for="CVAutomationRepeatTime" class="label-title">
-            {{ "Repeat time" | localize }}
-          </label>
-          <div class="d-flex flex-row">
-            <input
-              type="number"
-              min="0"
-              id="CVAutomationRepeatTime"
-              pInputText
-              class="w-75 p-0"
-              [(ngModel)]="notifyCVAutomation.repeatTimeInMinutes"
-              [readonly]="!isEditing.notifyCVAutomation"
-            />
-            <span>minutes</span>
-          </div>
-        </div>
+
 
         <div>
           <label for="tlIsToChannel" class="label-title">

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 
 namespace TalentV2.DomainServices.Reports.Dtos
@@ -14,6 +12,94 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public List<SubPositionStatistic> SubPositionStatistics { get; set; }
         public TotalOverviewHiring TotalOverviewHiring { get; set; }
     }
+
+    public class RecruitmentOverviewRequestDto
+    {
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public UserType? UserType { get; set; }
+        public bool IsGetAllBranch { get; set; }
+        public List<long> BranchIds { get; set; }
+        public long? UserId { get; set; }
+    }
+
+    public class RecruitmentOverviewResponseDto
+    {
+        public long? BranchId { get; set; }
+        public string BranchName { get; set; }
+        public List<SubPositionStatisticV2> SubPositionStatistics { get; set; }
+        public TotalStatistics Total { get; set; }
+    }
+
+    public class TotalStatistics
+    {
+        public int RequestQuantity { get; set; }
+        public int ApplyQuantity { get; set; }
+        public List<CVStatusStatistic> CVStatusStatistics { get; set; }
+        public List<CVSourceStatisticV2> CVSourceStatistics { get; set; }
+        public List<CandidateStatusStatistic> CandidateStatusStatistics { get; set; }
+    }
+
+    public class SubPositionStatisticV2
+    {
+        public long SubPositionId { get; set; }
+        public string SubPositionName { get; set; }
+        public int RequestQuantity { get; set; }
+        public int ApplyQuantity { get; set; }
+        public List<CVStatusStatistic> CVStatusStatistics { get; set; }
+        public List<CVSourceStatisticV2> CVSourceStatistics { get; set; }
+        public List<CandidateStatusStatistic> CandidateStatusStatistics { get; set; }
+    }
+
+    public class SubPositionDto
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class CVStatusStatistic
+    {
+        public CVStatus Id { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+        public int PreviousQuantity { get; set; }
+        public int CurrentQuantity { get; set; }
+    }
+
+    public class CVSourceStatisticV2
+    {
+        public long? Id { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class CandidateStatusStatistic
+    {
+        public RequestCVStatus? Id { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class RequestStatistic
+    {
+        public long BranchId { get; set; }
+        public long SubPositionId { get; set; }
+        public string SubPositionName { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class CVStatistic
+    {
+        public long BranchId { get; set; }
+        public long SubPositionId { get; set; }
+        public string SubPositionName { get; set; }
+        public CVStatus CVStatusId { get; set; }
+        public long? CVSourceId { get; set; }
+        public string CVSourceName { get; set; }
+        public RequestCVStatus? CandidateStatusId { get; set; }
+        public DateTime? LastModificationTime { get; set; }
+    }
+
     public class SubPositionStatistic
     {
         public long SubPositionId { get; set; }
