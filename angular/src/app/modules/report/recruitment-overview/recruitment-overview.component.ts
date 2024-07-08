@@ -58,6 +58,7 @@ export class RecruitmentOverviewComponent
   public cvSourceHeaders: CatalogModel[] = [];
   public candidateStatusHeaders: CatalogModel[] = [];
   public hasNewCVStatus: boolean = false;
+  public hasAnyStatus: boolean = false;
 
   constructor(
     injector: Injector,
@@ -123,6 +124,7 @@ export class RecruitmentOverviewComponent
   }
 
   private getHeaderItems() {
+    let candidateStatusHeaders: CatalogModel[] = [];
     this.overviewReport?.forEach((branch) => {
       branch.subPositionStatistics?.forEach((subPosition) => {
         subPosition.cvStatusStatistics?.forEach((cvStatus) => {
@@ -144,11 +146,12 @@ export class RecruitmentOverviewComponent
         });
         subPosition.candidateStatusStatistics?.forEach((candidateStatus) => {
           if (
-            !this.candidateStatusHeaders.some(
+            !candidateStatusHeaders.some(
               (item) => item.id === candidateStatus.id
-            )
+            ) &&
+            candidateStatus.id
           )
-            this.candidateStatusHeaders.push({
+            candidateStatusHeaders.push({
               id: candidateStatus.id,
               name: candidateStatus.name,
             });
@@ -156,10 +159,19 @@ export class RecruitmentOverviewComponent
       });
     });
     this.cvStatusHeaders.sort((a, b) => a.id - b.id);
-    this.candidateStatusHeaders.sort((a, b) => a.id - b.id);
+    this.candidateStatusHeaders = this._utilitiesService.catReqCvStatus.filter(
+      (candidateStatus) =>
+        candidateStatusHeaders.some(
+          (status) => status.id === candidateStatus.id
+        )
+    );
     this.hasNewCVStatus = this.cvStatusHeaders.some(
       (cvStatus) => cvStatus.id == 0
     );
+    this.hasAnyStatus =
+      !!this.cvSourceHeaders.length ||
+      !!this.cvSourceHeaders.length ||
+      !!this.candidateStatusHeaders.length;
   }
 
   private resetHeaderItems() {
@@ -172,12 +184,18 @@ export class RecruitmentOverviewComponent
     return list?.find((item) => item.id === id)?.quantity;
   }
 
-  public getPreviousQuantityById(list: OverviewStatistic[], id: number): number {
-    return list?.find((item) => item.id === id)?.previousQuantity;
+  public getCVStatusUnprocessedQuantity(
+    list: OverviewStatistic[],
+    id: number
+  ): number {
+    return list?.find((item) => item.id === id)?.unprocessedQuantity;
   }
 
-  public getCurrentQuantityById(list: OverviewStatistic[], id: number): number {
-    return list?.find((item) => item.id === id)?.currentQuantity;
+  public getCVStatusNormalQuantity(
+    list: OverviewStatistic[],
+    id: number
+  ): number {
+    return list?.find((item) => item.id === id)?.normalQuantity;
   }
 
   getDropdownFilterBranch() {

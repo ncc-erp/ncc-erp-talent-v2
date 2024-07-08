@@ -116,7 +116,7 @@ export class CandidateInternListComponent
     return this.indexOfLastMail = lengthOfListMail;
   }
 
-  getRowspanRequisiton(item: CandidateIntern) {
+  getRowSpanRequisition(item: CandidateIntern) {
     if (!item.requisitionInfos || item.requisitionInfos.length === 0) {
       return 1;
     }
