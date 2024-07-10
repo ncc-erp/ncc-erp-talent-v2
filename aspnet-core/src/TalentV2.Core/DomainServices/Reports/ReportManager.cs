@@ -115,6 +115,7 @@ namespace TalentV2.DomainServices.Reports
             var fromDate = payload.FromDate.ToLocalTime().Date;
             var toDate = payload.ToDate.ToLocalTime().Date;
             var hasBranches = payload.BranchIds != null && payload.BranchIds.Any();
+            DateTime currentDateTime = DateTime.Now;
 
             var CVs = await WorkScope.GetAll<CV>()
                 .Where(CV => CV.LastModificationTime >= fromDate && CV.LastModificationTime < toDate.AddDays(1) && !CV.IsDeleted)
@@ -131,8 +132,7 @@ namespace TalentV2.DomainServices.Reports
                             CandidateStatusId = CV.RequestCVs
                             .Where(requestCV => !requestCV.IsDeleted)
                             .OrderByDescending(requestCV => requestCV.LastModificationTime)
-                            .Select(requestCV => requestCV.Status)
-                            .FirstOrDefault(),
+                            .FirstOrDefault().Status,
                             LastModificationTime = CV.LastModificationTime
                         })
                         .ToListAsync();
@@ -154,20 +154,20 @@ namespace TalentV2.DomainServices.Reports
 
             if (payload.IsGetAllBranch)
             {
-                recruitmentOverviewResult.Add(StatisticRecruitmentOverviewByBranch(fromDate, toDate, CVs, requests, null));
+                recruitmentOverviewResult.Add(StatisticRecruitmentOverviewByBranch(fromDate, toDate, CVs, requests, currentDateTime, null));
             }
             if (hasBranches)
             {
                 foreach (var branchId in payload.BranchIds)
                 {
-                    recruitmentOverviewResult.Add(StatisticRecruitmentOverviewByBranch(fromDate, toDate, CVs, requests, branchId));
+                    recruitmentOverviewResult.Add(StatisticRecruitmentOverviewByBranch(fromDate, toDate, CVs, requests, currentDateTime, branchId));
                 }
             }
 
             return recruitmentOverviewResult;
         }
 
-        private RecruitmentOverviewResponseDto StatisticRecruitmentOverviewByBranch(DateTime fromDate, DateTime toDate, List<CVStatistic> CVs, List<RequestStatistic> requests, long? branchId)
+        private RecruitmentOverviewResponseDto StatisticRecruitmentOverviewByBranch(DateTime fromDate, DateTime toDate, List<CVStatistic> CVs, List<RequestStatistic> requests, DateTime currentDateTime, long? branchId)
         {
             string branchName = "All company";
             if (branchId.HasValue)
@@ -228,11 +228,11 @@ namespace TalentV2.DomainServices.Reports
                         Id = CVStatusGroup.Key,
                         Name = CVStatusGroup.Key.ToString(),
                         Quantity = CVStatusGroup.Count(),
-                        PreviousQuantity = CVStatusGroup
-                        .Where(item => item.LastModificationTime < fromDate)
+                        UnprocessedQuantity = CVStatusGroup
+                        .Where(item => item.LastModificationTime?.AddDays(3) < currentDateTime)
                         .Count(),
-                        CurrentQuantity = CVStatusGroup
-                        .Where(item => item.LastModificationTime >= fromDate)
+                        NormalQuantity = CVStatusGroup
+                        .Where(item => item.LastModificationTime?.AddDays(3) >= currentDateTime)
                         .Count(),
                     }).ToList(),
                     CVSourceStatistics = filterCVs
@@ -265,11 +265,11 @@ namespace TalentV2.DomainServices.Reports
                             Id = CVStatusGroup.Key,
                             Name = CVStatusGroup.Key.ToString(),
                             Quantity = CVStatusGroup.Count(),
-                            PreviousQuantity = CVStatusGroup
-                            .Where(item => item.LastModificationTime < fromDate)
+                            UnprocessedQuantity = CVStatusGroup
+                            .Where(item => item.LastModificationTime?.AddDays(3) < currentDateTime)
                             .Count(),
-                            CurrentQuantity = CVStatusGroup
-                            .Where(item => item.LastModificationTime >= fromDate)
+                            NormalQuantity = CVStatusGroup
+                            .Where(item => item.LastModificationTime?.AddDays(3) >= currentDateTime)
                             .Count(),
                         }).ToList(),
                     CVSourceStatistics = filterCVs

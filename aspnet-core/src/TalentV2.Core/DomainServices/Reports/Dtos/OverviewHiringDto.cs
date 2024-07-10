@@ -62,8 +62,8 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public CVStatus Id { get; set; }
         public string Name { get; set; }
         public int Quantity { get; set; }
-        public int PreviousQuantity { get; set; }
-        public int CurrentQuantity { get; set; }
+        public int UnprocessedQuantity { get; set; }
+        public int NormalQuantity { get; set; }
     }
 
     public class CVSourceStatisticV2
