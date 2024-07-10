@@ -10,7 +10,7 @@ import { UtilitiesService } from './../../../app/core/services/utilities.service
   templateUrl: './candidate-info-new.component.html',
   styleUrls: ['./candidate-info-new.component.scss']
 })
-export class CandidateInfoNewComponent extends AppComponentBase implements OnInit {
+export class CandidateInfoNewComponent extends AppComponentBase {
 
   @Input() data: CandidateInfo;
   @Input() showSkills = true;
@@ -27,7 +27,6 @@ export class CandidateInfoNewComponent extends AppComponentBase implements OnIni
     super(injector);
   }
 
-  ngOnInit(): void { }
 
   navigateToCanDetail(slug: number) {
     if(!this.isOpenDetail) return;

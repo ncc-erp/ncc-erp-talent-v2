@@ -104,12 +104,24 @@
                 </th>
                 <th
                   [colSpan]="cvSourceHeaders.length"
+                  [rowSpan]="
+                    1 +
+                    (cvSourceHeaders.length === 0 && hasAnyStatus
+                      ? 2
+                      : 0)
+                  "
                   class="background-color-3"
                 >
                   CV SOURCE
                 </th>
                 <th
                   [colSpan]="candidateStatusHeaders.length"
+                  [rowSpan]="
+                    1 +
+                    (candidateStatusHeaders.length === 0 && hasAnyStatus
+                      ? 2
+                      : 0)
+                  "
                   class="background-color-4"
                 >
                   CANDIDATE STATUS
@@ -140,8 +152,8 @@
                 </th>
               </tr>
               <tr class="header-item" *ngIf="hasNewCVStatus">
-                <th class="background-color-2">PREVIOUS</th>
-                <th class="background-color-2">CURRENT</th>
+                <th class="background-color-2">UNPROCESSED</th>
+                <th class="background-color-2">NORMAL</th>
               </tr>
             </thead>
             <tbody>
@@ -164,7 +176,7 @@
                   </td>
                   <td *ngIf="cvStatus.id === 0" class="background-color-2">
                     {{
-                      getPreviousQuantityById(
+                      getCVStatusUnprocessedQuantity(
                         branch.total.cvStatusStatistics,
                         cvStatus.id
                       )
@@ -172,7 +184,7 @@
                   </td>
                   <td *ngIf="cvStatus.id === 0" class="background-color-2">
                     {{
-                      getCurrentQuantityById(
+                      getCVStatusNormalQuantity(
                         branch.total.cvStatusStatistics,
                         cvStatus.id
                       )
@@ -252,7 +264,7 @@
                     [ngClass]="{ 'background-color-1': i % 2 === 0 }"
                   >
                     {{
-                      getPreviousQuantityById(
+                      getCVStatusUnprocessedQuantity(
                         subPosition?.cvStatusStatistics,
                         cvStatus.id
                       )
@@ -263,7 +275,7 @@
                     [ngClass]="{ 'background-color-1': i % 2 === 0 }"
                   >
                     {{
-                      getCurrentQuantityById(
+                      getCVStatusNormalQuantity(
                         subPosition?.cvStatusStatistics,
                         cvStatus.id
                       )
