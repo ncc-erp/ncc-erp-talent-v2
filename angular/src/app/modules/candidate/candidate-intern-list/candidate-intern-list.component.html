@@ -308,7 +308,7 @@
 
     <ng-template pTemplate="body" let-item let-i="rowIndex">
       <tr>
-        <td *ngIf="isDialogMode" [attr.rowspan]="getRowspanRequisiton(item)">
+        <td *ngIf="isDialogMode" [attr.rowspan]="getRowSpanRequisition(item)">
           <talent-tag-select
             [currentItem]="item"
             [seletedIds]="internIdsInReqList"
@@ -317,18 +317,18 @@
           </talent-tag-select>
         </td>
 
-        <td class="text-center" [attr.rowspan]="getRowspanRequisiton(item)">
+        <td class="text-center" [attr.rowspan]="getRowSpanRequisition(item)">
           {{ i + 1 }}
         </td>
 
-        <td class="candidate-infor" [attr.rowspan]="getRowspanRequisiton(item)">
+        <td class="candidate-infor" [attr.rowspan]="getRowSpanRequisition(item)">
           <talent-candidate-info-new
             [data]="item"
             [tabActive]="getTabActiveDetail(item)"
           ></talent-candidate-info-new>
         </td>
 
-        <td class="text-center" [attr.rowspan]="getRowspanRequisiton(item)">
+        <td class="text-center" [attr.rowspan]="getRowSpanRequisition(item)">
           <div>
             {{
               item.lastModifiedTime
@@ -347,7 +347,7 @@
           ></talent-requisition-info>
         </td>
 
-        <td class="text-center" [attr.rowspan]="getRowspanRequisiton(item)">
+        <td class="text-center" [attr.rowspan]="getRowSpanRequisition(item)">
           <div>
             <div *ngIf="item.mailStatusHistories.length <= 3">
               <ng-container *ngFor="let mail of item.mailStatusHistories">
@@ -396,7 +396,7 @@
 
         <td
           [attr.title]="item.note"
-          [attr.rowspan]="getRowspanRequisiton(item)"
+          [attr.rowspan]="getRowSpanRequisition(item)"
         >
           <div class="row no-wrap">
             <div
@@ -418,7 +418,7 @@
         </td>
 
         <td
-          [attr.rowspan]="getRowspanRequisiton(item)"
+          [attr.rowspan]="getRowSpanRequisition(item)"
           class="text-center"
           *ngIf="!isDialogMode"
         >
