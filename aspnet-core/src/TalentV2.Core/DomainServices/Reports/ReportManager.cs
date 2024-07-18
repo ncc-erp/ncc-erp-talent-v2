@@ -696,7 +696,7 @@ namespace TalentV2.DomainServices.Reports
         public async Task<List<IdAndNameDto>> GetUserCreated()
         {
             var query = from cv in WorkScope.GetAll<CV>()
-                        where cv.CreatorUserId.HasValue && !cv.CreatorUser.IsDeleted
+                        where cv.CreatorUserId.HasValue && !cv.CreatorUser.IsDeleted && cv.CreatorUser.IsActive
                         select new IdAndNameDto
                         {
                             Id = cv.CreatorUserId.Value,
