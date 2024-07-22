@@ -223,6 +223,8 @@ namespace TalentV2.DomainServices.Candidates
                     Level = s.Request.Level,
                     SubPositionId = s.Request.SubPositionId,
                     SubPositionName = s.Request.SubPosition.Name,
+                    PositionId = s.Request.SubPosition.PositionId,
+                    PositionName = s.Request.SubPosition.Position.Name,
                     Priority = s.Request.Priority,
                     Note = s.Request.Note,
                     Quantity = s.Request.Quantity,
@@ -834,6 +836,10 @@ namespace TalentV2.DomainServices.Candidates
                     Salary = s.Salary,
                     Status = s.Status,
                     Percentage = s.Percentage,
+                    SubPositionId = s.Request.SubPositionId,
+                    SubPositionName = s.Request.SubPosition.Name,
+                    PositionId = s.Request.SubPosition.PositionId,
+                    PositionName = s.Request.SubPosition.Position.Name,
                     HistoryStatuses = s.RequestCVStatusHistories
                     .OrderByDescending(s => s.TimeAt)
                     .Select(x => new HistoryStatusesDto

@@ -36,6 +36,8 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string UserTypeName { get => CommonUtils.GetEnumName(UserType); }
         public long SubPositionId { get; set; }
         public string SubPositionName { get; set; }
+        public long PositionId { get; set; }
+        public string PositionName { get; set; }
         public Level Level { get; set; }
         public LevelDto LevelInfo { get => CommonUtils.ListLevel.Where(s => s.Id == Level.GetHashCode()).Select(s => s).FirstOrDefault(); }
         public List<CategoryDto> Skills { get; set; }
@@ -120,6 +122,10 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public string LMSInfo { get; set; }
         public string Percentage { get; set; }
         public bool? EmailSent { get; set; }
+        public long SubPositionId { get; set; }
+        public string SubPositionName { get; set; }
+        public long PositionId { get; set; }
+        public string PositionName { get; set; }
     }
     public class InterviewLevelCandidateDto
     {
