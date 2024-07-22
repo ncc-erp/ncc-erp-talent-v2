@@ -3,7 +3,7 @@ import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
-import { CatalogModel } from '@app/core/models/common/common.dto';
+import { CatalogModel, MailTemplateCatalog } from '@app/core/models/common/common.dto';
 import { RequisitionStaff } from '@app/core/models/requisition/requisition.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
@@ -12,7 +12,7 @@ import { RequisitionInternComponent } from '@app/modules/requisitiion/requisitio
 import { RequisitionStaffComponent } from '@app/modules/requisitiion/requisition-staff/requisition-staff.component';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DateFormat, MESSAGE, TOOL_URL } from '@shared/AppConsts';
-import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
+import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, MailFunc, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
 import * as moment from 'moment';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import * as _ from 'lodash';
@@ -23,6 +23,7 @@ import { CapabilityWithSetting } from '@app/core/models/categories/capabilities-
 import { ParamsGetScoreRange, ScoreRangeWithSetting } from '@app/core/models/categories/score-range-setting.model';
 import { ScoreSettingService } from '@app/core/services/categories/score-setting.service';
 import { ApiResponse } from '@shared/paged-listing-component-base';
+import { CommonService } from '@app/core/services/common.service';
 
 @Component({
   selector: 'talent-current-requisition',
@@ -94,6 +95,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   catInternLevels = this.optionFailInternLevel.concat(this._utilities.catLevelFinalIntern).filter(item => item.defaultName !== "FresherPlus");
   catStaffLevels = this.optionFailStaffLevel.concat(this._utilities.catLevelFinalStaff).filter((item) => item.id !== 100);
   createAccountOption = Object.entries(StatusCreateAccount).map(([key]) => ({ name: key, id: key }));
+  emailTemplateOption: MailTemplateCatalog[] = [];
 
   //permission
   PS_EditSalaryIntern: string = this.PS.Pages_CandidateIntern_ViewDetail_RequestCV_EditSalary;
@@ -109,6 +111,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   constructor(
     injector: Injector,
     public _utilities: UtilitiesService,
+    public _common: CommonService,
     public _dialog: DialogService,
     public _capSetting: CapabilitySettingService,
     private fb: FormBuilder,
@@ -168,8 +171,19 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     );
   }
 
-  onDropdownChange(createAccount: any) {
-    this.createAccountStatusId = createAccount.value;
+  onEmailTemplateVersionChange() {
+    const emailTemplate = getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate');
+    if (!emailTemplate) {
+      return;
+    }
+
+    if (emailTemplate.version === 'Tester') {
+      this.applyResultForm.get('lmsInfo').setValue(`<p>Link bài Test: <a href="https://contest.ncc.asia/contest/6" rel="noopener noreferrer" target="_blank">NCC Tester Contest</a></p>`)
+    } else if (emailTemplate === 'Developer') {
+      this.applyResultForm.get('lmsInfo').setValue(`<p>Link bài Test: <a href="https://contest.ncc.asia/contest/4" rel="noopener noreferrer" target="_blank">NCC Developer Contest</a></p>`)
+    } else {
+      this.applyResultForm.get('lmsInfo').setValue(`<p>Link bài Test: <a href="https://contest.ncc.asia/contest/4" rel="noopener noreferrer" target="_blank">NCC Contest</a></p>`)
+    }
   }
 
   onInterviewerChange(id: number) {
@@ -540,7 +554,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
 
   private handleSendMail() {
-    this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id).subscribe(res => {
+    this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id, getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate').version).subscribe(res => {
       if (!res.success || res.loading) return;
 
       const data: MailDialogConfig = { mailInfo: res.result, showEditBtn: true }
@@ -685,7 +699,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       mailDetail: null,
       lmsInfo: null,
       percentage: '',
-      createAccount: [this.getDefaultCreateAccount()],
+      scheduledTestEmailTemplate: [this.getDefaultscheduledTestEmailTemplate()],
     })
 
     const interviewLevelForm = this.fb.group({
@@ -749,7 +763,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  getDefaultCreateAccount(lmsInfo: string = null) {
+  getDefaultscheduledTestEmailTemplate(lmsInfo: string = null) {
     if (lmsInfo?.includes(TOOL_URL.lms) && !lmsInfo.includes(TOOL_URL.contest)) {
       return StatusCreateAccount.CREATE_LMS_ACCOUNT;
     }
@@ -776,7 +790,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       this.applyResultForm.patchValue({
         ...applyResult,
         onboardDate: applyResult.onboardDate ? new Date(applyResult.onboardDate) : null,
-        createAccount: this.getDefaultCreateAccount(applyResult?.lmsInfo)
+        createAccount: this.getDefaultscheduledTestEmailTemplate(applyResult?.lmsInfo)
       });
 
       this.applyHistoryStatuses.clear();
@@ -939,6 +953,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     el.scrollIntoView({ behavior: 'smooth' });
   }
   OnReqCvStatus() {
+    if (this.candidateRequisiton?.applicationResult) {
+      this.candidateRequisiton.applicationResult.status = getFormControlValue(this.applyResultForm, "status");
+    }
+
     if (getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.ScheduledInterview ||
       getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.RejectInterview ||
       getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.FailedInterview) {
@@ -946,6 +964,16 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
     else {
       this.listRequestStatus = [...this._utilities.catReqCvStatus]
+    }
+
+    if (getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.ScheduledTest) {
+      this._common.getEmailTemplate(MailFunc.ScheduledTest).subscribe((res) => {
+        if (res.success) {
+          this.emailTemplateOption = res.result;
+          this.applyResultForm.get('scheduledTestEmailTemplate').setValue(this.emailTemplateOption[0]);
+          this.onEmailTemplateVersionChange();
+        }
+      })
     }
   }
   totalScore(): string {

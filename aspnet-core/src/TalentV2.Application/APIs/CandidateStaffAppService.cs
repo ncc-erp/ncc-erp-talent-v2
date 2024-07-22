@@ -257,9 +257,9 @@ namespace TalentV2.APIs
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_CandidateStaff_ViewDetail_RequestCV_SendMail)]
-        public async Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long requestCVId)
+        public async Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long requestCVId, string? mailVersion = null)
         {
-            return await _candidateManager.PreviewBeforeSendMailRequestCV(requestCVId);
+            return await _candidateManager.PreviewBeforeSendMailRequestCV(requestCVId, mailVersion);
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_CandidateStaff_ViewDetail_PersonInfo_Edit)]

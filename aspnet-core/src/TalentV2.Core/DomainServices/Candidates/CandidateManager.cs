@@ -1519,9 +1519,16 @@ namespace TalentV2.DomainServices.Candidates
             return await _mailService.GetContentMailCV(cvId);
         }
 
-        public async Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long requestCVId)
+        public async Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long requestCVId, string? mailVersion = null)
         {
-            return await _mailService.GetContentMailRequestCV(requestCVId);
+            if (string.IsNullOrEmpty(mailVersion))
+            {
+                return await _mailService.GetContentMailRequestCV(requestCVId);
+            }
+            else
+            {
+                return await _mailService.GetContentMailRequestCV(requestCVId, mailVersion);
+            }
         }
 
         public async Task<MailDetailDto> SendMailCV(long cvId, MailPreviewInfoDto message)

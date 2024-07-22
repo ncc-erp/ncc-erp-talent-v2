@@ -66,7 +66,7 @@ namespace TalentV2.DomainServices.Candidates
 
         #region send mail CV
         Task<MailPreviewInfoDto> PreviewBeforeSendMailCV(long cvId);
-        Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long cvId);
+        Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long cvId, string? mailVersion = null);
         Task<MailDetailDto> SendMailCV(long cvId, MailPreviewInfoDto message);
         Task<MailDetailDto> SendMailRequestCV(long cvId, MailPreviewInfoDto message);
         Task<string> CreateAccountStudent(long cvId, long requestCVId, StatusCreateAccount statusCreateAccount);

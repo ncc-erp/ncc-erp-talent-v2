@@ -37,3 +37,9 @@ export class PositionCatalog {
     position: string;
     items: { id: number, subPosition: string }[];
 }
+
+export class MailTemplateCatalog {
+    id: number;
+    name: string;
+    version: string;
+}

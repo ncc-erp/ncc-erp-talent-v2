@@ -2,6 +2,7 @@ import {
   CatalogModel,
   InternSalaryCatalog,
   LevelInfo,
+  MailTemplateCatalog,
   PositionCatalog,
 } from "./../models/common/common.dto";
 import { HttpClient } from "@angular/common/http";
@@ -9,6 +10,7 @@ import { Injectable } from "@angular/core";
 import { ApiResponse } from "@shared/paged-listing-component-base";
 import { Observable } from "rxjs";
 import { BaseApiService } from "./apis/base-api.service";
+import { MailFunc } from "@shared/AppEnums";
 
 @Injectable({
   providedIn: "root",
@@ -84,5 +86,13 @@ export class CommonService extends BaseApiService {
 
   getLevelFinalIntern(): Observable<ApiResponse<InternSalaryCatalog[]>> {
     return this.getAll("/GetLevelFinalIntern");
+  }
+
+  getEmailTemplate(mailFunc: MailFunc = null): Observable<ApiResponse<MailTemplateCatalog[]>> {
+    if (mailFunc) {
+      return this.getAll(`/GetEmailTemplate?mailFunc=${mailFunc}`);
+    } else {
+      return this.getAll("/GetEmailTemplate");
+    }
   }
 }
