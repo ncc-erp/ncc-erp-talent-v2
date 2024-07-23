@@ -265,21 +265,18 @@
         " [toggleable]="true">
         <ng-template pTemplate="header">
           <div class="d-flex ">
-          <div class="panel-title d-flex mr-3 align-items-center">
-            Capability (for interviewer) Total Score
-            :
-            <label class="tl-link" (click)="showDialogScoreRanges('top')">{{totalScore()}}/5</label>
+            <div class="panel-title d-flex mr-3 align-items-center">
+              Capability (for interviewer) Total Score
+              :
+              <label class="tl-link" (click)="showDialogScoreRanges('top')">{{totalScore()}}/5</label>
+            </div>
+            <div class="mt-1" *ngIf="userType === USER_TYPE.INTERN">
+              <input type="text" pInputText [value]="levelByScore" disabled />
+              <div class="text-error text-danger" *ngIf="!hasValidScoreLevel ">
+                There is no suitable range
+              </div>
+            </div>
           </div>
-          <div class="mt-1" *ngIf="userType === USER_TYPE.INTERN">
-          <input type="text" pInputText [value]="levelByScore" disabled />
-          <div
-          class="text-error text-danger"
-          *ngIf="!hasValidScoreLevel "
-         >
-         There is no suitable range
-          </div>
-          </div>
-        </div>
         </ng-template>
         <ng-template pTemplate="icons">
           <div class="d-flex">
@@ -519,8 +516,8 @@
                     submitted &&
                     applyResultFormControls.percentage?.errors?.required
                   ">
-                  Percentage is required
-                </div>
+                      Percentage is required
+                    </div>
                   </div>
                 </div>
 
@@ -655,31 +652,21 @@
                 <div class="editor w-100">
                   <div class="mb-3">
                     <div class="d-flex">
-                    <span class="mt-2 mr-2" for="lmsEditor"> {{ "Create" | localize }}</span>
-                    <div class="w-50"
-                      *ngIf="
+                      <div class="w-50" *ngIf="
                         candidateRequisiton?.applicationResult.status ===
                           REQUEST_CV_STATUS.ScheduledTest &&
                           validPermissionUserType(
                           userType,
                           PS.Pages_CandidateIntern_ViewDetail_RequestCV_CreateAccountLMS,
                           PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS)">
-                        <p-dropdown
-                         formControlName="createAccount"
-                         [options]="createAccountOption"
-                         placeholder="All"
-                         optionLabel="name"
-                         optionValue="id"
-                         styleClass="w-100"
-                         [filter]="true"
-                         filterBy="name"
-                         [showClear]="true"
-                         (onChange)="onDropdownChange($event)"
-                         >
+                        <p-dropdown formControlName="scheduledTestEmailTemplate" [options]="emailTemplateOption"
+                          placeholder="All" optionLabel="name" styleClass="w-100" [filter]="true" filterBy="name"
+                          [showClear]="true" [(ngModel)]="scheduledMailTemplate"
+                          (onChange)="onEmailTemplateVersionChange()">
                         </p-dropdown>
                       </div>
 
-                    <p-button *ngIf="
+                      <!-- <p-button *ngIf="
                         candidateRequisiton?.applicationResult.status ===
                           REQUEST_CV_STATUS.ScheduledTest &&
                         validPermissionUserType(
@@ -688,14 +675,13 @@
                           PS.Pages_CandidateStaff_ViewDetail_RequestCV_CreateAccountLMS
                         )
                       " label="Create Account" styleClass="p-button-sm p-button-outlined ml-4"
-                      (onClick)="createAccount()"></p-button>
+                      (onClick)="createAccount()"></p-button> -->
+                    </div>
                   </div>
-                </div>
 
                   <p-editor inputId="lmsEditor" formControlName="lmsInfo" [readonly]="
                       applyResultForm?.controls?.lmsInfo?.status ==
-                      STATUS_DISABLED
-                    " [style]="{ height: '100px' }"></p-editor>
+                      STATUS_DISABLED" [style]="{ height: '100px' }"></p-editor>
                 </div>
 
                 <div class="group-card w-100">

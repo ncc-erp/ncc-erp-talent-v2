@@ -145,17 +145,25 @@ namespace TalentV2.MultiTenancy
                 .ToList()
                 .ForEach(e =>
                 {
-                    mailTemplates.Add(
-                        new EmailTemplate
+                    var mailSeeds = DictionaryHelper.SeedMailDic[e];
+                    if (mailSeeds != null && mailSeeds.Count > 0)
+                    {
+                        foreach (var mail in mailSeeds)
                         {
-                            Subject = DictionaryHelper.SeedMailDic[e].Subject,
-                            Name = DictionaryHelper.SeedMailDic[e].Name,
-                            BodyMessage = TemplateHelper.ContentEmailTemplate(e),
-                            Description = DictionaryHelper.SeedMailDic[e].Description,
-                            Type = e,
-                            TenantId = tenantId
+                            mailTemplates.Add(
+                                new EmailTemplate
+                                {
+                                    Subject = mail.Subject,
+                                    Name = mail.Name,
+                                    BodyMessage = TemplateHelper.ContentEmailTemplate(e),
+                                    Description = mail.Description,
+                                    Type = e,
+                                    Version = mail.Version,
+                                    TenantId = tenantId
+                                }
+                            );
                         }
-                    );
+                    }
                 });
             await _workScope.InsertRangeAsync(mailTemplates);
         }

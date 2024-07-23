@@ -26,4 +26,9 @@ namespace TalentV2.DomainServices.Categories.Dtos
         [MaxLength(20)]
         public string ColorCode { get; set; }
     }
+
+    public class MailTemplateDto : CategoryDto
+    {
+        public string Version { get; set; }
+    }
 }
