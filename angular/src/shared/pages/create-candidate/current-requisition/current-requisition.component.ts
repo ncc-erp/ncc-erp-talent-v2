@@ -554,7 +554,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private handleSendMail() {
-    this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id, getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate').version).subscribe(res => {
+    const mail = getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate');
+    this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id, mail?.version).subscribe(res => {
       if (!res.success || res.loading) return;
 
       const data: MailDialogConfig = { mailInfo: res.result, showEditBtn: true }
