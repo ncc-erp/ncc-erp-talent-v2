@@ -16,7 +16,6 @@ using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Requisitions;
 using TalentV2.Entities;
 using TalentV2.Notifications.Mail.Dtos;
-using TalentV2.Utils;
 
 namespace TalentV2.APIs
 {
@@ -256,9 +255,9 @@ namespace TalentV2.APIs
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_SendMail)]
-        public async Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long requestCVId)
+        public async Task<MailPreviewInfoDto> PreviewBeforeSendMailRequestCV(long requestCVId, string? mailVersion = null)
         {
-            return await _candidateManager.PreviewBeforeSendMailRequestCV(requestCVId);
+            return await _candidateManager.PreviewBeforeSendMailRequestCV(requestCVId, mailVersion);
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_PersonInfo_SendMail)]

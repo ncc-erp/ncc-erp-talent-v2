@@ -12,10 +12,12 @@ namespace TalentV2.Notifications.Mail
     public interface IMailService : ITransientDependency
     {
         Task<MailPreviewInfoDto> GetContentMailRequestCV(long requestCVId);
+        Task<MailPreviewInfoDto> GetContentMailRequestCV(long requestCVId, string mailVersion);
         Task<MailPreviewInfoDto> GetContentMailCV(long cvId);
         Task<bool> IsSentMailCV(long cvId, MailFuncEnum mailFuncType);
         Task<List<MailStatusHistoryDto>> GetMailStatusHistoryByCVId(long cvId);
         Task<MailPreviewInfoDto> PreviewContentMail(long id, MailFuncEnum mailFuncType);
+        Task<MailPreviewInfoDto> PreviewContentMail(long id, MailFuncEnum emailType, string mailVersion);
         void Send(MailPreviewInfoDto content);
         Task<List<MailDto>> GetAllMailTemplate();
         Task<MailPreviewInfoDto> GetById(long id);

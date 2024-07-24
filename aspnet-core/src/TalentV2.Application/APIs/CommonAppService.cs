@@ -1,13 +1,12 @@
 ﻿using Abp.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Users;
-using TalentV2.DomainServices.Candidates.Dtos;
+using TalentV2.Constants.Dictionary;
+using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.DomainServices.Users.Dtos;
 using TalentV2.Entities;
@@ -130,6 +129,29 @@ namespace TalentV2.APIs
         public List<InternSalaryDto> GetLevelFinalIntern()
         {
             return CommonUtils.ListLevelFinalIntern;
+        }
+
+        [HttpGet]
+        public List<MailTemplateDto> GetEmailTemplate(MailFuncEnum? mailFunc = null)
+        {
+            if (mailFunc != null)
+            {
+                return DictionaryHelper.SeedMailDic[(MailFuncEnum)mailFunc].Select(mailInfo => new MailTemplateDto
+                {
+                    Id = mailInfo.Name.GetHashCode(),
+                    Name = mailInfo.Name,
+                    Version = mailInfo.Version,
+                }).ToList();
+            }
+            else
+            {
+                return DictionaryHelper.SeedMailDic.Values.SelectMany(mailInfo => mailInfo).Select(mailInfo => new MailTemplateDto
+                {
+                    Id = mailInfo.Name.GetHashCode(),
+                    Name = mailInfo.Name,
+                    Version = mailInfo.Version,
+                }).ToList();
+            }
         }
     }
 }

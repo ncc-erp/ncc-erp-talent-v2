@@ -3,7 +3,7 @@ import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
 import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateRequisiton, CandidatInterviewer, CurrentRequisition, HistoryChangeStatus, HistoryStatus } from '@app/core/models/candidate/candiadte-requisition.model';
-import { CatalogModel } from '@app/core/models/common/common.dto';
+import { CatalogModel, MailTemplateCatalog } from '@app/core/models/common/common.dto';
 import { RequisitionStaff } from '@app/core/models/requisition/requisition.model';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
@@ -12,7 +12,7 @@ import { RequisitionInternComponent } from '@app/modules/requisitiion/requisitio
 import { RequisitionStaffComponent } from '@app/modules/requisitiion/requisition-staff/requisition-staff.component';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DateFormat, MESSAGE, TOOL_URL } from '@shared/AppConsts';
-import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
+import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, MailFunc, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
 import * as moment from 'moment';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import * as _ from 'lodash';
@@ -23,6 +23,7 @@ import { CapabilityWithSetting } from '@app/core/models/categories/capabilities-
 import { ParamsGetScoreRange, ScoreRangeWithSetting } from '@app/core/models/categories/score-range-setting.model';
 import { ScoreSettingService } from '@app/core/services/categories/score-setting.service';
 import { ApiResponse } from '@shared/paged-listing-component-base';
+import { CommonService } from '@app/core/services/common.service';
 
 @Component({
   selector: 'talent-current-requisition',
@@ -61,8 +62,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   clonedCanCapability: { [s: string]: CandidateCapability; } = {};
   isLoadingCapabilityTable = false;
   isLoadingSendMail = false;
-  levelByScore : string;
-  hasValidScoreLevel  = false;
+  levelByScore: string;
+  hasValidScoreLevel = false;
 
   form: FormGroup;
   submitted = false;
@@ -94,6 +95,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   catInternLevels = this.optionFailInternLevel.concat(this._utilities.catLevelFinalIntern).filter(item => item.defaultName !== "FresherPlus");
   catStaffLevels = this.optionFailStaffLevel.concat(this._utilities.catLevelFinalStaff).filter((item) => item.id !== 100);
   createAccountOption = Object.entries(StatusCreateAccount).map(([key]) => ({ name: key, id: key }));
+  emailTemplateOption: MailTemplateCatalog[] = [];
 
   //permission
   PS_EditSalaryIntern: string = this.PS.Pages_CandidateIntern_ViewDetail_RequestCV_EditSalary;
@@ -109,6 +111,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   constructor(
     injector: Injector,
     public _utilities: UtilitiesService,
+    public _common: CommonService,
     public _dialog: DialogService,
     public _capSetting: CapabilitySettingService,
     private fb: FormBuilder,
@@ -122,7 +125,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.initForm();
     this.getCanRequisitionData();
     this._utilities.loadCatalogForCategories();
-    }
+  }
   ngOnDestroy(): void {
     super.ngOnDestroy();
     if (this.dialogRef) this.dialogRef.close()
@@ -168,8 +171,21 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     );
   }
 
-  onDropdownChange(createAccount: any) {
-    this.createAccountStatusId = createAccount.value;
+  onEmailTemplateVersionChange() {
+    const emailTemplate = getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate');
+    if (!emailTemplate) {
+      return;
+    }
+
+    if (emailTemplate.version === 'Tester') {
+      this.applyResultForm.get('lmsInfo').setValue(`<p>Link bài Test: <a href="https://contest.ncc.asia/contest/6" rel="noopener noreferrer" target="_blank">NCC Tester Contest</a></p>`)
+    } else if (emailTemplate.version === 'Developer') {
+      this.applyResultForm.get('lmsInfo').setValue(`<p>Link bài Test: <a href="https://contest.ncc.asia/contest/4" rel="noopener noreferrer" target="_blank">NCC Developer Contest</a></p>`)
+    } else {
+      this.applyResultForm.get('lmsInfo').setValue(
+        `<p>Link bài Test: <a href="https://contest.ncc.asia/contest/4" rel="noopener noreferrer" target="_blank">NCC Developer Contest</a> OR
+        <a href="https://contest.ncc.asia/contest/6" rel="noopener noreferrer" target="_blank">NCC Tester Contest</a></p>`)
+    }
   }
 
   onInterviewerChange(id: number) {
@@ -235,8 +251,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   createAccount() {
     const statusCreateAccount = this.applyResultForm.get('createAccount')?.value;
-      if (statusCreateAccount === StatusCreateAccount.CREATE_LMS_ACCOUNT) {
-      this.headerCreate ='Create LMS account';
+    if (statusCreateAccount === StatusCreateAccount.CREATE_LMS_ACCOUNT) {
+      this.headerCreate = 'Create LMS account';
       this.notifiCationHeader = 'Create account for';
       this.endofNotifiCation = 'LMS tool ?';
       this.messages = 'LMS Account';
@@ -313,8 +329,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   saveManyCapability(payload: CandidateCapability[]) {
     const noteCandidateCapability = payload.find((item) => item.note?.length > 5000);
-    if (noteCandidateCapability){
-      this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED,`${noteCandidateCapability.capabilityName}_Max 5000 characters`);
+    if (noteCandidateCapability) {
+      this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED, `${noteCandidateCapability.capabilityName}_Max 5000 characters`);
       return;
     }
 
@@ -345,8 +361,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     const { id, requestCvId, capabilityId, capabilityName, score, note, factor } = entity;
     const payload = { id, requestCvId, capabilityId, capabilityName, score, note, factor };
 
-    if (payload.note?.length > 5000){
-      this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED,`${payload.capabilityName}_Max 5000 characters` );
+    if (payload.note?.length > 5000) {
+      this.showToastMessage(ToastMessageType.ERROR, MESSAGE.UPDATE_FAILED, `${payload.capabilityName}_Max 5000 characters`);
       return;
     }
 
@@ -373,29 +389,28 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.validateStaffRequestCVStatus(id);
   }
 
-  validateRequestCVLevel(id: number)
-  {
+  validateRequestCVLevel(id: number) {
     const onboardDate = this.applyResultForm.get('onboardDate');
     const hasRequired = onboardDate.hasValidator(Validators.required);
-    if(id !== REQUEST_CV_STATUS.Onboarded && hasRequired) {
+    if (id !== REQUEST_CV_STATUS.Onboarded && hasRequired) {
       onboardDate.removeValidators(Validators.required);
       onboardDate.updateValueAndValidity();
     }
-    if(id === REQUEST_CV_STATUS.Onboarded) {
+    if (id === REQUEST_CV_STATUS.Onboarded) {
       onboardDate.setValidators([Validators.required]);
       onboardDate.updateValueAndValidity();
     }
   }
 
-  validateStaffRequestCVStatus(id: number){
+  validateStaffRequestCVStatus(id: number) {
     const applyLevel = this.applyResultForm.get('applyLevel');
     const finalLevel = this.applyResultForm.get('finalLevel');
     const salary = this.applyResultForm.get('salary');
     const percentage = this.applyResultForm.get('percentage');
     const onboardDate = this.applyResultForm.get('onboardDate');
 
-    if(this.userType === UserType.STAFF){
-      if(id !== REQUEST_CV_STATUS.AcceptedOffer){
+    if (this.userType === UserType.STAFF) {
+      if (id !== REQUEST_CV_STATUS.AcceptedOffer) {
         applyLevel.removeValidators(Validators.required);
         finalLevel.removeValidators(Validators.required);
         salary.removeValidators(Validators.required);
@@ -406,7 +421,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
         salary.updateValueAndValidity();
         percentage.updateValueAndValidity();
       }
-      if(id === REQUEST_CV_STATUS.AcceptedOffer){
+      if (id === REQUEST_CV_STATUS.AcceptedOffer) {
         applyLevel.setValidators([Validators.required]);
         finalLevel.setValidators([Validators.required]);
         salary.setValidators([Validators.required]);
@@ -419,11 +434,11 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
         percentage.updateValueAndValidity();
         onboardDate.updateValueAndValidity();
       }
-      if(id === REQUEST_CV_STATUS.ScheduledTest || id === REQUEST_CV_STATUS.PassedInterview){
+      if (id === REQUEST_CV_STATUS.ScheduledTest || id === REQUEST_CV_STATUS.PassedInterview) {
         applyLevel.setValidators([Validators.required]);
         applyLevel.updateValueAndValidity();
       }
-      if(id === REQUEST_CV_STATUS.PassedInterview){
+      if (id === REQUEST_CV_STATUS.PassedInterview) {
         finalLevel.setValidators([Validators.required]);
         finalLevel.updateValueAndValidity();
       }
@@ -456,7 +471,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.submitted = true;
     if (this.interviewLevelForm.invalid) return;
     const payload = this.getPayloadApplyInverviewLevel();
-    if(payload.interviewLevel !=null){
+    if (payload.interviewLevel != null) {
       this._candidate.updateInterviewLevel(payload).subscribe(res => {
         if (!res) return;
         if (!res.loading && res.success) {
@@ -466,20 +481,20 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           this.adjustInterviewlevel();
         }
       })
-    }else {
+    } else {
       this.showToastMessage(ToastMessageType.WARN, 'Interview level cannot be left blank');
     }
   }
 
-  adjustInterviewlevel(){
+  adjustInterviewlevel() {
     this.subs.add(
       this._candidate.getCurentReqByCanId(this.candidateId).subscribe(rs => {
         this.isLoading = rs.loading;
         if (rs.success) {
-            const isinterviewLevel = rs.result?.interviewLevel;
-            this.updateValueInterviewLevelForm(isinterviewLevel);
-            this.isInterviewed =  rs.result.interviewed.interviewed;
-            this.saveInterviewed();
+          const isinterviewLevel = rs.result?.interviewLevel;
+          this.updateValueInterviewLevelForm(isinterviewLevel);
+          this.isInterviewed = rs.result.interviewed.interviewed;
+          this.saveInterviewed();
         }
       })
     );
@@ -530,17 +545,17 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   navigateToRequestDetail() {
     const IsCurrentRequisition = this.candidateRequisiton?.currentRequisition?.id
-    if(!IsCurrentRequisition)
-    {
+    if (!IsCurrentRequisition) {
       return;
     }
     const reqPath = this.userType === UserType.INTERN ? 'req-intern' : 'req-staff';
     const url = `/app/requisition/${reqPath}/${this.candidateRequisiton.currentRequisition.id}?type=${this.userType}`;
     window.open(url, '_blank');
-    }
+  }
 
   private handleSendMail() {
-    this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id).subscribe(res => {
+    const mail = getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate');
+    this._candidate.getPreviewRequestCvMail(this.candidateRequisiton.id, mail?.version).subscribe(res => {
       if (!res.success || res.loading) return;
 
       const data: MailDialogConfig = { mailInfo: res.result, showEditBtn: true }
@@ -584,10 +599,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           setTimeout(() => this.listenFragment())
           this.OnReqCvStatus();
           this.totalScore();
-          if (this.candidateRequisiton)
-          {
-           this.isInterviewed = this.candidateRequisiton.interviewed.interviewed;
-           this.saveInterviewed();
+          if (this.candidateRequisiton) {
+            this.isInterviewed = this.candidateRequisiton.interviewed.interviewed;
+            this.saveInterviewed();
           }
         }
       })
@@ -685,7 +699,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       mailDetail: null,
       lmsInfo: null,
       percentage: '',
-      createAccount: [this.getDefaultCreateAccount()],
+      scheduledTestEmailTemplate: [this.getDefaultscheduledTestEmailTemplate()],
     })
 
     const interviewLevelForm = this.fb.group({
@@ -749,12 +763,16 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  getDefaultCreateAccount(lmsInfo: string = null) {
-    if (lmsInfo?.includes(TOOL_URL.lms) && !lmsInfo.includes(TOOL_URL.contest)) {
-      return StatusCreateAccount.CREATE_LMS_ACCOUNT;
+  getDefaultscheduledTestEmailTemplate(lmsInfo: string = null) {
+    if (lmsInfo) {
+      if (lmsInfo.includes('Tester') && lmsInfo.includes('Developer')) {
+        return this.emailTemplateOption.find(x => !x.version);
+      } else if (lmsInfo.includes('Tester')) {
+        return this.emailTemplateOption.find(x => x.version === 'Tester');
+      } else {
+        return this.emailTemplateOption.find(x => x.version === 'Developer');
+      }
     }
-
-    return StatusCreateAccount.CREATE_URL_CONTEST;
   }
 
   private onResetApplyResultForm() {
@@ -776,7 +794,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       this.applyResultForm.patchValue({
         ...applyResult,
         onboardDate: applyResult.onboardDate ? new Date(applyResult.onboardDate) : null,
-        createAccount: this.getDefaultCreateAccount(applyResult?.lmsInfo)
       });
 
       this.applyHistoryStatuses.clear();
@@ -811,7 +828,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   private updateValueRequisitionForm(currentRequisition: CurrentRequisition) {
     this.requisitionDetail = currentRequisition;
-    if(this.requisitionDetail){
+    if (this.requisitionDetail) {
       this.loadScoreRanges(this.requisitionDetail.userType, this.requisitionDetail.subPositionId);
     }
     this.headerCurrentReq = `Current Requisition ${currentRequisition?.id ? '#' + currentRequisition?.id : ''} `;
@@ -830,27 +847,27 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  levelFilterbyScore(totalScore : any){
-    if(!totalScore || !this.scoreRangeResults?.length) {
-      this.hasValidScoreLevel  = false;
+  levelFilterbyScore(totalScore: any) {
+    if (!totalScore || !this.scoreRangeResults?.length) {
+      this.hasValidScoreLevel = false;
       this.levelByScore = '';
       return;
     }
 
-      let closestRange: ScoreRangeWithSetting | null = null;
+    let closestRange: ScoreRangeWithSetting | null = null;
 
-      for (let i = 0; i < this.scoreRangeResults?.length; i++) {
-        const range = this.scoreRangeResults[i];
-        if (totalScore >= range.scoreFrom && (totalScore < range.scoreTo || totalScore == 5)) {
-          closestRange = range;
-        }
-        if (!closestRange) {
-          this.hasValidScoreLevel  = false;
-          this.levelByScore = '';
-        } else {
-          this.hasValidScoreLevel  = true;
-          this.levelByScore = closestRange.levelInfo.defaultName;
-        }
+    for (let i = 0; i < this.scoreRangeResults?.length; i++) {
+      const range = this.scoreRangeResults[i];
+      if (totalScore >= range.scoreFrom && (totalScore < range.scoreTo || totalScore == 5)) {
+        closestRange = range;
+      }
+      if (!closestRange) {
+        this.hasValidScoreLevel = false;
+        this.levelByScore = '';
+      } else {
+        this.hasValidScoreLevel = true;
+        this.levelByScore = closestRange.levelInfo.defaultName;
+      }
     }
   }
 
@@ -906,25 +923,25 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
     dialogRef.onClose.subscribe((entity: RequisitionStaff) => {
       if (entity?.id) {
-       const payload = { cvId: this.candidateId, requestId: entity.id }
-          this.subs.add(
-            this._candidate.createReqCV(payload).subscribe(res => {
-              if (!res.loading && res.success) {
-                this.candidateRequisiton = res.result;
+        const payload = { cvId: this.candidateId, requestId: entity.id }
+        this.subs.add(
+          this._candidate.createReqCV(payload).subscribe(res => {
+            if (!res.loading && res.success) {
+              this.candidateRequisiton = res.result;
 
-                const currentRequisition = this.candidateRequisiton?.currentRequisition;
-                const appilicationResult = this.candidateRequisiton?.applicationResult;
-                const interviewLevel = this.candidateRequisiton?.interviewLevel;
+              const currentRequisition = this.candidateRequisiton?.currentRequisition;
+              const appilicationResult = this.candidateRequisiton?.applicationResult;
+              const interviewLevel = this.candidateRequisiton?.interviewLevel;
 
-                this.updateValueRequisitionForm(currentRequisition);
-                this.updateValueInterviewTime(this.candidateRequisiton);
-                this.updateValueApplyResultForm(appilicationResult);
-                this.updateValueInterviewLevelForm(interviewLevel);
-                this._candidate.setCurrentReqUpdated(true);
-                this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.ADD_SUCCESS);
-              }
-            })
-          );
+              this.updateValueRequisitionForm(currentRequisition);
+              this.updateValueInterviewTime(this.candidateRequisiton);
+              this.updateValueApplyResultForm(appilicationResult);
+              this.updateValueInterviewLevelForm(interviewLevel);
+              this._candidate.setCurrentReqUpdated(true);
+              this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.ADD_SUCCESS);
+            }
+          })
+        );
       }
     });
   }
@@ -939,6 +956,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     el.scrollIntoView({ behavior: 'smooth' });
   }
   OnReqCvStatus() {
+    if (this.candidateRequisiton?.applicationResult) {
+      this.candidateRequisiton.applicationResult.status = getFormControlValue(this.applyResultForm, "status");
+    }
+
     if (getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.ScheduledInterview ||
       getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.RejectInterview ||
       getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.FailedInterview) {
@@ -946,6 +967,20 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
     else {
       this.listRequestStatus = [...this._utilities.catReqCvStatus]
+    }
+
+    if (getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.ScheduledTest) {
+      this._common.getEmailTemplate(MailFunc.ScheduledTest).subscribe((res) => {
+        if (res.success) {
+          this.emailTemplateOption = res.result;
+          if (this.candidateRequisiton?.applicationResult?.lmsInfo) {
+            this.applyResultForm.get('scheduledTestEmailTemplate').setValue(this.getDefaultscheduledTestEmailTemplate(this.candidateRequisiton?.applicationResult?.lmsInfo));
+          } else {
+            this.applyResultForm.get('scheduledTestEmailTemplate').setValue(this.emailTemplateOption[0]);
+          }
+          this.onEmailTemplateVersionChange();
+        }
+      })
     }
   }
   totalScore(): string {

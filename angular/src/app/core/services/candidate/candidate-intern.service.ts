@@ -74,8 +74,12 @@ export class CandidateInternService extends BaseApiService {
     return this.get("/PreviewBeforeSendMailCV?cvId=" + cvId);
   }
 
-  getPreviewRequestCvMail(requestCvId: number): Observable<ApiResponse<MailPreviewInfo>> {
-    return this.get("/PreviewBeforeSendMailRequestCV?requestCVId=" + requestCvId);
+  getPreviewRequestCvMail(requestCvId: number, mailVersion: string = null): Observable<ApiResponse<MailPreviewInfo>> {
+    if (mailVersion) {
+      return this.get("/PreviewBeforeSendMailRequestCV?requestCVId=" + requestCvId + "&mailVersion=" + mailVersion);
+    } else {
+      return this.get("/PreviewBeforeSendMailRequestCV?requestCVId=" + requestCvId);
+    }
   }
 
   createEducation(payload: CandidateEducationPayload): Observable<ApiResponse<CandidateEducation>> {
