@@ -20,5 +20,6 @@ namespace TalentV2.Entities
         public MailFuncEnum Type { get; set; }
         [MaxLength(200)]
         public string CCs { get; set; }
+        public string Version { get; set; }
     }
 }

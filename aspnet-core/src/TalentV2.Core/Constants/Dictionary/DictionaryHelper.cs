@@ -13,78 +13,115 @@ namespace TalentV2.Constants.Dictionary
                 {"IMAGE", new string[] { "jpeg", "png", "svg", "jpg"} },
                 {"DOCUMENT", new string[]{ "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt"} }
             };
-        public static readonly Dictionary<MailFuncEnum, MailInfo> SeedMailDic = new Dictionary<MailFuncEnum, MailInfo>()
+        public static readonly Dictionary<MailFuncEnum, List<MailInfo>> SeedMailDic = new Dictionary<MailFuncEnum, List<MailInfo>>()
         {
             {
                 MailFuncEnum.AcceptedOfferJob,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Accepted Offer] Job invitation",
-                    Description = "Job invitation, sent when candidate has accepted HR's offer",
-                    Subject = "[NCC]_THƯ MỜI NHẬN VIỆC",
+                    new() {
+                        Name = "[Accepted Offer] Job invitation",
+                        Description = "Job invitation, sent when candidate has accepted HR's offer",
+                        Subject = "[NCC]_THƯ MỜI NHẬN VIỆC",
+                    }
                 }
             },
             {
                 MailFuncEnum.FailedInterview,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Failed Interview] Interview result",
-                    Description = "Interview result announcement, sent when candidate has passed the interview",
-                    Subject = "[NCC]_THÔNG BÁO KẾT QUẢ",
+                    new()
+                    {
+                        Name = "[Failed Interview] Interview result",
+                        Description = "Interview result announcement, sent when candidate has passed the interview",
+                        Subject = "[NCC]_THÔNG BÁO KẾT QUẢ",
+                    }
                 }
             },
             {
                 MailFuncEnum.FailedCV,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Failed CV] Thank-you mail",
-                    Description = "Thank-you mail, sent when the CV has been considered failed",
-                    Subject = "[NCC]_THƯ CẢM ƠN",
+                    new()
+                    {
+                        Name = "[Failed CV] Thank-you mail",
+                        Description = "Thank-you mail, sent when the CV has been considered failed",
+                        Subject = "[NCC]_THƯ CẢM ƠN",
+                    }
                 }
             },
             {
                 MailFuncEnum.AcceptedOfferInternship,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Accepted Offer] Internship invitation",
-                    Description = "Internship invitation, sent when candidate has accepted HR's offer",
-                    Subject = "[NCC]_THƯ MỜI THỰC TẬP",
+                    new()
+                    {
+                        Name = "[Accepted Offer] Internship invitation",
+                        Description = "Internship invitation, sent when candidate has accepted HR's offer",
+                        Subject = "[NCC]_THƯ MỜI THỰC TẬP",
+                    }
                 }
             },
             {
                 MailFuncEnum.ScheduledTest,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Scheduled Test] Test invitation",
-                    Description = "Test invitation, sent when candidate has passed the test and is scheduled for interview",
-                    Subject = "[NCC]_THƯ MỜI LÀM BÀI TEST",
+                    new()
+                    {
+                        Name = "[Scheduled Test] Test invitation",
+                        Description = "Test invitation, sent when candidate has passed the test and is scheduled for interview",
+                        Subject = "[NCC]_THƯ MỜI LÀM BÀI TEST"
+                    },
+                    new()
+                    {
+                        Name = "[Scheduled Test] Developer Test invitation",
+                        Description = "Developer Test invitation, sent when candidate has passed the test and is scheduled for interview",
+                        Subject = "[NCC]_THƯ MỜI LÀM BÀI TEST",
+                        Version = "Developer"
+                    },
+                    new()
+                    {
+                        Name = "[Scheduled Test] Tester Test invitation",
+                        Description = "Tester Test invitation, sent when candidate has passed the test and is scheduled for interview",
+                        Subject = "[NCC]_THƯ MỜI LÀM BÀI TEST",
+                        Version = "Tester"
+                    }
                 }
             },
             {
                 MailFuncEnum.ScheduledInterview,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Scheduled Interview] Interview invitation",
-                    Description = "Interview invitation, sent when candidate has passed the test",
-                    Subject = "[NCC]_THƯ MỜI THAM GIA PHỎNG VẤN",
+                    new()
+                    {
+                        Name = "[Scheduled Interview] Interview invitation",
+                        Description = "Interview invitation, sent when candidate has passed the test",
+                        Subject = "[NCC]_THƯ MỜI THAM GIA PHỎNG VẤN",
+                    }
                 }
             },
             {
                 MailFuncEnum.FailedTest,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Failed Test] Test result",
-                    Description = "Test result announcement, sent when candidate has failed the test",
-                    Subject = "[NCC]_THƯ THÔNG BÁO KẾT QUẢ BÀI TEST",
+                    new()
+                    {
+                        Name = "[Failed Test] Test result",
+                        Description = "Test result announcement, sent when candidate has failed the test",
+                        Subject = "[NCC]_THƯ THÔNG BÁO KẾT QUẢ BÀI TEST",
+                    }
                 }
             },
             {
                 MailFuncEnum.RejectedOffer,
-                new MailInfo
+                new List<MailInfo>()
                 {
-                    Name = "[Rejected Offer] Thank-you mail",
-                    Description = "Thank-you mail, sent when candidate has rejected the offer",
-                    Subject = "[NCC]_THƯ CẢM ƠN",
+                    new()
+                    {
+                        Name = "[Rejected Offer] Thank-you mail",
+                        Description = "Thank-you mail, sent when candidate has rejected the offer",
+                        Subject = "[NCC]_THƯ CẢM ƠN",
+                    }
                 }
             },
         };

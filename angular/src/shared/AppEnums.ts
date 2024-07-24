@@ -223,3 +223,14 @@ export enum ENoticeMode {
     Channel = 'Channel',
     User = 'User'
 }
+
+export enum MailFunc {
+    FailedCV = 0,
+    ScheduledTest = 1,
+    FailedTest = 2,
+    ScheduledInterview = 3,
+    FailedInterview = 4,
+    AcceptedOfferInternship = 5,
+    AcceptedOfferJob = 6,
+    RejectedOffer = 7,
+}

@@ -45,6 +45,7 @@ namespace TalentV2.Notifications.Mail
         {
             return await PreviewContentMail(cvId, MailFuncEnum.FailedCV);
         }
+
         public async Task<MailPreviewInfoDto> GetContentMailRequestCV(long requestCVId)
         {
             var requestCV = await _workScope.GetAll<RequestCV>()
@@ -56,12 +57,26 @@ namespace TalentV2.Notifications.Mail
 
             return await PreviewContentMail(requestCVId, mailFuncType);
         }
+
+        public async Task<MailPreviewInfoDto> GetContentMailRequestCV(long requestCVId, string mailVersion)
+        {
+            var requestCV = await _workScope.GetAll<RequestCV>()
+                .Where(q => q.Id == requestCVId)
+                .Select(s => new { s.Status, s.Request.UserType })
+                .FirstOrDefaultAsync();
+
+            var mailFuncType = CommonUtils.MapRequestCVStatusToEmailType(requestCV.Status, requestCV.UserType);
+
+            return await PreviewContentMail(requestCVId, mailFuncType, mailVersion);
+        }
+
         public async Task<bool> IsSentMailCV(long cvId, MailFuncEnum mailFuncType)
         {
             return await _workScope.GetAll<EmailStatusHistory>()
                 .Where(s => s.CVId == cvId && s.EmailTemplate.Type == mailFuncType)
                 .AnyAsync();
         }
+
         public async Task<MailPreviewInfoDto> PreviewContentMail(long id, MailFuncEnum emailType)
         {
             var email = await _workScope.GetAll<EmailTemplate>()
@@ -84,6 +99,31 @@ namespace TalentV2.Notifications.Mail
                 CCs = message.CCs
             };
         }
+
+        public async Task<MailPreviewInfoDto> PreviewContentMail(long id, MailFuncEnum emailType, string mailVersion)
+        {
+            var email = await _workScope.GetAll<EmailTemplate>()
+                .Where(q => q.Type == emailType)
+                .Where(q => q.Version == mailVersion)   
+                .FirstOrDefaultAsync();
+
+            var data = await EmailDispatchData(emailType, id);
+            var message = GetContentMail(data.Result, email);
+
+            if (!string.IsNullOrEmpty(email.CCs))
+                message.CCs = email.CCs.Split(',').ToList();
+
+            return new MailPreviewInfoDto
+            {
+                BodyMessage = message.BodyMessage,
+                Subject = email.Subject,
+                PropertiesSupport = message.PropertiesSupport,
+                TemplateId = email.Id,
+                To = message.To,
+                CCs = message.CCs
+            };
+        }
+
         public async Task<List<MailStatusHistoryDto>> GetMailStatusHistoryByCVId(long cvId)
         {
             return await _workScope.GetAll<EmailStatusHistory>()
@@ -100,6 +140,7 @@ namespace TalentV2.Notifications.Mail
                  .OrderByDescending(q => q.CreationTime)
                  .ToListAsync();
         }
+
         public void Send(MailPreviewInfoDto message)
         {
             if (message.CCs.Any())
