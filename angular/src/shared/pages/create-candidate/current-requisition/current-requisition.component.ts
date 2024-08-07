@@ -601,7 +601,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           this.totalScore();
           if (this.candidateRequisiton) {
             this.isInterviewed = this.candidateRequisiton.interviewed.interviewed;
-            this.saveInterviewed();
+            //This block code is applied to the auto-suggest level function, but it is logical and affects RequestCV's data, so it has been commented out.
+            //Detail: Changing the LastModificationTime of RequestCVs for the wrong purpose.
+            //this.saveInterviewed();
           }
         }
       })
