@@ -599,13 +599,12 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           setTimeout(() => this.listenFragment())
           this.OnReqCvStatus();
           this.totalScore();
-
-          //This block code is applied to the auto-suggest level function, but it is logical and affects RequestCV's data, so it has been commented out.
-          //Detail: Changing the LastModificationTime of RequestCVs for the wrong purpose.
-          // if (this.candidateRequisiton) {
-          //   this.isInterviewed = this.candidateRequisiton.interviewed.interviewed;
-          //   this.saveInterviewed();
-          // }
+          if (this.candidateRequisiton) {
+            this.isInterviewed = this.candidateRequisiton.interviewed.interviewed;
+            //This block code is applied to the auto-suggest level function, but it is logical and affects RequestCV's data, so it has been commented out.
+            //Detail: Changing the LastModificationTime of RequestCVs for the wrong purpose.
+            //this.saveInterviewed();
+          }
         }
       })
     );
