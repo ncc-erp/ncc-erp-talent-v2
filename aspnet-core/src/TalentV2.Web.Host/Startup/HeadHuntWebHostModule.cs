@@ -35,6 +35,8 @@ namespace TalentV2.Web.Host.Startup
             worker.Add(IocManager.Resolve<NoticeInterviewResultWorker>());
             worker.Add(IocManager.Resolve<NoticeInterviewWorker>());
             worker.Add(IocManager.Resolve<CrawlCVFromAWSWorker>());
+            worker.Add(IocManager.Resolve<CrawlCVFromFirebaseWorker>());
+
             Configuration.BackgroundJobs.IsJobExecutionEnabled = true;
             Logger.Info("PostInitialize() done");
         }

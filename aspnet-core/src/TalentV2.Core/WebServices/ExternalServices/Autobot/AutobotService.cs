@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using TalentV2.BackgroundWorker.CVTransformHelper;
 using TalentV2.DomainServices.Dto;
 
 namespace TalentV2.WebServices.ExternalServices.Autobot
@@ -18,6 +19,7 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
         private double _sleepTime = 5;
 
         private const string ExtractCV = "extract-cv";
+        private const string ExtractCVFirebase = "extract-cv";
 
         public AutobotService(HttpClient httpClient, ILogger<AutobotService> logger, IAbpSession abpSession) : base(httpClient, logger, abpSession)
         {
@@ -53,7 +55,27 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
             }
             return default;
         }
-
+        public async Task<CVScanResulFromFireBase> ExtractCVFromFirebaseAsync(byte[] fileBytes, string fileName)
+        {
+            var requestUrl = $"{HttpClient.BaseAddress}{ExtractCVFirebase}";
+            try
+            {
+                using (var content = new MultipartFormDataContent())
+                {
+                    content.Add(new ByteArrayContent(fileBytes), "file", fileName);
+                    var response = await HttpClient.PostAsync(requestUrl, content);
+                    response.EnsureSuccessStatusCode();
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<CVScanResulFromFireBase>(jsonResponse);
+                    return result;
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while extracting CV: {ex.Message}");
+                throw;
+            }
+        }
         public async Task<T> ExtractCVInformationAsync<T>(Stream stream, string fileName)
         {
             var fullUrl = $"{HttpClient.BaseAddress}{ExtractCV}";

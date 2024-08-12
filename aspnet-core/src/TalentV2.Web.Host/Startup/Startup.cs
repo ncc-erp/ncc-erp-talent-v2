@@ -32,6 +32,7 @@ using TalentV2.FileServices.Paths;
 using TalentV2.WebServices;
 using TalentV2.WebServices.InternalServices.LMS;
 using TalentV2.WebServices.ExternalServices.Komu;
+using TalentV2.Firebase;
 
 namespace TalentV2.Web.Host.Startup
 {
@@ -102,6 +103,7 @@ namespace TalentV2.Web.Host.Startup
             );
 
             services.AddWebServices(_appConfiguration);
+            services.Configure<FirebaseConfig>(_appConfiguration.GetSection("FirebaseConfig"));
 
             RegisterFileService(services);
         }
