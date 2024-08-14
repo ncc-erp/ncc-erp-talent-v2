@@ -1,49 +1,40 @@
 ﻿using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using TalentV2.DomainServices.Dto;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Net.Sockets;
 using TalentV2.Constants.Const;
+using TalentV2.Constants.Dictionary;
 using TalentV2.DomainServices.CVAutomation.Dto;
-using TalentV2.FileServices.Paths;
-using TalentV2.FileServices.Providers;
+using TalentV2.DomainServices.Dto;
 
 namespace TalentV2.WebServices.ExternalServices.Autobot
 {
     public class AutobotService : BaseWebService
     {
         private double _sleepTime = 5;
-
+        private const string ExtractV2 = "extract-cv-vision";
         private const string ExtractCV = "extract-cv";
-        private readonly string FILE_CANDIDATE_FOLDER_SERVICE = "candidates";
-
         private readonly IConfiguration _configuration;
-        private readonly IAbpSession _session;
-        private readonly IFileProvider _fileService;
-        private readonly IFilePath _filePath;
 
 
         public AutobotService(HttpClient httpClient,
             ILogger<AutobotService> logger,
             IAbpSession abpSession,
-            IConfiguration configuration,
-            IFileProvider fileService,
-            IFilePath filePath) : base(httpClient, logger, abpSession)
+            IConfiguration configuration
+         ) : base(httpClient, logger, abpSession)
         {
             _configuration = configuration;
-            _session = abpSession;
-            _fileService = fileService;
-            _filePath = filePath;
+
         }
 
         public async Task<T> ExtractCVInformationAsync<T>(IFormFile file)
@@ -126,26 +117,62 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
 
 
 
-        public async Task<CVScanResultFromFireBase> ExtractCVFromFirebaseAsync(string fileUrl)
+        public async Task<Dictionary<string, CVScanResultFromFireBase>> ValidateAndExtractCVFromFirebaseAsync(string fileUrl)
         {
-            var fileName = Path.GetFileName(new Uri(fileUrl).AbsolutePath);
-            var fileNameDecoded = WebUtility.UrlDecode(fileName);
-            var fileBytes = await HttpClient.GetByteArrayAsync(fileUrl);
+            var result = new Dictionary<string, CVScanResultFromFireBase>();
+            var maxFileSize = _configuration.GetSection("UploadFile:MaxSizeFile").Get<int>();
+            var fileNameDecoded = WebUtility.UrlDecode(Path.GetFileName(new Uri(fileUrl).AbsolutePath));
+            var fileExtension = Path.GetExtension(fileNameDecoded).Replace(".", "").ToLower();
+            try
+            {
 
+                var httpResponse = await HttpClient.GetAsync(fileUrl);
+                httpResponse.EnsureSuccessStatusCode();
+                var fileBytes = await httpResponse.Content.ReadAsByteArrayAsync();
+                var fileSize = fileBytes.Length;
+                if (fileSize > maxFileSize)
+                {
+                    logger.LogError($"CV 's size is over the limit {maxFileSize / (1024 * 1024)}MB");
+                    result.Add(FirebaseLogStatusConstant.CV_SIZE_TOO_BIG, null);
+                    return result;
+                }
 
-            var requestUrl = $"{HttpClient.BaseAddress}{ExtractCV}";
+                if (!DictionaryHelper.FileTypeDic[FileTypes.DOCUMENT].Contains(fileExtension))
+                {
+                    logger.LogError("CV 's type is not accepted. Only file type PDF, DOC, DOCX is accepted");
+                    result.Add(FirebaseLogStatusConstant.CV_ERROR_TYPE, null);
+                    return result;
+                }
+
+                var cvExtractionResult = await SendFileToCVExtractionAsync(fileNameDecoded, fileBytes);
+                cvExtractionResult.CVData = fileBytes;
+                result.Add("OK", cvExtractionResult);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error occurred: {Exception}", e.Message);
+                return null;
+            }
+        }
+        private async Task<CVScanResultFromFireBase> SendFileToCVExtractionAsync(string fileName, byte[] fileBytes)
+        {
+
+            var requestUrl = $"{HttpClient.BaseAddress}{ExtractV2}";
             const int maxRetries = 5;
             int delayTime = 10000; // 10s
             int attempt = 0;
             bool isComplete = false;
+
             while (attempt < maxRetries && !isComplete)
             {
                 try
                 {
                     using (var content = new MultipartFormDataContent())
                     {
-                        content.Add(new ByteArrayContent(fileBytes), "file", fileNameDecoded);
+                        content.Add(new ByteArrayContent(fileBytes), "file", fileName);
                         var response = await HttpClient.PostAsync(requestUrl, content);
+
                         if (response.StatusCode == HttpStatusCode.TooManyRequests)
                         {
                             attempt++;
@@ -163,154 +190,19 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                         {
                             response.EnsureSuccessStatusCode();
                             var jsonResponse = await response.Content.ReadAsStringAsync();
-                            var result = JsonConvert.DeserializeObject<CVScanResultFromFireBase>(jsonResponse);
                             isComplete = true;
-                            return result;
+                            return JsonConvert.DeserializeObject<CVScanResultFromFireBase>(jsonResponse);
                         }
                     };
-
-                }
-
-                catch (TaskCanceledException e)
-                {
-
-                    logger.LogError("TaskCanceledException occurred: {Exception}", e);
-                }
-                catch (HttpRequestException ex)
-                {
-                    logger.LogError("HttpRequestException occurred: {Exception}", ex);
-
-                    if (ex.InnerException is SocketException socketEx)
-                    {
-                        logger.LogError($"SocketException: {socketEx.Message}");
-                    }
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Exception occurred: {Exception}", ex);
-
+                    logger.LogError("Exception occurred: {Exception}", ex.Message);
                 }
             }
-
             logger.LogError($"Failed to extract CV from Firebase at {fileName}");
             return null;
         }
-        public async Task<bool> IsAcceptedSize(string fileUrl)
-        {
-
-            try
-            {
-                var response = await HttpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead);
-                var fileSize = response.Content.Headers.ContentLength;
-
-                var MaxFileSize = _configuration.GetSection("FirebaseConfig:FileSize").Get<int>();
-                if (fileSize > MaxFileSize)
-                {
-
-
-                    logger.LogError($"CV 's size is over the limit {MaxFileSize / (1024 * 1024)}MB");
-                    return false;
-                }
-            }
-            catch (TaskCanceledException e)
-            {
-                logger.LogError("TaskCanceledException occurred: {Exception}", e);
-            }
-            catch (HttpRequestException ex)
-            {
-                logger.LogError("HttpRequestException occurred: {Exception}", ex);
-
-                if (ex.InnerException is SocketException socketEx)
-                {
-                    logger.LogError($"SocketException: {socketEx.Message}");
-                }
-
-
-            }
-
-            return true;
-        }
-        public async Task<bool> IsAcceptedType(string fileUrl)
-        {
-
-            try
-            {
-                var response = await HttpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead);
-                var contentType = response.Content.Headers.ContentType.ToString();
-                var validContentTypes = new HashSet<string>
-                {
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            };
-
-                if (!validContentTypes.Contains(contentType))
-                {
-
-
-                    logger.LogError($"CV 's type is not accepted. Only file type PDF, DOC, DOCX is accepted.");
-                    return false;
-                }
-            }
-            catch (TaskCanceledException e)
-            {
-                logger.LogError("TaskCanceledException occurred: {Exception}", e);
-            }
-            catch (HttpRequestException ex)
-            {
-                logger.LogError("HttpRequestException occurred: {Exception}", ex);
-
-                if (ex.InnerException is SocketException socketEx)
-                {
-                    logger.LogError($"SocketException: {socketEx.Message}");
-                }
-
-
-            }
-
-            return true;
-
-        }
-        public bool IsAcceptedExtension(string fileUrl)
-        {
-            var fileName = Path.GetFileName(new Uri(fileUrl).AbsolutePath);
-            var fileNameDecoded = WebUtility.UrlDecode(fileName);
-
-            var validExtensions = new HashSet<string> { ".pdf", ".doc", ".docx" };
-            var fileExtension = Path.GetExtension(fileNameDecoded).ToLower();
-
-            if (!validExtensions.Contains(fileExtension))
-            {
-                logger.LogError($"CV 's type is not accepted. Only file type PDF, DOC, DOCX is accepted.");
-                return false;
-            }
-            return true;
-        }
-
-        public async Task<string> SaveCVToAWS(string fileURL)
-        {
-
-            var fileName = Path.GetFileName(new Uri(fileURL).AbsolutePath);
-            var fileNameDecoded = WebUtility.UrlDecode(fileName);
-            var fileBytes = await HttpClient.GetByteArrayAsync(fileURL);
-            var streamConverted = new MemoryStream(fileBytes);
-            var formFile = CreateFormFile(fileBytes, fileNameDecoded, streamConverted);
-            var paths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
-
-            var cvAwslink = await _fileService.UploadFileAsync(paths, formFile);
-            return cvAwslink;
-
-
-        }
-        private static IFormFile CreateFormFile(byte[] fileBytes, string fileName, MemoryStream stream)
-        {
-            return new FormFile(stream, 0, fileBytes.Length, "file", fileName)
-            {
-                Headers = new HeaderDictionary(),
-                ContentType = "application/octet-stream" // 
-            };
-        }
-
         public void SetSleepTime(double seconds)
         {
             if (seconds < 5)

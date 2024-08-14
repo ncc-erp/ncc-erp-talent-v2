@@ -13,6 +13,19 @@ namespace TalentV2.Constants.Dictionary
                 {"IMAGE", new string[] { "jpeg", "png", "svg", "jpg"} },
                 {"DOCUMENT", new string[]{ "doc", "docx", "xls", "xlsx", "pdf", "csv", "txt"} }
             };
+
+        public static readonly Dictionary<string, string> NCCBranchNames =
+             new()
+            {
+                { "Ho Chi Minh", "HCM" },
+                { "Ha Noi 1", "HN1" },
+                { "Ha Noi 2", "HN2" },
+                { "Ha Noi 3", "HN3" },
+                { "Da Nang", "DN" },
+                { "Vinh", "Vinh" },
+                { "Quy Nhon", "QN" },
+
+            };
         public static readonly Dictionary<MailFuncEnum, List<MailInfo>> SeedMailDic = new Dictionary<MailFuncEnum, List<MailInfo>>()
         {
             {

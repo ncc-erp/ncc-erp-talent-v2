@@ -80,5 +80,7 @@ namespace TalentV2.WebServices.ExternalServices.Firebase
         public string JobTitle { get; set; }
         public string Office { get; set; }
         public string PhoneNumber { get; set; }
+        public string Position { get; set; }
+
     }
 }
