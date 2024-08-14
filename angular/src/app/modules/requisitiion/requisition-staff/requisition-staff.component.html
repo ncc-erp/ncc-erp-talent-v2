@@ -87,6 +87,22 @@
           ></p-dropdown>
         </div>
       </div>
+
+      <div
+        class="col item-group"
+        [class]="
+          !searchWithUpdatedTime || searchWithUpdatedTime.dateType === 'All'
+            ? 'creation-time-default'
+            : 'creation-time-open'
+        "
+      >
+        <talent-date-selector
+          [label]="'Updated Time'"
+          [timeOptions]="FILTER_TIME"
+          (selectChange)="onUpdatedTimeChange($event)"
+          class="talent-date"
+        ></talent-date-selector>
+      </div>
     </div>
   </div>
 

@@ -164,14 +164,18 @@ namespace TalentV2.DomainServices.CVAutomation
             var cv = new CV
             {
                 TenantId = _session?.TenantId,
-                Name = StringExtensions.FormatName(cvExtractionData.Fullname),
                 Email = cvExtractionData.Email,
-                Phone = StringExtensions.FormatPhoneNumber(cvExtractionData.PhoneNumber),
                 Address = cvExtractionData.Address,
                 UserType = userType,
                 LinkCV = cvLink,
                 CVStatus = CVStatus.Draft,
             };
+
+            string phoneNumber = StringExtensions.FormatPhoneNumber(cvExtractionData.PhoneNumber);
+            cv.Phone = phoneNumber.Length > 12 ? string.Empty : phoneNumber;
+
+            string name = StringExtensions.FormatName(cvExtractionData.Fullname);
+            cv.Name = name.Length > 100 ? name.Substring(0, 100) : name;
 
             if (DateTime.TryParse(cvExtractionData.Birthday, out var birthday))
             {

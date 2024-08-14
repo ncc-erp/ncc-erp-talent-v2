@@ -3,8 +3,8 @@ import { checkNumber } from '@app/core/helpers/utils.helper';
 import { CandidateInfo } from '@app/core/models/candidate/candidate.model';
 import { RequisitionPayloadList, RequisitionStaff, RequisitionStaffConfigDiaLog, RequisitonCandidate } from '@app/core/models/requisition/requisition.model';
 import { UtilitiesService } from '@app/core/services/utilities.service';
-import { DateFormat, MESSAGE } from '@shared/AppConsts';
-import { ActionEnum, API_RESPONSE_STATUS, COMPARISION_OPERATOR, DefaultRoute, ECandidateTypeCount, SearchType, SortType, StatusEnum, ToastMessageType, UserType } from '@shared/AppEnums';
+import { DateFormat, FILTER_TIME, MESSAGE } from '@shared/AppConsts';
+import { ActionEnum, API_RESPONSE_STATUS, COMPARISION_OPERATOR, CreationTimeEnum, DefaultRoute, ECandidateTypeCount, SearchType, SortType, StatusEnum, ToastMessageType, UserType } from '@shared/AppEnums';
 import { ApiResponse, Filter, PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
 import { MenuItem } from 'primeng/api';
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -12,6 +12,7 @@ import { RequisitionStaffService } from './../../../core/services/requisition/re
 import { CandidateStaffListComponent } from './../../candidate/candidate-staff-list/candidate-staff-list.component';
 import { RequisitionStaffDialogComponent } from './requisition-staff-dialog/requisition-staff-dialog.component';
 import { ConfirmPresentForHr } from '@shared/pages/create-candidate/current-requisition/confirm-presentforhr/confirm-presentforhr.component';
+import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
 
 @Component({
   selector: 'talent-requisition-staff',
@@ -22,6 +23,7 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
   public readonly SORT_TYPE = SortType;
   public readonly DATE_FORMAT = DateFormat;
   public readonly ECandidateTypeCount = ECandidateTypeCount;
+  public readonly FILTER_TIME = FILTER_TIME;
 
   searchWithProcessCvStatus: number;
   reqStaffs: RequisitionStaff[] = [];
@@ -31,6 +33,7 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
   searchWithSubPosition: number;
   searchWithSkills: number[];
   searchWithReqStatus: number = 0;
+  searchWithUpdatedTime: TalentDateTime = null
   isSearchAnd: boolean = false;
   isRowExpand: boolean = false;
   expandedRows: number[] = [];
@@ -288,6 +291,11 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
     });
   }
 
+  onUpdatedTimeChange(talentDateTime: TalentDateTime) {
+    this.searchWithUpdatedTime = talentDateTime;
+    this.getDataPage(this.GET_FIRST_PAGE);
+  }
+
   private getPayLoad(request: PagedRequestDto): RequisitionPayloadList {
     const payload: any = { ...request }
     const filterItems: Filter[] = [];
@@ -308,6 +316,24 @@ export class RequisitionStaffComponent extends PagedListingComponentBase<Requisi
     if (checkNumber(this.searchWithSubPosition)) {
       const filterObj: Filter = { propertyName: 'subPositionId', value: this.searchWithSubPosition, comparision: COMPARISION_OPERATOR.Equal }
       filterItems.push(filterObj);
+    }
+
+    const updatedTime: TalentDateTime = this.searchWithUpdatedTime;
+    if (updatedTime && updatedTime.dateType !== CreationTimeEnum.ALL) {
+      const fromfilterObj: Filter = {
+        propertyName: "lastModifiedTime",
+        value: updatedTime?.fromDate.format(DateFormat.YYYY_MM_DD),
+        comparision: COMPARISION_OPERATOR.GreaterThanOrEqual,
+      };
+
+      const tofilterObj: Filter = {
+        propertyName: "lastModifiedTime",
+        value: updatedTime?.toDate.format(DateFormat.YYYY_MM_DD),
+        comparision: COMPARISION_OPERATOR.LessThanOrEqual,
+      };
+
+      filterItems.push(fromfilterObj);
+      filterItems.push(tofilterObj);
     }
 
     payload.filterItems = filterItems;
