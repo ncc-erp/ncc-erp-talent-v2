@@ -1,37 +1,35 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Castle.Facilities.Logging;
-using Abp.AspNetCore;
+﻿using Abp.AspNetCore;
 using Abp.AspNetCore.Mvc.Antiforgery;
-using Abp.Castle.Logging.Log4Net;
-using Abp.Extensions;
-using TalentV2.Configuration;
-using TalentV2.Identity;
 using Abp.AspNetCore.SignalR.Hubs;
 using Abp.Dependency;
 using Abp.Json;
+using Abp.Castle.Logging.Log4Net;
+using Abp.Extensions;
+using Amazon;
+using Amazon.Runtime.CredentialManagement;
+using Amazon.S3;
+using Castle.Facilities.Logging;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System.IO;
-using TalentV2.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Amazon.Runtime.CredentialManagement;
-using Amazon.S3;
-using Amazon;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Reflection;
+using TalentV2.Configuration;
 using TalentV2.Constants.Const;
-using TalentV2.FileServices;
+using TalentV2.Identity;
+using TalentV2.WebServices.ExternalServices.Firebase;
+using TalentV2.EntityFrameworkCore;
 using TalentV2.FileServices.Providers;
 using TalentV2.FileServices.Paths;
 using TalentV2.WebServices;
-using TalentV2.WebServices.InternalServices.LMS;
-using TalentV2.WebServices.ExternalServices.Komu;
 
 namespace TalentV2.Web.Host.Startup
 {
@@ -103,6 +101,7 @@ namespace TalentV2.Web.Host.Startup
 
             services.AddWebServices(_appConfiguration);
 
+            services.Configure<FirebaseConfig>(_appConfiguration.GetSection("FirebaseConfig"));
             RegisterFileService(services);
         }
 
