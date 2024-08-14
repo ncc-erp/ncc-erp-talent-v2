@@ -1,25 +1,29 @@
 ﻿using Abp.Dependency;
+using Abp.Domain.Uow;
 using Abp.Runtime.Session;
 using Castle.Core.Logging;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NccCore.Extension;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Users;
 using TalentV2.Configuration;
 using TalentV2.Constants.Const;
+using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.CVAutomation.Dto;
 using TalentV2.Entities;
 using TalentV2.FileServices.Paths;
 using TalentV2.FileServices.Providers;
+using TalentV2.NccCore;
 using TalentV2.Utils;
 using TalentV2.WebServices.ExternalServices.Autobot;
-using TalentV2.NccCore;
-using Abp.Domain.Uow;
 using TalentV2.WebServices.ExternalServices.Firebase;
 
 namespace TalentV2.DomainServices.CVAutomation
@@ -38,7 +42,6 @@ namespace TalentV2.DomainServices.CVAutomation
         private readonly ILogger _logger;
         private readonly FirebaseServices _firebaseService;
         private readonly IWorkScope _workScope;
-
         public CVAutomationManager(
             FirebaseServices firebaseService,
             IWorkScope workScope,
@@ -46,7 +49,8 @@ namespace TalentV2.DomainServices.CVAutomation
             IFileProvider fileService,
             IFilePath filePath,
             IConfiguration configuration,
-            AutobotService autobotService)
+            AutobotService autobotService
+            )
         {
             _session = session;
             _fileService = fileService;
@@ -56,6 +60,7 @@ namespace TalentV2.DomainServices.CVAutomation
             _logger = IocManager.Instance.Resolve<ILogger>();
             _firebaseService = firebaseService;
             _workScope = workScope;
+
         }
 
         public async Task<AutomationResult> AutoCreateInternCV()
@@ -224,35 +229,37 @@ namespace TalentV2.DomainServices.CVAutomation
             await WorkScope.InsertAsync(cv);
         }
         [UnitOfWork]
-        public async Task<AutomationResult> AutoCreateCVFromFirebase()
+        public async Task<Dictionary<int, int>> AutoCreateCVFromFirebase()
         {
             _logger.Info($"AutoCreateCVFromFirebase() start.");
 
-            var result = new AutomationResult();
+            var resultStaff = new AutomationResult();
+            var resultIntern = new AutomationResult();
             var data = await _firebaseService.CrawlData();
             var logList = await WorkScope.GetAll<FirebaseCareerLog>().ToListAsync();
             var logIdSet = new HashSet<string>(logList.Select(l => l.IdFirebase));
-            foreach (var item in data)
-            {
-
-                if (logIdSet.Contains(item.Key))
-                    data.Remove(item.Key);
-            }
 
             if (data != null)
-                foreach (var item in data)
+            {
+                foreach (var item in data.Where(d => !logIdSet.Contains(d.Key)))
                 {
-                    var CVInfor = await ExtractingCV(item.Value.FileURL, item.Key);
-                    if (CVInfor != null)
+                    var cvInfor = await ValidatingAndExtractingCV(item.Value.FileURL, item.Key);
+                    if (cvInfor != null && await SavingCV(cvInfor, item))
                     {
-                        if (await SaveCV(CVInfor, item))
-                            result.Success++;
+                        (item.Value.Position.Equals("Staff") ? resultStaff : resultIntern).Success++;
                     }
                 }
+            }
+            var result = new Dictionary<int, int>
+                {
+                    { (int)UserType.Staff, resultStaff.Success },
+                    { (int) UserType.Intern, resultIntern.Success }
+                };
+
             return result;
         }
         [UnitOfWork]
-        private async Task<bool> SaveCV(CVScanResultFromFireBase CVInfor, KeyValuePair<string, Applicant> item)
+        private async Task<bool> SavingCV(CVScanResultFromFireBase CVInfor, KeyValuePair<string, Applicant> item)
         {
             try
             {
@@ -263,8 +270,8 @@ namespace TalentV2.DomainServices.CVAutomation
                     Email = item.Value.Email,
                     Phone = item.Value.PhoneNumber,
                     Address = CVInfor.Address,
-                    UserType = UserType.Intern,
-                    LinkCV = await _autobotService.SaveCVToAWS(item.Value.FileURL),//save CV to AWS and set AWS link to CV.LinkCV
+                    UserType = item.Value.Position.Equals("Staff") ? UserType.Staff : UserType.Intern,
+                    LinkCV = await SaveCVToAWS(item.Value.FileURL, CVInfor.CVData),//save CV to AWS and set AWS link to CV.LinkCV
                     CVStatus = CVStatus.Draft,
                 };
 
@@ -316,37 +323,29 @@ namespace TalentV2.DomainServices.CVAutomation
             };
             return true;
         }
-        private async Task<CVScanResultFromFireBase> ExtractingCV(string fileUrl, string firebaseId)
+        private async Task<CVScanResultFromFireBase> ValidatingAndExtractingCV(string fileUrl, string firebaseId)
         {
-
             try
             {
-                if (!await _autobotService.IsAcceptedSize(fileUrl))
-                {
-                    var firebaseCareerLog = new FirebaseCareerLog
-                    {
-                        IdFirebase = firebaseId,
-                        Status = FirebaseLogStatusConstant.CV_SIZE_TOO_BIG
-                    };
-                    await WorkScope.InsertAsync(firebaseCareerLog);
-                }
-                else if (!await _autobotService.IsAcceptedType(fileUrl) || !_autobotService.IsAcceptedExtension(fileUrl))
-                {
-                    var firebaseCareerLog = new FirebaseCareerLog
-                    {
-                        IdFirebase = firebaseId,
-                        Status = FirebaseLogStatusConstant.CV_ERROR_TYPE
-                    };
-                    await WorkScope.InsertAsync(firebaseCareerLog);
-                }
+                var result = await _autobotService.ValidateAndExtractCVFromFirebaseAsync(fileUrl);
 
-                else
+                if (result != null)
                 {
-                    return await _autobotService.ExtractCVFromFirebaseAsync(fileUrl);
+                    if (result.Values.FirstOrDefault() == null)
+                    {
+                        var firebaseCareerLog = new FirebaseCareerLog
+                        {
+                            IdFirebase = firebaseId,
+                            Status = result.Keys.FirstOrDefault()
+                        };
+                        await WorkScope.InsertAsync(firebaseCareerLog);
+
+                    }
+                    else
+                        return result.Values.FirstOrDefault();
+
                 }
             }
-
-            
             catch (Exception e)
             {
                 _logger.Error($"IsAcceptedFileAsync() - {firebaseId} - exception", e);
@@ -355,21 +354,32 @@ namespace TalentV2.DomainServices.CVAutomation
 
             return null;
         }
+        private async Task<string> SaveCVToAWS(string fileURL, byte[] fileBytes)
+        {
+
+            var fileName = Path.GetFileName(new Uri(fileURL).AbsolutePath);
+            var fileNameDecoded = WebUtility.UrlDecode(fileName);
+            var streamConverted = new MemoryStream(fileBytes);
+            var formFile = CreateFormFile(fileBytes, fileNameDecoded, streamConverted);
+            var paths = await _filePath.GetPath(FILE_CANDIDATE_FOLDER_SERVICE, PathFolder.FOLDER_CV, _session.TenantId);
+
+            var cvAwslink = await _fileService.UploadFileAsync(paths, formFile);
+            return cvAwslink;
+
+
+        }
+        private static IFormFile CreateFormFile(byte[] fileBytes, string fileName, MemoryStream stream)
+        {
+            return new FormFile(stream, 0, fileBytes.Length, "file", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "application/octet-stream" // 
+            };
+        }
 
         private static string ConvertToAliasName(string input)
         {
-            var NCCBranchNames = new Dictionary<string, string>
-        {
-            { "Ho Chi Minh", "HCM" },
-            { "Ha Noi 1", "HN1" },
-            { "Ha Noi 2", "HN2" },
-            { "Ha Noi 3", "HN3" },
-            { "Da Nang", "DN" },
-            { "Vinh", "Vinh" },
-            { "Quy Nhon", "QN" },
-
-        };
-            foreach (var item in NCCBranchNames)
+            foreach (var item in DictionaryHelper.NCCBranchNames)
             {
                 if (item.Key.Equals(input))
                     return item.Value;

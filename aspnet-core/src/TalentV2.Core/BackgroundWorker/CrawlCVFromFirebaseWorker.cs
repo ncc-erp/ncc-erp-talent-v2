@@ -6,6 +6,7 @@ using Abp.Threading.BackgroundWorkers;
 using Abp.Threading.Timers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NccCore.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,6 @@ using System.Text;
 using TalentV2.Configuration;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.CVAutomation;
-using TalentV2.DomainServices.CVAutomation.Dto;
 using TalentV2.Utils;
 using TalentV2.WebServices.ExternalServices.Komu;
 
@@ -22,13 +22,14 @@ namespace TalentV2.BackgroundWorker
 
     public class CrawlCVFromFirebaseWorker : PeriodicBackgroundWorkerBase, ISingletonDependency
     {
-        public AutomationResult InternResult { get; private set; }
-        public AutomationResult StaffResult { get; private set; }
+
 
         private readonly ILogger<CrawlCVFromFirebaseWorker> _logger;
         protected readonly ICVAutomationManager _cvAutomationService;
         protected readonly KomuService _komuService;
         protected readonly IConfiguration _configuration;
+        private int _intern = 0;
+        private int _staff = 0;
 
         public CrawlCVFromFirebaseWorker(AbpTimer timer,
             ILogger<CrawlCVFromFirebaseWorker> logger,
@@ -41,7 +42,7 @@ namespace TalentV2.BackgroundWorker
             _komuService = komuService;
             _cvAutomationService = cvAutomationService;
             _configuration = configuration;
-         
+
 
             if (int.TryParse(settingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationRepeatTimeInMinutes), out var repeatTimeInMinutes))
             {
@@ -52,7 +53,6 @@ namespace TalentV2.BackgroundWorker
                 Timer.Period = 1000 * 60 * 60 * 24; // default repeat each 24 hour
             }
 
-            InternResult = new AutomationResult();
 
         }
 
@@ -68,18 +68,17 @@ namespace TalentV2.BackgroundWorker
             {
                 AsyncHelper.RunSync(async () =>
                 {
-                    var internResult = await _cvAutomationService.AutoCreateCVFromFirebase();
-                    if (internResult != null)
-                        InternResult.Success += internResult.Success;
+
+                    var result = await _cvAutomationService.AutoCreateCVFromFirebase();
+                    _intern = result[(int)UserType.Intern];
+                    _staff = result[(int)UserType.Staff];
+                    bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
+                    if (enableNotify && (_intern > 0 || _staff > 0)) PreNotify();
+                    _logger.LogInformation("Crawling data from Firebase completed successfully.");
                 });
 
 
-                bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
 
-                if (enableNotify && InternResult.Success > 0) PreNotify();
-
-
-                _logger.LogInformation("Crawling data from Firebase completed successfully.");
             }
             catch (Exception ex)
             {
@@ -131,7 +130,8 @@ namespace TalentV2.BackgroundWorker
                 Logger.Info($"The current time is within the notification configuration period ({startAtHour} - {endAtHour}).");
                 Notify();
 
-                InternResult.Success = 0;
+                _intern = 0;
+                _staff = 0;
 
             }
         }
@@ -170,11 +170,21 @@ namespace TalentV2.BackgroundWorker
             var clientUrl = _configuration.GetValue<string>($"App:ClientRootAddress");
 
 
-            if (InternResult.Success > 0)
+            if (_intern > 0)
             {
-                sb.AppendLine("All new CV has automatically created successfully:");
-                sb.Append($"**New CV quantity: {InternResult.Success}**");
-                
+                sb.AppendLine("All new Intern CV has automatically created successfully:");
+                sb.Append($"**Intern CV quantity: {_intern}**");
+                sb.AppendLine($" --- Intern CV : {GetTalentLink(clientUrl, UserType.Intern)}\n");
+
+            }
+
+
+
+            if (_staff > 0)
+            {
+                sb.AppendLine("\nAll new Staff CV has automatically created successfully:");
+                sb.Append($"**Staff CV quantity: {_staff}**");
+                sb.AppendLine($" --- Staff CV: {GetTalentLink(clientUrl, UserType.Staff)}");
             }
 
 
@@ -199,10 +209,12 @@ namespace TalentV2.BackgroundWorker
                 }
                 else
                 {
-                    sb.Append("\nPlease check the created CV information at the attached link");
+                    sb.Append("\nPlease check the created CV information at the attached link\n");
+
                 }
             }
-            sb.AppendLine($": {GetTalentLink(clientUrl, UserType.Intern)}");
+
+
             return sb.ToString();
         }
 
