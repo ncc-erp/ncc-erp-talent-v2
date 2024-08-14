@@ -255,7 +255,7 @@
     [rowsPerPageOptions]="rowsPerPageOptions"
     [loading]="isLoading"
     [totalRecords]="totalItems"
-    sortField="latestModifiedTime"
+    sortField="lastModifiedTime"
     [sortOrder]="SORT_TYPE.DESC"
     [resizableColumns]="true"
     columnResizeMode="expand"
@@ -293,10 +293,10 @@
           {{ "Info" | localize }} <p-sortIcon field="fullName"></p-sortIcon>
         </th>
 
-        <th pSortableColumn="latestModifiedTime" pResizableColumn>
+        <th pSortableColumn="lastModifiedTime" pResizableColumn>
           <div class="box-wrapper box-wrapper--creation-time">
             {{ "Updated Time" | localize }}
-            <p-sortIcon field="latestModifiedTime"></p-sortIcon>
+            <p-sortIcon field="lastModifiedTime"></p-sortIcon>
           </div>
         </th>
 
