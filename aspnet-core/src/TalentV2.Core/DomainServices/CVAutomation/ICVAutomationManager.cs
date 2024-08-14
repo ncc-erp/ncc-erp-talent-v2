@@ -9,5 +9,7 @@ namespace TalentV2.DomainServices.CVAutomation
         Task<AutomationResult> AutoCreateInternCV();
 
         Task<AutomationResult> AutoCreateStaffCV();
+
+        Task<AutomationResult> AutoCreateCVFromFirebase();
     }
 }
