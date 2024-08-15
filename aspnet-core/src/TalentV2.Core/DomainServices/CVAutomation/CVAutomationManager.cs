@@ -172,10 +172,10 @@ namespace TalentV2.DomainServices.CVAutomation
             };
 
             string phoneNumber = StringExtensions.FormatPhoneNumber(cvExtractionData.PhoneNumber);
-            cv.Phone = phoneNumber.Length > 12 ? string.Empty : phoneNumber;
+            cv.Phone = phoneNumber == null ? string.Empty : phoneNumber.Length > 12 ? string.Empty : phoneNumber;
 
             string name = StringExtensions.FormatName(cvExtractionData.Fullname);
-            cv.Name = name.Length > 100 ? name.Substring(0, 100) : name;
+            cv.Name = name == null ? string.Empty : name.Length > 100 ? name.Substring(0, 100) : name;
 
             if (DateTime.TryParse(cvExtractionData.Birthday, out var birthday))
             {
