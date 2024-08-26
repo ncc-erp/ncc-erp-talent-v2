@@ -23,6 +23,7 @@ export interface TalentDateTime {
 export class DateSelectorComponent implements OnInit {
 
   @Output() selectChange = new EventEmitter<TalentDateTime>();
+  @Input() rowUI: boolean = false;
   @Input() defaultOption: string;
   @Input() label: string;
   @Input() timeOptions = CREATION_TIME;
@@ -36,6 +37,7 @@ export class DateSelectorComponent implements OnInit {
   isBtnPrev: boolean;
   initOptionHalfYear: boolean = true;
   currentDate = moment();
+
   constructor(private _dialog: DialogService) { }
 
   ngOnInit(): void {
@@ -70,6 +72,7 @@ export class DateSelectorComponent implements OnInit {
   }
 
   onSelectChange(reset?: boolean) {
+    console.log('this.dateType ==> ', this.dateType);
     if (reset) {
       this.customizeView = 0;
        this.dateText = '';
@@ -122,7 +125,7 @@ export class DateSelectorComponent implements OnInit {
         this.isFistHalfYear = true;
       }
     }
-    
+
     this.dateText = this.getDisplayText(CreationTimeEnum.HALF_YEAR, fromDate, toDate);
     this.selectChange.emit({ dateType: this.dateType, fromDate, toDate, dateText: this.dateText });
   }
@@ -151,7 +154,7 @@ export class DateSelectorComponent implements OnInit {
           typeDate: CreationTimeEnum.DAY
         }
       }
-      
+
       case CreationTimeEnum.WEEK: {
         return {
           unitOfTime: 'isoWeek',
@@ -206,7 +209,7 @@ export class DateSelectorComponent implements OnInit {
   }
 
   private getDisplayText(typeDate: string, fromDate: moment.Moment = null, toDate: moment.Moment = null) {
-    const spaceFormat = '\u00A0\u00A0\u00A0 \u2014 \u00A0\u00A0\u00A0';
+    const spaceFormat = '\u00A0 \u2014 \u00A0';
     if (typeDate === CreationTimeEnum.ALL) {
       return '';
     }
@@ -223,7 +226,7 @@ export class DateSelectorComponent implements OnInit {
         if(fromDate.format(DateFormat.MM) == toDate.format(DateFormat.MM)){
           return `${fromDate.format(DateFormat.DD)}${spaceFormat}${toDate.format(DateFormat.DD_MM_YYYY)}`
         }
-         
+
         return `${fromDate.format(DateFormat.DD_MM)}${spaceFormat}${toDate.format(DateFormat.DD_MM_YYYY)}`
       }
       case CreationTimeEnum.MONTH: {

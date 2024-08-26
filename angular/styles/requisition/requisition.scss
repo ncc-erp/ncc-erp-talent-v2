@@ -80,15 +80,6 @@
   color: $color-tag-selected;
 }
 
-:host ::ng-deep .creation-time-default {
-  flex: 1;
-  .creation-date-container {
-    .creation-group-select {
-      flex-basis: 100%;
-    }
-  }
-}
-
 :host ::ng-deep .creation-time-open {
   flex-basis: 20%;
   .creation-date-container {
