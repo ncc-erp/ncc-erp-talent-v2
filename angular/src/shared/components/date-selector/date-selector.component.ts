@@ -72,7 +72,6 @@ export class DateSelectorComponent implements OnInit {
   }
 
   onSelectChange(reset?: boolean) {
-    console.log('this.dateType ==> ', this.dateType);
     if (reset) {
       this.customizeView = 0;
        this.dateText = '';
