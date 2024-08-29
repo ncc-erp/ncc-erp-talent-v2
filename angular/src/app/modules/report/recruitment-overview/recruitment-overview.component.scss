@@ -18,7 +18,10 @@
     }
     .th-total-report > th{
         font-weight: 700 !important;
-    }        
+    }
+    .item-group {
+        padding: 0.25rem;
+    }
 }
 
 .bg-yellow-1{
@@ -73,6 +76,24 @@
 
         .total {
             font-weight: bold;
+        }
+    }
+}
+
+@media (max-width: 1500px) {
+    .row {
+        .col-md-2, .col-md-4, .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+    }
+}
+
+@media (max-width: 1000px) {
+    .row {
+        .col-md-2, .col-md-4, .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
         }
     }
 }

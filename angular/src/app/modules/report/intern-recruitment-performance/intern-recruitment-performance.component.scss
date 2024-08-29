@@ -8,8 +8,10 @@
     .w-inherit{
         width: inherit !important;
     }
-    .msl-branch 
-        .p-multiselect {
-            width: inherit !important;
-        }
+    .msl-branch .p-multiselect {
+        width: inherit !important;
+    }
+    .item-group {
+        padding: 0.25rem;
+    }
 }
