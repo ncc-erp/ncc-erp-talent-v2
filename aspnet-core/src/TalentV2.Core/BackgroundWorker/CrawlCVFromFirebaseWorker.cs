@@ -70,9 +70,9 @@ namespace TalentV2.BackgroundWorker
                     var result = await _cvAutomationService.AutoCreateCVFromFirebase();
                     _intern = result[UserType.Intern];
                     _staff = result[UserType.Staff];
-                bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
+                    bool.TryParse(SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationEnabled), out bool enableNotify);
                     if (enableNotify && (_intern > 0 || _staff > 0)) PreNotify();
-                _logger.LogInformation("Crawling data from Firebase completed successfully.");
+                    _logger.LogInformation("Crawling data from Firebase completed successfully.");
                 });
             }
             catch (Exception ex)
@@ -182,9 +182,9 @@ namespace TalentV2.BackgroundWorker
                 sb.Append(string.IsNullOrEmpty(clientUrl)
     ? " please check the created CV information at Talent."
     : " please check the created CV information at the attached link.\n");
-                }
-                else
-                {
+            }
+            else
+            {
                 sb.Append(string.IsNullOrEmpty(clientUrl)
     ? "Please check the created CV information at Talent."
     : "Please check the created CV information at the attached link.\n");
@@ -192,7 +192,7 @@ namespace TalentV2.BackgroundWorker
             sb.AppendLine($": {GetTalentLink(clientUrl, UserType.Intern)}");
             return sb.ToString();
         }
-        
+
         private static string GetTalentLink(string clientUrl, UserType userType)
         {
             return $"{clientUrl}app/candidate/{(userType == UserType.Intern ? "intern-list" : "staff-list")}?cvStatus=20";
