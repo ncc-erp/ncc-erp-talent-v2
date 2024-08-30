@@ -16,6 +16,13 @@ using TalentV2.Constants.Const;
 using TalentV2.Constants.Dictionary;
 using TalentV2.DomainServices.CVAutomation.Dto;
 using TalentV2.DomainServices.Dto;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using TalentV2.Constants.Const;
+using TalentV2.DomainServices.CVAutomation.Dto;
+using TalentV2.FileServices.Paths;
+using TalentV2.FileServices.Providers;
 
 namespace TalentV2.WebServices.ExternalServices.Autobot
 {
