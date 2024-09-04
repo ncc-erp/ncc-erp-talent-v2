@@ -1,25 +1,28 @@
-<a
-  href="javascript:;"
-  class="nav-link d-inline-block w-auto ml-1 p-0"
-  (click)="languagePanel.toggle($event)"
->
-  <i class="d-inline-block {{ currentLanguage.icon }} ml-2"></i>
-  <span class="d-none d-md-inline-block ml-1 mr-1 language-text">
-    {{ currentLanguage.displayName }}
-  </span>
+<a class="nav-link d-flex align-items-center" href="javascript:;">
+  <div class="nav-icon">
+    <i class="d-inline-block {{ currentLanguage.icon }}"></i>
+  </div>
+  <p class="flex-fill">
+    <p-dropdown
+      class="w-100"
+      [options]="languages"
+      [(ngModel)]="currentLanguage"
+      placeholder="Select a language"
+      dropdownIcon="pi pi-chevron-up"
+      [scrollHeight]="575"
+      (onChange)="dropdownChange($event)"
+    >
+      <ng-template pTemplate="selectedItem">
+        <div *ngIf="currentLanguage">
+          {{currentLanguage.displayName}}
+        </div>
+      </ng-template>
+      <ng-template let-language pTemplate="item">
+        <div class="d-flex align-items-center gap-2">
+          <i class="d-inline-block {{ language.icon }} mr-1"></i>
+          <div>{{language.displayName}}</div>
+        </div>
+      </ng-template>
+    </p-dropdown>
+  </p>
 </a>
-
-<p-overlayPanel #languagePanel baseZIndex="1000" appendTo="body">
-  <ng-template pTemplate>
-    <ng-container *ngFor="let language of languages">
-      <a
-        *ngIf="language.name != currentLanguage.name"
-        class="dropdown-item pointer"
-        (click)="changeLanguage(language.name)"
-      >
-        <i class="d-inline-block {{ language.icon }} mr-1"></i>
-        {{ language.displayName }}
-      </a>
-    </ng-container>
-  </ng-template>
-</p-overlayPanel>
