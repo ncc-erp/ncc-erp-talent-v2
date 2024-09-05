@@ -89,236 +89,241 @@
           <div class="branch-title">
             {{ branch.branchName | uppercase }}
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th rowspan="3" class="background-color-1">NO</th>
-                <th rowspan="3" class="background-color-1">POSITION</th>
-                <th rowspan="3" class="background-color-1">REQUEST</th>
-                <th rowspan="3" class="background-color-1">APPLY</th>
-                <th
-                  [colSpan]="cvStatusHeaders.length + (hasNewCVStatus ? 1 : 0)"
-                  class="background-color-2"
-                >
-                  CV STATUS
-                </th>
-                <th
-                  [colSpan]="cvSourceHeaders.length"
-                  [rowSpan]="
-                    1 +
-                    (cvSourceHeaders.length === 0 && hasAnyStatus
-                      ? 2
-                      : 0)
-                  "
-                  class="background-color-3"
-                >
-                  CV SOURCE
-                </th>
-                <th
-                  [colSpan]="candidateStatusHeaders.length"
-                  [rowSpan]="
-                    1 +
-                    (candidateStatusHeaders.length === 0 && hasAnyStatus
-                      ? 2
-                      : 0)
-                  "
-                  class="background-color-4"
-                >
-                  CANDIDATE STATUS
-                </th>
-              </tr>
-              <tr class="header-item">
-                <th
-                  *ngFor="let cvStatus of cvStatusHeaders"
-                  class="background-color-2"
-                  [rowSpan]="cvStatus.id == 0 ? 1 : 2"
-                  [colSpan]="cvStatus.id == 0 ? 2 : 1"
-                >
-                  {{ cvStatus.name | uppercase }}
-                </th>
-                <th
-                  *ngFor="let cvSource of cvSourceHeaders"
-                  class="background-color-3"
-                  rowspan="2"
-                >
-                  {{ cvSource.name | uppercase }}
-                </th>
-                <th
-                  *ngFor="let candidateStatus of candidateStatusHeaders"
-                  class="background-color-4"
-                  rowspan="2"
-                >
-                  {{ candidateStatus.name | uppercase }}
-                </th>
-              </tr>
-              <tr class="header-item" *ngIf="hasNewCVStatus">
-                <th class="background-color-2">UNPROCESSED</th>
-                <th class="background-color-2">NORMAL</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="total">
-                <td colspan="2" class="background-color-1">TOTAL</td>
-                <td class="background-color-1">
-                  {{ branch.total.requestQuantity }}
-                </td>
-                <td class="background-color-1">
-                  {{ branch.total.applyQuantity }}
-                </td>
-                <ng-container *ngFor="let cvStatus of cvStatusHeaders">
-                  <td *ngIf="cvStatus.id !== 0" class="background-color-2">
-                    {{
-                      getQuantityById(
-                        branch.total.cvStatusStatistics,
-                        cvStatus.id
-                      )
-                    }}
-                  </td>
-                  <td *ngIf="cvStatus.id === 0" class="background-color-2">
-                    {{
-                      getCVStatusUnprocessedQuantity(
-                        branch.total.cvStatusStatistics,
-                        cvStatus.id
-                      )
-                    }}
-                  </td>
-                  <td *ngIf="cvStatus.id === 0" class="background-color-2">
-                    {{
-                      getCVStatusNormalQuantity(
-                        branch.total.cvStatusStatistics,
-                        cvStatus.id
-                      )
-                    }}
-                  </td>
-                </ng-container>
-                <td
-                  *ngFor="let cvSource of cvSourceHeaders"
-                  class="background-color-3"
-                >
-                  {{
-                    getQuantityById(
-                      branch.total.cvSourceStatistics,
-                      cvSource.id
-                    )
-                  }}
-                </td>
-                <td
-                  *ngFor="let candidateStatus of candidateStatusHeaders"
-                  class="background-color-4"
-                >
-                  {{
-                    getQuantityById(
-                      branch.total.candidateStatusStatistics,
-                      candidateStatus.id
-                    )
-                  }}
-                </td>
-                <td
-                  *ngIf="cvStatusHeaders.length == 0"
-                  class="background-color-2"
-                ></td>
-                <td
-                  *ngIf="cvSourceHeaders.length == 0"
-                  class="background-color-3"
-                ></td>
-                <td
-                  *ngIf="candidateStatusHeaders.length == 0"
-                  class="background-color-4"
-                ></td>
-              </tr>
-              <tr
-                *ngFor="
-                  let subPosition of branch?.subPositionStatistics;
-                  index as i
-                "
-              >
-                <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
-                  {{ i + 1 }}
-                </td>
-                <td
-                  class="sub-position-name"
-                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                >
-                  {{ subPosition.subPositionName }}
-                </td>
-                <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
-                  {{ subPosition.requestQuantity }}
-                </td>
-                <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
-                  {{ subPosition.applyQuantity }}
-                </td>
-                <ng-container *ngFor="let cvStatus of cvStatusHeaders">
-                  <td
-                    *ngIf="cvStatus.id !== 0"
-                    [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+          <div #tableContainer class="table-container">
+            <table #table
+              [class.overflowingX]="table.scrollWidth > tableContainer.clientWidth"
+              [class.overflowingY]="table.scrollHeight > tableContainer.clientHeight"
+            >
+              <thead>
+                <tr>
+                  <th rowspan="3" class="background-color-1">NO</th>
+                  <th rowspan="3" class="background-color-1">POSITION</th>
+                  <th rowspan="3" class="background-color-1">REQUEST</th>
+                  <th rowspan="3" class="background-color-1">APPLY</th>
+                  <th
+                    [colSpan]="cvStatusHeaders.length + (hasNewCVStatus ? 1 : 0)"
+                    class="background-color-2"
+                  >
+                    CV STATUS
+                  </th>
+                  <th
+                    [colSpan]="cvSourceHeaders.length"
+                    [rowSpan]="
+                      1 +
+                      (cvSourceHeaders.length === 0 && hasAnyStatus
+                        ? 2
+                        : 0)
+                    "
+                    class="background-color-3"
+                  >
+                    CV SOURCE
+                  </th>
+                  <th
+                    [colSpan]="candidateStatusHeaders.length"
+                    [rowSpan]="
+                      1 +
+                      (candidateStatusHeaders.length === 0 && hasAnyStatus
+                        ? 2
+                        : 0)
+                    "
+                    class="background-color-4"
+                  >
+                    CANDIDATE STATUS
+                  </th>
+                </tr>
+                <tr class="header-item">
+                  <th
+                    *ngFor="let cvStatus of cvStatusHeaders"
+                    class="background-color-2"
+                    [rowSpan]="cvStatus.id == 0 ? 1 : 2"
+                    [colSpan]="cvStatus.id == 0 ? 2 : 1"
+                  >
+                    {{ cvStatus.name | uppercase }}
+                  </th>
+                  <th
+                    *ngFor="let cvSource of cvSourceHeaders"
+                    class="background-color-3"
+                    rowspan="2"
+                  >
+                    {{ cvSource.name | uppercase }}
+                  </th>
+                  <th
+                    *ngFor="let candidateStatus of candidateStatusHeaders"
+                    class="background-color-4"
+                    rowspan="2"
+                  >
+                    {{ candidateStatus.name | uppercase }}
+                  </th>
+                </tr>
+                <tr class="header-item" *ngIf="hasNewCVStatus">
+                  <th class="background-color-2">UNPROCESSED</th>
+                  <th class="background-color-2">NORMAL</th>
+                </tr>
+                <tr class="total" *ngIf="hasNewCVStatus">
+                  <th colspan="2" class="background-color-1">TOTAL</th>
+                  <th class="background-color-1">
+                    {{ branch.total.requestQuantity }}
+                  </th>
+                  <th class="background-color-1">
+                    {{ branch.total.applyQuantity }}
+                  </th>
+                  <ng-container *ngFor="let cvStatus of cvStatusHeaders">
+                    <th *ngIf="cvStatus.id !== 0" class="background-color-2">
+                      {{
+                        getQuantityById(
+                          branch.total.cvStatusStatistics,
+                          cvStatus.id
+                        )
+                      }}
+                    </th>
+                    <th *ngIf="cvStatus.id === 0" class="background-color-2">
+                      {{
+                        getCVStatusUnprocessedQuantity(
+                          branch.total.cvStatusStatistics,
+                          cvStatus.id
+                        )
+                      }}
+                    </th>
+                    <th *ngIf="cvStatus.id === 0" class="background-color-2">
+                      {{
+                        getCVStatusNormalQuantity(
+                          branch.total.cvStatusStatistics,
+                          cvStatus.id
+                        )
+                      }}
+                    </th>
+                  </ng-container>
+                  <th
+                    *ngFor="let cvSource of cvSourceHeaders"
+                    class="background-color-3"
                   >
                     {{
                       getQuantityById(
-                        subPosition?.cvStatusStatistics,
-                        cvStatus.id
+                        branch.total.cvSourceStatistics,
+                        cvSource.id
+                      )
+                    }}
+                  </th>
+                  <th
+                    *ngFor="let candidateStatus of candidateStatusHeaders"
+                    class="background-color-4"
+                  >
+                    {{
+                      getQuantityById(
+                        branch.total.candidateStatusStatistics,
+                        candidateStatus.id
+                      )
+                    }}
+                  </th>
+                  <th
+                    *ngIf="cvStatusHeaders.length == 0"
+                    class="background-color-2"
+                  ></th>
+                  <th
+                    *ngIf="cvSourceHeaders.length == 0"
+                    class="background-color-3"
+                  ></th>
+                  <th
+                    *ngIf="candidateStatusHeaders.length == 0"
+                    class="background-color-4"
+                  ></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let subPosition of branch?.subPositionStatistics;
+                    index as i
+                  "
+                >
+                  <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
+                    {{ i + 1 }}
+                  </td>
+                  <td
+                    class="sub-position-name"
+                    [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                  >
+                    {{ subPosition.subPositionName }}
+                  </td>
+                  <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
+                    {{ subPosition.requestQuantity }}
+                  </td>
+                  <td [ngClass]="{ 'background-color-1': i % 2 === 0 }">
+                    {{ subPosition.applyQuantity }}
+                  </td>
+                  <ng-container *ngFor="let cvStatus of cvStatusHeaders">
+                    <td
+                      *ngIf="cvStatus.id !== 0"
+                      [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                    >
+                      {{
+                        getQuantityById(
+                          subPosition?.cvStatusStatistics,
+                          cvStatus.id
+                        )
+                      }}
+                    </td>
+                    <td
+                      *ngIf="cvStatus.id === 0"
+                      [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                    >
+                      {{
+                        getCVStatusUnprocessedQuantity(
+                          subPosition?.cvStatusStatistics,
+                          cvStatus.id
+                        )
+                      }}
+                    </td>
+                    <td
+                      *ngIf="cvStatus.id === 0"
+                      [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                    >
+                      {{
+                        getCVStatusNormalQuantity(
+                          subPosition?.cvStatusStatistics,
+                          cvStatus.id
+                        )
+                      }}
+                    </td>
+                  </ng-container>
+                  <td
+                    *ngFor="let cvSource of cvSourceHeaders"
+                    [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                  >
+                    {{
+                      getQuantityById(
+                        subPosition?.cvSourceStatistics,
+                        cvSource.id
                       )
                     }}
                   </td>
                   <td
-                    *ngIf="cvStatus.id === 0"
+                    *ngFor="let candidateStatus of candidateStatusHeaders"
                     [ngClass]="{ 'background-color-1': i % 2 === 0 }"
                   >
                     {{
-                      getCVStatusUnprocessedQuantity(
-                        subPosition?.cvStatusStatistics,
-                        cvStatus.id
+                      getQuantityById(
+                        subPosition?.candidateStatusStatistics,
+                        candidateStatus.id
                       )
                     }}
                   </td>
                   <td
-                    *ngIf="cvStatus.id === 0"
+                    *ngIf="cvStatusHeaders.length == 0"
                     [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                  >
-                    {{
-                      getCVStatusNormalQuantity(
-                        subPosition?.cvStatusStatistics,
-                        cvStatus.id
-                      )
-                    }}
-                  </td>
-                </ng-container>
-                <td
-                  *ngFor="let cvSource of cvSourceHeaders"
-                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                >
-                  {{
-                    getQuantityById(
-                      subPosition?.cvSourceStatistics,
-                      cvSource.id
-                    )
-                  }}
-                </td>
-                <td
-                  *ngFor="let candidateStatus of candidateStatusHeaders"
-                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                >
-                  {{
-                    getQuantityById(
-                      subPosition?.candidateStatusStatistics,
-                      candidateStatus.id
-                    )
-                  }}
-                </td>
-                <td
-                  *ngIf="cvStatusHeaders.length == 0"
-                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                ></td>
-                <td
-                  *ngIf="cvSourceHeaders.length == 0"
-                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                ></td>
-                <td
-                  *ngIf="candidateStatusHeaders.length == 0"
-                  [ngClass]="{ 'background-color-1': i % 2 === 0 }"
-                ></td>
-              </tr>
-            </tbody>
-          </table>
+                  ></td>
+                  <td
+                    *ngIf="cvSourceHeaders.length == 0"
+                    [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                  ></td>
+                  <td
+                    *ngIf="candidateStatusHeaders.length == 0"
+                    [ngClass]="{ 'background-color-1': i % 2 === 0 }"
+                  ></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </ng-container>
     </ng-template>
