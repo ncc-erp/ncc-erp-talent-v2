@@ -172,7 +172,7 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                     {
                         content.Add(new ByteArrayContent(fileBytes), "file", fileName);
                         var response = await HttpClient.PostAsync(requestUrl, content);
-                        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                        if (response.StatusCode == HttpStatusCode.TooManyRequests || response.StatusCode >= HttpStatusCode.InternalServerError)
                         {
                             attempt++;
                             if (attempt == maxRetries)
