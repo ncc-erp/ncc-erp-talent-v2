@@ -3,7 +3,6 @@ import {
   Renderer2,
   OnInit
 } from '@angular/core';
-import { AppAuthService } from '@shared/auth/app-auth.service';
 import { LayoutStoreService } from '@shared/layout/layout-store.service';
 
 @Component({
@@ -17,8 +16,7 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private renderer: Renderer2,
-    private _layoutStore: LayoutStoreService,
-    private _authService: AppAuthService
+    private _layoutStore: LayoutStoreService
   ) {}
 
   ngOnInit(): void {
@@ -44,9 +42,5 @@ export class SidebarComponent implements OnInit {
   hideSidebar(): void {
     this.renderer.removeClass(document.body, 'sidebar-open');
     this.renderer.addClass(document.body, 'sidebar-collapse');
-  }
-
-  logout(): void {
-    this._authService.logout();
   }
 }
