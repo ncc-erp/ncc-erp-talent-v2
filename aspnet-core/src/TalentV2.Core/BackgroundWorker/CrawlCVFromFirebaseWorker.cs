@@ -10,15 +10,12 @@ using NccCore.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 using TalentV2.Configuration;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.CVAutomation;
-using TalentV2.DomainServices.CVAutomation.Dto;
 using TalentV2.Utils;
 using TalentV2.WebServices.ExternalServices.Komu;
-using static Castle.MicroKernel.ModelBuilder.Descriptors.InterceptorDescriptor;
 
 namespace TalentV2.BackgroundWorker
 {
@@ -189,7 +186,6 @@ namespace TalentV2.BackgroundWorker
     ? "Please check the created CV information at Talent."
     : "Please check the created CV information at the attached link.\n");
             }
-            sb.AppendLine($": {GetTalentLink(clientUrl, UserType.Intern)}");
             return sb.ToString();
         }
 

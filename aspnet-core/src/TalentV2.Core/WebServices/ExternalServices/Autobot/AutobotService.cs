@@ -140,6 +140,12 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                 }
 
                 var cvExtractionResult = await SendFileToCVExtractionAsync(fileNameDecoded, fileBytes);
+                if (cvExtractionResult == null)
+                {
+                    logger.LogError("Cant extract CV from Firebase");
+                    result.Add(FirebaseLogStatusConstant.CV_ERROR_AT_EXTRACTING, null);
+                    return result;
+                }
                 cvExtractionResult.CVData = fileBytes;
                 result.Add("OK", cvExtractionResult);
                 return result;
@@ -154,7 +160,7 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
         private async Task<CVScanResultFromFireBase> SendFileToCVExtractionAsync(string fileName, byte[] fileBytes)
         {
             var requestUrl = $"{HttpClient.BaseAddress}{ExtractV2}";
-            const int maxRetries = 5;
+            const int maxRetries = 3;
             int delayTime = 10000; // 10s
             int attempt = 0;
             bool isComplete = false;
@@ -175,7 +181,7 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                                 break;
                             }
                             logger.LogError($"Attempt {attempt} failed due to AI request-limiting. Retrying in {delayTime / 1000} seconds...");
-                            delayTime = Math.Min(delayTime * 2, 60000);
+                            delayTime = Math.Min(delayTime * 2, 40000);
                             await Task.Delay(delayTime);
                         }
                         else
@@ -190,6 +196,7 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                 catch (Exception ex)
                 {
                     logger.LogError("Exception occurred: {Exception}", ex.Message);
+                    break;
                 }
             }
             logger.LogError($"Failed to extract CV from Firebase at {fileName}");
