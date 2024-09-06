@@ -5,7 +5,9 @@
     class="content-wrapper vh-100 overflow-auto"
     [class.nav-loading]="isLoading$ | async"
   >
-    <router-outlet></router-outlet>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
   </div>
   <!-- <app-footer></app-footer> -->
   <div id="sidebar-overlay" (click)="toggleSidebar()"></div>

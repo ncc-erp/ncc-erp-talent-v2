@@ -56,20 +56,6 @@
   }
 }
 
-.p-component:disabled {
-  &.p-inputtext,
-  &.p-inputtextarea {
-    opacity: 1;
-  }
-}
-
-.p-disabled {
-  &.p-dropdown,
-  &.p-inputmask {
-    opacity: 1;
-  }
-}
-
 .max-line-content-1 {
   @include ellipsisWithLine(1);
   cursor: pointer;
@@ -185,4 +171,9 @@ body {
   .p-dialog-content {
     padding: 0 !important;
   }
+}
+
+.main-content {
+  min-width: 600px;
+  overflow: auto;
 }

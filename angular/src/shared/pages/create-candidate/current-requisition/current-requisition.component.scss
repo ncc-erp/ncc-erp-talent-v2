@@ -248,7 +248,9 @@
   width: 100%;
   border: 1px solid #ced4da;
   border-radius: 3px;
-  opacity: 1;
+  &:disabled {
+    opacity: 0.6;
+  }
 }
 .selectpercentage:enabled:focus{
   outline: 0 none;
