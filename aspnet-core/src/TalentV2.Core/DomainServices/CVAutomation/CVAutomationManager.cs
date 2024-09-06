@@ -8,9 +8,11 @@ using Microsoft.Extensions.Configuration;
 using NccCore.Extension;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using TalentV2.Authorization.Users;
 using TalentV2.Configuration;
@@ -58,7 +60,7 @@ namespace TalentV2.DomainServices.CVAutomation
             _autobotService = autobotService;
             _logger = IocManager.Instance.Resolve<ILogger>();
             _firebaseService = firebaseService;
-            
+
 
         }
 
@@ -264,10 +266,10 @@ namespace TalentV2.DomainServices.CVAutomation
                 var newCVToSave = new CV
                 {
                     TenantId = _session?.TenantId,
-                    Name = item.Value.FullName,
+                    Name = item.Value.FullName.Length > CvAnnotationValue.Name ? item.Value.FullName[..CvAnnotationValue.Name] : item.Value.FullName,
                     Email = item.Value.Email,
-                    Phone = item.Value.PhoneNumber,
-                    Address = CVInfor.Address,
+                    Phone = item.Value.PhoneNumber.Length > CvAnnotationValue.Phone ? item.Value.PhoneNumber[..CvAnnotationValue.Phone] : item.Value.PhoneNumber,
+                    Address = CVInfor.Address.Length > CvAnnotationValue.Address ? CVInfor.Address[..CvAnnotationValue.Address] : CVInfor.Address,
                     UserType = item.Value.Position.Equals("Staff", StringComparison.OrdinalIgnoreCase) ? UserType.Staff : UserType.Intern,
                     LinkCV = await SaveCVToAWS(item.Value.FileURL, CVInfor.CVData),//save CV to AWS and set AWS link to CV.LinkCV
                     CVStatus = CVStatus.Draft,
@@ -290,7 +292,7 @@ namespace TalentV2.DomainServices.CVAutomation
                     newCVToSave.LastModifierUserId = defaultUserCreation?.Id;
                 }
                 string branchName = ConvertToAliasName(item.Value.Office);
-                var defaultBranch = await WorkScope.GetAll<Branch>().FirstOrDefaultAsync(b => b.Name.Equals(branchName))?? await WorkScope.GetAll<Branch>().FirstOrDefaultAsync();
+                var defaultBranch = await WorkScope.GetAll<Branch>().FirstOrDefaultAsync(b => b.Name.Equals(branchName)) ?? await WorkScope.GetAll<Branch>().FirstOrDefaultAsync();
                 newCVToSave.BranchId = defaultBranch.Id;
 
                 var defaultSubPosition = await WorkScope.GetAll<SubPosition>().FirstOrDefaultAsync(p => item.Value.JobTitle.Contains(p.Name)) ?? await WorkScope.GetAll<SubPosition>().FirstOrDefaultAsync();
