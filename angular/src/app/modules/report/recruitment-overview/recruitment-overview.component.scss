@@ -33,16 +33,45 @@
 
 .recruitment-overview-wrapping {
     padding: 20px;
-    overflow: auto;
 
     .branch-title {
         font-weight: bold;
         font-size: 27px;
     }
 
+    .table-container {
+        position: relative;
+        max-height: 535px;
+        overflow: hidden;
+        &:has(.overflowingX) {
+            padding-bottom: 16px;
+        }
+        &:has(.overflowingY) {
+            padding-right: 16px;
+        }
+        &:hover {
+            overflow: auto !important;
+            padding-right: 0;
+            padding-bottom: 0;
+        }
+    }
+
     table {
         border-collapse: separate;
         width: 100%;
+
+        thead {
+            position: sticky;
+            top: 0;
+            &::before {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: white;
+                z-index: -1;
+            }
+        }
 
         th,
         td {
