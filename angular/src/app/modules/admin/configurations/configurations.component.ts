@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
 import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentContestUrl, INoticeCVAutomationDto } from '@app/core/models/configuration/configuration.model';
-import { MESSAGE } from '@shared/AppConsts';
+import { AppConsts, MESSAGE } from '@shared/AppConsts';
 import { DefaultRoute, ToastMessageType } from '@shared/AppEnums';
 import { NccAppComponentBase } from '@shared/ncc-component-base';
 import * as _ from 'lodash';
@@ -505,7 +505,12 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
         }
       })
     );
-  }
+    }
+    public goToHangfire() {
+        const hangfireUrl = `${AppConsts.remoteServiceBaseUrl}/public/hangfire`;
+        window.open(hangfireUrl, '_blank');
+
+    }
 
   mapCVAutomationDTOData(data: INoticeCVAutomationDto): INoticeCVAutomationDto{
     return {

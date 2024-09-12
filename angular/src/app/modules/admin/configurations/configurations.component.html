@@ -416,6 +416,29 @@
       </div>
     </p-panel>
   </div>
+
+    <div class="panel panel--hangfire">
+    <p-panel [toggleable]="true">
+      <ng-template pTemplate="header">
+        <div class="d-flex align-items-center">
+          <span class="panel-title">
+            {{ "Hangfire Dashboard" | localize }}
+          </span>
+        </div>
+      </ng-template>
+
+      <div class="panel-body">
+        <button pButton
+          pRipple
+          type="button"
+          icon="fas fa-server"
+          label="Go to Hangfire Dashboard"
+          class="p-button-primary"
+          (click)="goToHangfire()">
+  </button>
+      </div>
+    </p-panel>
+  </div>
 </section>
 
 <section class="content setting-grid">

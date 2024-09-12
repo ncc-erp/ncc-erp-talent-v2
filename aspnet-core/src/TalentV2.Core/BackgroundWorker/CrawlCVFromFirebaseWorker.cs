@@ -193,5 +193,10 @@ namespace TalentV2.BackgroundWorker
         {
             return $"{clientUrl}app/candidate/{(userType == UserType.Intern ? "intern-list" : "staff-list")}?cvStatus=20";
         }
-    }
+
+		public void HangfireIntegrated()
+		{
+			DoWork();
+		}
+	}
 }

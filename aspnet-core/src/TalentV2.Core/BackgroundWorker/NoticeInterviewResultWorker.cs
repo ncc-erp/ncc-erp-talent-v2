@@ -114,5 +114,10 @@ namespace TalentV2.BackgroundWorker
                 }
             }
         }
-    }
+
+		public void HangfireIntegrated()
+		{
+			DoWork();
+		}
+	}
 }
