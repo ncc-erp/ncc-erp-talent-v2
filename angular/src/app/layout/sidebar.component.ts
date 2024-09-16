@@ -1,9 +1,9 @@
 import {
   Component,
   Renderer2,
-  OnInit
+  OnInit,
+  OnDestroy
 } from '@angular/core';
-import { AppAuthService } from '@shared/auth/app-auth.service';
 import { LayoutStoreService } from '@shared/layout/layout-store.service';
 
 @Component({
@@ -12,13 +12,13 @@ import { LayoutStoreService } from '@shared/layout/layout-store.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['sidebar.component.scss']
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   sidebarExpanded: boolean;
+  hideSideBarTimeout: NodeJS.Timeout;
 
   constructor(
     private renderer: Renderer2,
-    private _layoutStore: LayoutStoreService,
-    private _authService: AppAuthService
+    private _layoutStore: LayoutStoreService
   ) {}
 
   ngOnInit(): void {
@@ -26,7 +26,13 @@ export class SidebarComponent implements OnInit {
       this.sidebarExpanded = value;
       this.toggleSidebar();
     });
+    this._layoutStore.checkToHideSidebar();
   }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.hideSideBarTimeout);
+  }
+
 
   toggleSidebar(): void {
     if (this.sidebarExpanded) {
@@ -44,9 +50,12 @@ export class SidebarComponent implements OnInit {
   hideSidebar(): void {
     this.renderer.removeClass(document.body, 'sidebar-open');
     this.renderer.addClass(document.body, 'sidebar-collapse');
-  }
-
-  logout(): void {
-    this._authService.logout();
+    const sidebar = document.querySelector('.main-sidebar');
+    if (sidebar) {
+      this.renderer.setStyle(sidebar, 'pointer-events', 'none');
+      this.hideSideBarTimeout = setTimeout(() => {
+        this.renderer.setStyle(sidebar, 'pointer-events', 'unset');
+      }, 500);
+    }
   }
 }

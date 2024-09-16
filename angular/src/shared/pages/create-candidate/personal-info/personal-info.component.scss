@@ -103,6 +103,8 @@
 }
 
 .avatar {
+  width: fit-content;
+  object-fit: contain;
   height: auto;
   max-width: auto;
   border-radius: 5px;

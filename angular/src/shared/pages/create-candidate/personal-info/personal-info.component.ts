@@ -305,7 +305,6 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
 
     const payload = this.getPayload(true) as CandidatePayload;
     this._candidate.updateCV(payload).subscribe(res => {
-      this.isLoading = res.loading;
       if (!res.loading && res.success && res.result) {
         this.updateCandidateInfoData(res.result);
         this.resetStatus();
@@ -508,6 +507,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     this.referenceType = this._utilities.catCvSource.find(item => item.id === cvSourceId)?.referenceType;
     if (cvSourceId && checkNumber(this.referenceType)) {
       this.formControls['referenceId'].enable();
+      !this.isEditing && this.formControls['referenceId'].disable();
       return true;
     }
     this.formControls['referenceId'].setValue(null);

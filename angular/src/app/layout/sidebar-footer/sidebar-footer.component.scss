@@ -1,0 +1,36 @@
+:host {
+  border-top: 1px solid #4b545c;
+  .sidebar {
+    height: auto !important;
+    overflow: visible;
+  }
+}
+
+::ng-deep {
+  header-language-menu {
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, .1);
+    }
+
+    p-dropdown {
+      .p-dropdown-label, .p-dropdown-trigger-icon {
+        padding: 0;
+        color: #c2c7d0;
+      }
+
+      .p-dropdown {
+        width: 100%;
+        background: transparent !important;
+        border: 0 !important;
+        outline: 0 !important;
+        box-shadow: unset !important;
+
+        &:hover {
+          .p-dropdown-label, .p-dropdown-trigger-icon {
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}

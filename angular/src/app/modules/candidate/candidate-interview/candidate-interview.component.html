@@ -72,11 +72,7 @@
 
       <div
         class="col item-group"
-        [class]="
-          !searchWithinterviewTime || searchWithinterviewTime.dateType === 'All'
-            ? 'creation-time-default'
-            : 'creation-time-open'
-        "
+        [ngClass]="{'creation-time-open': searchWithinterviewTime && searchWithinterviewTime.dateType !== 'All'}"
       >
         <talent-date-selector
           [label]="'Interview Time'"
