@@ -22,6 +22,7 @@ import { retrievedUserList } from '@app/store/actions/user.action';
 import { LazyLoadEvent, MenuItem } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DefaultRoute } from '@shared/AppEnums';
+import { ActiveRadioData } from '@shared/AppConsts';
 
 class PagedUsersRequestDto extends PagedRequestDto {
   keyword: string;
@@ -35,10 +36,10 @@ class PagedUsersRequestDto extends PagedRequestDto {
 export class UsersComponent extends PagedListingComponentBase<UserDto> {
   users: UserDto[] = [];
   keyword = '';
-  isActive: boolean | null;
-  advancedFiltersVisible = false;
+  isActive: boolean | undefined = undefined;
   listUsers$ = this._store.pipe(select(allUsers));
   public loading: boolean;
+  public ActiveRadioData = ActiveRadioData;
 
   constructor(
     injector: Injector,

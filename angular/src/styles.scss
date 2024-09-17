@@ -177,3 +177,36 @@ body {
   min-width: 600px;
   overflow: auto;
 }
+
+.custom-search {
+  &-container {
+    background: #fff;
+    display: flex;
+    gap: .5rem;
+    width: 60%;
+    border-radius: .25rem;
+    border: 1px solid #ddd;
+    min-width: 400px;
+  }
+
+  &-input {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: unset !important;
+    padding: 0 !important;
+    flex: 1;
+  }
+
+  @media (max-width: 1500px) {
+    &-container {
+      width: 80%;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    &-container {
+      width: 100%;
+    }
+  }
+}
