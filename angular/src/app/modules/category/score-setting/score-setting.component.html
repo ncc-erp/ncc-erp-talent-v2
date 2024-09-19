@@ -4,8 +4,8 @@
 
 <section class="section-table">
   <div class="header-toolbar">
-    <div class="row gap-2">
-      <div class="col-12 col-md-5 d-flex align-items-md-center flex-column flex-md-row">
+    <div class="row">
+      <div class="col-12 col-md-6 d-flex align-items-md-center flex-column flex-md-row pr-2 pb-2">
         <label for="userType" class="mb-0 mr-2">User Type</label>
         <div class="col p-0">
           <p-dropdown id="userType" [options]="_utilities.catUserType" [(ngModel)]="searchWithUserType"
@@ -13,7 +13,7 @@
             (onChange)="onGetDataChange()"></p-dropdown>
         </div>
       </div>
-      <div class="col-12 col-md-5 d-flex align-items-md-center flex-column flex-md-row">
+      <div class="col-12 col-md-6 d-flex align-items-md-center flex-column flex-md-row pb-2">
         <label for="position" class="mb-0 mr-2">Position</label>
         <div class="col p-0">
           <talent-position-dropdown [id]="'position'" [options]="_utilities.catPosition"

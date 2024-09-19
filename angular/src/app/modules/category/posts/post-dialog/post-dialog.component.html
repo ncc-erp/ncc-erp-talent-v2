@@ -1,6 +1,6 @@
 <form [formGroup]="form">
-    <div class="form-group row gap-2">
-      <div class="col-md-12">
+    <div class="form-group d-flex flex-column gap-2">
+      <div>
         <label> {{ "Post's Name" | localize }} <span class="text-danger">*</span></label>
         <input
           talentAutoFocus
@@ -17,7 +17,7 @@
           Post's Name is required!
         </span>
       </div>
-      <div class="col-md-12">
+      <div>
         <label> {{ "Post Creation Time" | localize }} <span class="text-danger">*</span></label>
         <div class="input-item">
           <p-calendar
@@ -36,7 +36,7 @@
           Post Creation Time is required!
         </div>
       </div>
-      <div class="col-md-12">
+      <div>
         <label> {{ "URL" | localize }} <span class="text-danger">*</span></label>
         <input
           talentAutoFocus
@@ -53,7 +53,7 @@
           URL is required!
         </span>
       </div>
-      <div class="col-md-12">
+      <div>
         <label> {{ "Type" | localize }}</label>
         <input
           talentAutoFocus
@@ -64,7 +64,7 @@
           formControlName="type"
         />
       </div>
-      <div class="col-md-12">
+      <div>
         <label> {{ "Post Creator" | localize }} <span class="text-danger">*</span></label>
         <p-dropdown
             [options]="catAllUser"
