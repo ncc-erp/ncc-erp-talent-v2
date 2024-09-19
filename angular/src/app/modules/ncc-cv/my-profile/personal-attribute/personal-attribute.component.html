@@ -8,14 +8,14 @@
   </div>
   <div class="card-body pb-2 m-0">
     <div class="row mb-2 pb-2">
-      <form [formGroup]="atributeForm" class="w-100">
+      <form [formGroup]="attributeForm" class="w-100">
         <div class="col-md-12">
-          <label for="attbute" class="mr-2">
+          <label for="attribute-textarea" class="mr-2">
             {{ "Attribute" | localize }}</label
           >
           <textarea
-            id="attbute"
-            formControlName="atribute"
+            id="attribute-textarea"
+            formControlName="attribute"
             rows="4"
             class="w-100"
             pInputTextarea
@@ -23,7 +23,7 @@
           ></textarea>
 
           <div
-            *ngIf="submitted && (listInputValid[0].value || formControls.atribute.errors?.required)"
+            *ngIf="submitted && (listInputValid[0].value || formControls.attribute.errors?.required)"
             class="text-danger"
           >
             This field is invalid
@@ -37,5 +37,5 @@
 <talent-dialog-action-toolbar
   [dialogRef]="dialogRef"
   [disabledSaveBtn]="isLoading"
-  (onSave)="saveAtribute()"
+  (onSave)="saveAttribute()"
 ></talent-dialog-action-toolbar>
