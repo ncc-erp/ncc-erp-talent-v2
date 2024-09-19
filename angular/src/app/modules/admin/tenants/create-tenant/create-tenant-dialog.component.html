@@ -5,15 +5,15 @@
   (ngSubmit)="save()"
 >
   <abp-modal-header
-    [title]="'CreateNewTenant' | localize"
+    [title]="'Create New Tenant' | localize"
     (onCloseClick)="bsModalRef.hide()"
   ></abp-modal-header>
   <div class="modal-body">
     <div class="form-group row required">
-      <label class="col-md-3 col-form-label" for="tenancyName">
-        {{ "TenancyName" | localize }}
+      <label class="col-md-12 col-lg-3 col-form-label" for="tenancyName">
+        {{ "Tenancy Name" | localize }}
       </label>
-      <div class="col-md-9">
+      <div class="col-md-12 col-lg-9">
         <input
           type="text"
           class="form-control"
@@ -33,10 +33,10 @@
       </div>
     </div>
     <div class="form-group row required">
-      <label class="col-md-3 col-form-label" for="name">
+      <label class="col-md-12 col-lg-3 col-form-label" for="name">
         {{ "Name" | localize }}
       </label>
-      <div class="col-md-9">
+      <div class="col-md-12 col-lg-9">
         <input
           type="text"
           class="form-control"
@@ -55,10 +55,10 @@
       </div>
     </div>
     <div class="form-group row">
-      <label class="col-md-3 col-form-label" for="connectionString">
-        {{ "DatabaseConnectionString" | localize }}
+      <label class="col-md-12 col-lg-3 col-form-label" for="connectionString">
+        {{ "Database Connection String" | localize }}
       </label>
-      <div class="col-md-9">
+      <div class="col-md-12 col-lg-9">
         <input
           type="text"
           class="form-control"
@@ -70,10 +70,10 @@
       </div>
     </div>
     <div class="form-group row required">
-      <label class="col-md-3 col-form-label" for="adminEmailAddress">
-        {{ "AdminEmailAddress" | localize }}
+      <label class="col-md-12 col-lg-3 col-form-label" for="adminEmailAddress">
+        {{ "Admin Email Address" | localize }}
       </label>
-      <div class="col-md-9">
+      <div class="col-md-12 col-lg-9">
         <input
           type="email"
           class="form-control"
@@ -93,10 +93,10 @@
       </div>
     </div>
     <div class="form-group row mb-0">
-      <label class="col-md-3 col-form-label">
+      <label class="col-3 col-form-label">
         {{ "IsActive" | localize }}
       </label>
-      <div class="col-md-9">
+      <div class="col-9">
         <div class="custom-control custom-checkbox">
           <input
             type="checkbox"

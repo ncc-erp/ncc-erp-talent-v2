@@ -2,14 +2,14 @@
   <div class="card mt-3">
     <div class="card-header">
       <div class="row row-toolbar">
-        <div class="col-lg-3 col d-flex align-items-center">
+        <div class="col-lg-4 col-md-6 col-12 d-flex flex-column flex-md-row align-items-md-center">
           <label for="userType" class="mb-0 mr-2">User Type</label>
-          <div class="col">
+          <div class="flex-fill">
             <p-dropdown
               id="userType"
               [options]="_utilities.catUserType"
               [(ngModel)]="userType"
-              placeholder="Please select an user type"
+              placeholder="Select an user type"
               optionLabel="name"
               optionValue="id"
               styleClass="w-100"
@@ -20,9 +20,9 @@
           </div>
         </div>
 
-        <div class="col-lg-3 col d-flex align-items-center">
+        <div class="col-lg-3 col-md-5 col-12 d-flex flex-column flex-md-row align-items-md-center">
           <label for="position" class="mb-0 mr-2">Position</label>
-          <div class="col">
+          <div class="flex-fill">
             <talent-position-dropdown
               [id]="'position'"
               [options]="_utilities.catPosition"
@@ -33,26 +33,26 @@
           </div>
         </div>
 
-        <div class="col text-right">
+        <div class="col-lg-auto col-md-12 col-12 flex-fill d-flex align-items-center justify-content-end gap-2">
           <p-button *ngIf="!canEditFactor &&isGranted(PS.Pages_CapabilitySettings_EditFactor)"
                     label="{{ 'Edit Factors' | localize }}"
                     icon="pi pi-pencil"
-                    styleClass="p-button-sm p-button-primary mr-3"
+                    styleClass="p-button-sm p-button-primary"
                     (click)="onEditFactor()"></p-button>
           <p-button *ngIf="canEditFactor"
                     label="{{ 'Save' | localize }}"
                     icon="pi pi-check"
-                    styleClass="  p-button-sm p-button-primary mr-3"
+                    styleClass="  p-button-sm p-button-primary"
                     (click)="onDoneEditFactor()"></p-button>
           <p-button *ngIf="canEditFactor"
                     label="{{ 'Cancel' | localize }}"
                     icon="pi pi-times"
-                    styleClass=" p-button-sm p-button-secondary mr-3"
+                    styleClass=" p-button-sm p-button-secondary"
                     (click)="onCancelEditFactor()"></p-button>
           <p-button
             *ngIf="isGranted(PS.Pages_CapabilitySettings_Clone)"
             label="{{ 'Clone' | localize }}"
-            styleClass="p-button-sm p-button-warning mr-3"
+            styleClass="p-button-sm p-button-warning"
             (click)="onClone()"
           ></p-button>
 

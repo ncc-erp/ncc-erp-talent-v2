@@ -210,3 +210,7 @@ body {
     }
   }
 }
+
+.swal2-popup, .modal-dialog .modal-content, .p-dialog {
+  min-width: 500px;
+}
