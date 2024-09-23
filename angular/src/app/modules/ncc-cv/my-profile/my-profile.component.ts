@@ -79,7 +79,7 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     ]
   };
   isUser: boolean;
-  listPersonalAtribute: any;
+  listPersonalAttribute: any;
   isSale = false;
   editAsSale = false;
   isVersionDefault = true;
@@ -95,7 +95,9 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     { id: 0, name: 'Default' }
   ];
   isOpenMenu = false;
+  showSideBarWorkingExperience = false;
   versionForm: FormGroup;
+
   constructor(
     private fb: FormBuilder,
     injector: Injector,
@@ -175,7 +177,7 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
   showDialogCreateVersion() {
     const dialogRef = this._dialog.open(CreateVersionComponent, {
       width: "40%",
-      contentStyle: { "max-height": "100%", overflow: "visible" },
+      contentStyle: { "max-height": "100%" },
       showHeader: false,
       baseZIndex: 5000,
       data: this.id,
@@ -208,7 +210,7 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
         employeeInfo: this.inform,
         educationBackGround: this.listEducation,
         technicalExpertises: this.listskill,
-        personalAttributes: { personalAttributes: this.listPersonalAtribute },
+        personalAttributes: { personalAttributes: this.listPersonalAttribute },
         workingExperiences: this.workingExperience,
       },
       this.isUser,
@@ -247,7 +249,7 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
   showDialogCreatEdit(entity: ContactInformation) { // UU
     const dialogRef = this._dialog.open(ContactInformationComponent, {
       width: "40%",
-      contentStyle: { "max-height": "100%", overflow: "visible" },
+      contentStyle: { "max-height": "100%" },
       showHeader: false,
       baseZIndex: 5000,
       data: entity || null,
@@ -279,6 +281,9 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
         this.workingExperience = res.result.map(el => {
           el.endTime = moment(new Date(el.endTime)).format('YYYY-MM-DD');
           el.startTime = moment(new Date(el.startTime)).format('YYYY-MM-DD');
+          el.projectDescription = this.breakLine(el.projectDescription);
+          el.responsibility = this.breakLine(el.responsibility);
+
           return { ...el }
         });
         this.tempWorkingExperience = res.result;
@@ -399,7 +404,7 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     const dialogConfig: ProfileEducationConfigDiaLog = { education: education, action: dialogAction, isUser: this.isUser };
     const dialogRef = this._dialog.open(ProfileEducationComponent, {
       width: "50%",
-      contentStyle: { "max-height": "100%", overflow: "visible" },
+      contentStyle: { "max-height": "100%" },
       showHeader: false,
       baseZIndex: 5000,
       data: dialogConfig,
@@ -430,36 +435,37 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     });
   }
 
-  // Lấy thông tin thêm sửa xóa thông tin atribute
+  // Lấy thông tin thêm sửa xóa thông tin attribute
   getPersonalAttribute() {
     if (this.permission.isGranted(PERMISSIONS_CONSTANT.MyProfile_PersonalAttribute_View)) {
       this._myProfile.getPersonalAttribute(this.id).subscribe(res => {
         if (!res || res.loading) return;
 
         if (res.result === null) {
-          this.listPersonalAtribute = [];
+          this.listPersonalAttribute = [];
         }
-        this.listPersonalAtribute = res.result.personalAttributes;
+
+        this.setListPersonalAttribute(res.result.personalAttributes)
       });
     }
   }
 
-  createAtribute(listPersonalAtribute): void {
-    this.showDialogCreateEditAtribute(listPersonalAtribute, ActionEnum.CREATE);
+  createAttribute(listPersonalAttribute): void {
+    this.showDialogCreateEditAttribute(listPersonalAttribute, ActionEnum.CREATE);
   }
 
-  editAtribute(listPersonalAtribute, item): void {
-    this.showDialogCreateEditAtribute(listPersonalAtribute, ActionEnum.UPDATE, item);
+  editAttribute(listPersonalAttribute, item): void {
+    this.showDialogCreateEditAttribute(listPersonalAttribute, ActionEnum.UPDATE, item);
   }
 
-  deleteAtribute(index) {
+  deleteAttribute(index) {
     abp.message.confirm(undefined, 'Are you sure that you want to delete?', (result: boolean) => {
       if (result) {
         if (this.isSale && !this.isUser) {
-          this.listPersonalAtribute.splice(index, 1);
+          this.listPersonalAttribute.splice(index, 1);
         } else {
-          this.listPersonalAtribute.splice(index, 1);
-          const data = { personalAttributes: this.listPersonalAtribute };
+          this.listPersonalAttribute.splice(index, 1);
+          const data = { personalAttributes: this.listPersonalAttribute };
           this._myProfile.updatePersonalAttribute(data).subscribe(res => {
             if (res) {
               this.notify.success(MESSAGE.DELETE_SUCCES);
@@ -471,9 +477,9 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     });
   }
 
-  showDialogCreateEditAtribute(listPersonalAtribute, action: ActionEnum, item = null) {
+  showDialogCreateEditAttribute(listPersonalAttribute, action: ActionEnum, item = null) {
     const body: PersonalAttributeConfigDialog = {
-      listPersonalAtribute,
+      listPersonalAttribute,
       item,
       isUser: this.isUser,
       action
@@ -481,7 +487,7 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
 
     const dialogRef = this._dialog.open(PersonalAttributeComponent, {
       width: "50%",
-      contentStyle: { "max-height": "100%", overflow: "visible" },
+      contentStyle: { "max-height": "100%" },
       showHeader: false,
       baseZIndex: 5000,
       data: body,
@@ -489,13 +495,18 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
 
     dialogRef.onClose.subscribe(res => {
       if (this.isSale && !this.isUser) {
-        if (res) { this.listPersonalAtribute = res.personalAttributes; }
+        if (res) { this.setListPersonalAttribute(res.personalAttributes) }
       } else {
         if (res) this.getPersonalAttribute();
       }
     });
   }
-  // end atribute
+
+  setListPersonalAttribute(personalAttributes: string[]) {
+    if (!personalAttributes?.length) return;
+    this.listPersonalAttribute = personalAttributes.map(attribute => this.breakLine(attribute));
+  }
+  // end attribute
 
 
   // Lấy thông tin , thêm sửa xóa edit technical
@@ -531,8 +542,8 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     };
 
     const dialogRef = this._dialog.open(TechnicalExpertisesComponent, {
-      width: "40%",
-      contentStyle: { "max-height": "100%", overflow: "visible" },
+      width: "55%",
+      contentStyle: { "max-height": "100%" },
       showHeader: false,
       baseZIndex: 5000,
       data: item,
@@ -557,8 +568,8 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
     });
   }
 
-  // end dialog techincal
-  xuongDong(value: string) {
+  // end dialog technical
+  breakLine(value: string) {
     if (value) {
       return value.split('\n').join('<br>');
     }
@@ -620,18 +631,6 @@ export class MyProfileComponent extends NccAppComponentBase implements OnInit {
       item.startTime = new Date(item.startTime).getTime();
       item.endTime = new Date(item.endTime).getTime();
     })
-  }
-
-  toggleSidebar() {
-    let bar = document.getElementById("sideBarWorkingExperience");
-    let mainBar = document.getElementById("mainMenuWorkingExperience");
-    if (bar.style.display === "none") {
-      bar.style.display = "block";
-      mainBar.className = "col-md-8";
-    } else {
-      bar.style.display = "none";
-      mainBar.className = "col-md-12"
-    }
   }
 
   protected getBreadCrumbConfig(): BreadCrumbConfig {

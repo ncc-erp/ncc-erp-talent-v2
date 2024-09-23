@@ -30,7 +30,7 @@ export class LayoutStoreService {
   }
 
   checkToHideSidebar() {
-    if (window.innerWidth < 1000) {
+    if (window.innerWidth < 1100) {
       this.setSidebarExpanded(true);
     }
   }
