@@ -105,8 +105,8 @@ export class RecruitmentOverviewComponent
           this.isLoading = true;
           const branchIds = this.filterBranches.map((branch) => branch.id);
           const payload: RecruitmentOverviewRequest = {
-            fromDate: this.filterDate?.fromDate.toDate(),
-            toDate: this.filterDate?.toDate.toDate(),
+            fromDate: this.filterDate?.fromDate?.toDate(),
+            toDate: this.filterDate?.toDate?.toDate(),
             userType: this.filterCandidateTypes.id,
             isGetAllBranch: branchIds.includes(null),
             branchIds: branchIds.filter((id) => id),

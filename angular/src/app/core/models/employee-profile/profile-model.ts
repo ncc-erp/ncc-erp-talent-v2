@@ -51,7 +51,7 @@ export class ProfileVersion {
 }
 
 
-//Technical 
+//Technical
 export class TechnicalExpertise {
   userId: number;
   groupSkills: GroupTechnical[];
@@ -72,7 +72,7 @@ export class ProfileCvSkill {
 
 //PersonalAttribute
 export class PersonalAttributeConfigDialog {
-  listPersonalAtribute: any[];
+  listPersonalAttribute: any[];
   item?: any
   isUser: boolean;
   action: ActionEnum;

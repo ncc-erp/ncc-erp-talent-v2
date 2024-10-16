@@ -48,4 +48,8 @@ export class HeaderLanguageMenuComponent extends AppComponentBase
       window.location.reload();
     });
   }
+
+  dropdownChange(event) {
+    event?.value?.name && this.changeLanguage(event.value.name);
+  }
 }

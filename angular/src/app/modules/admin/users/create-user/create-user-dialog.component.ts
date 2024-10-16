@@ -34,13 +34,13 @@ export class CreateUserDialogComponent extends AppComponentBase
     {
       name: 'pattern',
       localizationKey:
-        'PasswordsMustBeAtLeast8CharactersContainLowercaseUppercaseNumber',
+        'Passwords must be at least 8 characters contain lowercase uppercase number',
     },
   ];
   confirmPasswordValidationErrors: Partial<AbpValidationError>[] = [
     {
       name: 'validateEqual',
-      localizationKey: 'PasswordsDoNotMatch',
+      localizationKey: 'Passwords do not match',
     },
   ];
 

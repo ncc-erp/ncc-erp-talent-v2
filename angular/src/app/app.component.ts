@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Injector, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Injector, OnInit, Renderer2 } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart } from '@angular/router';
 import { AppComponentBase } from '@shared/app-component-base';
 import { SignalRAspNetCoreHelper } from '@shared/helpers/SignalRAspNetCoreHelper';
@@ -12,6 +12,11 @@ export class AppComponent extends AppComponentBase implements OnInit {
   sidebarExpanded: boolean;
   isLoading$  = new BehaviorSubject<boolean>(false);
 
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    !this.sidebarExpanded && this._layoutStore.checkToHideSidebar();
+  }
+
   constructor(
     injector: Injector,
     private renderer: Renderer2,
@@ -19,7 +24,7 @@ export class AppComponent extends AppComponentBase implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {
     super(injector);
-  
+
     this.router.events.subscribe(event => {
       this.handleLoadingBar(event)
     });
@@ -59,7 +64,7 @@ export class AppComponent extends AppComponentBase implements OnInit {
   }
 
   private handleLoadingBar(event) {
-    if (event instanceof NavigationStart) {  
+    if (event instanceof NavigationStart) {
       this.isLoading$.next(true);
     }
     else if (event instanceof NavigationEnd) {

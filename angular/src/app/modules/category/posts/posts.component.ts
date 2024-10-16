@@ -71,7 +71,7 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
   }
 
   openDialog(obj: Post, dialogAction: ActionEnum) {
-    const dialogConfig  = { post: obj, action: dialogAction };    
+    const dialogConfig  = { post: obj, action: dialogAction };
     const dialogRef = this.dialogService.open(PostDialogComponent, {
       header: `${dialogConfig.action} Post`,
       width: "40%",
@@ -163,5 +163,5 @@ export class PostsComponent extends PagedListingComponentBase<Post> implements O
       homeItem: { icon: "pi pi-home", routerLink: "/" },
     };
   }
- 
+
 }

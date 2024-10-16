@@ -1,7 +1,7 @@
 <talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig">
 </talent-section-breadcrumb>
 
-<section class="content setting-grid">
+<section class="content configurations-content">
   <div class="panel panel--google-setting" *ngIf="googleClientAppSetting">
     <p-panel
       [toggleable]="true"
@@ -418,7 +418,7 @@
   </div>
 </section>
 
-<section class="content setting-grid">
+<section class="content configurations-content">
   <div class="panel panel--email-setting" *ngIf="emailSetting">
     <p-panel [toggleable]="true" [(collapsed)]="isPanelCollapse.email">
       <ng-template pTemplate="header">
@@ -726,7 +726,7 @@
             [(ngModel)]="notifyCVAutomation.crawlCVStartAtHour"
             [readonly]="!isEditing.notifyCVAutomation"
           />
-          <span>minutes</span>
+          <span>o'clock</span>
         </div>
       </div>
 
@@ -744,7 +744,7 @@
             [(ngModel)]="notifyCVAutomation.crawlCVEndAtHour"
             [readonly]="!isEditing.notifyCVAutomation"
           />
-          <span>minutes</span>
+          <span>o'clock</span>
         </div>
       </div>
 

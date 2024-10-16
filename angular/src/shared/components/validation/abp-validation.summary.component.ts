@@ -17,29 +17,29 @@ import { AbpValidationError } from './abp-validation.api';
 export class AbpValidationSummaryComponent extends AppComponentBase implements OnInit {
 
   defaultValidationErrors: Partial<AbpValidationError>[] = [
-    { name: 'required', localizationKey: 'ThisFieldIsRequired' },
+    { name: 'required', localizationKey: 'This field is required' },
     {
       name: 'minlength',
-      localizationKey: 'PleaseEnterAtLeastNCharacter',
+      localizationKey: 'Please enter at least N character',
       propertyKey: 'requiredLength',
     },
     {
       name: 'maxlength',
-      localizationKey: 'PleaseEnterNoMoreThanNCharacter',
+      localizationKey: 'Please enter no more than N character',
       propertyKey: 'requiredLength',
     },
     {
       name: 'email',
-      localizationKey: 'InvalidEmailAddress',
+      localizationKey: 'Invalid email address',
     },
     {
       name: 'pattern',
-      localizationKey: 'InvalidPattern',
+      localizationKey: 'Invalid pattern',
       propertyKey: 'requiredPattern',
     },
     {
       name: 'validateEqual',
-      localizationKey: 'PairsDoNotMatch',
+      localizationKey: 'Pairs do not match',
     },
   ];
   validationErrors = <AbpValidationError[]>this.defaultValidationErrors;

@@ -6,3 +6,9 @@ label {
 .card-header{
   font-size: 25px; font-family: auto;
 }
+
+:host ::ng-deep {
+  p-inputNumber .p-inputnumber-input {
+    width: 100%;
+  }
+}
