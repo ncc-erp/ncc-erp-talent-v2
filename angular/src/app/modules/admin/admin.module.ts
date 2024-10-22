@@ -24,6 +24,9 @@ import { MailComponent } from './mail/mail.component';
 import { MailDialogComponent } from './mail/mail-dialog/mail-dialog.component';
 import { DialogModule } from 'primeng/dialog';
 import { EditMailDialogComponent } from './mail/edit-mail-dialog/edit-mail-dialog.component';
+import { MezonWebhooksComponent } from './mezon-webhooks/mezon-webhooks.component';
+import { EditMezonWebhookDialogComponent } from './mezon-webhooks/edit-mezon-webhook-dialog/edit-mezon-webhook-dialog.component';
+import { CreateMezonWebhookDialogComponent } from './mezon-webhooks/create-mezon-webhook-dialog/create-mezon-webhook-dialog.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +46,9 @@ import { EditMailDialogComponent } from './mail/edit-mail-dialog/edit-mail-dialo
     MailDialogComponent,
     EditMailDialogComponent,
     TabUserRoleComponent,
+    MezonWebhooksComponent,
+    EditMezonWebhookDialogComponent,
+    CreateMezonWebhookDialogComponent,
   ],
   imports: [
     CommonModule,
