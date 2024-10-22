@@ -57,12 +57,5 @@ namespace TalentV2.APIs
             await _mezonWebhookManager.DeleteMezonWebhook(Id);
             return "Deleted Successfully!";
         }
-
-        [HttpGet]
-        [AbpAuthorize(PermissionNames.Pages_MezonWebhooks_ViewList)]
-        public async Task Notify()
-        {
-            await _mezonWebhookService.NotifyToWebhookUrl("NotifyToWebhookUrl", "https://webhook.mezon.ai/webhooks/1833361163941842944/MTcyODQ0OTU3MjE3MzQ1NTcyMjoxNzc5NDg0NTA0Mzc3NzkwNDY0OjE4MzMzNjExNjM5NDE4NDI5NDQ.aBOrllerpGbwoQtzRsFLuBd1PGGuP6cHtiN1i3gma8w");
-        }
     }
 }
