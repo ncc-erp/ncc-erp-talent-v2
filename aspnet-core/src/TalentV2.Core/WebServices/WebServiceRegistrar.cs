@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TalentV2.WebServices.ExternalServices.Autobot;
 using TalentV2.WebServices.ExternalServices.Komu;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks;
 using TalentV2.WebServices.InternalServices.HRM;
 using TalentV2.WebServices.InternalServices.LMS;
 
@@ -20,6 +21,10 @@ namespace TalentV2.WebServices
             {
                 options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("KomuService:BaseAddress"));
                 options.DefaultRequestHeaders.Add("X-Secret-Key", _appConfiguration.GetValue<string>("KomuService:SecurityCode"));
+            });
+            services.AddHttpClient<MezonWebhookService>(options =>
+            {
+                options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("MezonWebhookService:BaseAddress"));
             });
             services.AddHttpClient<LMSService>(options =>
             {

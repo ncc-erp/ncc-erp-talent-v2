@@ -1,0 +1,101 @@
+<form
+  class="form-horizontal"
+  autocomplete="off"
+  #editWebhookForm="ngForm"
+  (ngSubmit)="save()"
+>
+  <abp-modal-header
+    [title]="'Edit Mezon Webhook' | localize"
+    (onCloseClick)="bsModalRef.hide()"
+  ></abp-modal-header>
+  <div class="modal-body">
+    <div class="form-group row required">
+      <label class="col-md-3 col-form-label" for="name">
+        {{ "Name" | localize }}
+      </label>
+      <div *ngIf="webhook" class="col-md-9">
+        <input
+          type="text"
+          class="form-control"
+          name="name"
+          id="name"
+          minlength="2"
+          maxlength="32"
+          required
+          [(ngModel)]="webhook.name"
+          #nameModel="ngModel"
+          #nameEl
+        />
+        <abp-validation-summary
+          [control]="nameModel"
+          [controlEl]="nameEl"
+        ></abp-validation-summary>
+      </div>
+    </div>
+    <div class="form-group row required">
+      <label class="col-md-3 col-form-label" for="url">
+        {{ "Url" | localize }}
+      </label>
+      <div *ngIf="webhook" class="col-md-9">
+        <input
+          type="text"
+          class="form-control"
+          name="url"
+          id="url"
+          required
+          [(ngModel)]="webhook.url"
+          #urlModel="ngModel"
+          #urlEl
+        />
+        <abp-validation-summary
+          [control]="urlModel"
+          [controlEl]="urlEl"
+        ></abp-validation-summary>
+      </div>
+    </div>
+    <div class="form-group row required">
+      <label class="col-md-3 col-form-label" for="destination">
+        {{ "Destination" | localize }}
+      </label>
+      <div *ngIf="webhook" class="col-md-9">
+        <input
+          type="text"
+          class="form-control"
+          name="destination"
+          id="destination"
+          required
+          [(ngModel)]="webhook.destination"
+          #destinationModel="ngModel"
+          #destinationEl
+        />
+        <abp-validation-summary
+          [control]="destinationModel"
+          [controlEl]="destinationEl"
+        ></abp-validation-summary>
+      </div>
+    </div>
+    <div class="form-group row mb-0">
+      <label class="col-3 col-form-label">
+        {{ "IsActive" | localize }}
+      </label>
+      <div class="col-9">
+        <div *ngIf="webhook" class="custom-control custom-checkbox">
+          <input
+            type="checkbox"
+            class="custom-control-input"
+            name="isActive"
+            id="isActive"
+            [(ngModel)]="webhook.isActive"
+          />
+          <label class="custom-control-label mt-2" for="isActive"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <abp-modal-footer
+    [cancelDisabled]="saving"
+    [saveDisabled]="!editWebhookForm.form.valid || saving"
+    (onCancelClick)="bsModalRef.hide()"
+  ></abp-modal-footer>
+</form>
+

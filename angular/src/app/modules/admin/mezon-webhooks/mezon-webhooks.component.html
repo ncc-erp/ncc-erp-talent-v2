@@ -1,0 +1,103 @@
+<div [@routerTransition]>
+  <talent-section-breadcrumb
+    [breadcrumbConfig]="breadcrumbConfig"
+    [isShowBtn]="isGranted(PS.Pages_MezonWebhooks_Create)"
+    (onBtnClick)="createWebhook()"
+  >
+  </talent-section-breadcrumb>
+
+
+  <section class="section-table">
+    <div class="header-toolbar">
+      <div class="custom-search-container">
+        <button
+          type="button"
+          pButton
+          pRipple
+          icon="pi pi-search"
+          (click)="getDataPage(GET_FIRST_PAGE)"
+        ></button>
+        <input
+          talentAutoFocus
+          type="text"
+          pInputText
+          name="keyword"
+          class="custom-search-input"
+          [placeholder]="'Search by webhook name' | localize"
+          [(ngModel)]="searchText"
+          (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+        />
+      </div>
+    </div>
+
+    <p-table
+      [value]="mezonWebhooks"
+      [lazy]="true"
+      (onLazyLoad)="lazyLoadingData($event)"
+      [paginator]="true"
+      [rows]="defaultRows"
+      responsiveLayout="scroll"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [loading]="isLoading"
+      [(first)]="first"
+      [totalRecords]="totalItems"
+      [showCurrentPageReport]="mezonWebhooks.length"
+      currentPageReportTemplate="Total: {totalRecords}"
+      styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm tl-table-card-box"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center">#</th>
+          <th>{{ "Name" | localize }}</th>
+          <th>{{ "Url" | localize }}</th>
+          <th>{{ "Destination" | localize }}</th>
+          <th>{{ "IsActive" | localize }}</th>
+          <th class="w-230px">{{ "Actions" | localize }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-webhook let-i="rowIndex">
+        <tr>
+          <td class="w-70px text-center">{{ i + 1 }}</td>
+          <td>{{ webhook.name }}</td>
+          <td>{{ webhook.url }}</td>
+          <td>{{ webhook.destination }}</td>
+          <td>
+            <div class="custom-control custom-checkbox">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                disabled
+                [checked]="webhook.isActive"
+              />
+              <label class="custom-control-label"></label>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex justify-content-center">
+            <button
+              *ngIf="permission.isGranted(PS.Pages_MezonWebhooks_Edit)"
+              type="button"
+              class="btn btn-sm bg-secondary"
+              (click)="editWebhook(webhook)"
+            >
+              <i class="fas fa-pencil-alt"></i>
+              {{ "Edit" | localize }}
+            </button>
+            <button
+              *ngIf="permission.isGranted(PS.Pages_MezonWebhooks_Delete)"
+              type="button"
+              class="btn btn-sm bg-danger mx-2"
+              (click)="delete(webhook)"
+            >
+              <i class="fas fa-trash"></i>
+              {{ "Delete" | localize }}
+            </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+
+</div>

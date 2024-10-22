@@ -41,6 +41,11 @@ export const PERMISSIONS_CONSTANT = {
     Pages_Configurations_ViewTalentNotifyCVAutomationSettings: "Pages.Configurations.ViewTalentNotifyCVAutomationSettings",
     Pages_Configurations_EditTalentNotifyCVAutomationSettings: "Pages.Configurations.EditTalentNotifyCVAutomationSettings",
     PermissionNames_Pages_Configurations_ConfigureContestUrl: "PermissionNames.Pages_Configurations.ConfigureContestUrl",
+    Pages_MezonWebhooks: "Pages.MezonWebhooks",
+    Pages_MezonWebhooks_ViewList: "Pages.MezonWebhooks.ViewList",
+    Pages_MezonWebhooks_Create: "Pages.MezonWebhooks.Create",
+    Pages_MezonWebhooks_Edit: "Pages.MezonWebhooks.Edit",
+    Pages_MezonWebhooks_Delete: "Pages.MezonWebhooks.Delete",
 
     TabCategory: "Category",
     Pages_SubPositions: "Pages.SubPositions",
