@@ -113,13 +113,10 @@
         </div>
       </div>
 
+
       <div
         class="col item-group"
-        [class]="
-          !searchWithOnboardDate || searchWithOnboardDate.dateType === 'All'
-            ? 'creation-time-default'
-            : 'creation-time-open'
-        "
+        [ngClass]="{'creation-time-open': searchWithOnboardDate && searchWithOnboardDate.dateType !== 'All'}"
       >
         <talent-date-selector
           [label]="'Onboard Date'"

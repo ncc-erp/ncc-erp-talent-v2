@@ -165,45 +165,34 @@ namespace TalentV2.BackgroundWorker
         {
             var sb = new StringBuilder();
             var clientUrl = _configuration.GetValue<string>($"App:ClientRootAddress");
+            sb.AppendLine("Automatically created CV from NCC Career successfully:");
 
-            sb.AppendLine("Talent has automatically created successfully:");
             if (InternResult.Total > 0)
             {
                 sb.Append($"**Intern CV: {InternResult.Success}/{InternResult.Total}**");
-                sb.AppendLine($": {GetTalentLink(clientUrl, UserType.Intern)}");
+                sb.AppendLine($" --- [New Intern CVs Here]({GetTalentLink(clientUrl, UserType.Intern)})");
             }
-
             if (StaffResult.Total > 0)
             {
                 sb.Append($"**Staff CV: {StaffResult.Success}/{StaffResult.Total}**");
-                sb.AppendLine($": {GetTalentLink(clientUrl, UserType.Staff)}");
+                sb.AppendLine($" --- [New Staff CVs Here]({GetTalentLink(clientUrl, UserType.Staff)})");
             }
+
 
             if (emails != null && emails.Count > 0)
             {
                 var tagNames = string.Join(", ", emails.Select(x => CommonUtils.GetDiscordTagUser(x)).ToArray());
                 sb.Append($"HR: {tagNames} ");
-                if (string.IsNullOrEmpty(clientUrl))
-                {
-                    sb.Append("please check the created CV information at Talent.");
-                }
-                else
-                {
-                    sb.Append("please check the created CV information at the attached link.");
-                }
+                sb.Append(string.IsNullOrEmpty(clientUrl)
+    ? " please check the created CV information at Talent."
+    : " please check the created CV information at the attached link.\n");
             }
             else
             {
-                if (string.IsNullOrEmpty(clientUrl))
-                {
-                    sb.Append("Please check the created CV information at Talent.");
-                }
-                else
-                {
-                    sb.Append("Please check the created CV information at the attached link.");
-                }
+                sb.Append(string.IsNullOrEmpty(clientUrl)
+    ? "Please check the created CV information at Talent."
+    : "Please check the created CV information at the attached link.\n");
             }
-
             return sb.ToString();
         }
 

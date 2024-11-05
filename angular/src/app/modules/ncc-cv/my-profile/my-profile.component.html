@@ -7,128 +7,120 @@
     <div class="col-md-12">
       <div class="card" [ngClass]="{ contentHasmenu: isOpenMenu }">
         <div class="card-header content-gachchan">
+          <div style="font-family: auto">
+            <h3>{{ "Profile" | localize }} : {{ employeeName }}</h3>
+          </div>
+
           <div class="row">
-            <div class="col-md-4" style="font-family: auto">
-              <h3>{{ "Profile" | localize }} : {{ employeeName }}</h3>
+            <div class="col-md-8 pr-2 pb-2">
+              <form [formGroup]="versionForm">
+                <div class="flex-center-vertical gap-2">
+                  <label for="slVersion">
+                    {{ "Version" | localize }}
+                  </label>
+                  <p-dropdown
+                    id="userType"
+                    [options]="version"
+                    formControlName="version"
+                    optionLabel="name"
+                    optionValue="id"
+                    styleClass="w-200px"
+                  ></p-dropdown>
+
+                  <p-button
+                    *ngIf="
+                      (isUser &&
+                        permission.isGranted(MYPROFILE_VERSION_CREATE)) ||
+                      editAsSale
+                    "
+                    type="button"
+                    styleClass="p-button-sm p-button-outlined p-button-info"
+                    icon="pi pi-plus"
+                    (onClick)="showDialogCreateVersion()"
+                  ></p-button>
+
+                  <p-button
+                    *ngIf="
+                      (isUser &&
+                        isVersionDefault &&
+                        permission.isGranted(MYPROFILE_VERSION_DELETE)) ||
+                      editAsSale
+                    "
+                    type="button"
+                    styleClass="p-button-sm p-button-outlined p-button-danger"
+                    icon="pi pi-trash"
+                    (onClick)="deleteVersion()"
+                  ></p-button>
+                </div>
+              </form>
             </div>
 
-            <div class="col-md-8">
-              <div class="row">
-                <div class="col-md-6">
-                  <form [formGroup]="versionForm">
-                    <div class="flex-center-vertical gap-2">
-                      <label for="slVersion">
-                        {{ "Version" | localize }}
-                      </label>
-                      <p-dropdown
-                        id="userType"
-                        [options]="version"
-                        formControlName="version"
-                        optionLabel="name"
-                        optionValue="id"
-                        styleClass="w-200px"
-                      ></p-dropdown>
+            <div class="col-md-4 d-flex justify-content-md-end pb-2">
+              <p-button
+                type="button"
+                label="{{ 'Export' | localize }}"
+                styleClass="p-button-danger"
+                icon="fas fa-download"
+                (onClick)="showDialogExport()"
+              ></p-button>
 
-                      <p-button
-                        *ngIf="
-                          (isUser &&
-                            permission.isGranted(MYPROFILE_VERSION_CREATE)) ||
-                          editAsSale
-                        "
-                        type="button"
-                        styleClass="p-button-sm p-button-outlined p-button-info"
-                        icon="pi pi-plus"
-                        (onClick)="showDialogCreateVersion()"
-                      ></p-button>
-
-                      <p-button
-                        *ngIf="
-                          (isUser &&
-                            isVersionDefault &&
-                            permission.isGranted(MYPROFILE_VERSION_DELETE)) ||
-                          editAsSale
-                        "
-                        type="button"
-                        styleClass="p-button-sm p-button-outlined p-button-danger"
-                        icon="pi pi-trash"
-                        (onClick)="deleteVersion()"
-                      ></p-button>
-                    </div>
-                  </form>
-                </div>
-
-                <div class="col-md-6 text-right">
-                  <p-button
-                    type="button"
-                    label="{{ 'Export' | localize }}"
-                    styleClass="p-button-danger"
-                    icon="fas fa-download"
-                    (onClick)="showDialogExport()"
-                  ></p-button>
-
-                  <p-button
-                    *ngIf="isEmployee || editAsSale"
-                    type="button"
-                    label="{{ 'Exit' | localize }}"
-                    styleClass="p-button-secondary ml-2"
-                    icon="fas fa-reply"
-                    (onClick)="exitEmployee()"
-                  ></p-button>
-                </div>
-              </div>
+              <p-button
+                *ngIf="isEmployee || editAsSale"
+                type="button"
+                label="{{ 'Exit' | localize }}"
+                styleClass="p-button-secondary ml-2"
+                icon="fas fa-reply"
+                (onClick)="exitEmployee()"
+              ></p-button>
             </div>
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-2">
-              <img
-                  *ngIf="!this.appSession.user.avatarPath"
-                  src="../../../assets/img/user-circle.png"
-                  alt="Thumbnail"
-                />
-              <img
-                *ngIf="this.appSession.user.avatarPath"
-                class="img-circle"
-                [src]="this.appSession.user.avatarPath"
-                alt="Thumbnail"
-              />
-            </div>
-
-            <div class="col-md-8">
-              <ul
+        <div class="card-body m-0">
+          <div class="profile-data flex-column flex-md-row">
+            <img
+              *ngIf="!this.appSession.user.avatarPath"
+              src="../../../assets/img/user-circle.png"
+              alt="Thumbnail"
+            />
+            <img
+              *ngIf="this.appSession.user.avatarPath"
+              class="img-circle"
+              [src]="this.appSession.user.avatarPath"
+              alt="Thumbnail"
+            />
+            <div class="d-flex flex-fill">
+              <div
                 *ngIf="inform?.currentPosition"
-                style="list-style-type: none"
-                class="profile-contact"
+                class="profile-contact text-size"
               >
                 <h4>{{ employeeName }}</h4>
-                <li class="text-size">{{ inform.currentPosition }}</li>
-                <li class="text-size">
-                  <span
-                    ><i class="fas fa-address-card"></i>
-                    {{ inform.address }}</span
-                  >
-                </li>
-                <li class="text-size">
-                  <span
-                    ><i class="fas fa-phone"></i> {{ inform.phoneNumber }}</span
-                  >
-                </li>
-                <li class="text-size">
-                  <span
-                    ><i class="fas fa-envelope-square"></i>
-                    {{ inform.emailAddressInCV }}</span
-                  >
-                </li>
-              </ul>
-            </div>
+                <div class="row">
+                  <div class="col-12 col-xl-6 p-2">
+                    <i class="fas fa-briefcase pr-2"></i>
+                    {{ inform.currentPosition }}
+                  </div>
+                  <div class="col-12 col-xl-6 p-2">
+                    <i class="fas fa-address-card pr-2"></i>
+                    {{ inform.address }}
+                  </div>
+                </div>
 
-            <div class="col-md-2 text-right">
+                <div class="row">
+                  <div class="col-12 col-xl-6 p-2">
+                    <i class="fas fa-phone pr-2"></i>
+                    {{ inform.phoneNumber }}
+                  </div>
+                  <div class="col-12 col-xl-6 p-2">
+                    <i class="fas fa-envelope-square pr-2"></i>
+                    {{ inform.emailAddressInCV }}
+                  </div>
+                </div>
+              </div>
               <p-button
                 *ngIf="isUser && permission.isGranted(MYPROFILE_USER_EDIT)"
                 type="button"
-                styleClass="p-button p-button-outlined p-button-text"
+                styleClass="p-button p-button-outlined p-button-text p-0"
                 icon="fas fa-edit"
                 (onClick)="showDialogCreatEdit(inform)"
               ></p-button>
@@ -159,66 +151,65 @@
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="row">
-            <ng-container *ngFor="let item of listEducation">
-              <div class="row col-md-12">
-                <div class="col-md-2 text-right font-weight-bold">
-                  <span>{{ item.startYear }}-{{ item.endYear }}</span>
+        <div class="card-body m-0">
+          <ng-container *ngFor="let item of listEducation; last as last">
+            <div class="row">
+              <div class="col-10 row">
+                <div class="col-12 col-md-3 d-flex h-fit-content gap-2 align-items-center font-weight-bold text-size px-3">
+                  {{ item.startYear }} <i class="fas fa-long-arrow-alt-right"></i> {{ item.endYear }}
                 </div>
 
-                <div class="col-md-6 text-left">
-                  <ul style="list-style-type: none">
-                    <li class="text-size">
-                      <span class="font-weight-bold">
-                        {{ "School or center name" | localize }}:
-                      </span>
-                      {{ item.schoolOrCenterName }}
-                    </li>
+                <div class="col-12 col-md-9 px-3 text-size">
+                  <div>
+                    <span class="font-weight-bold">
+                      {{ "School or center name" | localize }}:
+                    </span>
+                    {{ item.schoolOrCenterName }}
+                  </div>
 
-                    <li class="text-size">
-                      <span class="font-weight-bold">
-                        {{ "Degree" | localize }}:
-                      </span>
-                      {{ item.degreeType }}
-                    </li>
+                  <div>
+                    <span class="font-weight-bold">
+                      {{ "Degree" | localize }}:
+                    </span>
+                    {{ item.degreeType }}
+                  </div>
 
-                    <li class="text-size">
-                      <span class="font-weight-bold">
-                        {{ "Major" | localize }}:
-                      </span>
-                      {{ item.major }}
-                    </li>
-                  </ul>
-                </div>
-
-                <div
-                  class="col-md-4 text-right"
-                  *ngIf="
-                    isUser &&
-                    (permission.isGranted(MYPROFILE_EDUCATION_EDIT) ||
-                      permission.isGranted(MYPROFILE_EDUCATION_DELETE))
-                  "
-                >
-                  <p-button
-                    *ngIf="permission.isGranted(MYPROFILE_EDUCATION_EDIT)"
-                    type="button"
-                    styleClass="p-button-sm p-button-outlined p-button-secondary p-button-text mr-3"
-                    icon="fas fa-edit"
-                    (onClick)="editEducation(item)"
-                  ></p-button>
-
-                  <p-button
-                    *ngIf="permission.isGranted(MYPROFILE_EDUCATION_DELETE)"
-                    type="button"
-                    styleClass="p-button-sm p-button-outlined p-button-danger p-button-text mr-3"
-                    icon="pi pi-trash"
-                    (onClick)="deleteEducation(item)"
-                  ></p-button>
+                  <div>
+                    <span class="font-weight-bold">
+                      {{ "Major" | localize }}:
+                    </span>
+                    {{ item.major }}
+                  </div>
                 </div>
               </div>
-            </ng-container>
-          </div>
+
+              <div
+                class="col-2 d-flex justify-content-end"
+                *ngIf="
+                  isUser &&
+                  (permission.isGranted(MYPROFILE_EDUCATION_EDIT) ||
+                    permission.isGranted(MYPROFILE_EDUCATION_DELETE))
+                "
+              >
+                <p-button
+                  *ngIf="permission.isGranted(MYPROFILE_EDUCATION_EDIT)"
+                  type="button"
+                  styleClass="p-button-sm p-button-outlined p-button-secondary p-button-text"
+                  icon="fas fa-edit"
+                  (onClick)="editEducation(item)"
+                ></p-button>
+
+                <p-button
+                  *ngIf="permission.isGranted(MYPROFILE_EDUCATION_DELETE)"
+                  type="button"
+                  styleClass="p-button-sm p-button-outlined p-button-danger p-button-text"
+                  icon="pi pi-trash"
+                  (onClick)="deleteEducation(item)"
+                ></p-button>
+              </div>
+            </div>
+            <hr *ngIf="!last">
+          </ng-container>
         </div>
       </div>
     </div>
@@ -263,20 +254,16 @@
           </div>
         </div>
 
-        <div class="card-body" *ngIf="groupSkillNumber > 0">
-          <div class="row">
-            <div class="col-md-8"></div>
-            <div class="col-md-4" style="text-align: end"></div>
-          </div>
-          <ng-container *ngFor="let item of listskill.groupSkills">
+        <div class="card-body m-0" *ngIf="groupSkillNumber > 0">
+          <ng-container *ngFor="let item of listskill.groupSkills; last as last">
             <div class="row">
-              <div class="col-md-2 text-right font-weight-bold text-size">
+              <div class="col-md-3 d-flex justify-content-md-end font-weight-bold text-size">
                 {{ item.name }}
               </div>
               <div class="col-md-6 text-left">
                 <ng-container *ngFor="let child of item.cvSkills">
-                  <ul style="list-style-type: none">
-                    <li class="text-size">
+                  <div class="px-3 text-size">
+                    <div class="text-size">
                       {{ child.skillName }}
                       <div
                         *ngIf="child.level > 0 || child.level"
@@ -291,11 +278,12 @@
                           aria-valuemax="100"
                         ></div>
                       </div>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </ng-container>
               </div>
             </div>
+            <hr *ngIf="!last">
           </ng-container>
         </div>
       </div>
@@ -320,25 +308,19 @@
               styleClass="p-button p-button-outlined p-button-text"
               icon="fas fa-plus"
               aria-hidden="true"
-              (onClick)="createAtribute(listPersonalAtribute)"
+              (onClick)="createAttribute(listPersonalAttribute)"
             ></p-button>
           </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body m-0">
           <ng-container
-            *ngFor="let item of listPersonalAtribute; let i = index"
+            *ngFor="let item of listPersonalAttribute; let i = index; last as last"
           >
-            <div class="row">
-              <div class="col-md-2"></div>
-              <div class="col-md-8 text-left">
-                <ul style="list-style-type: none">
-                  <li class="text-size" [innerHTML]="xuongDong(item)"></li>
-                </ul>
-              </div>
-
+            <div class="d-flex align-items-center justify-content-between gap-2">
+              <div class="h-fit-content text-size" [innerHTML]="item"></div>
               <div
-                class="col-md-2 text-right"
+                class="col-2 d-flex justify-content-end"
                 *ngIf="
                   isUser &&
                   (permission.isGranted(MYPROFILE_PERSONALATTRIBUTE_EDIT) ||
@@ -348,22 +330,21 @@
                 <p-button
                   *ngIf="permission.isGranted(MYPROFILE_PERSONALATTRIBUTE_EDIT)"
                   type="button"
-                  styleClass="p-button-sm p-button-outlined p-button-secondary p-button-text mr-3"
+                  styleClass="p-button-sm p-button-outlined p-button-secondary p-button-text"
                   icon="fas fa-edit"
-                  (onClick)="editAtribute(listPersonalAtribute, item)"
+                  (onClick)="editAttribute(listPersonalAttribute, item)"
                 ></p-button>
 
                 <p-button
-                  *ngIf="
-                    permission.isGranted(MYPROFILE_PERSONALATTRIBUTE_DELETE)
-                  "
+                  *ngIf="permission.isGranted(MYPROFILE_PERSONALATTRIBUTE_DELETE)"
                   type="button"
-                  styleClass="p-button-sm p-button-outlined p-button-danger p-button-text mr-3"
+                  styleClass="p-button-sm p-button-outlined p-button-danger p-button-text"
                   icon="pi pi-trash"
-                  (onClick)="deleteAtribute(i)"
+                  (onClick)="deleteAttribute(i)"
                 ></p-button>
               </div>
             </div>
+            <hr *ngIf="!last">
           </ng-container>
         </div>
       </div>
@@ -372,7 +353,7 @@
 
   <!----Working Experience---->
   <div class="row">
-    <div class="col-md-12" id="mainMenuWorkingExperience">
+    <div [class]="showSideBarWorkingExperience ? 'col-md-8' : 'col-md-12'">
       <div class="card" [ngClass]="{ contentHasmenu: isOpenMenu }">
         <div class="card-header">
           <h2 class="card-title">{{ "Working experience" | localize }}</h2>
@@ -394,117 +375,120 @@
               styleClass="p-button p-button-outlined p-button-text"
               icon="fas fa-bars"
               aria-hidden="true"
-              (onClick)="toggleSidebar()"
+              (onClick)="showSideBarWorkingExperience = !showSideBarWorkingExperience"
             ></p-button>
           </div>
         </div>
 
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-12">
-              <ng-container *ngFor="let item of workingExperience">
-                <div class="row col-md-12 keotha">
-                  <div class="col-md-2 text-right font-weight-bold">
-                    <span>{{ item.startTime | date: "MM/yyyy" }} - </span>
-                    <span *ngIf="item.endTime">
-                      {{ item.endTime | date: "MM/yyyy" }}
-                    </span>
-                    <span *ngIf="!item.endTime"> Now </span>
+        <div class="card-body m-0">
+          <ng-container *ngFor="let item of workingExperience; last as last">
+            <div class="row">
+              <div class="col-10 row">
+                <div
+                  class="col-12 d-flex h-fit-content gap-2 align-items-center font-weight-bold text-size px-3"
+                  [class]="showSideBarWorkingExperience ? 'col-xl-3' : 'col-lg-3'"
+                >
+                  <div>{{ item.startTime | date: "MM/yyyy" }}</div>
+                  <i class="fas fa-long-arrow-alt-right"></i>
+                  <div *ngIf="item.endTime">
+                    {{ item.endTime | date: "MM/yyyy" }}
                   </div>
-
-                  <div class="col-md-6 text-left">
-                    <ul style="list-style-type: none">
-                      <li class="text-size">
-                        <span class="font-weight-bold">
-                          {{ "Project name" | localize }} :
-                        </span>
-                        {{ item.projectName }}
-                      </li>
-
-                      <li class="text-size">
-                        <span class="font-weight-bold"
-                          >{{ "Position " | localize }} :
-                        </span>
-                        {{ item.position }}
-                      </li>
-
-                      <li class="text-size">
-                        <span class="font-weight-bold"
-                          >{{ "Description " | localize }} :
-                        </span>
-                        <ul style="list-style-type: none">
-                          <li
-                            [innerHTML]="xuongDong(item.projectDescription)"
-                          ></li>
-                        </ul>
-                      </li>
-
-                      <li class="text-size">
-                        <span class="font-weight-bold">
-                          {{ "Responsibility " | localize }}:
-                        </span>
-                        <ul style="list-style-type: none">
-                          <li [innerHTML]="xuongDong(item.responsibility)"></li>
-                        </ul>
-                      </li>
-
-                      <li class="text-size">
-                        <span class="font-weight-bold">
-                          {{ "Technologies " | localize }}:
-                        </span>
-                        {{ item.technologies }}
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div
-                    class="col-md-4 text-right"
-                    *ngIf="
-                      editAsSale ||
-                      (isUser &&
-                        permission.isGranted(
-                          MYPROFILE_WORKINGEXPERIENCE_EDIT
-                        )) ||
-                      (isUser &&
-                        permission.isGranted(
-                          MYPROFILE_WORKINGEXPERIENCE_DELETE
-                        ))
-                    "
-                  >
-                    <p-button
-                      *ngIf="
-                        permission.isGranted(MYPROFILE_WORKINGEXPERIENCE_EDIT)
-                      "
-                      type="button"
-                      styleClass="p-button-sm p-button-outlined p-button-secondary p-button-text mr-3"
-                      icon="fas fa-edit"
-                      (onClick)="editWorkingExp(item)"
-                    ></p-button>
-
-                    <p-button
-                      *ngIf="
-                        permission.isGranted(MYPROFILE_WORKINGEXPERIENCE_DELETE)
-                      "
-                      type="button"
-                      styleClass="p-button-sm p-button-outlined p-button-danger p-button-text"
-                      icon="pi pi-trash"
-                      (onClick)="deleteWorkingExp(item)"
-                    ></p-button>
-                  </div>
+                  <div *ngIf="!item.endTime"> Now </div>
                 </div>
-              </ng-container>
+                <div
+                  class="col-12"
+                  [class]="showSideBarWorkingExperience ? 'col-xl-9' : 'col-lg-9'"
+                >
+                  <ul style="list-style-type: none">
+                    <li class="text-size">
+                      <span class="font-weight-bold">
+                        {{ "Project name" | localize }} :
+                      </span>
+                      {{ item.projectName }}
+                    </li>
+
+                    <li class="text-size">
+                      <span class="font-weight-bold"
+                        >{{ "Position " | localize }} :
+                      </span>
+                      {{ item.position }}
+                    </li>
+
+                    <li class="text-size">
+                      <span class="font-weight-bold"
+                        >{{ "Description " | localize }} :
+                      </span>
+                      <ul style="list-style-type: none">
+                        <li [innerHTML]="item.projectDescription"></li>
+                      </ul>
+                    </li>
+
+                    <li class="text-size">
+                      <span class="font-weight-bold">
+                        {{ "Responsibility " | localize }}:
+                      </span>
+                      <ul style="list-style-type: none">
+                        <li [innerHTML]="item.responsibility"></li>
+                      </ul>
+                    </li>
+
+                    <li class="text-size">
+                      <span class="font-weight-bold">
+                        {{ "Technologies " | localize }}:
+                      </span>
+                      {{ item.technologies }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div
+                class="col-2 d-flex justify-content-end"
+                *ngIf="
+                  editAsSale ||
+                  (isUser &&
+                    permission.isGranted(
+                      MYPROFILE_WORKINGEXPERIENCE_EDIT
+                    )) ||
+                  (isUser &&
+                    permission.isGranted(
+                      MYPROFILE_WORKINGEXPERIENCE_DELETE
+                    ))
+                "
+              >
+                <p-button
+                  *ngIf="
+                    permission.isGranted(MYPROFILE_WORKINGEXPERIENCE_EDIT)
+                  "
+                  type="button"
+                  styleClass="p-button-sm p-button-outlined p-button-secondary p-button-text"
+                  icon="fas fa-edit"
+                  (onClick)="editWorkingExp(item)"
+                ></p-button>
+
+                <p-button
+                  *ngIf="
+                    permission.isGranted(MYPROFILE_WORKINGEXPERIENCE_DELETE)
+                  "
+                  type="button"
+                  styleClass="p-button-sm p-button-outlined p-button-danger p-button-text"
+                  icon="pi pi-trash"
+                  (onClick)="deleteWorkingExp(item)"
+                ></p-button>
+              </div>
             </div>
-          </div>
+            <hr *ngIf="!last">
+          </ng-container>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4" id="sideBarWorkingExperience" style="display: none">
+    <div class="col-md-4" *ngIf="showSideBarWorkingExperience">
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">{{ "Working Experience" | localize }}</h2>
         </div>
-        <div class="card-body">
+        <div class="card-body m-0">
           <ng-container *ngFor="let item of tempWorkingExperience">
             <div class="row">
               <div class="col-md-12">

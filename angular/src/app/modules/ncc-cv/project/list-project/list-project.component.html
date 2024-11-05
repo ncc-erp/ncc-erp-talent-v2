@@ -4,14 +4,14 @@
 <section class="section-table">
   <div class="header-toolbar pt-0">
     <div class="row-group">
-      <div class="col-5 item-group item-group--search">
+      <div class="col-12 col-md-5 item-group item-group--search">
         <p-button type="button" styleClass="p-button-primary" icon="pi pi-search" (click)="getDataPage(GET_FIRST_PAGE)">
         </p-button>
         <input talentAutoFocus type="text" class="w-100" pInputText [placeholder]="'Search by Project name' | localize"
           [(ngModel)]="searchText" (keyup.enter)="getDataPage(GET_FIRST_PAGE)" />
       </div>
 
-      <div class="col-5 item-group">
+      <div class="col-12 col-md-5 item-group">
         <label for="projectType">Project Type</label>
         <div class="w-100">
           <p-dropdown inputId="projectType" [options]="projectTypes" [(ngModel)]="slProjectType" placeholder="All"

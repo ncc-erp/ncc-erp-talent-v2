@@ -3,7 +3,7 @@
 <section class="section-table">
   <div class="header-toolbar pt-0">
     <div class="row">
-      <div class="col-6 col-md-3 item-group item-group--search mb-2">
+      <div class="col-12 col-md-6 col-lg-3 item-group item-group--search mb-2">
         <div class="p-inputgroup">
           <button type="button" pButton pRipple icon="pi pi-search" (click)="getDataPage(GET_FIRST_PAGE)"></button>
           <input talentAutoFocus type="text" class="input-search" pInputText
@@ -11,21 +11,21 @@
             (keyup.enter)="getDataPage(GET_FIRST_PAGE)" />
         </div>
       </div>
-      <div class="col-6 col-md-3 item-group item-group--search mb-2">
+      <div class="col-12 col-md-6 col-lg-3 item-group item-group--search mb-2">
         <div class="p-inputgroup">
           <button type="button" pButton pRipple icon="pi pi-search" (click)="getDataPage(GET_FIRST_PAGE)"></button>
           <input type="text" class="input-search" pInputText [placeholder]="'Search by Technology' | localize"
             [(ngModel)]="searchTextTechnology" (keyup.enter)="getDataPage(GET_FIRST_PAGE)" />
         </div>
       </div>
-      <div class="col-6 col-md-3 item-group item-group--search mb-2">
+      <div class="col-12 col-md-6 col-lg-3 item-group item-group--search mb-2">
         <div class="p-inputgroup">
           <button type="button" pButton pRipple icon="pi pi-search" (click)="getDataPage(GET_FIRST_PAGE)"></button>
           <input type="text" class="input-search" pInputText [placeholder]="'Search by Position' | localize"
             [(ngModel)]="searchTextPositions" (keyup.enter)="getDataPage(GET_FIRST_PAGE)" />
         </div>
       </div>
-      <div class="col-6 col-md-3 item-group item-group--search mb-2">
+      <div class="col-12 col-md-6 col-lg-3 item-group item-group--search mb-2">
         <div class="p-inputgroup">
           <button type="button" pButton pRipple icon="pi pi-search" (click)="getDataPage(GET_FIRST_PAGE)"></button>
           <input type="text" class="input-search" pInputText [placeholder]="'Search by Employee' | localize"

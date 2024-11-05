@@ -18,6 +18,10 @@
     grid-template-columns: 1fr 2fr;
     gap: 3rem;
   }
+
+  .item-group {
+    padding: 0.25rem;
+  }
 }
 
 @media (max-width: 900px) {

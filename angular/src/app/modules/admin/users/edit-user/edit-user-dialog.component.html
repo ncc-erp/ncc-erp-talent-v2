@@ -5,12 +5,12 @@
   (ngSubmit)="save()"
 >
   <abp-modal-header
-    [title]="'EditUser' | localize"
+    [title]="'Edit User' | localize"
     (onCloseClick)="bsModalRef.hide()"
   ></abp-modal-header>
   <div class="modal-body edit-user-body">
     <tabset>
-      <tab [heading]="'UserDetails' | localize" class="pt-3 px-2">
+      <tab [heading]="'User Details' | localize" class="pt-3 px-2">
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="name">
             {{ "Name" | localize }}
@@ -80,7 +80,7 @@
         </div>
         <div class="form-group row required">
           <label class="col-md-3 col-form-label" for="emailAddress">
-            {{ "EmailAddress" | localize }}
+            {{ "Email Address" | localize }}
           </label>
           <div class="col-md-9">
             <input
@@ -103,7 +103,7 @@
         </div>
         <div class="form-group row">
           <label class="col-md-3 col-form-label" for="phoneNumber">
-            {{ "PhoneNumber" | localize }}
+            {{ "Phone Number" | localize }}
           </label>
           <div class="col-md-9">
             <input
@@ -122,10 +122,10 @@
           class="form-group row mb-0"
           *ngIf="permission.isGranted(PS.Pages_Users_Activation)"
         >
-          <label class="col-md-3 col-form-label">
+          <label class="col-3 col-form-label">
             {{ "IsActive" | localize }}
           </label>
-          <div class="col-md-9">
+          <div class="col-9">
             <div class="custom-control custom-checkbox">
               <input
                 type="checkbox"
@@ -173,7 +173,7 @@
         </div>
       </tab>
 
-      <tab [heading]="'UserRoles' | localize" class="pt-3 px-2">
+      <tab [heading]="'User Roles' | localize" class="pt-3 px-2">
         <div class="form-group row mb-0">
           <ng-container *ngFor="let role of roles; let i = index">
             <div class="col-md-6">

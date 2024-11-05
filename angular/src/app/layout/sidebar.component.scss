@@ -1,43 +1,33 @@
-::ng-deep .sidebar-mini.sidebar-collapse {
-  .main-sidebar:not(.sidebar-no-expand):hover {
-    .language-text {
-      visibility: visible;
+::ng-deep {
+  .sidebar-mini {
+    &.sidebar-open {
+      .content-wrapper {
+        margin-left: 270px !important;
+      }
+      .main-sidebar {
+        width: 270px !important;
+        .nav-treeview {
+          margin-left: 18px !important;
+        }
+      }
     }
 
-    .sidebar-custom {
-      height: 6rem;
-      display: flex;
-      flex-wrap: nowrap;
-      flex-direction: row;
-      justify-content: space-between;
-
-      .language-text {
-        display: inline-block!important;;
+    &.sidebar-collapse .main-sidebar:not(.sidebar-no-expand):hover {
+      width: 270px !important;
+      .nav-treeview {
+        transition: margin 0.3s ease;
+        margin-left: 18px !important;
       }
     }
   }
 
-  .sidebar-custom {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .language-text {
-      display: none !important;
+  sidebar-menu, talent-sidebar-footer {
+    .nav-item {
+      max-width: 100%;
     }
-  }
-}
-
-::ng-deep .layout-fixed {
-  .main-sidebar-custom {
-    .sidebar {
-      height: calc(100% - (9.5rem + 1px));
-    }
-    .sidebar-custom {
-      height: 6rem;
-      display: flex;
-      flex-wrap: nowrap;
-      justify-content: space-between;
+    .nav-link {
+      max-width: 100%;
+      width: 100% !important;
     }
   }
 }

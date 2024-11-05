@@ -127,7 +127,7 @@ export class PickListCapabilityComponent extends AppComponentBase implements OnI
     const dialogData: CloneCapabilitySettingConfigDiaLog = { userTypeFrom: this.userType, subPositionIdFrom: this.subPositionId }
     const dialogRef = this._dialog.open(CloneCapabilitySettingComponent, {
       header: `Clone capabilities`,
-      width: "45%",
+      width: "55%",
       contentStyle: { "max-height": "100%", overflow: 'visible' },
       baseZIndex: 5000,
       data: dialogData,

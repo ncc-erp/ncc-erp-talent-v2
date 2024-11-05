@@ -139,3 +139,9 @@ export const TOOL_URL = {
     contest: 'https://contest.ncc.asia',
     lms: 'http://lms.nccsoft.vn'
 }
+
+export const ActiveRadioData = [
+  { label: 'All', value: undefined },
+  { label: 'Active', value: true },
+  { label: 'Inactive', value: false },
+]

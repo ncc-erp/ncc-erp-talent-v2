@@ -14,40 +14,38 @@
     <div class="row">
       <!---vùng 2-->
       <div class="col-md-4">
-        <div class="col-md-12">
-          <label for="w-projectname">
-            {{ "Project name" | localize }}
-            <span class="text-danger">*</span>
-          </label>
-          <input
-            *ngIf="isEdit"
-            pInputText
-            type="text"
-            id="w-projectname"
-            class="w-100"
-            formControlName="projectName"
-          />
+        <label for="w-projectname">
+          {{ "Project name" | localize }}
+          <span class="text-danger">*</span>
+        </label>
+        <input
+          *ngIf="isEdit"
+          pInputText
+          type="text"
+          id="w-projectname"
+          class="w-100"
+          formControlName="projectName"
+        />
 
-          <div class="w-100">
-            <p-autoComplete
-              *ngIf="!isEdit"
-              formControlName="project"
-              completeOnFocus="true"
-              [suggestions]="filteredListProject"
-              (completeMethod)="filterProject($event)"
-              field="name"
-              styleClass="w-100 project-complete"
-              (onSelect)="changeProject($event)"
-              (onKeyUp)="changeProject($event, true)"
-            ></p-autoComplete>
-          </div>
+        <div class="w-100">
+          <p-autoComplete
+            *ngIf="!isEdit"
+            formControlName="project"
+            completeOnFocus="true"
+            [suggestions]="filteredListProject"
+            (completeMethod)="filterProject($event)"
+            field="name"
+            styleClass="w-100 project-complete"
+            (onSelect)="changeProject($event)"
+            (onKeyUp)="changeProject($event, true)"
+          ></p-autoComplete>
+        </div>
 
-          <div
-            *ngIf="submitted && formControls.projectName.errors?.required"
-            class="text-error text-danger"
-          >
-            Project is required
-          </div>
+        <div
+          *ngIf="submitted && formControls.projectName.errors?.required"
+          class="text-error text-danger"
+        >
+          Project is required
         </div>
       </div>
 

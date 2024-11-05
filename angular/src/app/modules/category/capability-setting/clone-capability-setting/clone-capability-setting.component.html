@@ -2,12 +2,12 @@
   <div class="form-group">
     <div class="row">
       <div class="col-12 sub-heading">{{ "From" | localize }}</div>
-      <div class="col-6 d-flex align-items-center">
+      <div class="col-md-6 col-12 d-flex flex-column flex-lg-row align-items-lg-center">
         <label class="w-100px" for="userTypeFrom">
           {{ "User Type" | localize }}
           <span class="text-danger">*</span>
         </label>
-        <div class="col">
+        <div class="flex-fill">
           <p-dropdown
             id="userTypeFrom"
             [options]="_utilities.catUserType"
@@ -28,12 +28,12 @@
         </div>
       </div>
 
-      <div class="col-6 d-flex align-items-center">
+      <div class="col-md-6 col-12 d-flex flex-column flex-lg-row align-items-lg-center">
         <label class="w-100px" for="sub-position-from">
           {{ "Position" | localize }}
           <span class="text-danger">*</span>
         </label>
-        <div class="col">
+        <div class="flex-fill">
           <talent-position-dropdown
             [id]="'sub-position-from'"
             [options]="_utilities.catPosition"
@@ -53,12 +53,12 @@
 
     <div class="row mt-4">
       <div class="col-12 sub-heading">{{ "To" | localize }}</div>
-      <div class="col-6 d-flex align-items-center">
+      <div class="col-md-6 col-12 d-flex flex-column flex-lg-row align-items-lg-center">
         <label class="w-100px" for="userTypeTo">
           {{ "User Type" | localize }}
           <span class="text-danger">*</span>
         </label>
-        <div class="col">
+        <div class="flex-fill">
           <p-dropdown
             id="userTypeTo"
             [options]="_utilities.catUserType"
@@ -79,12 +79,12 @@
         </div>
       </div>
 
-      <div class="col-6 d-flex align-items-center">
+      <div class="col-md-6 col-12 d-flex flex-column flex-lg-row align-items-lg-center">
         <label class="w-100px" for="sub-position-to">
           {{ "Position" | localize }}
           <span class="text-danger">*</span>
         </label>
-        <div class="col">
+        <div class="flex-fill">
           <talent-position-dropdown
             [id]="'sub-position-to'"
             [options]="_utilities.catPosition"

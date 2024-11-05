@@ -111,13 +111,10 @@
         </div>
       </div>
 
+
       <div
-        class="col item-group"
-        [class]="
-          !searchWithUpdatedTime || searchWithUpdatedTime.dateType === 'All'
-            ? 'creation-time-default'
-            : 'creation-time-open'
-        "
+        class="col item-group filter-row--items p-0"
+        [ngClass]="{'creation-time-open': searchWithUpdatedTime && searchWithUpdatedTime.dateType !== 'All'}"
       >
         <talent-date-selector
           [label]="'Updated Time'"

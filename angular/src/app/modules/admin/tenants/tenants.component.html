@@ -8,113 +8,29 @@
 
   <section class="section-table">
     <div class="header-toolbar">
-      <div class="row">
-        <div class="col-12 col-md-5">
-          <div class="p-inputgroup">
-            <button
-              type="button"
-              pButton
-              pRipple
-              icon="pi pi-search"
-              (click)="getDataPage(GET_FIRST_PAGE)"
-            ></button>
+      <div class="custom-search-container">
+        <button
+          type="button"
+          pButton
+          pRipple
+          icon="pi pi-search"
+          (click)="getDataPage(GET_FIRST_PAGE)"
+        ></button>
+        <input
+          talentAutoFocus
+          type="text"
+          pInputText
+          name="keyword"
+          class="custom-search-input"
+          [placeholder]="'Search by tenancy name/name' | localize"
+          [(ngModel)]="keyword"
+          (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+        />
 
-            <input
-              talentAutoFocus
-              type="text"
-              pInputText
-              name="keyword"
-              [placeholder]="'Search by tenancy name/name' | localize"
-              [(ngModel)]="keyword"
-              (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
-            />
-            <div class="input-group-append">
-              <button
-                pButton
-                pRipple
-                type="button"
-                class="p-button-sm p-button-outlined p-button-secondary"
-                (click)="advancedFiltersVisible = !advancedFiltersVisible"
-              >
-                <i
-                  class="fas"
-                  [class.fa-angle-up]="advancedFiltersVisible"
-                  [class.fa-angle-down]="!advancedFiltersVisible"
-                ></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="advancedFiltersVisible" class="card mb-0 mt-1">
-        <div class="card-body">
-          <form class="form-horizontal">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group row mb-0">
-                  <label class="col-md-3 col-form-label">
-                    {{ "IsActive" | localize }}
-                  </label>
-                  <div class="col-md-9 pt-2">
-                    <div class="custom-control custom-radio d-inline">
-                      <input
-                        type="radio"
-                        class="custom-control-input"
-                        id="isActiveAll"
-                        name="isActive"
-                        [(ngModel)]="isActive"
-                        [value]="undefined"
-                        checked
-                      />
-                      <label class="custom-control-label" for="isActiveAll">
-                        {{ "All" | localize }}
-                      </label>
-                    </div>
-                    <div class="custom-control custom-radio d-inline mx-3">
-                      <input
-                        type="radio"
-                        class="custom-control-input"
-                        id="isActiveActive"
-                        name="isActive"
-                        [(ngModel)]="isActive"
-                        [value]="true"
-                      />
-                      <label class="custom-control-label" for="isActiveActive">
-                        {{ "Yes" | localize }}
-                      </label>
-                    </div>
-                    <div class="custom-control custom-radio d-inline">
-                      <input
-                        type="radio"
-                        class="custom-control-input"
-                        id="isActivePassive"
-                        name="isActive"
-                        [(ngModel)]="isActive"
-                        [value]="false"
-                      />
-                      <label class="custom-control-label" for="isActivePassive">
-                        {{ "No" | localize }}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="card-footer">
-          <button type="button" class="btn bg-blue" (click)="getDataPage(GET_FIRST_PAGE)">
-            {{ "Search" | localize }}
-          </button>
-          <button
-            type="button"
-            class="btn btn-default float-right"
-            (click)="clearFilters()"
-          >
-            {{ "Clear" | localize }}
-          </button>
-        </div>
+        <talent-radio-switch
+          [inputData]="ActiveRadioData"
+          [(ngModel)]="isActive"
+        ></talent-radio-switch>
       </div>
     </div>
 

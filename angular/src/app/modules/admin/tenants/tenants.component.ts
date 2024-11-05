@@ -14,6 +14,7 @@ import {
 import { CreateTenantDialogComponent } from './create-tenant/create-tenant-dialog.component';
 import { EditTenantDialogComponent } from './edit-tenant/edit-tenant-dialog.component';
 import { DefaultRoute } from '@shared/AppEnums';
+import { ActiveRadioData } from '@shared/AppConsts';
 
 class PagedTenantsRequestDto extends PagedRequestDto {
   keyword: string;
@@ -27,8 +28,8 @@ class PagedTenantsRequestDto extends PagedRequestDto {
 export class TenantsComponent extends PagedListingComponentBase<TenantDto> {
   tenants: TenantDto[] = [];
   keyword = '';
-  isActive: boolean | null;
-  advancedFiltersVisible = false;
+  isActive: boolean | undefined = undefined;
+  public ActiveRadioData = ActiveRadioData;
 
   constructor(
     injector: Injector,

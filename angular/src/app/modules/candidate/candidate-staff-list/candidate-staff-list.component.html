@@ -151,14 +151,7 @@
         </div>
       </div>
 
-      <div
-        class="col item-group item-group--skill"
-        [class]="
-          !searchWithCreationTime || searchWithCreationTime.dateType === 'All'
-            ? 'skill-select-default'
-            : 'skill-select-time-open'
-        "
-      >
+      <div class="col item-group">
         <talent-multi-select-h-radio
           [catalogConfig]="catalogConfig"
           (onChange)="onSkillChange($event)"
@@ -166,22 +159,16 @@
         ></talent-multi-select-h-radio>
       </div>
 
-      <div
-        class="col item-group"
-        [class]="
-          !searchWithCreationTime || searchWithCreationTime.dateType === 'All'
-            ? 'creation-time-default'
-            : 'creation-time-open'
-        "
-      >
+      <div class="col item-group">
         <talent-date-selector
           (selectChange)="onTalentDateChange($event)"
           [timeOptions]="FILTER_TIME"
           class="talent-date"
         ></talent-date-selector>
       </div>
-
-      <div class="col-12 col-md-2 item-group">
+    </div>
+    <div class="row-group" [class.d-none]="!isShowAdvanceSearch">
+      <div class="col item-group">
         <label for="processStatus">Process Status</label>
         <div class="d-flex">
           <div class="w-100">
@@ -201,7 +188,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-2 item-group">
+      <div class="col item-group">
         <label for="fromStatus">From Status</label>
         <div class="d-flex">
           <div class="w-100">
@@ -221,7 +208,7 @@
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-2 item-group">
+      <div class="col item-group">
         <label for="toStatus">To Status</label>
         <div class="d-flex">
           <div class="w-100">

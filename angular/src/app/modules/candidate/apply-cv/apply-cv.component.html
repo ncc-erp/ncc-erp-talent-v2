@@ -67,11 +67,7 @@
 
       <div
         class="col item-group"
-        [class]="
-          !searchWithCreationTime || searchWithCreationTime.dateType === 'All'
-            ? 'creation-time-default'
-            : 'creation-time-open'
-        "
+        [ngClass]="{'creation-time-open': searchWithCreationTime && searchWithCreationTime.dateType !== 'All'}"
       >
         <talent-date-selector
           (selectChange)="onTalentDateChange($event)"

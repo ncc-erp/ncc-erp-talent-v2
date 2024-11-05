@@ -1,0 +1,19 @@
+<div class="talent-multi-switch-container">
+  <label *ngIf="switchLabel">{{switchLabel}}</label>
+  <div class="talent-multi-switch">
+    <ng-container *ngFor="let input of inputData; index as index">
+      <input
+        type="radio"
+        [id]="'talent-multi-switch-radio-' + index"
+        name="radio"
+        [value]="input.value"
+        [(ngModel)]="_value"
+        [disabled]="isDisabled"
+        (ngModelChange)="ngModelChange($event)"
+      />
+      <label [for]="'talent-multi-switch-radio-' + index">
+        {{input.label}}
+      </label>
+    </ng-container>
+  </div>
+</div>

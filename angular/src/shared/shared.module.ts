@@ -116,6 +116,7 @@ import { ViewFllesComponent } from "./pages/create-candidate/view-flles/view-fll
 import { PdfJsViewerModule } from "ng2-pdfjs-viewer";
 import { PdfDocViewerComponent } from './components/pdf-doc-viewer/pdf-doc-viewer.component';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { RadioSwitchComponent } from './components/talent-radio-switch/talent-radio-switch.component';
 //import { CurrentRequesitionGuildlineDialogComponent } from './pages/create-candidate/current-requisition/current-requesition-guildline-dialog/current-requesition-guildline-dialog.component';
 const primengLibs = [
   TableModule,
@@ -239,7 +240,8 @@ const candidate = [
         SafeHtmlPipe,
         ExportDialogComponent,
         CustomTooltipDirective,
-        PdfDocViewerComponent
+        PdfDocViewerComponent,
+        RadioSwitchComponent
         //CurrentRequesitionGuildlineDialogComponent,
     ],
     exports: [
@@ -275,7 +277,8 @@ const candidate = [
         ...primengLibs,
         ...candidate,
         SafeHtmlPipe,
-        CustomTooltipDirective
+        CustomTooltipDirective,
+        RadioSwitchComponent
     ]
 })
 export class SharedModule {

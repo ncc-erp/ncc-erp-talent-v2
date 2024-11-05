@@ -1,5 +1,27 @@
 :host {
   width: 100%;
+
+  p-dropdown {
+    width: 100%;
+    &.show-date {
+      width: 35%;
+    }
+  }
+
+  ::ng-deep {
+    .p-dropdown {
+      background: transparent !important;
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: unset !important;
+    }
+
+    .creation-group-select-input {
+      background: white;
+      border: 1px solid #ced4da;
+      justify-content: space-between;
+    }
+  }
 }
 
 .creation-date-container {
@@ -7,23 +29,45 @@
   align-items: center;
   flex-wrap: wrap;
 
-  .creation-group-select {
-    display: flex;
-    flex-direction: column;
+  .row-ui {
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
   }
 
   .creation-group-label {
-    align-self: flex-end;
-    margin-bottom: 5px;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-around;
+    gap: 4px;
+    padding: 0 4px;
+    border-right: 1px solid #ced4da;
+
     .date-text {
       min-width: fit-content;
     }
 
     .date-type {
       color: #888;
+    }
+
+    .pi {
+      cursor: pointer;
+      opacity: 0.5;
+      padding: 2px;
+      background: #dfdfdf;
+      border-radius: 50%;
+      transition: 0.3s;
+
+      &:hover {
+        background: #cdcdcd;
+      }
+    }
+
+    .icon-disabled {
+      opacity: 0.3;
+      pointer-events: none;
     }
   }
 }

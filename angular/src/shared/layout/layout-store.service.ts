@@ -28,4 +28,10 @@ export class LayoutStoreService {
       Object.assign(this.configSource.value, { sidebarExpanded: value })
     );
   }
+
+  checkToHideSidebar() {
+    if (window.innerWidth < 1100) {
+      this.setSidebarExpanded(true);
+    }
+  }
 }

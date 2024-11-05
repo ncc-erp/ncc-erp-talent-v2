@@ -1,8 +1,28 @@
 <div class="creation-date-container">
-  <div class="creation-group-select">
+  <div class="d-flex flex-column w-100" [ngClass]="{'row-ui': rowUI}">
     <label for="creationDate">{{ label }}</label>
-    <div class="w-100">
+    <div class="w-100 d-flex creation-group-select-input">
+      <div class="creation-group-label" *ngIf="dateType !== CreationTimeEnum.ALL">
+        <i
+          *ngIf="dateType !== CreationTimeEnum.CUSTOM"
+          class="pi pi-angle-left"
+          [ngClass]="{'icon-disabled': dateType === CreationTimeEnum.CUSTOM}"
+          (click)="onPreOrNext('Previous')">
+        </i>
+
+        <div class="date-text">
+          {{ dateText }}
+        </div>
+
+        <i
+          *ngIf="dateType !== CreationTimeEnum.CUSTOM"
+          class="pi pi-angle-right"
+          [ngClass]="{'icon-disabled': dateType === CreationTimeEnum.CUSTOM}"
+          (click)="onPreOrNext('Next')">
+        </i>
+      </div>
       <p-dropdown
+        [ngClass]="{'show-date': dateType !== CreationTimeEnum.ALL}"
         inputId="creationDate"
         [options]="timeOptions"
         [formControl]="searchVal"
@@ -12,26 +32,5 @@
         placeholder="All"
       ></p-dropdown>
     </div>
-  </div>
-
-  <div class="creation-group-label">
-    <p-button
-      *ngIf="dateType !== CreationTimeEnum.ALL"
-      [disabled]="dateType === CreationTimeEnum.CUSTOM"
-      icon="pi pi-chevron-left"
-      styleClass="p-button-rounded p-button-danger btn-pre"
-      (click)="onPreOrNext('Previous')"
-    ></p-button>
-
-    <label class="date-text" for="creationTime">
-      {{ dateText }}
-    </label>
-    <p-button
-      *ngIf="dateType !== CreationTimeEnum.ALL"
-      [disabled]="dateType === CreationTimeEnum.CUSTOM"
-      icon="pi pi-chevron-right"
-      styleClass="p-button-rounded p-button-danger btn-after"
-      (click)="onPreOrNext('Next')"
-    ></p-button>
   </div>
 </div>

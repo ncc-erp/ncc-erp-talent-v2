@@ -1,14 +1,20 @@
 ﻿using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using TalentV2.Constants.Const;
+using TalentV2.Constants.Dictionary;
+using TalentV2.DomainServices.CVAutomation.Dto;
 using TalentV2.DomainServices.Dto;
 
 namespace TalentV2.WebServices.ExternalServices.Autobot
@@ -16,11 +22,19 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
     public class AutobotService : BaseWebService
     {
         private double _sleepTime = 5;
-
+        private const string ExtractV2 = "extract-cv-vision";
         private const string ExtractCV = "extract-cv";
+        private readonly IConfiguration _configuration;
 
-        public AutobotService(HttpClient httpClient, ILogger<AutobotService> logger, IAbpSession abpSession) : base(httpClient, logger, abpSession)
+
+        public AutobotService(HttpClient httpClient,
+            ILogger<AutobotService> logger,
+            IAbpSession abpSession,
+            IConfiguration configuration
+         ) : base(httpClient, logger, abpSession)
         {
+            _configuration = configuration;
+
         }
 
         public async Task<T> ExtractCVInformationAsync<T>(IFormFile file)
@@ -98,6 +112,95 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                 }
             }
             return default;
+        }
+
+        public async Task<Dictionary<string, CVScanResultFromFireBase>> ValidateAndExtractCVFromFirebaseAsync(string fileUrl)
+        {
+            var result = new Dictionary<string, CVScanResultFromFireBase>();
+            try
+            {
+                var maxFileSize = _configuration.GetSection("UploadFile:MaxSizeFile").Get<int>();
+                var fileNameDecoded = WebUtility.UrlDecode(Path.GetFileName(new Uri(fileUrl).AbsolutePath));
+                var fileExtension = Path.GetExtension(fileNameDecoded).Replace(".", "").ToLower();
+                var httpResponse = await HttpClient.GetAsync(fileUrl);
+                httpResponse.EnsureSuccessStatusCode();
+                var fileBytes = await httpResponse.Content.ReadAsByteArrayAsync();
+                var fileSize = fileBytes.Length;
+                if (fileSize > maxFileSize)
+                {
+                    logger.LogError($"CV 's size is over the limit {maxFileSize / (1024 * 1024)}MB");
+                    result.Add(FirebaseLogStatusConstant.CV_SIZE_TOO_BIG, null);
+                    return result;
+                }
+                if (!DictionaryHelper.FileTypeDic[FileTypes.DOCUMENT].Contains(fileExtension))
+                {
+                    logger.LogError("CV 's type is not accepted. Only file type PDF, DOC, DOCX is accepted");
+                    result.Add(FirebaseLogStatusConstant.CV_ERROR_TYPE, null);
+                    return result;
+                }
+
+                var cvExtractionResult = await SendFileToCVExtractionAsync(fileNameDecoded, fileBytes);
+                if (cvExtractionResult == null)
+                {
+                    logger.LogError("Cant extract CV from Firebase");
+                    result.Add(FirebaseLogStatusConstant.CV_ERROR_AT_EXTRACTING, null);
+                    return result;
+                }
+                cvExtractionResult.CVData = fileBytes;
+                result.Add("OK", cvExtractionResult);
+                return result;
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error occurred: {Exception}", e.Message);
+                return null;
+            }
+        }
+
+        private async Task<CVScanResultFromFireBase> SendFileToCVExtractionAsync(string fileName, byte[] fileBytes)
+        {
+            var requestUrl = $"{HttpClient.BaseAddress}{ExtractV2}";
+            const int maxRetries = 3;
+            int delayTime = 10000; // 10s
+            int attempt = 0;
+            bool isComplete = false;
+            while (attempt < maxRetries && !isComplete)
+            {
+                try
+                {
+                    using (var content = new MultipartFormDataContent())
+                    {
+                        content.Add(new ByteArrayContent(fileBytes), "file", fileName);
+                        var response = await HttpClient.PostAsync(requestUrl, content);
+                        if (response.StatusCode == HttpStatusCode.TooManyRequests || response.StatusCode >= HttpStatusCode.InternalServerError)
+                        {
+                            attempt++;
+                            if (attempt == maxRetries)
+                            {
+                                logger.LogError($"Attempt {attempt} is maximum number of retries");
+                                break;
+                            }
+                            logger.LogError($"Attempt {attempt} failed due to AI request-limiting. Retrying in {delayTime / 1000} seconds...");
+                            delayTime = Math.Min(delayTime * 2, 40000);
+                            await Task.Delay(delayTime);
+                        }
+                        else
+                        {
+                            response.EnsureSuccessStatusCode();
+                            var jsonResponse = await response.Content.ReadAsStringAsync();
+                            isComplete = true;
+                            return JsonConvert.DeserializeObject<CVScanResultFromFireBase>(jsonResponse);
+                        }
+                    };
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError("Exception occurred: {Exception}", ex.Message);
+                    break;
+                }
+            }
+            logger.LogError($"Failed to extract CV from Firebase at {fileName}");
+            return null;
         }
 
         public void SetSleepTime(double seconds)

@@ -1,11 +1,13 @@
 @import "../../../../../styles/variables";
 
-.setting-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.configurations-content {
+  display: flex;
+  flex-wrap: wrap;
   gap: 2rem;
 
   ::ng-deep .panel {
+    flex-basis: 30%;
+    min-width: 350px;
     .p-panel {
       &-content {
         height: 240px;
@@ -85,6 +87,18 @@
 
     .white-space-nowrap {
       cursor: default;
+    }
+  }
+
+  @media (max-width: 1500px) {
+    .panel {
+      flex-basis: 45% !important;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .panel {
+      flex-basis: 100% !important;
     }
   }
 }

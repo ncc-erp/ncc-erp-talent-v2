@@ -14,14 +14,14 @@ import { enterName } from '../../employee-profile.helper';
   styleUrls: ['./personal-attribute.component.scss']
 })
 export class PersonalAttributeComponent extends AppComponentBase implements OnInit {
-  atributeForm: FormGroup;
+  attributeForm: FormGroup;
   listData;
   foundItem: number;
   isSale: boolean;
   isUser: boolean;
   id: number;
   submitted = false;
-  public listInputValid = [{ text: 'atribute', value: false }]
+  public listInputValid = [{ text: 'attribute', value: false }]
 
   data: PersonalAttributeConfigDialog;
   action: ActionEnum;
@@ -43,7 +43,7 @@ export class PersonalAttributeComponent extends AppComponentBase implements OnIn
     this.action = this.data.action;
 
     this.buildForm();
-    this.listData = (!this.data.listPersonalAtribute || this.data?.listPersonalAtribute?.length === 0)  ? [] : this.data.listPersonalAtribute;
+    this.listData = (!this.data.listPersonalAttribute || this.data?.listPersonalAttribute?.length === 0)  ? [] : this.data.listPersonalAttribute;
 
     if (!this.data.item) {
       return;
@@ -54,25 +54,25 @@ export class PersonalAttributeComponent extends AppComponentBase implements OnIn
         this.foundItem = i;
       }
     }
-    this.atributeForm.get('atribute').setValue(this.config.data.item);
+    this.attributeForm.get('attribute').setValue(this.config.data.item);
   }
 
-  get formControls() { return this.atributeForm.controls; }
+  get formControls() { return this.attributeForm.controls; }
 
 
-  saveAtribute() {
+  saveAttribute() {
     this.submitted = true;
-    if(this.atributeForm.invalid) return;
-    
-    if (!this.listInputValid[0].value && this.atributeForm.controls.atribute.value) {
+    if(this.attributeForm.invalid) return;
+
+    if (!this.listInputValid[0].value && this.attributeForm.controls.attribute.value) {
       if (this.action === ActionEnum.UPDATE) {
         for (let i = 0; i <= this.listData.length; i++) {
           if (this.foundItem === i) {
-            this.listData[i] = this.atributeForm.controls.atribute.value;
+            this.listData[i] = this.attributeForm.controls.attribute.value;
           }
         }
       } else {
-        this.listData.push(this.atributeForm.controls.atribute.value);
+        this.listData.push(this.attributeForm.controls.attribute.value);
       }
       const data = {
         personalAttributes: this.listData
@@ -96,8 +96,8 @@ export class PersonalAttributeComponent extends AppComponentBase implements OnIn
   }
 
   private buildForm() {
-    this.atributeForm = this.fb.group({
-      atribute: [null, [Validators.required]],
+    this.attributeForm = this.fb.group({
+      attribute: [null, [Validators.required]],
     });
   }
 

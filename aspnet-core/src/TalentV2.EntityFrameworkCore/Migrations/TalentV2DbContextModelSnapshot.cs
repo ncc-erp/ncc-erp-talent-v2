@@ -2428,6 +2428,25 @@ namespace TalentV2.Migrations
                     b.ToTable("ExternalCVs");
                 });
 
+            modelBuilder.Entity("TalentV2.Entities.FirebaseCareerLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("IdFirebase")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FirebaseCareerLogs");
+                });
+
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeeEducation", b =>
                 {
                     b.Property<long>("Id")

@@ -8,8 +8,8 @@
 
     <section class="section-table">
       <div class="header-toolbar">
-        <div class="row">
-          <div class="col-12 col-md-5">
+        <div class="row-group">
+          <div class="item-group d-flex align-items-end">
             <div class="p-inputgroup">
               <button
                 type="button"
@@ -29,16 +29,14 @@
               />
             </div>
           </div>
-          <div class="col-12 col-md-7">
-            <div class="col item-group item-group--creation-time p-0" >
-              <talent-date-selector
-                [label]="'Time'"
-                [timeOptions]="FILTER_TIME"
-                [defaultOption]="defaultOptionTime"
-                (selectChange)="onTalentDateChange($event)"
-                class="talent-date"
-              ></talent-date-selector>
-            </div>
+          <div class="item-group">
+            <talent-date-selector
+              [label]="'Time'"
+              [timeOptions]="FILTER_TIME"
+              [defaultOption]="defaultOptionTime"
+              (selectChange)="onTalentDateChange($event)"
+              class="talent-date"
+            ></talent-date-selector>
           </div>
         </div>
       </div>

@@ -28,6 +28,7 @@ import { AppConsts } from '@shared/AppConsts';
 import { GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
 import { StoreModule } from '@ngrx/store';
 import { userReducer } from './store/reducers/user.reducer';
+import { SidebarFooterComponent } from './layout/sidebar-footer/sidebar-footer.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { userReducer } from './store/reducers/user.reducer';
     SidebarLogoComponent,
     SidebarUserPanelComponent,
     SidebarMenuComponent,
+    SidebarFooterComponent
   ],
   imports: [
     CommonModule,

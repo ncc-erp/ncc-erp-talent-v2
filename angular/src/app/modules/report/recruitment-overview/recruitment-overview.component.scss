@@ -18,7 +18,10 @@
     }
     .th-total-report > th{
         font-weight: 700 !important;
-    }        
+    }
+    .item-group {
+        padding: 0.25rem;
+    }
 }
 
 .bg-yellow-1{
@@ -30,16 +33,45 @@
 
 .recruitment-overview-wrapping {
     padding: 20px;
-    overflow: auto;
 
     .branch-title {
         font-weight: bold;
         font-size: 27px;
     }
 
+    .table-container {
+        position: relative;
+        max-height: 535px;
+        overflow: hidden;
+        &:has(.overflowingX) {
+            padding-bottom: 16px;
+        }
+        &:has(.overflowingY) {
+            padding-right: 16px;
+        }
+        &:hover {
+            overflow: auto !important;
+            padding-right: 0;
+            padding-bottom: 0;
+        }
+    }
+
     table {
         border-collapse: separate;
         width: 100%;
+
+        thead {
+            position: sticky;
+            top: 0;
+            &::before {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: white;
+                z-index: -1;
+            }
+        }
 
         th,
         td {
@@ -73,6 +105,24 @@
 
         .total {
             font-weight: bold;
+        }
+    }
+}
+
+@media (max-width: 1500px) {
+    .row {
+        .col-md-2, .col-md-4, .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+    }
+}
+
+@media (max-width: 1000px) {
+    .row {
+        .col-md-2, .col-md-4, .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
         }
     }
 }

@@ -692,23 +692,24 @@
 
                     <ng-container *ngIf="applyHistoryStatuses?.value?.length">
                       <div class="input-item box">
-                        <div *ngFor="let appStatus of applyHistoryStatuses.value">
-                          <div class="d-flex">
-                            <span class="tag" [style.backgroundColor]="
-                                _utilities.getBgTagRequestCvStatusColor(
-                                  appStatus.statusName
-                                )
-                              ">
-                              {{ appStatus.statusName }}
-                            </span>
+                        <div
+                          *ngFor="let appStatus of applyHistoryStatuses.value"
+                          class="d-flex align-items-center gap-2"
+                        >
+                          <span class="tag" [style.backgroundColor]="
+                              _utilities.getBgTagRequestCvStatusColor(
+                                appStatus.statusName
+                              )
+                            ">
+                            {{ appStatus.statusName }}
+                          </span>
 
-                            <span class="ml-auto">
-                              {{
-                              appStatus.timeAt
-                              | talentDateTime: DATE_FORMAT.DD_MM_YYYY_H_MM
-                              }}
-                            </span>
-                          </div>
+                          <span class="ml-auto">
+                            {{
+                            appStatus.timeAt
+                            | talentDateTime: DATE_FORMAT.DD_MM_YYYY_H_MM
+                            }}
+                          </span>
                         </div>
                       </div>
                     </ng-container>
@@ -749,31 +750,29 @@
 
                     <ng-container>
                       <div class="input-item box">
-                        <div *ngFor="let appStatus of applyHistoryChangeStatuses.value">
-                          <div class="d-flex">
-                            <span *ngIf="appStatus.fromStatusName" class="tag" [style.backgroundColor]="
-                                _utilities.getBgTagRequestCvStatusColor(
-                                  appStatus.fromStatusName
-                                )
-                              ">
-                              {{ appStatus.fromStatusName }}
-                            </span>
-                            <span *ngIf="appStatus.fromStatusName">&#160;->&#160;</span>
-                            <span class="tag" [style.backgroundColor]="
-                                _utilities.getBgTagRequestCvStatusColor(
-                                  appStatus.toStatusName
-                                )
-                              ">
-                              {{ appStatus.toStatusName }}
-                            </span>
+                        <div class="d-flex align-items-center gap-2" *ngFor="let appStatus of applyHistoryChangeStatuses.value">
+                          <span *ngIf="appStatus.fromStatusName" class="tag" [style.backgroundColor]="
+                              _utilities.getBgTagRequestCvStatusColor(
+                                appStatus.fromStatusName
+                              )
+                            ">
+                            {{ appStatus.fromStatusName }}
+                          </span>
+                          <i *ngIf="appStatus.fromStatusName" class="fas fa-long-arrow-alt-right"></i>
+                          <span class="tag" [style.backgroundColor]="
+                              _utilities.getBgTagRequestCvStatusColor(
+                                appStatus.toStatusName
+                              )
+                            ">
+                            {{ appStatus.toStatusName }}
+                          </span>
 
-                            <span class="ml-auto">
-                              {{
-                              appStatus.timeAt
-                              | talentDateTime: DATE_FORMAT.DD_MM_YYYY_H_MM
-                              }}
-                            </span>
-                          </div>
+                          <span class="ml-auto">
+                            {{
+                            appStatus.timeAt
+                            | talentDateTime: DATE_FORMAT.DD_MM_YYYY_H_MM
+                            }}
+                          </span>
                         </div>
                       </div>
                     </ng-container>

@@ -1,19 +1,26 @@
-:host ::ng-deep talent-date-selector {
-     .creation-date-container {
-          justify-content: space-around !important;
-          .creation-group-select {
-               flex-direction: row !important;
-               align-items: center !important;
+.row-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 
-               label {
-                    margin: 0 10px !important;
-               }
-               .w-100 {
-                    width: 200px !important;
-               }
-          }
-          .creation-group-label {
-               width: 300px !important;
-          }   
-     }
-} 
+  .item-group {
+    flex-grow: 1;
+  }
+}
+
+@media (max-width: 1500px) {
+  .row-group {
+    .item-group {
+      flex-basis: calc(50% - 0.5rem);
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .row-group {
+    gap: 1rem;
+    .item-group {
+      flex-basis: 100%;
+    }
+  }
+}

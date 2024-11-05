@@ -20,7 +20,7 @@
   <div class="card">
     <div class="card-header">
       <div class="row">
-        <div class="col-12 col-md-8 item-group item-group--creation-time p-0">
+        <div class="col-12 col-md-8 item-group">
           <talent-date-selector
             [label]="'Time'"
             [defaultOption]="defaultOptionTime"
@@ -28,7 +28,7 @@
             class="talent-date"
           ></talent-date-selector>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-4 item-group">
           <label for="branch" class="mr-2">{{ "Branch" | localize }}</label>
           <div class="w-100">
             <p-multiSelect
