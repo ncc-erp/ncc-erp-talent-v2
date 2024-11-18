@@ -271,7 +271,7 @@ namespace TalentV2.DomainServices.Candidates
                 || personBio.BranchId != input.BranchId
                 || (!string.IsNullOrEmpty(personBio.Phone) && !personBio.Phone.Equals(input.Phone))
                 || (!string.IsNullOrEmpty(personBio.Email) && !personBio.Email.Equals(input.Email));
-            if (input?.Note != requestCVs?.HRNote && requestCVs?.HRNote != null)
+            if (input?.Note != requestCVs?.HRNote && requestCVs != null)
             {
                 requestCVs.HRNote = input.Note;
 
