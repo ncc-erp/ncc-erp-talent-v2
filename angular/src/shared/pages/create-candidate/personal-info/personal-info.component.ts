@@ -507,7 +507,6 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     this.referenceType = this._utilities.catCvSource.find(item => item.id === cvSourceId)?.referenceType;
     if (cvSourceId && checkNumber(this.referenceType)) {
       this.formControls['referenceId'].enable();
-      !this.isEditing && this.formControls['referenceId'].disable();
       return true;
     }
     this.formControls['referenceId'].setValue(null);
