@@ -169,7 +169,7 @@ export class RecruitmentOverviewComponent
       (cvStatus) => cvStatus.id == 0
     );
     this.hasAnyStatus =
-      !!this.cvSourceHeaders.length ||
+      !!this.cvStatusHeaders.length ||
       !!this.cvSourceHeaders.length ||
       !!this.candidateStatusHeaders.length;
   }
