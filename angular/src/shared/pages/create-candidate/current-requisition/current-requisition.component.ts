@@ -554,7 +554,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private handleSendMail() {
-    let mail = null;
+    let mail;
     if (getFormControlValue(this.applyResultForm, "status") == this.REQUEST_CV_STATUS.ScheduledTest) {
       mail = getFormControlValue(this.applyResultForm, 'scheduledTestEmailTemplate');
     }
