@@ -80,14 +80,15 @@
           <div class="profile-data flex-column flex-md-row">
             <img
               *ngIf="!this.appSession.user.avatarPath"
+              class="img-circle profile-avatar"
               src="../../../assets/img/user-circle.png"
-              alt="Thumbnail"
+              alt="Avatar"
             />
             <img
               *ngIf="this.appSession.user.avatarPath"
-              class="img-circle"
+              class="img-circle profile-avatar"
               [src]="this.appSession.user.avatarPath"
-              alt="Thumbnail"
+              alt="Avatar"
             />
             <div class="d-flex flex-fill">
               <div
@@ -272,7 +273,7 @@
                         <div
                           class="progress-bar"
                           role="progressbar"
-                          style="width:{{ child.level * 10 }}%"
+                          [style.width]="(child.level * 10) + '%'"
                           aria-valuenow="25"
                           aria-valuemin="0"
                           aria-valuemax="100"
