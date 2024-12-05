@@ -10,7 +10,7 @@ import { catchError, map, startWith } from "rxjs/operators";
     providedIn: 'root'
 })
   
-export class AutobotExtractService extends BaseApiService {
+export class AutobotService extends BaseApiService {
     constructor(public http: HttpClient) {
         super(http);
     }

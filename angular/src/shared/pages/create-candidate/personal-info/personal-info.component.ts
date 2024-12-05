@@ -16,7 +16,7 @@ import { AppSessionService } from '@shared/session/app-session.service';
 import * as moment from 'moment';
 import { DialogService } from 'primeng/dynamicdialog';
 import { debounceTime, filter, finalize, switchMap } from 'rxjs/operators';
-import { AutobotExtractService } from '@app/core/services/candidate/autobot-extract.servive';
+import { AutobotService } from '@app/core/services/candidate/autobot.servive';
 import { AutoBotApiService } from '@app/core/services/apis/autobot-api.service';
 import { TitleCasePipe } from '@angular/common';
 import { Subject } from 'rxjs';
@@ -80,7 +80,7 @@ export class PersonalInfoComponent extends AppComponentBase implements OnInit {
     private _fb: FormBuilder,
     private _dialog: DialogService,
     private _apSession: AppSessionService,
-    private _autoBotService: AutobotExtractService,
+    private _autoBotService: AutobotService,
     private _titleCasePipe: TitleCasePipe
     ) {
     super(injector);
