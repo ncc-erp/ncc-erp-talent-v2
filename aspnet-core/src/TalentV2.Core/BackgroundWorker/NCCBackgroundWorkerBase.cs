@@ -50,6 +50,7 @@ namespace TalentV2.BackgroundWorker
         private void BackgroundWorkerManager_WorkerUpdated(object sender, DomainServices.BackgroundWorkers.BackgroundWorkerUpdatedEventArgs e)
         {
             Worker = e.BackgroundWorker;
+            Timer.Period = Worker.Period;
         }
 
         private void UpdateBackgroundWorkerState(BackgroundWorkerState state)
