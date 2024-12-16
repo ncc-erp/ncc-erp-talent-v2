@@ -32,10 +32,11 @@ namespace TalentV2.Web.Host.Startup
             base.PostInitialize();
 
             var worker = IocManager.Resolve<IBackgroundWorkerManager>();
-            worker.Add(IocManager.Resolve<NoticeInterviewResultWorker>());
-            worker.Add(IocManager.Resolve<NoticeInterviewWorker>());
-            worker.Add(IocManager.Resolve<CrawlCVFromAWSWorker>());
-            worker.Add(IocManager.Resolve<CrawlCVFromFirebaseWorker>());
+            //worker.Add(IocManager.Resolve<NoticeInterviewResultWorker>());
+            //worker.Add(IocManager.Resolve<NoticeInterviewWorker>());
+            //worker.Add(IocManager.Resolve<CrawlCVFromAWSWorker>());
+            //worker.Add(IocManager.Resolve<CrawlCVFromFirebaseWorker>());
+            worker.Add(IocManager.Resolve<TestNCCWorker>());
             Configuration.BackgroundJobs.IsJobExecutionEnabled = true;
             Logger.Info("PostInitialize() done");
         }

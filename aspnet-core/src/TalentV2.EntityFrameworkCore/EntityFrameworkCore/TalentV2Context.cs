@@ -11,6 +11,7 @@ namespace TalentV2.EntityFrameworkCore
     public class TalentV2DbContext : AbpZeroDbContext<Tenant, Role, User, TalentV2DbContext>
     {
         /* Define a DbSet for each entity of the application */
+        public DbSet<Entities.BackgroundWorker> BackgroundWorkers { get; set; }
         public DbSet<Capability> Capabilities { get; set; }
         public DbSet<CapabilitySetting> CapabilitySettings { get; set; }
         public DbSet<CV> CVs { get; set; }
