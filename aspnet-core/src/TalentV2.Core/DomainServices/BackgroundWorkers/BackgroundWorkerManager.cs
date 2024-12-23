@@ -1,34 +1,96 @@
-﻿using Abp.Extensions;
+﻿using Abp.Dependency;
+using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
+using NccCore.Extension;
 using System;
 using System.Linq;
+using TalentV2.MultiTenancy;
+using TalentV2.Constants.Enum;
+using Abp.UI;
+using TalentV2.DomainServices.BackgroundWorkers.Dtos;
+
 
 namespace TalentV2.DomainServices.BackgroundWorkers
 {
     public class BackgroundWorkerManager : BaseManager, IBackgroundWorkerManager
     {
-        public event EventHandler<BackgroundWorkerUpdatedEventArgs> WorkerUpdated;
+        public IUnitOfWorkManager _UnitOfWorkManager { get; private set; }
+        private readonly IRepository<Tenant> _TenantRepository;
+
+        public BackgroundWorkerManager(IUnitOfWorkManager unitOfWorkManager,
+            IRepository<Tenant> tenantRepository)
+        {
+            _UnitOfWorkManager = unitOfWorkManager;
+            _TenantRepository = tenantRepository;
+        }
 
         public Entities.BackgroundWorker Create(Entities.BackgroundWorker worker)
         {
-            return WorkScope.GetRepo<Entities.BackgroundWorker>()
+            var result = WorkScope.GetRepo<Entities.BackgroundWorker>()
                 .Insert(worker);
+            return result;
         }
 
         public Entities.BackgroundWorker Update(Entities.BackgroundWorker worker)
         {
-            var workerUpdated = WorkScope.GetRepo<Entities.BackgroundWorker>()
-                .Update(worker);
+            Entities.BackgroundWorker updatedWorker;
 
-            WorkerUpdated.InvokeSafely(this, new BackgroundWorkerUpdatedEventArgs(worker));
-            return workerUpdated;
+            using (var uow = _UnitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew))
+            {
+                updatedWorker = WorkScope.GetRepo<Entities.BackgroundWorker>()
+                        .Update(worker);
+                uow.Complete();
+            }
+
+            return updatedWorker;
         }
 
         public void PauseBackgroundWorker(string workerName)
         {
-            // Need to check BackgroundWorkerState, user can not pause BackgroundWorker if BackgroundWorkerState == Running
             var worker = GetBackgroundWorkerByName(workerName);
+            if (worker.State == BackgroundWorkerState.Running)
+            {
+                return;
+            }
+
             worker.IsPaused = true;
             Update(worker);
+        }
+
+        public BackgroundWorkerDto UpdateActivedWorker(BackgroundWorkerDto worker)
+        {
+            Entities.BackgroundWorker runningWorker = GetBackgroundWorkerByName(worker.Name);
+            if (runningWorker == null)
+            {
+                throw new UserFriendlyException("BackgroundWorker not found");
+            }
+            
+            if (worker.TenantId != null &&
+                !_TenantRepository.GetAll().Any(x => x.Id == worker.TenantId))
+            {
+                throw new UserFriendlyException("TenantId does not exist");
+            }
+
+            if (worker.IsPaused == true && worker.State == BackgroundWorkerState.Running)
+            {
+                throw new UserFriendlyException("BackgroundWorker can not pause while it is running!");
+            }
+
+            runningWorker.Period = worker.Period;
+            runningWorker.TenantId = worker.TenantId;
+            runningWorker.IsPaused = worker.IsPaused;
+
+            Type type = Type.GetType(runningWorker.Name);
+            var backgroundWorkerInstance = IocManager.Instance.Resolve(type);
+
+            var method = type.GetMethod("UpdateBackgroundWorker");
+            if (method != null)
+            {
+                method.Invoke(backgroundWorkerInstance, new object[] { runningWorker });
+            }
+
+            BackgroundWorkerDto result = ObjectMapper.Map<BackgroundWorkerDto>(runningWorker);
+            return result;
         }
 
         public Entities.BackgroundWorker GetBackgroundWorkerByName(string workerName)
@@ -39,13 +101,4 @@ namespace TalentV2.DomainServices.BackgroundWorkers
         }
     }
 
-    public class BackgroundWorkerUpdatedEventArgs : EventArgs
-    {
-        public Entities.BackgroundWorker BackgroundWorker { get; set; }
-
-        public BackgroundWorkerUpdatedEventArgs(Entities.BackgroundWorker backgroundWorker)
-        {
-            BackgroundWorker = backgroundWorker;
-        }
-    }
 }

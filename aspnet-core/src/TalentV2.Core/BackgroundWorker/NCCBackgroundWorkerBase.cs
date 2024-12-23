@@ -15,11 +15,12 @@ namespace TalentV2.BackgroundWorker
 
         public Entities.BackgroundWorker Worker { get; private set; }
 
+        private const int InitialPeriod = 1000 * 5 * 1 ;  //5 seconds
+
         public NCCBackgroundWorkerBase(AbpTimer timer) : base(timer)
         {
             UnitOfWorkManager = IocManager.Instance.Resolve<IUnitOfWorkManager>();
             WorkerManager = IocManager.Instance.Resolve<DomainServices.BackgroundWorkers.IBackgroundWorkerManager>();
-            WorkerManager.WorkerUpdated += BackgroundWorkerManager_WorkerUpdated;
             WorkerName = typeof(T).FullName;
             InitializeBackgroundWorker();
         }
@@ -33,24 +34,28 @@ namespace TalentV2.BackgroundWorker
         {
             using var uow = UnitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew);
             Worker = WorkerManager.GetBackgroundWorkerByName(WorkerName);
-            if (Worker != null)
-            {
-                Timer.Period = Worker.Period;
-            }
+
             Worker ??= WorkerManager.Create(new Entities.BackgroundWorker
             {
                 Name = WorkerName,
                 IsPaused = false,
-                Period = Timer.Period,
+                Period = InitialPeriod,
                 State = BackgroundWorkerState.WaitToRun
             });
+
+            Timer.Period = Worker.Period;
             uow.Complete();
         }
 
-        private void BackgroundWorkerManager_WorkerUpdated(object sender, DomainServices.BackgroundWorkers.BackgroundWorkerUpdatedEventArgs e)
+        public void UpdateBackgroundWorker(Entities.BackgroundWorker worker)
         {
-            Worker = e.BackgroundWorker;
-            Timer.Period = Worker.Period;
+            Timer.Period = worker.Period;
+
+            Worker.Period = worker.Period;
+            Worker.IsPaused = worker.IsPaused;
+            Worker.TenantId = worker.TenantId;
+
+            WorkerManager.Update(Worker);
         }
 
         private void UpdateBackgroundWorkerState(BackgroundWorkerState state)
@@ -68,7 +73,7 @@ namespace TalentV2.BackgroundWorker
 
         protected override void DoWork()
         {
-            if (!DoWorkStartCondition())
+            if (DoWorkStartCondition())
             {
                 UpdateBackgroundWorkerState(BackgroundWorkerState.Paused);
                 return;

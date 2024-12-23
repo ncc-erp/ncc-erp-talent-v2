@@ -1,5 +1,6 @@
 ﻿using Abp.Dependency;
 using Abp.Threading.Timers;
+using System;
 
 namespace TalentV2.BackgroundWorker
 {
@@ -8,7 +9,6 @@ namespace TalentV2.BackgroundWorker
         public TestNCCWorker(AbpTimer timer) : base(timer)
         {
             Timer.RunOnStart = true;
-            Timer.Period = 10000;
         }
 
         protected override void DoWorkMainLogic()
