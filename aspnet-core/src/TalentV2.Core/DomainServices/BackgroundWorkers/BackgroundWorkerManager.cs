@@ -24,6 +24,21 @@ namespace TalentV2.DomainServices.BackgroundWorkers
             _TenantRepository = tenantRepository;
         }
 
+        public IQueryable<BackgroundWorkerDto> IQGetAllBackgroundWorker()
+        {
+            var qallBackgroundWorker = from worker in WorkScope.GetAll<Entities.BackgroundWorker>()
+                                   select new BackgroundWorkerDto
+                                   {
+                                       Id = worker.Id,
+                                       Name = worker.Name,
+                                       TenantId = worker.TenantId,
+                                       State = worker.State,
+                                       Period = worker.Period,
+                                       IsPaused = worker.IsPaused
+                                   };
+            return qallBackgroundWorker;
+        }
+
         public Entities.BackgroundWorker Create(Entities.BackgroundWorker worker)
         {
             var result = WorkScope.GetRepo<Entities.BackgroundWorker>()

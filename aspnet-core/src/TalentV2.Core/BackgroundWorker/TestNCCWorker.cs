@@ -9,6 +9,7 @@ namespace TalentV2.BackgroundWorker
         public TestNCCWorker(AbpTimer timer) : base(timer)
         {
             Timer.RunOnStart = true;
+            InitialPeriod = 2000;
         }
 
         protected override void DoWorkMainLogic()

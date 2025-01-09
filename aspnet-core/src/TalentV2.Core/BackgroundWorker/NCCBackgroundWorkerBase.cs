@@ -15,18 +15,18 @@ namespace TalentV2.BackgroundWorker
 
         public Entities.BackgroundWorker Worker { get; private set; }
 
-        private const int InitialPeriod = 1000 * 5 * 1 ;  //5 seconds
+        protected int InitialPeriod { get; set; }
 
         public NCCBackgroundWorkerBase(AbpTimer timer) : base(timer)
         {
             UnitOfWorkManager = IocManager.Instance.Resolve<IUnitOfWorkManager>();
             WorkerManager = IocManager.Instance.Resolve<DomainServices.BackgroundWorkers.IBackgroundWorkerManager>();
             WorkerName = typeof(T).FullName;
-            InitializeBackgroundWorker();
         }
 
         public override void Start()
         {
+            InitializeBackgroundWorker();
             base.Start();
         }
 
