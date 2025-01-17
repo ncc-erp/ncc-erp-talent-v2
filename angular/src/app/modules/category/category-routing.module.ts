@@ -18,6 +18,7 @@ import { SubPositionComponent } from './sub-position/sub-position.component';
 import { PostsComponent } from "./posts/posts.component";
 import {ScoreSettingComponent} from "./score-setting/score-setting.component";
 import { CandidateLevelResolver } from "@app/core/resolver/candidate-level.resolver";
+import { NotificationSettingComponent } from "./notification-setting/notification-setting.component";
 
 const routes: Routes = [
   {
@@ -96,6 +97,11 @@ const routes: Routes = [
         component: ScoreSettingComponent,
         resolve: { categoriesResolver: CategoriesResolver, CandidateLevelResolver: CandidateLevelResolver },
         data: { permission: PERMISSIONS_CONSTANT.Pages_ScoreSettings },
+      },
+      {
+        path: "notification-setting",
+        component: NotificationSettingComponent,
+        data: { permission: PERMISSIONS_CONSTANT.Pages_NotificationSettings },
       }
     ],
   },

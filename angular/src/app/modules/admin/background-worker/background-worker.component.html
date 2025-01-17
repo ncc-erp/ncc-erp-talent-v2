@@ -1,0 +1,168 @@
+<talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig">
+</talent-section-breadcrumb>
+
+<section class="section-table">
+    <div class="header-toolbar">
+    <div class="custom-search-container">
+        <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-search"
+            (click)="getDataPage(GET_FIRST_PAGE)"
+        ></button>
+        <input
+            talentAutoFocus
+            type="text"
+            pInputText
+            name="keyword"
+            class="custom-search-input"
+            [placeholder]="'Search by background worker name' | localize"
+            [(ngModel)]="searchText"
+            (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+        />
+    </div>
+    </div>
+
+    <p-table
+        [value]="backgroundWorkers"
+        [editingRowKeys]="editingRowKey"
+        editMode="row"
+        dataKey="id"
+        [lazy]="true"
+        (onLazyLoad)="lazyLoadingData($event)"
+        [paginator]="true"
+        [rows]="defaultRows"
+        responsiveLayout="scroll"
+        [rowsPerPageOptions]="rowsPerPageOptions"
+        [loading]="isLoading"
+        [(first)]="first"
+        [totalRecords]="totalItems"
+        [showCurrentPageReport]="backgroundWorkers.length"
+        currentPageReportTemplate="Total: {totalRecords}"
+        styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm tl-table-card-box"
+    >
+    <ng-template pTemplate="header">
+        <tr>
+        <th class="text-center">#</th>
+        <th>{{ "Name" | localize }}</th>
+        <th>{{ "TenantId" | localize }}</th>
+        <th>{{ "Period" | localize }}</th>
+        <th>{{ "Is Paused" | localize }}</th>
+        <th class="w-230px">{{ "Actions" | localize }}</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-worker let-i="rowIndex" let-editing="editing">
+        <tr [pEditableRow]="worker">
+        <td class="w-70px text-center">{{ i + 1 }}</td>
+        <td>{{ worker.name }}</td>
+
+        <!-- TenantId -->
+        <td>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <input
+                  *ngIf="editing"
+                  pInputText
+                  [(ngModel)]="worker.TenantId"
+                  class="edit-period"
+                />
+              </ng-template>
+              <ng-template pTemplate="output">
+                <div>{{ worker.TenantId }}</div>
+              </ng-template>
+            </p-cellEditor>
+        </td>
+
+        <!-- Period -->
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input
+                *ngIf="editing"
+                pInputText
+                [(ngModel)]="worker.period"
+                class="edit-period"
+              />
+              <ng-container *ngIf="!editing">
+                <div>{{ worker?.period }}</div>
+              </ng-container>
+            </ng-template>
+            <ng-template pTemplate="output">
+              <div>{{ worker?.period }}</div>
+            </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <!-- Is Paused -->
+        <td>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <div class="custom-control custom-checkbox">
+                    <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="isPaused"
+                        [(ngModel)]="worker.isPaused"
+                    />
+                    <label class="custom-control-label" for="isPaused"></label>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="output">
+                <div class="custom-control custom-checkbox">
+                    <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        disabled
+                        [checked]="worker.isPaused"
+                    />
+                    <label class="custom-control-label"></label>
+                </div>
+              </ng-template>
+            </p-cellEditor>
+        </td>
+
+        <td class="text-center">
+            <p-button
+                *ngIf="permission.isGranted(PS.Pages_BackgroundWorkers_Update) && editing"
+                pSaveEditableRow
+                title="Save"
+                icon="pi pi-check"
+                styleClass="p-button-sm mr-1"
+                (onClick)="onSave(worker)"
+            ></p-button>
+            <p-button
+                *ngIf="permission.isGranted(PS.Pages_BackgroundWorkers_Update) && editing"
+                pCancelEditableRow
+                icon="pi pi-times"
+                title="Cancel Edit"
+                styleClass="p-button-sm p-button-secondary"
+                (click)="onCancel(worker)"
+            ></p-button>
+  
+            <button *ngIf="permission.isGranted(PS.Pages_BackgroundWorkers_Update) && !editing"
+                type="button"
+                pButton
+                pRipple
+                icon="pi pi-bars"
+                (click)="menu.toggle($event)"
+            ></button>
+            <p-menu
+                #menu
+                [popup]="true"
+                appendTo="body"
+                [model]="getListItem(worker)"
+            >
+            </p-menu>
+        </td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="100%" class="text-center">No Record.</td>
+      </tr>
+    </ng-template>
+    </p-table>
+</section>
+  

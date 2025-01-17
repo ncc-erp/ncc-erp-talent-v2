@@ -1,0 +1,23 @@
+<ng-container *ngIf="template">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row scroll-y mt-2 rounded">
+          <div class="col-md-12 bg-white">
+            <div [innerHtml]="template.bodyMessage"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-end text-right mt-2">
+      <div class="col">
+        <p-button
+          label="Close"
+          icon="pi pi-times"
+          styleClass="p-button-sm p-button-secondary"
+          (onClick)="ref.close()"
+        ></p-button>
+  
+      </div>
+    </div>
+  </ng-container>
+  

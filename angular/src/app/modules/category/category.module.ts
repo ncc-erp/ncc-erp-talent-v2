@@ -33,6 +33,9 @@ import { PostDetailComponent } from './posts/post-detail/post-detail.component'
 import { ScoreSettingComponent } from './score-setting/score-setting.component';
 import { DialogScoreSettingComponent } from './score-setting/dialog-score-setting/dialog-score-setting.component';
 import {FormsModule} from '@angular/forms';
+import { NotificationSettingComponent } from './notification-setting/notification-setting.component';
+import { EditMessageTemplateDialogComponent } from './notification-setting/edit-message-template-dialog/edit-message-template-dialog.component';
+import { PreviewMessageTemplateDialogComponent } from './notification-setting/preview-message-template-dialog/preview-message-template-dialog.component';
 
 const dialogComponents = [
   EducationTypesDialogComponent,
@@ -69,7 +72,9 @@ const dialogComponents = [
     PostsComponent,
     ScoreSettingComponent,
     DialogScoreSettingComponent,
-    
+    EditMessageTemplateDialogComponent,
+    NotificationSettingComponent,
+    PreviewMessageTemplateDialogComponent,
   ],
   imports: [
     CommonModule,

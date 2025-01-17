@@ -1,0 +1,164 @@
+<talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig">
+</talent-section-breadcrumb>
+
+<section class="section-table">
+    <div class="header-toolbar">
+    <div class="custom-search-container">
+        <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-search"
+            (click)="getDataPage(GET_FIRST_PAGE)"
+        ></button>
+        <input
+            talentAutoFocus
+            type="text"
+            pInputText
+            name="keyword"
+            class="custom-search-input"
+            [placeholder]="'Search by notification type' | localize"
+            [(ngModel)]="searchText"
+            (keyup.enter)="getDataPage(GET_FIRST_PAGE)"
+        />
+    </div>
+    </div>
+
+    <p-table
+      [value]="notifications"
+      [editingRowKeys]="editingRowKey"
+      editMode="row"
+      dataKey="id"
+      [lazy]="true"
+      (onLazyLoad)="lazyLoadingData($event)"
+      [paginator]="true"
+      [rows]="defaultRows"
+      responsiveLayout="scroll"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [loading]="isLoading"
+      [(first)]="first"
+      [totalRecords]="totalItems"
+      [showCurrentPageReport]="notifications.length"
+      currentPageReportTemplate="Total: {totalRecords}"
+      styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm tl-table-card-box"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="w-70px text-center">{{ "No" | localize }}</th>
+          <th>{{ "Notification Type" | localize }}</th>
+          <th>{{ "Webhook" | localize }}</th>
+          <th>{{ "Message Template" | localize }}</th>
+          <th class="text-center">{{ "IsActive" | localize }}</th>
+          <th class="text-center w-150px">
+            {{ "Action" | localize }}
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item let-i="rowIndex" let-editing="editing">
+        <tr [pEditableRow]="item">
+          <td class="text-center">{{ i + 1 }}</td>
+          <td>{{ item.typeName }}</td>
+          <td>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <textarea 
+                  pInputTextarea 
+                  rows="3"
+                  cols="40"
+                  [(ngModel)]="item.webhookUrl"
+                  style="width: 100%;"
+                >
+                </textarea>
+              </ng-template>
+              <ng-template pTemplate="output">
+                <div class="url-text">
+                  {{ item.webhookUrl }}
+                </div>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+
+          <!-- Message Template -->
+          <td>
+            <textarea 
+              pInputTextarea 
+              rows="3"
+              cols="70"
+              disabled
+              [value]="item.bodyMessage"
+              style="width: 100%;"
+            >
+            </textarea>
+          </td>
+
+          <!-- Is Active -->
+          <td>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <div class="custom-control custom-checkbox text-center">
+                    <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="isPaused"
+                        [(ngModel)]="item.isActived"
+                    />
+                    <label class="custom-control-label" for="isPaused"></label>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="output">
+                <div class="custom-control custom-checkbox text-center">
+                    <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        disabled
+                        [checked]="item.isActived"
+                    />
+                    <label class="custom-control-label"></label>
+                </div>
+              </ng-template>
+            </p-cellEditor>
+          </td>
+
+          <td class="text-center">
+            <p-button
+              *ngIf="editing"
+              pSaveEditableRow
+              title="Save"
+              icon="pi pi-check"
+              styleClass="p-button-sm"
+              (onClick)="onSave(item)"
+            ></p-button>
+  
+            <p-button
+              *ngIf="editing"
+              pCancelEditableRow
+              icon="pi pi-times"
+              title="Cancel Edit"
+              styleClass="p-button-sm p-button-secondary ml-1"
+              (click)="onCancel(item)"
+            ></p-button>
+  
+            <button *ngIf="!editing "
+              type="button"
+              pButton
+              pRipple
+              icon="pi pi-bars"
+              (click)="menu.toggle($event)"
+            ></button>
+            <p-menu
+              #menu
+              [popup]="true"
+              appendTo="body"
+              [model]="getListItem(item)"
+            >
+            </p-menu>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="100%" class="text-center">No Record.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>

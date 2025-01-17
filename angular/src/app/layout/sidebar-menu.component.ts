@@ -76,7 +76,13 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     '/app/admin/mail',
                     'fas fa-envelope',
                     PERMISSIONS_CONSTANT.Pages_Mails
-                )
+                ),
+                new MenuItem(
+                    this.l('Background Worker'),
+                    '/app/admin/background-worker',
+                    'fas fa-history',
+                    PERMISSIONS_CONSTANT.Pages_BackgroundWorkers
+                ),
             ]),
             new MenuItem('Categories', '', 'fas fa-folder-open', PERMISSIONS_CONSTANT.TabCategory, [
                 new MenuItem(
@@ -150,8 +156,13 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     '/app/categories/score-setting',
                     'far fa-star',
                     PERMISSIONS_CONSTANT.Pages_ScoreSettings
-                )
-              
+                ),
+                new MenuItem(
+                    this.l('Notification Setting'),
+                    '/app/categories/notification-setting',
+                    'fas fa-comment-dots',
+                    PERMISSIONS_CONSTANT.Pages_NotificationSettings
+                ),
             ]),
             new MenuItem('Candidates', '', 'fas fa-id-card', 
                 [PERMISSIONS_CONSTANT.Pages_CandidateStaff_ViewList, PERMISSIONS_CONSTANT.Pages_CandidateIntern_ViewList], [
@@ -177,7 +188,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     this.l('Apply CV'),
                     '/app/candidate/apply-cv',
                     'fas fa-file-alt',
-                  
+                    
                 ),
             ]),
             new MenuItem('Requisitions', '', 'fas fa-file-audio', PERMISSIONS_CONSTANT.TabRequisition, [

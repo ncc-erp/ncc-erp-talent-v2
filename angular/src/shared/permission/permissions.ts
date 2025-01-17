@@ -41,6 +41,11 @@ export const PERMISSIONS_CONSTANT = {
     Pages_Configurations_ViewTalentNotifyCVAutomationSettings: "Pages.Configurations.ViewTalentNotifyCVAutomationSettings",
     Pages_Configurations_EditTalentNotifyCVAutomationSettings: "Pages.Configurations.EditTalentNotifyCVAutomationSettings",
     PermissionNames_Pages_Configurations_ConfigureContestUrl: "PermissionNames.Pages_Configurations.ConfigureContestUrl",
+    Pages_BackgroundWorkers: "Pages.BackgroundWorkers",
+    Pages_BackgroundWorkers_ViewList: "Pages.BackgroundWorkers.ViewList",
+    Pages_BackgroundWorkers_Update: "Pages.BackgroundWorkers.Update",
+
+
 
     TabCategory: "Category",
     Pages_SubPositions: "Pages.SubPositions",
@@ -106,6 +111,11 @@ export const PERMISSIONS_CONSTANT = {
     Pages_Posts_Create: "Pages.Posts.Create",
     Pages_Posts_Edit: "Pages.Posts.Edit",
     Pages_Posts_Delete: "Pages.Posts.Delete",
+
+    Pages_NotificationSettings: "Pages.NotificationSettings",
+    Pages_NotificationSettings_ViewList: "Pages.NotificationSettings.ViewList",
+    Pages_NotificationSettings_Update: "Pages.NotificationSettings.Update",
+    Pages_NotificationSettings_Preview: "Pages.NotificationSettings.Preview",
 
     Pages_ExternalCVs: "Pages.ExternalCVs",
     Pages_ExternalCVs_ViewList: "Pages.ExternalCVs.View_List",

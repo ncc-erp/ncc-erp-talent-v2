@@ -1,0 +1,12 @@
+textarea {
+    resize: none;
+    overflow: hidden;
+}
+
+.url-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 400px;
+    display: block;
+  }

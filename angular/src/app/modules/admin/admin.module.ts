@@ -24,6 +24,7 @@ import { MailComponent } from './mail/mail.component';
 import { MailDialogComponent } from './mail/mail-dialog/mail-dialog.component';
 import { DialogModule } from 'primeng/dialog';
 import { EditMailDialogComponent } from './mail/edit-mail-dialog/edit-mail-dialog.component';
+import { BackgroundWorkerComponent } from './background-worker/background-worker.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { EditMailDialogComponent } from './mail/edit-mail-dialog/edit-mail-dialo
     MailDialogComponent,
     EditMailDialogComponent,
     TabUserRoleComponent,
+    BackgroundWorkerComponent,
   ],
   imports: [
     CommonModule,
