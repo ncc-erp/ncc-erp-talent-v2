@@ -22,6 +22,7 @@ using TalentV2.Constants.Dictionary;
 using TalentV2.Notifications.Templates;
 using TalentV2.EntityFrameworkCore.Seed.Emails;
 using System.Collections.Generic;
+using TalentV2.EntityFrameworkCore.Seed.MezonTemplates;
 
 namespace TalentV2.EntityFrameworkCore.Seed.Tenants
 {
@@ -117,6 +118,7 @@ namespace TalentV2.EntityFrameworkCore.Seed.Tenants
                 _context.SaveChanges();
             }
             new DefaultEmailSettingsCreator(_context, adminRole.TenantId).Create();
+            new DefaultNotificationSettingsCreator(_context, adminRole.TenantId).Create();
         }
 
         private void CreateRoleAndAddPermission(int? tenantId)

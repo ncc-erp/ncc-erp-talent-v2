@@ -156,6 +156,22 @@ namespace TalentV2.Constants.Dictionary
             {RequestCVStatus.RejectedApply, "Rejected Apply" },
         };
 
+        public static readonly Dictionary<NotificationType, string> NotificationTypeDict = new Dictionary<NotificationType, string>
+        {
+            {NotificationType.AcceptedOffer, "[HR] Accepted Offer" },
+            {NotificationType.RejectedOffer, "[HR] Rejected Offer" },
+            {NotificationType.UpdatedPersonalInfo, "[HR] Updated Personal Info" },
+
+            {NotificationType.ChannelNotice_InterviewRemind, "[Worker] Interview Remind Message To Channel" },
+            {NotificationType.ChannelNotice_CandidateEvaluation, "[Worker] Candidate Evaluation Message To Channel" },
+            {NotificationType.ChannelNotice_CandidateEvaluationAndLevel, "[Worker] Evaluation And Suggest-Level Message To Channel" },
+            {NotificationType.UserNotice_InterviewRemind, "[Worker] Interview Remind To User" },
+            {NotificationType.UserNotice_CandidateEvaluation, "[Worker] Candidate Evaluation Message To User" },
+            {NotificationType.UserNotice_CandidateEvaluationAndLevel, "[Worker] Evaluation And Suggest-Level Message To User" },
+
+            {NotificationType.CrawlCV_MessageToChannel, "[Worker] Crawl CV Message To Channel" },
+            {NotificationType.CrawlCV_MessageToUser, "[Worker] Crawl CV Message To User" },
+        };
         public static readonly Dictionary<Level, LevelDto> LevelDict = new Dictionary<Level, LevelDto>
         {
             {

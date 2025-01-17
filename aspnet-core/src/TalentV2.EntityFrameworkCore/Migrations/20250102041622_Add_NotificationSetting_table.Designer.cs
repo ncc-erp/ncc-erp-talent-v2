@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TalentV2.EntityFrameworkCore;
@@ -11,9 +12,10 @@ using TalentV2.EntityFrameworkCore;
 namespace TalentV2.Migrations
 {
     [DbContext(typeof(TalentV2DbContext))]
-    partial class TalentV2DbContextModelSnapshot : ModelSnapshot
+    [Migration("20250102041622_Add_NotificationSetting_table")]
+    partial class Add_NotificationSetting_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,7 +65,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpEditions", (string)null);
+                    b.ToTable("AbpEditions");
                 });
 
             modelBuilder.Entity("Abp.Application.Features.FeatureSetting", b =>
@@ -99,7 +101,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpFeatures", (string)null);
+                    b.ToTable("AbpFeatures");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("FeatureSetting");
                 });
@@ -177,7 +179,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpAuditLogs", (string)null);
+                    b.ToTable("AbpAuditLogs");
                 });
 
             modelBuilder.Entity("Abp.Authorization.PermissionSetting", b =>
@@ -213,7 +215,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "Name");
 
-                    b.ToTable("AbpPermissions", (string)null);
+                    b.ToTable("AbpPermissions");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("PermissionSetting");
                 });
@@ -251,7 +253,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "ClaimType");
 
-                    b.ToTable("AbpRoleClaims", (string)null);
+                    b.ToTable("AbpRoleClaims");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserAccount", b =>
@@ -312,7 +314,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "UserName");
 
-                    b.ToTable("AbpUserAccounts", (string)null);
+                    b.ToTable("AbpUserAccounts");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserClaim", b =>
@@ -348,7 +350,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "ClaimType");
 
-                    b.ToTable("AbpUserClaims", (string)null);
+                    b.ToTable("AbpUserClaims");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserLogin", b =>
@@ -386,7 +388,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "LoginProvider", "ProviderKey");
 
-                    b.ToTable("AbpUserLogins", (string)null);
+                    b.ToTable("AbpUserLogins");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserLoginAttempt", b =>
@@ -435,7 +437,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenancyName", "UserNameOrEmailAddress", "Result");
 
-                    b.ToTable("AbpUserLoginAttempts", (string)null);
+                    b.ToTable("AbpUserLoginAttempts");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserOrganizationUnit", b =>
@@ -470,7 +472,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpUserOrganizationUnits", (string)null);
+                    b.ToTable("AbpUserOrganizationUnits");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserRole", b =>
@@ -504,7 +506,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpUserRoles", (string)null);
+                    b.ToTable("AbpUserRoles");
                 });
 
             modelBuilder.Entity("Abp.Authorization.Users.UserToken", b =>
@@ -542,7 +544,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpUserTokens", (string)null);
+                    b.ToTable("AbpUserTokens");
                 });
 
             modelBuilder.Entity("Abp.BackgroundJobs.BackgroundJobInfo", b =>
@@ -588,7 +590,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("IsAbandoned", "NextTryTime");
 
-                    b.ToTable("AbpBackgroundJobs", (string)null);
+                    b.ToTable("AbpBackgroundJobs");
                 });
 
             modelBuilder.Entity("Abp.Configuration.Setting", b =>
@@ -632,7 +634,7 @@ namespace TalentV2.Migrations
                     b.HasIndex("TenantId", "Name", "UserId")
                         .IsUnique();
 
-                    b.ToTable("AbpSettings", (string)null);
+                    b.ToTable("AbpSettings");
                 });
 
             modelBuilder.Entity("Abp.DynamicEntityProperties.DynamicEntityProperty", b =>
@@ -660,7 +662,7 @@ namespace TalentV2.Migrations
                     b.HasIndex("EntityFullName", "DynamicPropertyId", "TenantId")
                         .IsUnique();
 
-                    b.ToTable("AbpDynamicEntityProperties", (string)null);
+                    b.ToTable("AbpDynamicEntityProperties");
                 });
 
             modelBuilder.Entity("Abp.DynamicEntityProperties.DynamicEntityPropertyValue", b =>
@@ -688,7 +690,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("DynamicEntityPropertyId");
 
-                    b.ToTable("AbpDynamicEntityPropertyValues", (string)null);
+                    b.ToTable("AbpDynamicEntityPropertyValues");
                 });
 
             modelBuilder.Entity("Abp.DynamicEntityProperties.DynamicProperty", b =>
@@ -720,7 +722,7 @@ namespace TalentV2.Migrations
                     b.HasIndex("PropertyName", "TenantId")
                         .IsUnique();
 
-                    b.ToTable("AbpDynamicProperties", (string)null);
+                    b.ToTable("AbpDynamicProperties");
                 });
 
             modelBuilder.Entity("Abp.DynamicEntityProperties.DynamicPropertyValue", b =>
@@ -745,7 +747,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("DynamicPropertyId");
 
-                    b.ToTable("AbpDynamicPropertyValues", (string)null);
+                    b.ToTable("AbpDynamicPropertyValues");
                 });
 
             modelBuilder.Entity("Abp.EntityHistory.EntityChange", b =>
@@ -782,7 +784,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("EntityTypeFullName", "EntityId");
 
-                    b.ToTable("AbpEntityChanges", (string)null);
+                    b.ToTable("AbpEntityChanges");
                 });
 
             modelBuilder.Entity("Abp.EntityHistory.EntityChangeSet", b =>
@@ -835,7 +837,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "UserId");
 
-                    b.ToTable("AbpEntityChangeSets", (string)null);
+                    b.ToTable("AbpEntityChangeSets");
                 });
 
             modelBuilder.Entity("Abp.EntityHistory.EntityPropertyChange", b =>
@@ -878,7 +880,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("EntityChangeId");
 
-                    b.ToTable("AbpEntityPropertyChanges", (string)null);
+                    b.ToTable("AbpEntityPropertyChanges");
                 });
 
             modelBuilder.Entity("Abp.Localization.ApplicationLanguage", b =>
@@ -934,7 +936,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "Name");
 
-                    b.ToTable("AbpLanguages", (string)null);
+                    b.ToTable("AbpLanguages");
                 });
 
             modelBuilder.Entity("Abp.Localization.ApplicationLanguageText", b =>
@@ -984,7 +986,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "Source", "LanguageName", "Key");
 
-                    b.ToTable("AbpLanguageTexts", (string)null);
+                    b.ToTable("AbpLanguageTexts");
                 });
 
             modelBuilder.Entity("Abp.Notifications.NotificationInfo", b =>
@@ -1041,7 +1043,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpNotifications", (string)null);
+                    b.ToTable("AbpNotifications");
                 });
 
             modelBuilder.Entity("Abp.Notifications.NotificationSubscriptionInfo", b =>
@@ -1084,7 +1086,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "NotificationName", "EntityTypeName", "EntityId", "UserId");
 
-                    b.ToTable("AbpNotificationSubscriptions", (string)null);
+                    b.ToTable("AbpNotificationSubscriptions");
                 });
 
             modelBuilder.Entity("Abp.Notifications.TenantNotificationInfo", b =>
@@ -1134,7 +1136,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("AbpTenantNotifications", (string)null);
+                    b.ToTable("AbpTenantNotifications");
                 });
 
             modelBuilder.Entity("Abp.Notifications.UserNotificationInfo", b =>
@@ -1162,7 +1164,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("UserId", "State", "CreationTime");
 
-                    b.ToTable("AbpUserNotifications", (string)null);
+                    b.ToTable("AbpUserNotifications");
                 });
 
             modelBuilder.Entity("Abp.Organizations.OrganizationUnit", b =>
@@ -1216,7 +1218,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "Code");
 
-                    b.ToTable("AbpOrganizationUnits", (string)null);
+                    b.ToTable("AbpOrganizationUnits");
                 });
 
             modelBuilder.Entity("Abp.Organizations.OrganizationUnitRole", b =>
@@ -1251,7 +1253,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "RoleId");
 
-                    b.ToTable("AbpOrganizationUnitRoles", (string)null);
+                    b.ToTable("AbpOrganizationUnitRoles");
                 });
 
             modelBuilder.Entity("Abp.Webhooks.WebhookEvent", b =>
@@ -1281,7 +1283,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpWebhookEvents", (string)null);
+                    b.ToTable("AbpWebhookEvents");
                 });
 
             modelBuilder.Entity("Abp.Webhooks.WebhookSendAttempt", b =>
@@ -1315,7 +1317,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("WebhookEventId");
 
-                    b.ToTable("AbpWebhookSendAttempts", (string)null);
+                    b.ToTable("AbpWebhookSendAttempts");
                 });
 
             modelBuilder.Entity("Abp.Webhooks.WebhookSubscriptionInfo", b =>
@@ -1352,7 +1354,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AbpWebhookSubscriptions", (string)null);
+                    b.ToTable("AbpWebhookSubscriptions");
                 });
 
             modelBuilder.Entity("TalentV2.Authorization.Roles.Role", b =>
@@ -1427,7 +1429,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "NormalizedName");
 
-                    b.ToTable("AbpRoles", (string)null);
+                    b.ToTable("AbpRoles");
                 });
 
             modelBuilder.Entity("TalentV2.Authorization.Users.User", b =>
@@ -1584,7 +1586,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "NormalizedUserName");
 
-                    b.ToTable("AbpUsers", (string)null);
+                    b.ToTable("AbpUsers");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.ApplyCV", b =>
@@ -1669,7 +1671,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("ApplyCVs", (string)null);
+                    b.ToTable("ApplyCVs");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.BackgroundWorker", b =>
@@ -1722,7 +1724,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("BackgroundWorkers", (string)null);
+                    b.ToTable("BackgroundWorkers");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Branch", b =>
@@ -1775,7 +1777,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Branches", (string)null);
+                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Capability", b =>
@@ -1827,7 +1829,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("Capabilities", (string)null);
+                    b.ToTable("Capabilities");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.CapabilitySetting", b =>
@@ -1892,7 +1894,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SubPositionId");
 
-                    b.ToTable("CapabilitySettings", (string)null);
+                    b.ToTable("CapabilitySettings");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.CV", b =>
@@ -1996,7 +1998,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SubPositionId");
 
-                    b.ToTable("CVs", (string)null);
+                    b.ToTable("CVs");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.CVEducation", b =>
@@ -2047,7 +2049,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("CVEducations", (string)null);
+                    b.ToTable("CVEducations");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.CVSkill", b =>
@@ -2105,7 +2107,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("CVSkills", (string)null);
+                    b.ToTable("CVSkills");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.CVSource", b =>
@@ -2157,7 +2159,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("CVSources", (string)null);
+                    b.ToTable("CVSources");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Education", b =>
@@ -2211,7 +2213,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("Educations", (string)null);
+                    b.ToTable("Educations");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.EducationType", b =>
@@ -2256,7 +2258,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("EducationsTypes", (string)null);
+                    b.ToTable("EducationsTypes");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.EmailStatusHistory", b =>
@@ -2311,7 +2313,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("EmailStatusHistories", (string)null);
+                    b.ToTable("EmailStatusHistories");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.EmailTemplate", b =>
@@ -2375,7 +2377,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("EmailTemplates", (string)null);
+                    b.ToTable("EmailTemplates");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.ExternalCV", b =>
@@ -2478,7 +2480,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("ExternalCVs", (string)null);
+                    b.ToTable("ExternalCVs");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.FirebaseCareerLog", b =>
@@ -2497,7 +2499,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FirebaseCareerLogs", (string)null);
+                    b.ToTable("FirebaseCareerLogs");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeeEducation", b =>
@@ -2562,7 +2564,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("CVEmployeeId");
 
-                    b.ToTable("EmployeeEducations", (string)null);
+                    b.ToTable("EmployeeEducations");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeeLanguage", b =>
@@ -2602,7 +2604,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeeLanguages", (string)null);
+                    b.ToTable("EmployeeLanguages");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeePosition", b =>
@@ -2645,7 +2647,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmployeePositions", (string)null);
+                    b.ToTable("EmployeePositions");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeeSkill", b =>
@@ -2706,7 +2708,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("EmployeeSkills", (string)null);
+                    b.ToTable("EmployeeSkills");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeeWorkingExpAndTechnologies", b =>
@@ -2753,7 +2755,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("WorkingExpId");
 
-                    b.ToTable("EmployeeWorkingExpAndTechnologies", (string)null);
+                    b.ToTable("EmployeeWorkingExpAndTechnologies");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.EmployeeWorkingExperience", b =>
@@ -2829,7 +2831,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("VersionId");
 
-                    b.ToTable("EmployeeWorkingExperiences", (string)null);
+                    b.ToTable("EmployeeWorkingExperiences");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.FakeSkill", b =>
@@ -2877,7 +2879,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("GroupSkillId");
 
-                    b.ToTable("FakeSkills", (string)null);
+                    b.ToTable("FakeSkills");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.GroupSkill", b =>
@@ -2920,7 +2922,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GroupSkills", (string)null);
+                    b.ToTable("GroupSkills");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.Project", b =>
@@ -2969,7 +2971,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.ProjectTechnology", b =>
@@ -3019,7 +3021,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TechnologyId");
 
-                    b.ToTable("ProjectTechnologies", (string)null);
+                    b.ToTable("ProjectTechnologies");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.Technology", b =>
@@ -3062,7 +3064,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Technologies", (string)null);
+                    b.ToTable("Technologies");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NccCVs.Versions", b =>
@@ -3117,7 +3119,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("Versions", (string)null);
+                    b.ToTable("Versions");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.NotificationSetting", b =>
@@ -3174,7 +3176,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("NotificationSettings", (string)null);
+                    b.ToTable("NotificationSettings");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Position", b =>
@@ -3223,7 +3225,7 @@ namespace TalentV2.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Positions", (string)null);
+                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.PositionSetting", b =>
@@ -3291,7 +3293,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SubPositionId");
 
-                    b.ToTable("PositionSettings", (string)null);
+                    b.ToTable("PositionSettings");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Post", b =>
@@ -3362,7 +3364,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Request", b =>
@@ -3438,7 +3440,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SubPositionId");
 
-                    b.ToTable("Requests", (string)null);
+                    b.ToTable("Requests");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.RequestCV", b =>
@@ -3527,7 +3529,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("RequestId");
 
-                    b.ToTable("RequestCVs", (string)null);
+                    b.ToTable("RequestCVs");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.RequestCVCapabilityResult", b =>
@@ -3588,7 +3590,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("RequestCVId");
 
-                    b.ToTable("RequestCVCapabilityResults", (string)null);
+                    b.ToTable("RequestCVCapabilityResults");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.RequestCVInterview", b =>
@@ -3635,7 +3637,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("RequestCVId");
 
-                    b.ToTable("RequestCVInterviews", (string)null);
+                    b.ToTable("RequestCVInterviews");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.RequestCVStatusChangeHistory", b =>
@@ -3690,7 +3692,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("RequestCVId");
 
-                    b.ToTable("RequestCVStatusChangeHistories", (string)null);
+                    b.ToTable("RequestCVStatusChangeHistories");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.RequestCVStatusHistory", b =>
@@ -3742,7 +3744,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("RequestCVId");
 
-                    b.ToTable("RequestCVStatusHistories", (string)null);
+                    b.ToTable("RequestCVStatusHistories");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.RequestSkill", b =>
@@ -3793,7 +3795,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("RequestSkills", (string)null);
+                    b.ToTable("RequestSkills");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.ScoreRange", b =>
@@ -3848,7 +3850,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("ScoreSettingID");
 
-                    b.ToTable("ScoreRanges", (string)null);
+                    b.ToTable("ScoreRanges");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.ScoreSetting", b =>
@@ -3897,7 +3899,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("SubPositionId");
 
-                    b.ToTable("ScoreSettings", (string)null);
+                    b.ToTable("ScoreSettings");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.Skill", b =>
@@ -3947,7 +3949,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("LastModifierUserId");
 
-                    b.ToTable("Skills", (string)null);
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.SubPosition", b =>
@@ -4001,7 +4003,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("SubPositions", (string)null);
+                    b.ToTable("SubPositions");
                 });
 
             modelBuilder.Entity("TalentV2.MultiTenancy.Tenant", b =>
@@ -4065,7 +4067,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenancyName");
 
-                    b.ToTable("AbpTenants", (string)null);
+                    b.ToTable("AbpTenants");
                 });
 
             modelBuilder.Entity("Abp.Application.Features.EditionFeatureSetting", b =>
@@ -4077,7 +4079,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("EditionId", "Name");
 
-                    b.ToTable("AbpFeatures", (string)null);
+                    b.ToTable("AbpFeatures");
 
                     b.HasDiscriminator().HasValue("EditionFeatureSetting");
                 });
@@ -4091,7 +4093,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AbpPermissions", (string)null);
+                    b.ToTable("AbpPermissions");
 
                     b.HasDiscriminator().HasValue("RolePermissionSetting");
                 });
@@ -4105,7 +4107,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AbpPermissions", (string)null);
+                    b.ToTable("AbpPermissions");
 
                     b.HasDiscriminator().HasValue("UserPermissionSetting");
                 });
@@ -4116,7 +4118,7 @@ namespace TalentV2.Migrations
 
                     b.HasIndex("TenantId", "Name");
 
-                    b.ToTable("AbpFeatures", (string)null);
+                    b.ToTable("AbpFeatures");
 
                     b.HasDiscriminator().HasValue("TenantFeatureSetting");
                 });

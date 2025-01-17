@@ -14,6 +14,9 @@ using System.Text;
 using TalentV2.Configuration;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.CVAutomation;
+using TalentV2.DomainServices.CVAutomation.Dto;
+using TalentV2.Notifications.MezonWebhook;
+using TalentV2.Notifications.MezonWebhook.Dtos;
 using TalentV2.Utils;
 using TalentV2.WebServices.ExternalServices.Komu;
 
@@ -25,6 +28,7 @@ namespace TalentV2.BackgroundWorker
         private readonly ILogger<CrawlCVFromFirebaseWorker> _logger;
         protected readonly ICVAutomationManager _cvAutomationService;
         protected readonly KomuService _komuService;
+        protected readonly IMezonWebhookNotification _mezonWebhookNotification;
         protected readonly IConfiguration _configuration;
         private int _intern = 0;
         private int _staff = 0;
@@ -33,11 +37,13 @@ namespace TalentV2.BackgroundWorker
             ILogger<CrawlCVFromFirebaseWorker> logger,
             ICVAutomationManager cvAutomationService,
             KomuService komuService,
+            IMezonWebhookNotification mezonWebhookNotification,
             IConfiguration configuration,
             ISettingManager settingManager) : base(timer)
         {
             _logger = logger;
             _komuService = komuService;
+            _mezonWebhookNotification = mezonWebhookNotification;
             _cvAutomationService = cvAutomationService;
             _configuration = configuration;
          
@@ -128,6 +134,13 @@ namespace TalentV2.BackgroundWorker
 
         private void Notify()
         {
+            var clientUrl = _configuration.GetValue<string>($"App:ClientRootAddress");
+            var crawlDto = new CrawlCVDto
+            {
+                InternCVQuantity = _intern.ToString(),
+                StaffCVQuantity = _staff.ToString(),
+            };
+
             string notifyEmailsString = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNotifyToUser);
             List<string> notifyEmailsList = string.IsNullOrEmpty(notifyEmailsString)
                 ? new List<string>()
@@ -137,12 +150,13 @@ namespace TalentV2.BackgroundWorker
             switch (noticeMode)
             {
                 case "Channel":
-                    string channelId = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeChannelId);
-                    string messageToChannel = BuildMessage(notifyEmailsList);
-                    _komuService.NotifyToChannel(messageToChannel, channelId);
+                    //string channelId = SettingManager.GetSettingValueForApplication(AppSettingNames.CVAutomationNoticeChannelId);
+                    //string messageToChannel = BuildMessage(notifyEmailsList);
+                    //_komuService.NotifyToChannel(messageToChannel, channelId);
+                    _mezonWebhookNotification.NotifyCrawlCVToMezonChannel(crawlDto, clientUrl, notifyEmailsList);
                     break;
                 case "User":
-                    string messageToUser = BuildMessage();
+                    string messageToUser = TemplateToMezon.CrawlCVToUserTemplate(crawlDto, clientUrl);
                     var discordUsers = notifyEmailsList.Select(email => CommonUtils.GetUserNameByEmail(email));
                     foreach (string discordUser in discordUsers)
                     {

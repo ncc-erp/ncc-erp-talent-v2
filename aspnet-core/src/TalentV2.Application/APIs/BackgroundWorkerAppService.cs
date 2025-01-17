@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NccCore.Extension;
 using NccCore.Paging;
 using System.Threading.Tasks;
+using TalentV2.Authorization;
 using TalentV2.DomainServices.BackgroundWorkers.Dtos;
 
 namespace TalentV2.APIs
@@ -19,7 +20,7 @@ namespace TalentV2.APIs
         }
 
         [HttpPost]
-        [AbpAllowAnonymous]
+        [AbpAuthorize(PermissionNames.Pages_BackgroundWorkers_ViewList)]
         public async Task<GridResult<BackgroundWorkerDto>> GetAllPaging(GridParam param)
         {
             var query = _backgroundWorkerManager.IQGetAllBackgroundWorker();
@@ -27,7 +28,7 @@ namespace TalentV2.APIs
         }
 
         [HttpPut]
-        [AbpAllowAnonymous]
+        [AbpAuthorize(PermissionNames.Pages_BackgroundWorkers_Update)]
         public BackgroundWorkerDto Update(BackgroundWorkerDto workerInput)
         {
             return _backgroundWorkerManager.UpdateActivedWorker(workerInput);

@@ -368,5 +368,10 @@ namespace TalentV2.Utils
         {
             return "${" + GetUserNameByEmail(email) + "}";
         }
+
+        public static string GetMezonTagUser(string email)
+        {
+            return "@" + GetUserNameByEmail(email);
+        }
     }
 }

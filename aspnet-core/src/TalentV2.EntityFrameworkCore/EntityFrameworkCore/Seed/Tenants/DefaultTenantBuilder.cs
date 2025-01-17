@@ -9,6 +9,7 @@ using Abp.Dependency;
 using Abp.UI;
 using Microsoft.Extensions.Configuration;
 using TalentV2.EntityFrameworkCore.Seed.Emails;
+using TalentV2.EntityFrameworkCore.Seed.MezonTemplates;
 
 namespace TalentV2.EntityFrameworkCore.Seed.Tenants
 {
@@ -52,6 +53,7 @@ namespace TalentV2.EntityFrameworkCore.Seed.Tenants
                 _context.SaveChanges();
             }
             new DefaultEmailSettingsCreator(_context, null).Create();
+            new DefaultNotificationSettingsCreator(_context, null).Create();
         }
     }
 }

@@ -12,6 +12,7 @@ using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
 using TalentV2.Notifications;
 using TalentV2.Notifications.Komu;
+using TalentV2.Notifications.MezonWebhook;
 using TalentV2.Notifications.Templates;
 using TalentV2.Notifications.Templates.Dtos;
 using TalentV2.Utils;
@@ -21,9 +22,14 @@ namespace TalentV2.DomainServices.RequestCVs
     public class RequestCVManager : BaseManager, IRequestCVManager
     {
         private readonly IKomuNotification _komuNotification;
-        public RequestCVManager(IKomuNotification komuNotification)
+        private readonly IMezonWebhookNotification _mezonWebhookNotification;
+
+        public RequestCVManager(
+            IKomuNotification komuNotification,
+            IMezonWebhookNotification mezonWebhookNotification)
         {
             _komuNotification = komuNotification;
+            _mezonWebhookNotification = mezonWebhookNotification;
         }
         public IQueryable<CandidateOfferDto> IQGetRequestCV()
         {
@@ -96,7 +102,8 @@ namespace TalentV2.DomainServices.RequestCVs
                 var isFirstAcceptedOffer = (requestCV.Status != RequestCVStatus.AcceptedOffer && input.Status == RequestCVStatus.AcceptedOffer)
                     && (!requestCV.OnboardDate.HasValue && input.OnboardDate.HasValue);
 
-                _komuNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
+                //_komuNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
+                await _mezonWebhookNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
             }
             return requestCV.Id;
         }
@@ -124,7 +131,8 @@ namespace TalentV2.DomainServices.RequestCVs
 
             if (isSendNotification)
             {
-                _komuNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
+                //_komuNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
+                await _mezonWebhookNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
             }
 
             return requestCV.Id;

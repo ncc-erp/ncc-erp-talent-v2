@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using TalentV2.Configuration;
 using TalentV2.DomainServicesWithoutWorkScope.CandidateManager;
 using TalentV2.DomainServicesWithoutWorkScope.CandidateManager.Dtos;
+using TalentV2.Notifications.MezonWebhook;
 using TalentV2.Utils;
 using TalentV2.WebServices.ExternalServices.Komu;
 
@@ -18,6 +19,7 @@ namespace TalentV2.BackgroundWorker
     public class NoticeInterviewResultWorker : PeriodicBackgroundWorkerBase, ISingletonDependency
     {
         protected readonly KomuService _komuService;
+        private readonly IMezonWebhookNotification _mezonWebhookNotification;
         protected readonly ICandidateManagerWithouWS _candidateManagerWithouWS;
         private readonly IConfiguration _configuration;
         protected Dictionary<long, byte> _dicCVIdToNotifiedCount;
@@ -26,10 +28,12 @@ namespace TalentV2.BackgroundWorker
 
         public NoticeInterviewResultWorker(AbpTimer timer
             , KomuService komuService
+            , IMezonWebhookNotification mezonWebhookNotification
             , ICandidateManagerWithouWS candidateManagerWithouWS
             , IConfiguration configuration) : base(timer)
         {
             _komuService = komuService;
+            _mezonWebhookNotification = mezonWebhookNotification;
             _candidateManagerWithouWS = candidateManagerWithouWS;
             _configuration = configuration;
             _dicCVIdToNotifiedCount = new();
@@ -84,13 +88,16 @@ namespace TalentV2.BackgroundWorker
                 }
                 if (isToChannel == "true")
                 {
-                    _komuService.NotifyToChannel(item.GetMessageToChannel(feUrl, false), channelId);
+                    //_komuService.NotifyToChannel(item.GetMessageToChannel(feUrl, false), channelId);
+                    _mezonWebhookNotification.NotifyNoticeInterviewToMezonChannel(item, feUrl, false);
                 }
                 else
                 {
                     item.InterviewerEmails.ForEach(i =>
-                    _komuService.SendMessageToUser(CommonUtils.GetUserNameByEmail(i),
-                    item.GetMessageToUser(feUrl, false)));
+                        _komuService.SendMessageToUser(CommonUtils.GetUserNameByEmail(i),
+                        //item.GetMessageToUser(feUrl, false))
+                        TemplateToMezon.NoticeInterviewToUserTemplate(item, feUrl, false))
+                    );
                 }
                 _dicCVIdToNotifiedCount[item.RequestCVId] += 1;
             }

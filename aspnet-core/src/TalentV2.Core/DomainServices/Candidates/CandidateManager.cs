@@ -26,6 +26,7 @@ using TalentV2.FileServices.Services.Candidates;
 using TalentV2.Notifications.Komu;
 using TalentV2.Notifications.Mail;
 using TalentV2.Notifications.Mail.Dtos;
+using TalentV2.Notifications.MezonWebhook;
 using TalentV2.Notifications.Templates;
 using TalentV2.Utils;
 using TalentV2.WebServices.InternalServices.HRM;
@@ -41,6 +42,7 @@ namespace TalentV2.DomainServices.Candidates
         private readonly IMailService _mailService;
         private readonly LMSService _lmsService;
         private readonly IKomuNotification _komuNotification;
+        private readonly IMezonWebhookNotification _mezonWebhookNotification;
         private readonly HRMService _hrmService;        
         private readonly IConfiguration _configuration;
 
@@ -49,6 +51,7 @@ namespace TalentV2.DomainServices.Candidates
             IMailService mailService,
             LMSService lmsService,
             IKomuNotification komuNotification,
+            IMezonWebhookNotification mezonWebhookNotification,
             HRMService hrmService,
             IConfiguration configuration
         )
@@ -57,6 +60,7 @@ namespace TalentV2.DomainServices.Candidates
             _mailService = mailService;
             _lmsService = lmsService;
             _komuNotification = komuNotification;
+            _mezonWebhookNotification = mezonWebhookNotification;
             _hrmService = hrmService;
             _configuration = configuration;
         }
@@ -285,7 +289,8 @@ namespace TalentV2.DomainServices.Candidates
                 var requestCV = await WorkScope.GetAll<RequestCV>()
                     .FirstOrDefaultAsync(r => r.CVId == input.Id);
                 if (requestCV != null && requestCV.Status == RequestCVStatus.AcceptedOffer)
-                    await _komuNotification.NotifyUpdatedPersonalInfoTemplate(requestCV.Id);
+                    //await _komuNotification.NotifyUpdatedPersonalInfoTemplate(requestCV.Id);
+                    await _mezonWebhookNotification.NotifyUpdatedPersonalInfoTemplate(requestCV.Id);
             }
 
             return await GetCVById(personBio.Id);
@@ -760,7 +765,8 @@ namespace TalentV2.DomainServices.Candidates
                 var isFirstAcceptedOffer = (oldStatus != RequestCVStatus.AcceptedOffer && input.Status == RequestCVStatus.AcceptedOffer)
                     && (!oldOnboardDate.HasValue && input.OnboardDate.HasValue);
 
-                _komuNotification.NotifyAcceptedOrRejectedOffer(applicationResult.Status, applicationResult.Id, isFirstAcceptedOffer);
+                //_komuNotification.NotifyAcceptedOrRejectedOffer(applicationResult.Status, applicationResult.Id, isFirstAcceptedOffer);
+                await _mezonWebhookNotification.NotifyAcceptedOrRejectedOffer(applicationResult.Status, applicationResult.Id, isFirstAcceptedOffer);
             }
 
             return await GetApplicationResultByRequestCVId(applicationResult.Id);

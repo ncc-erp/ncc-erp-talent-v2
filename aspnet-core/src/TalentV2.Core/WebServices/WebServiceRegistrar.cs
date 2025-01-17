@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TalentV2.WebServices.ExternalServices.Autobot;
 using TalentV2.WebServices.ExternalServices.Komu;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks;
 using TalentV2.WebServices.InternalServices.HRM;
 using TalentV2.WebServices.InternalServices.LMS;
 
@@ -16,6 +17,10 @@ namespace TalentV2.WebServices
     {
         public static IServiceCollection AddWebServices(this IServiceCollection services, IConfigurationRoot _appConfiguration)
         {
+            services.AddHttpClient<MezonWebhookService>(options =>
+            {
+                options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("MezonWebhookService:BaseAddress"));
+            });
             services.AddHttpClient<KomuService>(options =>
             {
                 options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("KomuService:BaseAddress"));

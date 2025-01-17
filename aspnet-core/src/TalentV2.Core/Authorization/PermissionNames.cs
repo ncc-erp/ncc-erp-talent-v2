@@ -63,6 +63,12 @@ namespace TalentV2.Authorization
         public const string PermissionNames_Pages_Configurations_ConfigureContestUrl = "PermissionNames.Pages_Configurations.ConfigureContestUrl";
         #endregion
 
+        #region Background Worker
+        public const string Pages_BackgroundWorkers = "Pages.BackgroundWorkers";
+        public const string Pages_BackgroundWorkers_ViewList = "Pages.BackgroundWorkers.ViewList";
+        public const string Pages_BackgroundWorkers_Update = "Pages.BackgroundWorkers.Update";
+        #endregion
+
         public const string TabCategory = "Category";
         #region Page Sub Position
         public const string Pages_SubPositions = "Pages.SubPositions";
@@ -169,6 +175,13 @@ namespace TalentV2.Authorization
         public const string Pages_ScoreSettings_Create = "Pages.ScoreSettings.Create";
         public const string Pages_ScoreSettings_Edit = "Pages.ScoreSettings.Edit";
         public const string Pages_ScoreSettings_Delete = "Pages.ScoreSettings.Delete";
+        #endregion
+
+        #region Notification Setting
+        public const string Pages_NotificationSettings = "Pages.NotificationSettings";
+        public const string Pages_NotificationSettings_ViewList = "Pages.NotificationSettings.ViewList";
+        public const string Pages_NotificationSettings_Update = "Pages.NotificationSettings.Update";
+        public const string Pages_NotificationSettings_Preview = "Pages.NotificationSettings.Preview";
         #endregion
 
         public const string TabCandidate = "Candidate";
@@ -453,6 +466,10 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_Mails_Edit,
                     PermissionNames.Pages_Mails_Preview,
                     PermissionNames.Pages_Mails_SendMail,
+                    //BackgroundWorkers
+                    PermissionNames.Pages_BackgroundWorkers,
+                    PermissionNames.Pages_BackgroundWorkers_ViewList,
+                    PermissionNames.Pages_BackgroundWorkers_Update,
                     #endregion
 
                     #region Tab Category
@@ -538,6 +555,11 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_ScoreSettings_Delete,
                     PermissionNames.Pages_ScoreSettings_Edit,
                     PermissionNames.Pages_ScoreSettings_ViewList,
+                    //Pages_NotificationSettings
+                    PermissionNames.Pages_NotificationSettings,
+                    PermissionNames.Pages_NotificationSettings_ViewList,
+                    PermissionNames.Pages_NotificationSettings_Update,
+                    PermissionNames.Pages_NotificationSettings_Preview,
                     #endregion
 
                     #region Page ApplyCV
@@ -829,6 +851,11 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_PositionSettings_Create,
                     PermissionNames.Pages_PositionSettings_Edit,
                     PermissionNames.Pages_PositionSettings_Delete,
+                    //Pages_NotificationSettings
+                    PermissionNames.Pages_NotificationSettings,
+                    PermissionNames.Pages_NotificationSettings_ViewList,
+                    PermissionNames.Pages_NotificationSettings_Update,
+                    PermissionNames.Pages_NotificationSettings_Preview,
                     #endregion
 
                     #region Page ApplyCV
@@ -1236,6 +1263,10 @@ namespace TalentV2.Authorization
                 new SystemPermission {Name = PermissionNames.Pages_Mails_Edit, DisplayName = "Edit Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Mails_Preview, DisplayName = "Preview Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Mails_SendMail, DisplayName = "Send Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                //Background Worker
+                new SystemPermission {Name = PermissionNames.Pages_BackgroundWorkers, DisplayName = "Page Background Worker", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_BackgroundWorkers_ViewList, DisplayName = "View List Background Worker", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_BackgroundWorkers_Update, DisplayName = "Update Background Worker", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 #endregion
                 #region Tab Category
                 new SystemPermission {Name = PermissionNames.TabCategory, DisplayName = "Tab Category", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
@@ -1321,6 +1352,11 @@ namespace TalentV2.Authorization
                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Create, DisplayName = "Create Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Edit, DisplayName = "Edit Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Delete, DisplayName = "Delete Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                // Notification Setting
+                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings, DisplayName = "Pages Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings_ViewList, DisplayName = "View List Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings_Update, DisplayName = "Update Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings_Preview, DisplayName = "Preview Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 
                 #endregion
 
@@ -1644,6 +1680,19 @@ namespace TalentV2.Authorization
                             }
                         },
                         #endregion
+                        #region Pages_BackgroundWorkers
+                        new SystemPermission
+                        {
+                            Name = PermissionNames.Pages_BackgroundWorkers,
+                            DisplayName = "Page Background Workers",
+                            MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant,
+                            Children = new List<SystemPermission>()
+                            {
+                                new SystemPermission {Name = PermissionNames.Pages_BackgroundWorkers_ViewList, DisplayName = "View List Background Worker", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission {Name = PermissionNames.Pages_BackgroundWorkers_Update, DisplayName = "Update Background Worker", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                            }
+                        },
+                        #endregion
                     }
                 },
                 #endregion
@@ -1852,7 +1901,21 @@ namespace TalentV2.Authorization
                                 new SystemPermission {Name = PermissionNames.Pages_ScoreSettings_Edit, DisplayName = "Edit Score Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
 
                             }
-                        }
+                        },
+                        #endregion
+                        #region Pages_BackgroundWorkers
+                        new SystemPermission
+                        {
+                            Name = PermissionNames.Pages_NotificationSettings,
+                            DisplayName = "Page Notification Settings",
+                            MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant,
+                            Children = new List<SystemPermission>()
+                            {
+                                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings_ViewList, DisplayName = "View List Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings_Update, DisplayName = "Update Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission {Name = PermissionNames.Pages_NotificationSettings_Preview, DisplayName = "Preview Notification Settings", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                            }
+                        },
                         #endregion
                     }
                 },
