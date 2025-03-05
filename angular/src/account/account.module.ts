@@ -19,6 +19,7 @@ import { TenantChangeComponent } from './tenant/tenant-change.component';
 import { TenantChangeDialogComponent } from './tenant/tenant-change-dialog.component';
 import {  GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
 import { AppConsts } from '@shared/AppConsts';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 
 
 @NgModule({
@@ -43,6 +44,7 @@ import { AppConsts } from '@shared/AppConsts';
         // tenant
         TenantChangeComponent,
         TenantChangeDialogComponent,
+        AuthCallbackComponent,
     ],
     providers: [
         {

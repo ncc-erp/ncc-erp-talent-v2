@@ -1,57 +1,162 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Abp.Authorization;
+﻿using Abp.Authorization;
 using Abp.Authorization.Users;
 using Abp.Configuration;
 using Abp.Configuration.Startup;
 using Abp.Dependency;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
+using Abp.Extensions;
+using Abp.UI;
 using Abp.Zero.Configuration;
+using Castle.Core.Logging;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using TalentV2.Authorization.Roles;
 using TalentV2.Authorization.Users;
-using TalentV2.MultiTenancy;
-using Abp.UI;
-using System;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
-using Abp.Extensions;
-using Google.Apis.Auth;
 using TalentV2.Configuration;
-using Castle.Core.Logging;
-using System.Linq;
+using TalentV2.MultiTenancy;
+using TalentV2.WebServices.ExternalServices.Mezon;
+using TalentV2.WebServices.ExternalServices.Mezon.Dtos;
 
 namespace TalentV2.Authorization
 {
     public class LogInManager : AbpLogInManager<Tenant, Role, User>
     {
         private ILogger Logger { get; set; }
+        private readonly MezonService _mezonService;
         public LogInManager(
-            UserManager userManager, 
+            UserManager userManager,
             IMultiTenancyConfig multiTenancyConfig,
             IRepository<Tenant> tenantRepository,
             IUnitOfWorkManager unitOfWorkManager,
-            ISettingManager settingManager, 
+            ISettingManager settingManager,
             IRepository<UserLoginAttempt, long> userLoginAttemptRepository,
             IUserManagementConfig userManagementConfig,
             IIocResolver iocResolver,
-            IPasswordHasher<User> passwordHasher, 
+            IPasswordHasher<User> passwordHasher,
             RoleManager roleManager,
-            UserClaimsPrincipalFactory claimsPrincipalFactory) 
+            UserClaimsPrincipalFactory claimsPrincipalFactory,
+            MezonService mezonService)
             : base(
-                  userManager, 
+                  userManager,
                   multiTenancyConfig,
-                  tenantRepository, 
-                  unitOfWorkManager, 
-                  settingManager, 
+                  tenantRepository,
+                  unitOfWorkManager,
+                  settingManager,
                   userLoginAttemptRepository,
-                  userManagementConfig, 
-                  iocResolver, 
-                  passwordHasher, 
-                  roleManager, 
+                  userManagementConfig,
+                  iocResolver,
+                  passwordHasher,
+                  roleManager,
                   claimsPrincipalFactory)
         {
             Logger = NullLogger.Instance;
+            _mezonService = mezonService;
         }
+
+        [UnitOfWork]
+        public async Task<AbpLoginResult<Tenant, User>> LoginOAuth2Async(string token, string tenancyName = null, bool shouldLockout = true)
+        {
+            Logger.Info("LoginOAuth2");
+            var result = await LoginInternalOAuth2Async(token, tenancyName, shouldLockout);
+            var user = result.User;
+            SaveLoginAttempt(result, tenancyName, user == null ? null : user.EmailAddress);
+            return result;
+        }
+
+        public async Task<AbpLoginResult<Tenant, User>> LoginInternalOAuth2Async(string token, string tenancyName, bool shouldLockout)
+        {
+            if (token.IsNullOrEmpty())
+            {
+                return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
+            }
+
+            try
+            {
+                var mezonConfig = _mezonService.GetConfig();
+                var tokenResponse = await _mezonService.GetTokenAsync(new OAuth2Request
+                {
+                    Code = token,
+                    Scope = "openid offline"
+                });
+
+                if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
+                {
+                    return new AbpLoginResult<Tenant, User>(AbpLoginResultType.UnknownExternalLogin, null);
+                }
+
+                var userInfo = await _mezonService.GetUserInfoAsync(tokenResponse.AccessToken);
+                if (userInfo == null)
+                {
+                    return new AbpLoginResult<Tenant, User>(AbpLoginResultType.UnknownExternalLogin, null);
+                }
+
+                var correctAudience = userInfo.Audience.Any(s => s == mezonConfig.ClientId);
+                var correctIssuer = userInfo.Issuer == "oauth2.mezon.ai" || userInfo.Issuer == "https://oauth2.mezon.ai";
+                var correctSub = !string.IsNullOrEmpty(userInfo.Subject);
+                var correctExpiryTime = tokenResponse.ExpiresIn != null && tokenResponse.ExpiresIn > 0;
+
+                if (!correctAudience || !correctIssuer || !correctSub || !correctExpiryTime)
+                {
+                    return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
+                }
+
+                Tenant tenant = null;
+                using (UnitOfWorkManager.Current.SetTenantId(null))
+                {
+                    if (!MultiTenancyConfig.IsEnabled)
+                    {
+                        tenant = await GetDefaultTenantAsync();
+                    }
+                    else if (!string.IsNullOrWhiteSpace(tenancyName))
+                    {
+                        tenant = await TenantRepository.FirstOrDefaultAsync(t => t.TenancyName == tenancyName);
+                        if (tenant == null)
+                        {
+                            return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidTenancyName);
+                        }
+                        if (!tenant.IsActive)
+                        {
+                            return new AbpLoginResult<Tenant, User>(AbpLoginResultType.TenantIsNotActive, tenant);
+                        }
+                    }
+                }
+
+                var tenantId = tenant?.Id;
+                using (UnitOfWorkManager.Current.SetTenantId(tenantId))
+                {
+                    await UserManager.InitializeOptionsAsync(tenantId);
+                    var user = UserManager.Users.FirstOrDefault(x => x.EmailAddress == userInfo.Subject);
+                    if (user == null)
+                    {
+                        return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, tenant);
+                    }
+
+                    if (await UserManager.IsLockedOutAsync(user))
+                    {
+                        return new AbpLoginResult<Tenant, User>(AbpLoginResultType.LockedOut, tenant, user);
+                    }
+
+                    if (shouldLockout && await TryLockOutAsync(tenantId, user.Id))
+                    {
+                        return new AbpLoginResult<Tenant, User>(AbpLoginResultType.LockedOut, tenant, user);
+                    }
+
+                    await UserManager.ResetAccessFailedCountAsync(user);
+                    return await CreateLoginResultAsync(user, tenant);
+                }
+            }
+            catch (Exception)
+            {
+                return new AbpLoginResult<Tenant, User>(AbpLoginResultType.UnknownExternalLogin, null);
+            }
+        }
+
+
         [UnitOfWork]
         public async Task<AbpLoginResult<Tenant, User>> LoginAsyncNoPass(string token, string secretCode = "", string tenancyName = null, bool shouldLockout = true)
         {
