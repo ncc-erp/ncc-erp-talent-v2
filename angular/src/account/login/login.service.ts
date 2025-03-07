@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { GoogleLoginService } from '@app/core/services/apis/google-api.service';
+import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
+import { HttpErrorResponse } from '@node_modules/@angular/common/http';
+import { Observable, of, throwError } from '@node_modules/rxjs';
 import { AppConsts } from '@shared/AppConsts';
 import { UrlHelper } from '@shared/helpers/UrlHelper';
-import { AuthenticateModel, AuthenticateResultModel, TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AuthenticateModel, AuthenticateResultModel, ExternalAuthenticateModel, ExternalAuthenticateResultModel, ExternalLoginProviderInfoModel, TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
 import { LogService, MessageService, PermissionCheckerService, TokenService, UtilsService } from 'abp-ng2-module';
-import { finalize } from 'rxjs/operators';
+import { catchError, finalize, map, startWith } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -26,7 +29,8 @@ export class LoginService {
         private _tokenService: TokenService,
         private _logService: LogService,
         private _googleLoginService: GoogleLoginService,
-        private _message: MessageService
+        private _message: MessageService,
+        private _mezonService: MezonLoginService
         //private _permissionChecker: PermissionCheckerService
     ) {
         this.clear();
@@ -41,6 +45,19 @@ export class LoginService {
             .subscribe((result: AuthenticateResultModel) => {
                 this.processAuthenticateResult(result);
             });
+    }
+
+    authenticateMezon(token: string, scope: string): Observable<any> {
+        return this._mezonService.mezonAuthenticate(token).pipe(
+            map(data => {
+                var result = this.processAuthenticateResult(data.result);
+                return { ...data, loading: false }
+            }),
+            startWith({ loading: true, success: false }),
+            catchError((err: HttpErrorResponse) => {
+                return of({ loading: false, success: false, error: err.error.error });
+            }),
+        );
     }
 
     authenticateGoogle(googleToken: string, finallyCallback?: () => void): void {
