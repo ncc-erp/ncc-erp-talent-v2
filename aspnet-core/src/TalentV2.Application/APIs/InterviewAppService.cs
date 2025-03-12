@@ -1,8 +1,12 @@
 ﻿using Abp.Authorization;
 using Abp.Collections.Extensions;
+using Abp.Extensions;
 using Abp.Linq.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NccCore.Extension;
 using NccCore.Paging;
 using System;
@@ -11,6 +15,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Authorization;
+using TalentV2.BackgroundWorker;
+using TalentV2.Configuration;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Interview.Dtos;
@@ -18,8 +24,10 @@ using TalentV2.DomainServices.Interviews;
 using TalentV2.DomainServices.Interviews.Dtos;
 using TalentV2.DomainServices.Requisitions;
 using TalentV2.DomainServices.Requisitions.Dtos;
+using TalentV2.DomainServicesWithoutWorkScope.CandidateManager;
 using TalentV2.Entities;
 using TalentV2.ModelExtends;
+using TalentV2.Utils;
 
 namespace TalentV2.APIs
 {
@@ -28,13 +36,19 @@ namespace TalentV2.APIs
     {
         private readonly IInterviewManager _interviewManager;
         private readonly IRequisitionManager _requisitionManager;
+        protected readonly ICandidateManagerWithouWS _candidateManagerWithouWS;
+        private readonly ILogger<InterviewAppService> _logger;
         public InterviewAppService(
             IInterviewManager interviewManager,
-            IRequisitionManager requisitionManager 
+            IRequisitionManager requisitionManager ,
+            ICandidateManagerWithouWS candidateManagerWithouWS,
+            ILogger<InterviewAppService> logger
         ) 
         {
             _interviewManager = interviewManager;
             _requisitionManager = requisitionManager;
+            _candidateManagerWithouWS = candidateManagerWithouWS;
+            _logger = logger;
         }
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Interviews_ViewList,PermissionNames.Pages_Interviews_ViewOnlyMe)]
@@ -84,5 +98,23 @@ namespace TalentV2.APIs
                     UserName = s.Interview.UserName,
                 }).Distinct().ToListAsync();
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<InterviewInfoDto>>> GetInterviewInfo()
+        {
+            try
+            {
+                DateTime now = DateTimeUtils.GetNow();
+                var result = _candidateManagerWithouWS.GetInterviewInfo(now);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while get interview information.");
+                return null;
+            }
+        }
+
     }
 }

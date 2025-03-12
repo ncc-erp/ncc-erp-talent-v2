@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TalentV2.DomainServices.Candidates.Dtos;
+using TalentV2.DomainServices.Interviews.Dtos;
 using TalentV2.DomainServicesWithoutWorkScope.CandidateManager.Dtos;
 
 namespace TalentV2.DomainServicesWithoutWorkScope.CandidateManager
@@ -11,5 +12,6 @@ namespace TalentV2.DomainServicesWithoutWorkScope.CandidateManager
     {
         List<NoticeInterviewDto> GetNoticeInteviewInfo(DateTime now);
         List<NoticeInterviewDto> GetNoticeResultInteviewInfo(DateTime now);
+        List<InterviewInfoDto> GetInterviewInfo(DateTime now);
     }
 }

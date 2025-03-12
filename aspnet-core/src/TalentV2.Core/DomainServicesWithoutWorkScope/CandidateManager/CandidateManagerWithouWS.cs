@@ -1,9 +1,12 @@
 ﻿using Abp.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TalentV2.Configuration;
 using TalentV2.Constants.Enum;
+using TalentV2.DomainServices.Interviews.Dtos;
+using TalentV2.DomainServices.Requisitions.Dtos;
 using TalentV2.DomainServicesWithoutWorkScope.CandidateManager.Dtos;
 using TalentV2.Entities;
 
@@ -72,6 +75,39 @@ namespace TalentV2.DomainServicesWithoutWorkScope.CandidateManager
                 .Where(s => now.Subtract(s.TimeInterview).TotalMinutes > minutes)
                 .ToList();
             return listCvID;
+        }
+
+        public List<InterviewInfoDto> GetInterviewInfo(DateTime now)
+        {
+            var minutes = int.Parse(SettingManager.GetSettingValueForApplication
+                (AppSettingNames.NoticeInterviewMinutes));
+
+            var interviews = _repoRequestCv.GetAll()
+                     .Include(x => x.RequestCVInterviews)
+                     .Where(x => x.InterviewTime.HasValue)
+                     .Where(x => x.RequestCVInterviews.Any())
+                     .Where(x => x.Status == RequestCVStatus.ScheduledInterview)
+                     .Where(x => x.Request.Status == StatusRequest.InProgress)
+                     .Select(s => new InterviewInfoDto
+                     {
+                         HrEmail = s.CV.LastModifierUser.EmailAddress,
+                         Interviewer = s.RequestCVInterviews
+                             .Select(rci => new InterviewerDto
+                             {
+                                 Id = rci.Id,
+                                 InterviewerId = rci.Interview.Id,
+                                 InterviewerName = rci.Interview.UserName,
+                                 InterviewerEmail = rci.Interview.EmailAddress
+                             }).FirstOrDefault(),
+                         TimeInterview = s.InterviewTime.Value,
+                         InterviewIndate = now
+                     })
+                     .ToList()
+                     .Where(s => s.TimeInterview > now &&
+                                 s.TimeInterview.Subtract(now).TotalMinutes < minutes)
+                     .ToList();
+
+            return interviews;
         }
     }
 }
