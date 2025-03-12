@@ -98,23 +98,5 @@ namespace TalentV2.APIs
                     UserName = s.Interview.UserName,
                 }).Distinct().ToListAsync();
         }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<InterviewInfoDto>>> GetInterviewInfo()
-        {
-            try
-            {
-                DateTime now = DateTimeUtils.GetNow();
-                var result = _candidateManagerWithouWS.GetInterviewInfo(now);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while get interview information.");
-                return null;
-            }
-        }
-
     }
 }

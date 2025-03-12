@@ -1,10 +1,12 @@
 ﻿using Abp.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
+using TalentV2.DomainServices.Interviews.Dtos;
 using TalentV2.Notifications.Mail.Dtos;
 
 namespace TalentV2.DomainServices.Candidates
@@ -57,6 +59,7 @@ namespace TalentV2.DomainServices.Candidates
         Task<UpdateCandidateNoteDto> UpdateNote(UpdateCandidateNoteDto input);
         void UpdateHrmTempEmployee(long requestCVId);
         Task<long> CloneCandidateByCvId(long cvId);
+        List<InterviewInfoDto> GetInterviewInfo();
 
         #region export Infomation
 
