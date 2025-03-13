@@ -17,6 +17,12 @@ using TalentV2.DomainServices.Posts;
 using NccCore.Paging;
 using TalentV2.DomainServices.ApplyCVs.Dtos;
 using TalentV2.DomainServices.ApplyCVs;
+using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
+using System;
+using TalentV2.DomainServices.Interviews.Dtos;
+using TalentV2.Utils;
+using TalentV2.DomainServices.Candidates;
 
 namespace TalentV2.APIs.Public
 {
@@ -26,14 +32,16 @@ namespace TalentV2.APIs.Public
         private readonly IExternalCVManager _externalCVManager;
         private readonly ICategoryManager _categoryManager;
         private readonly IApplyCvManager _applyCvManager;
+        private readonly ICandidateManager _candidateManager;
 
 
-        public PublicAppService(IExternalCVManager externalCVManager, ICategoryManager categoryManager, IApplyCvManager applyCvManager)
+        public PublicAppService(IExternalCVManager externalCVManager, ICategoryManager categoryManager, IApplyCvManager applyCvManager, ICandidateManager candidateManager)
         {
             _httpContextAccessor = IocManager.Instance.Resolve<IHttpContextAccessor>();
             _externalCVManager = externalCVManager;
             _categoryManager = categoryManager;
             _applyCvManager = applyCvManager;
+            _candidateManager = candidateManager;
         }
         [AbpAllowAnonymous]
         [HttpGet]
@@ -228,6 +236,26 @@ namespace TalentV2.APIs.Public
         {
             var applyCVId = await _applyCvManager.Create(createApplyCVDto);
             return await _applyCvManager.GetApplyCVById(applyCVId);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<GetInterviewInfoDto> GetInterviewInfo()
+        {
+            var secretCode = SettingManager.GetSettingValue(AppSettingNames.TalentSecurityCode);
+            var header = _httpContextAccessor.HttpContext.Request.Headers;
+            var result = new GetInterviewInfoDto();
+            var securityCodeHeader = header["X-Secret-Key"];
+            if (!IsCheckSecurityCodeCorrectForProject())
+            {
+                result.IsConnected = false;
+                result.Message = $"SecretCode does not match: " + securityCodeHeader + " != ***" + secretCode.Substring(secretCode.Length - 3);
+                return result;
+            }
+            result.IsConnected = true;
+            result.Message = "Connected";
+            result.InterviewInfo = _candidateManager.GetInterviewInfo();
+            return result;
         }
     }
 }
