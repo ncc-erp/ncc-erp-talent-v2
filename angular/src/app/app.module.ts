@@ -24,13 +24,10 @@ import { SidebarComponent } from './layout/sidebar.component';
 import { SidebarLogoComponent } from './layout/sidebar-logo.component';
 import { SidebarUserPanelComponent } from './layout/sidebar-user-panel.component';
 import { SidebarMenuComponent } from './layout/sidebar-menu.component';
-import { AppConsts } from '@shared/AppConsts';
 import { SocialLoginModule } from 'angularx-social-login';
 import { StoreModule } from '@ngrx/store';
 import { userReducer } from './store/reducers/user.reducer';
 import { SidebarFooterComponent } from './layout/sidebar-footer/sidebar-footer.component';
-import { MezonLoginService } from './core/services/apis/mezon-api.service';
-import { LoginService } from 'account/login/login.service';
 
 @NgModule({
   declarations: [
@@ -70,8 +67,6 @@ import { LoginService } from 'account/login/login.service';
     )
   ],
   providers: [
-    MezonLoginService,
-    LoginService
     // {
     //   provide: 'SocialAuthServiceConfig',
     //   useValue: {
