@@ -3,7 +3,6 @@ import { Component, Injector } from '@angular/core';
 import { AbpSessionService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/app-component-base';
 import { accountModuleAnimation } from '@shared/animations/routerTransition';
-import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
 import { AppConsts } from '@shared/AppConsts';
 @Component({
@@ -18,7 +17,6 @@ export class LoginComponent extends AppComponentBase {
 
   constructor(
     injector: Injector,
-    public _authSocialService: SocialAuthService,
     private _sessionService: AbpSessionService,
     public loginService: LoginService,
     public mezonLoginService: MezonLoginService
@@ -42,11 +40,11 @@ export class LoginComponent extends AppComponentBase {
     this.submitting = true;
     this.loginService.authenticate(() => (this.submitting = false));
   }
-  signInWithGoogle(): void {
-    this._authSocialService.signIn(GoogleLoginProvider.PROVIDER_ID).then((rs: any) =>{
-      this.loginService.authenticateGoogle(rs.idToken)
-    })
-  }
+  // signInWithGoogle(): void {
+  //   this._authSocialService.signIn(GoogleLoginProvider.PROVIDER_ID).then((rs: any) =>{
+  //     this.loginService.authenticateGoogle(rs.idToken)
+  //   })
+  // }
 
   signInWithMezon(): void {
     this.mezonLoginService.redirectToOAuth();

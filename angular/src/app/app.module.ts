@@ -25,10 +25,12 @@ import { SidebarLogoComponent } from './layout/sidebar-logo.component';
 import { SidebarUserPanelComponent } from './layout/sidebar-user-panel.component';
 import { SidebarMenuComponent } from './layout/sidebar-menu.component';
 import { AppConsts } from '@shared/AppConsts';
-import { GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
+import { SocialLoginModule } from 'angularx-social-login';
 import { StoreModule } from '@ngrx/store';
 import { userReducer } from './store/reducers/user.reducer';
 import { SidebarFooterComponent } from './layout/sidebar-footer/sidebar-footer.component';
+import { MezonLoginService } from './core/services/apis/mezon-api.service';
+import { LoginService } from 'account/login/login.service';
 
 @NgModule({
   declarations: [
@@ -68,22 +70,24 @@ import { SidebarFooterComponent } from './layout/sidebar-footer/sidebar-footer.c
     )
   ],
   providers: [
-    {
-      provide: 'SocialAuthServiceConfig',
-      useValue: {
-        autoLogin: false,
-        providers: [
-          {
-            id: GoogleLoginProvider.PROVIDER_ID,
-            provider: new GoogleLoginProvider(
-              AppConsts.googleClientAppId != ''
-              ? AppConsts.googleClientAppId
-              : 'googleClientAppId'
-            )
-          }
-        ]
-      } as SocialAuthServiceConfig,
-    }
+    MezonLoginService,
+    LoginService
+    // {
+    //   provide: 'SocialAuthServiceConfig',
+    //   useValue: {
+    //     autoLogin: false,
+    //     providers: [
+    //       {
+    //         id: GoogleLoginProvider.PROVIDER_ID,
+    //         provider: new GoogleLoginProvider(
+    //           AppConsts.googleClientAppId != ''
+    //           ? AppConsts.googleClientAppId
+    //           : 'googleClientAppId'
+    //         )
+    //       }
+    //     ]
+    //   } as SocialAuthServiceConfig,
+    // }
   ],
   entryComponents: [ ],
 })

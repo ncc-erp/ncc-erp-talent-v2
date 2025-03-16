@@ -14,16 +14,25 @@ import { ToastMessageType } from '@shared/AppEnums';
 @Injectable()
 export class AppRouteGuard implements CanActivate, CanActivateChild {
 
+    private isFromMezon: boolean = false;
+
     constructor(
         private _permissionChecker: PermissionCheckerService,
         private _router: Router,
         private _sessionService: AppSessionService,
         private _message: MessageService
-    ) { }
+    ) { 
+        this.isFromMezon = window.self !== window.top;;
+    }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
         if (!this._sessionService.user) {
-            this._router.navigate(['/account/login']);
+            if (this.isFromMezon) {
+                this._router.navigate(['/account/login/mezon']);
+            }
+            else {
+                this._router.navigate(['/account/login']);
+            }
             return false;
         }
 
