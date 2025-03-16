@@ -1363,6 +1363,16 @@ namespace TalentV2.DomainServices.Candidates
                                  InterviewerEmail = rci.Interview.EmailAddress
                              }).FirstOrDefault(),
                          TimeInterview = s.InterviewTime.Value,
+                         CVInfo = new CVDto
+                         {
+                             CVId = s.CV.Id,
+                             BranchName = s.CV.Branch.Name,
+                             CandidateFulName = s.CV.Name,
+                             RequestCVId = s.Id,
+                             TimeInterview = s.InterviewTime.Value,
+                             PositionName = s.CV.SubPosition.Name,
+                             UserType = s.CV.UserType,
+                         }
                      })
                      .ToList();
 
