@@ -2,7 +2,6 @@ import { MessageService } from 'primeng/api';
 import { Injectable } from '@angular/core';
 import { PermissionCheckerService } from 'abp-ng2-module';
 import { AppSessionService } from '../session/app-session.service';
-
 import {
     CanActivate, Router,
     ActivatedRouteSnapshot,
@@ -14,25 +13,19 @@ import { ToastMessageType } from '@shared/AppEnums';
 @Injectable()
 export class AppRouteGuard implements CanActivate, CanActivateChild {
 
-    private isFromMezon: boolean = false;
-
     constructor(
         private _permissionChecker: PermissionCheckerService,
         private _router: Router,
         private _sessionService: AppSessionService,
         private _message: MessageService
-    ) { 
-        this.isFromMezon = window.self !== window.top;;
-    }
+    ) {}
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
         if (!this._sessionService.user) {
-            if (this.isFromMezon) {
-                this._router.navigate(['/account/login/mezon']);
-            }
-            else {
-                this._router.navigate(['/account/login']);
-            }
+            const loginRoute = '/account/login';
+
+            this._router.navigate([loginRoute]);
+
             return false;
         }
 

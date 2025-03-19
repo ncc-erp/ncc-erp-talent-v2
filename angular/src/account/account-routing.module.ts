@@ -4,7 +4,6 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { AccountComponent } from './account.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
-import { MezonAuthComponent } from './mezon-auth/mezon-auth.component';
 
 @NgModule({
     imports: [
@@ -18,7 +17,6 @@ import { MezonAuthComponent } from './mezon-auth/mezon-auth.component';
                 ]
             },
             { path: 'login/callback', component: AuthCallbackComponent },
-            { path: 'login/mezon', component: MezonAuthComponent }
         ])
     ],
     exports: [

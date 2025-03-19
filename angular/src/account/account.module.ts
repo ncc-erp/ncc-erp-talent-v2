@@ -19,7 +19,6 @@ import { TenantChangeComponent } from './tenant/tenant-change.component';
 import { TenantChangeDialogComponent } from './tenant/tenant-change-dialog.component';
 import {  SocialLoginModule } from 'angularx-social-login';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
-import { MezonAuthComponent } from './mezon-auth/mezon-auth.component';
 
 
 @NgModule({
@@ -44,8 +43,7 @@ import { MezonAuthComponent } from './mezon-auth/mezon-auth.component';
         // tenant
         TenantChangeComponent,
         TenantChangeDialogComponent,
-        AuthCallbackComponent,
-        MezonAuthComponent
+        AuthCallbackComponent
     ],
     providers: [
         // {

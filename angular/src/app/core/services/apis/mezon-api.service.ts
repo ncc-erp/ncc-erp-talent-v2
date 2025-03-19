@@ -10,14 +10,12 @@ import { MezonWebViewEvent, MezonAppEvent } from 'types/mezon/webview';
   providedIn: 'root'
 })
 export class MezonLoginService extends BaseApiService {
-  private userHashInfo = new Subject<any>();
-  private currentUserInfo = new Subject<any>();
+  private userHashData = new Subject<string>();
   private isInMezon = new Subject<boolean>();
 
   private eventListenersRegistered = false;
 
-  userHashInfo$ = this.userHashInfo.asObservable();
-  currentUserInfo$ = this.currentUserInfo.asObservable();
+  userHashData$ = this.userHashData.asObservable();
   isInMezon$ = this.isInMezon.asObservable();
 
 
@@ -29,8 +27,6 @@ export class MezonLoginService extends BaseApiService {
     http: HttpClient
   ) {
     super(http);
-
-    this.initMezonEventListeners();
   }
 
 
@@ -46,7 +42,6 @@ export class MezonLoginService extends BaseApiService {
 
           this.listenToPong();
           this.listenToUserHashInfo();
-          this.listenToCurrentUserInfo();
       }
   }
   
@@ -66,27 +61,7 @@ export class MezonLoginService extends BaseApiService {
 
     listenToUserHashInfo() {
         window.Mezon.WebView.onEvent("USER_HASH_INFO" as MezonAppEvent, async (_, userHashData: any) => {
-            this.userHashInfo.next(userHashData.message);
-        });
-    }
-
-    listenToCurrentUserInfo() {
-        window.Mezon.WebView.onEvent("CURRENT_USER_INFO" as MezonAppEvent, async (_, userData: any) => {
-            if (!userData || !userData.user) {
-                return;
-            }
-            const mezonUser = {
-                email: userData.email,
-                mezon_id: userData.mezon_id,
-                user: {
-                    avatar_url: userData.user.avatar_url,
-                    display_name: userData.user.display_name,
-                    id: userData.user.id,
-                    username: userData.user.username,
-                },
-                wallet: userData.wallet,
-            };
-            this.currentUserInfo.next(mezonUser);
+            this.userHashData.next(userHashData.message.web_app_data);
         });
     }
 

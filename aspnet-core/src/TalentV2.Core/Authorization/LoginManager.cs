@@ -15,8 +15,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using TalentV2.Authorization.Dto;
 using TalentV2.Authorization.Roles;
 using TalentV2.Authorization.Users;
@@ -171,7 +173,7 @@ namespace TalentV2.Authorization
 
         private async Task<AbpLoginResult<Tenant, User>> AuthMezonHashAsync(MezonHashAuthDto hashAuthDto, bool shouldLockout = false)
         {
-            if (hashAuthDto.HashKey.IsNullOrEmpty() || hashAuthDto.UserId.IsNullOrEmpty())
+            if (hashAuthDto.HashData.IsNullOrEmpty())
             {
                 return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null); ;
             }
@@ -179,22 +181,18 @@ namespace TalentV2.Authorization
             {
                 var mezonConfig = _mezonService.GetConfig();
                 var appToken = mezonConfig.AppToken ?? throw new UserFriendlyException("Invalid AppToken");
-                var dataKeys = new Dictionary<string, string>
-                {
-                    { "userid", hashAuthDto.UserId },
-                    { "username", hashAuthDto.UserName }
-                };
+                var rawHashData = hashAuthDto.HashData.DecodeBase64();
 
-                var hashParams = string.Join("\n", dataKeys.Select(x => $"{x.Key}={x.Value}"));
+                var hashData = HashParamsParser(rawHashData);
+                var hashParams = new BaseHashData { query_id = hashData.query_id, user = hashData.user, auth_date = hashData.auth_date, signature = hashData.signature }; 
+                var mezonUser = JsonConvert.DeserializeObject<MezonUser>(hashParams.user);
                 byte[] secretKey = HashingUtils.HMAC_SHA256(Encoding.UTF8.GetBytes(appToken), Encoding.UTF8.GetBytes("WebAppData"));
-                var hashedData = HashingUtils.HEX(HashingUtils.HMAC_SHA256(secretKey, Encoding.UTF8.GetBytes(hashParams)));
+                var hashedData = HashingUtils.HEX(HashingUtils.HMAC_SHA256(secretKey, Encoding.UTF8.GetBytes(HashParamsStringify(hashParams))));
 
-                if (hashAuthDto.HashKey.Equals(hashedData) == false)
+                if (hashData.hash.Equals(hashedData) == false)
                 {
                     return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null); ;
                 }
-
-                Logger.Info($"Try to login with user email: {hashAuthDto.UserEmail}");
 
                 Tenant tenant = null;
                 using (UnitOfWorkManager.Current.SetTenantId(null))
@@ -221,7 +219,7 @@ namespace TalentV2.Authorization
                 using (UnitOfWorkManager.Current.SetTenantId(tenantId))
                 {
                     await UserManager.InitializeOptionsAsync(tenantId);
-                    var user = UserManager.Users.FirstOrDefault(x => x.EmailAddress == hashAuthDto.UserEmail);
+                    var user = UserManager.Users.FirstOrDefault(x => x.EmailAddress == mezonUser.MezonId);
                     if (user == null)
                     {
                         return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, tenant);
@@ -338,6 +336,40 @@ namespace TalentV2.Authorization
             {
                 return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null);
             }
+        }
+
+        
+        private HashData HashParamsParser(string queryString)
+        {
+            var queryParams = HttpUtility.ParseQueryString(queryString);
+            var hashData = new HashData
+            {
+                query_id = queryParams["query_id"],
+                user = queryParams["user"],
+                auth_date = long.Parse(queryParams["auth_date"]),
+                signature = queryParams["signature"],
+                hash = queryParams["hash"]
+            };
+            return hashData;
+        }
+        private string HashParamsStringify(object hashData)
+        {
+            var queryString = new StringBuilder();
+
+            var properties = hashData.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(hashData);
+                if (value != null)
+                {
+                    if (queryString.Length > 0)
+                        queryString.Append("&");
+                    queryString.AppendFormat($"{Uri.EscapeDataString(property.Name)}={Uri.EscapeDataString(value.ToString())}");
+                }
+            }
+
+            return queryString.ToString();
         }
     }
 }

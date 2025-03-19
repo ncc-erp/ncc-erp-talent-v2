@@ -10,12 +10,7 @@ import { LogService, MessageService, PermissionCheckerService, TokenService, Uti
 import { catchError, finalize, map, startWith } from 'rxjs/operators';
 
 export interface IHashMezonAuthModel {
-    hashKey: string;
-    userId: string;
-    userName: string;
-    userEmail: string;
-    avatar: string;
-    name: string;
+    hashData: string;
     tenancyName: string;
 }
 

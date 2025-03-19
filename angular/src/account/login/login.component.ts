@@ -1,20 +1,25 @@
-import { LoginService } from './login.service';
-import { Component, Injector } from '@angular/core';
+import { IHashMezonAuthModel, LoginService } from './login.service';
+import { Component, Injector, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { AbpSessionService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/app-component-base';
 import { accountModuleAnimation } from '@shared/animations/routerTransition';
 import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
 import { AppConsts } from '@shared/AppConsts';
+import { isFromMezon } from '@app/core/helpers/utils.helper';
 @Component({
   templateUrl: './login.component.html',
   animations: [accountModuleAnimation()]
 })
-export class LoginComponent extends AppComponentBase {
+export class LoginComponent extends AppComponentBase implements OnInit, OnDestroy {
   submitting = false;
   nccCode: string;
   isShowPassword = true;
   enableNormalLogin: boolean = AppConsts.enableNormalLogin;
 
+  isMezonApp: boolean = false;
+
+  hashData: string;
+  
   constructor(
     injector: Injector,
     private _sessionService: AbpSessionService,
@@ -22,6 +27,21 @@ export class LoginComponent extends AppComponentBase {
     public mezonLoginService: MezonLoginService
   ) {
     super(injector);
+
+    this.isMezonApp = isFromMezon();
+    this.isLoading = true;
+  }
+
+  ngOnInit(): void {
+    this.mezonLoginService.userHashData$.subscribe((userHashData) => {
+      this.isLoading = true;
+      this.hashData = userHashData;
+      this.loginWithHash(this.hashData);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.mezonLoginService.removeEventListeners();
   }
 
   get multiTenancySideIsTeanant(): boolean {
@@ -45,6 +65,17 @@ export class LoginComponent extends AppComponentBase {
   //     this.loginService.authenticateGoogle(rs.idToken)
   //   })
   // }
+
+  loginWithHash(hash: string) {
+    if (hash) {
+      const hashData: IHashMezonAuthModel = {
+        hashData: btoa(hash),
+        tenancyName: null
+      };
+
+      this.loginService.authenticateMezonHash(hashData).subscribe(data => this.isLoading = data.isLoading);
+    }
+  }
 
   signInWithMezon(): void {
     this.mezonLoginService.redirectToOAuth();
