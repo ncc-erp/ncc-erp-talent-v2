@@ -1,4 +1,4 @@
-import { distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { distinctUntilChanged, debounceTime, takeUntil } from 'rxjs/operators';
 import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
@@ -24,6 +24,7 @@ import { ParamsGetScoreRange, ScoreRangeWithSetting } from '@app/core/models/cat
 import { ScoreSettingService } from '@app/core/services/categories/score-setting.service';
 import { ApiResponse } from '@shared/paged-listing-component-base';
 import { CommonService } from '@app/core/services/common.service';
+import { Subject } from '@node_modules/rxjs';
 
 @Component({
   selector: 'talent-current-requisition',
@@ -52,6 +53,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isAddingInterviewer = false;
   requisitionDetail: CurrentRequisition;
   ref: DynamicDialogRef;
+  private destroy$ = new Subject<void>(); 
 
   headerCreate: string;
   notifiCationHeader: string;
@@ -140,6 +142,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   get isAllowSendMail() { return this.applyResultForm.get('mailDetail')?.value?.isAllowSendMail; }
   get isSentMailStatus() { return this.applyResultForm.get('mailDetail')?.value?.isSentMailStatus; }
   get interviewLevelForm() { return this.form.get('interviewLevelForm') as FormGroup; }
+  get interviewUrlForm() { return this.form.get('interviewUrlForm') as FormGroup; }
+
 
   onToggleAddInterviewer() {
     this.isAddingInterviewer = !this.isAddingInterviewer;
@@ -600,6 +604,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           this.updateValueInterviewTime(this.candidateRequisiton);
           this.updateValueApplyResultForm(appilicationResult);
           this.updateValueInterviewLevelForm(interviewLevel);
+          this.setValueInterviewUrlForm(rs.result.interviewUrl)
           setTimeout(() => this.listenFragment())
           this.OnReqCvStatus();
           this.totalScore();
@@ -691,6 +696,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       },
     })
 
+    const interviewUrlForm = this.fb.group({
+      interviewUrl: ''
+    })
+
     const applyResultForm = this.fb.group({
       status: null,
       historyStatuses: this.fb.array([]),
@@ -721,6 +730,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       interviewForm: interviewForm,
       applyResultForm: applyResultForm,
       interviewLevelForm: interviewLevelForm,
+      interviewUrlForm
     });
 
     this.interviewForm.get('interviewTime').valueChanges.pipe(
@@ -739,6 +749,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.requisitonForm.disable();
     this.applyResultForm.disable();
     this.interviewLevelForm.disable();
+    this.handleSubscribeInterviewUrlValueChange()
   }
 
   private onResetInterviewForm() {
@@ -823,6 +834,11 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       this.interviewLevelForm.patchValue(interviewLevel);
     }
     this.originalInterviewLevelFormData = this.interviewLevelForm.getRawValue();
+  }
+
+  private setValueInterviewUrlForm(interviewUrl: string) {
+    if(!interviewUrl) return;
+    this.interviewUrlForm.patchValue({interviewUrl});      
   }
 
   private updateValueInterviewTime(candidateRequisiton: CandidateRequisiton) {
@@ -1055,5 +1071,30 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
         this._candidate.setCurrentReqUpdated(true);
       }
     })
+  }
+
+  handleSubscribeInterviewUrlValueChange () {
+    this.interviewUrlForm.get('interviewUrl').valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.destroy$),
+        debounceTime(this.DEBOUNE_1S))
+      .subscribe(url => {
+        this.handleChangeMeetingUrl(url)
+      })
+  }
+
+  handleChangeMeetingUrl(url: string) {
+    const googleMeetRegex = /^https:\/\/meet\.google\.com\/[a-zA-Z0-9]{3}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{3}$/
+    if (!googleMeetRegex.test(url)) {
+      this.showToastMessage(ToastMessageType.ERROR, 'Invalid URL. Please enter a valid Google Meet link.');
+      return;
+    }
+
+    const payload = {
+      requestCvId: this.candidateRequisiton.id,
+      url
+    }
+    this._candidate.updateInterviewUrl(payload).subscribe()
   }
 }

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateInterviewed, CandidateInterviewedPayload, CandidateRequisiton } from '@app/core/models/candidate/candiadte-requisition.model';
+import { CandidateApplyResult, CandidateApplyResultPayload, CandidateCapability, CandidateInterviewLevel, CandidateInterviewLevelPayload, CandidateInterviewUrlPayload, CandidateInterviewed, CandidateInterviewedPayload, CandidateRequisiton } from '@app/core/models/candidate/candiadte-requisition.model';
 import { CandidateEducation, CandidateEducationPayload } from '@app/core/models/candidate/candidate-education.model';
 import { CandidateSkill, CandidateSkillPayload } from '@app/core/models/candidate/candidate-skill.model';
 import { CandidateIntern, CandidatePayload, CandidateReportPayload, MailDetail } from '@app/core/models/candidate/candidate.model';
@@ -147,6 +147,10 @@ export class CandidateInternService extends BaseApiService {
 
   updateInterviewed(payload: CandidateInterviewedPayload): Observable<ApiResponse<CandidateInterviewed>> {
     return this.update(payload, '/UpdateInterviewed');
+  }
+
+  updateInterviewUrl(payload: CandidateInterviewUrlPayload): Observable<ApiResponse<string>> {
+    return this.update(payload, '/UpdateInterviewUrl');
   }
 
   deleteEducationCV(id: number): Observable<ApiResponse<string>> {
