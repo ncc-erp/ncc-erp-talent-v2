@@ -21,6 +21,7 @@ using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Categories.Dtos;
+using TalentV2.DomainServices.Interviews.Dtos;
 using TalentV2.Entities;
 using TalentV2.FileServices.Services.Candidates;
 using TalentV2.Notifications.Komu;
@@ -1335,6 +1336,47 @@ namespace TalentV2.DomainServices.Candidates
             cv.Note = input.Note;
             await CurrentUnitOfWork.SaveChangesAsync();
             return input;
+        }
+
+        public List<InterviewInfoDto> GetInterviewInfo()
+        {
+            DateTime now = DateTimeUtils.GetNow();
+            var startOfDay = now.Date;
+            var endOfDay = now.Date.AddDays(1).AddTicks(-1);
+
+            var interviews = WorkScope.GetAll<RequestCV>()
+                     .Include(x => x.RequestCVInterviews)
+                     .Where(x => x.InterviewTime.HasValue)
+                     .Where(x => x.RequestCVInterviews.Any())
+                     .Where(x => x.Status == RequestCVStatus.ScheduledInterview)
+                     .Where(x => x.Request.Status == StatusRequest.InProgress)
+                     .Where(x => x.InterviewTime >= startOfDay && x.InterviewTime <= endOfDay)
+                     .Select(s => new InterviewInfoDto
+                     {
+                         HrEmail = s.CV.LastModifierUser.EmailAddress,
+                         Interviewer = s.RequestCVInterviews
+                             .Select(rci => new InterviewerDto
+                             {
+                                 Id = rci.Id,
+                                 InterviewerId = rci.Interview.Id,
+                                 InterviewerName = rci.Interview.UserName,
+                                 InterviewerEmail = rci.Interview.EmailAddress
+                             }).FirstOrDefault(),
+                         TimeInterview = s.InterviewTime.Value,
+                         CVInfo = new CVDto
+                         {
+                             CVId = s.CV.Id,
+                             BranchName = s.CV.Branch.Name,
+                             CandidateFulName = s.CV.Name,
+                             RequestCVId = s.Id,
+                             TimeInterview = s.InterviewTime.Value,
+                             PositionName = s.CV.SubPosition.Name,
+                             UserType = s.CV.UserType,
+                         }
+                     })
+                     .ToList();
+
+            return interviews;
         }
 
         #region export infomation
