@@ -1,4 +1,4 @@
-import { distinctUntilChanged, debounceTime, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, debounceTime, takeUntil, skip } from 'rxjs/operators';
 import { Component, Injector, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { copyObject, getFormControlValue } from '@app/core/helpers/utils.helper';
@@ -1076,6 +1076,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   handleSubscribeInterviewUrlValueChange () {
     this.interviewUrlForm.get('interviewUrl').valueChanges
       .pipe(
+        skip(1),
         distinctUntilChanged(),
         takeUntil(this.destroy$),
         debounceTime(this.DEBOUNE_1S))
@@ -1095,6 +1096,10 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       requestCvId: this.candidateRequisiton.id,
       url
     }
-    this._candidate.updateInterviewUrl(payload).subscribe()
+    this._candidate.updateInterviewUrl(payload).subscribe((res) => {
+      if(res.success) {
+        this.showToastMessage(ToastMessageType.SUCCESS, 'Update meeting URL successfully');
+      }
+    })
   }
 }
