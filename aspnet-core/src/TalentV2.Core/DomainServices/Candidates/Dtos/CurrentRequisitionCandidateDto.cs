@@ -23,6 +23,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public InterviewedDto Interviewed { get; set; }
         public DateTime? InterviewTime { get; set; }
         public DateTime CreationTime { get; set; }
+        public string InterviewUrl { get; set; }
     }
     public class CurrentRequisitionDto : CreateUpdateAudit, IIsProjectTool
     {

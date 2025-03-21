@@ -19,6 +19,8 @@ namespace TalentV2.WebServices.ExternalServices.Mezon
         private readonly string _clientId;
         private readonly string _clientSecret;
         private readonly string _redirectUri;
+        private readonly string _appId;
+        private readonly string _appToken;
 
         public MezonService(HttpClient httpClient, IConfiguration configuration, ILogger<KomuService> logger, IAbpSession abpSession)
             : base(httpClient, logger, abpSession)
@@ -26,6 +28,8 @@ namespace TalentV2.WebServices.ExternalServices.Mezon
             _clientId = configuration.GetValue<string>($"{serviceName}:ClientId");
             _clientSecret = configuration.GetValue<string>($"{serviceName}:ClientSecret");
             _redirectUri = configuration.GetValue<string>($"{serviceName}:RedirectUri");
+            _appId = configuration.GetValue<string>($"{serviceName}:AppId");
+            _appToken = configuration.GetValue<string>($"{serviceName}:AppToken");
         }
 
         protected override async Task<T> PostAsync<T>(string url, object input)
@@ -96,7 +100,9 @@ namespace TalentV2.WebServices.ExternalServices.Mezon
                 ServiceName = serviceName,
                 ClientId = _clientId,
                 ClientSecret = _clientSecret,
-                RedirectUri = _redirectUri
+                RedirectUri = _redirectUri,
+                AppId = _appId,
+                AppToken = _appToken
             };
         }
     }

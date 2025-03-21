@@ -36,5 +36,6 @@ namespace TalentV2.Entities
         public bool? EmailSent { get; set; }
         public bool? Interviewed { get; set; }
         public string Percentage { get; set; }
+		public string InterviewUrl { get; set; }
     }
 }

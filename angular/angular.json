@@ -64,7 +64,9 @@
               "node_modules/quill/dist/quill.js",
               "node_modules/admin-lte/dist/js/adminlte.min.js",
               "node_modules/admin-lte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js",
-              "node_modules/admin-lte/plugins/overlayScrollbars/js/OverlayScrollbars.min.js"
+              "node_modules/admin-lte/plugins/overlayScrollbars/js/OverlayScrollbars.min.js",
+              "src/patches/abp.patch.js",
+              "src/assets/js/mezon-web-sdk.js"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -176,7 +178,9 @@
               "src/assets/abp-web-resources/abp.freeze-ui.js",
               "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.moment.js",
               "/node_modules/quill/dist/quill.js",
-              "/node_modules/chart.js/dist/Chart.js"
+              "/node_modules/chart.js/dist/Chart.js",
+              "src/patches/abp.patch.js",
+              "src/assets/js/mezon-web-sdk.js"
             ]
           }
         },
