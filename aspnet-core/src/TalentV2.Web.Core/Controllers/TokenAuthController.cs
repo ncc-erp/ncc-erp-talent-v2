@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using TalentV2.Authentication.External;
 using TalentV2.Authentication.JwtBearer;
 using TalentV2.Authorization;
+using TalentV2.Authorization.Dto;
 using TalentV2.Authorization.Users;
 using TalentV2.Controllers.Dtos;
 using TalentV2.Models.TokenAuth;
@@ -81,20 +82,37 @@ namespace TalentV2.Controllers
             return Redirect(authUrl);
         }
 
+        //[HttpPost]
+        //public async Task<AuthenticateResultModel> GoogleAuthenticate([FromBody] TokenDto model)
+        //{
+        //    Logger.Info("GoogleAuthenticate");
+        //    var loginResult = await GetLoginResultGoogleAsync(
+        //        model.googleToken,
+        //        GetTenancyNameOrNull(),
+        //        model.secretCode
+        //    );
+
+        //    Logger.Info("GoogleAuthenticate");
+
+        //    var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity));
+
+        //    return new AuthenticateResultModel
+        //    {
+        //        AccessToken = accessToken,
+        //        EncryptedAccessToken = GetEncryptedAccessToken(accessToken),
+        //        ExpireInSeconds = (int)_configuration.Expiration.TotalSeconds,
+        //        UserId = loginResult.User.Id
+        //    };
+        //}
+
         [HttpPost]
-        public async Task<AuthenticateResultModel> GoogleAuthenticate([FromBody] TokenDto model)
+        public async Task<AuthenticateResultModel> MezonHashAuthenticate([FromBody] MezonHashAuthDto model)
         {
-            Logger.Info("GoogleAuthenticate");
-            var loginResult = await GetLoginResultGoogleAsync(
-                model.googleToken,
-                GetTenancyNameOrNull(),
-                model.secretCode
+            var loginResult = await GetLoginResultMezonHashAsync(
+               model
             );
 
-            Logger.Info("GoogleAuthenticate");
-
             var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity));
-
             return new AuthenticateResultModel
             {
                 AccessToken = accessToken,
@@ -103,7 +121,6 @@ namespace TalentV2.Controllers
                 UserId = loginResult.User.Id
             };
         }
-
 
         [HttpPost]
         public async Task<AuthenticateResultModel> MezonAuthenticate([FromBody] OAuth2TokenDto model)
@@ -138,6 +155,20 @@ namespace TalentV2.Controllers
                     return loginResult;
                 default:
                     throw _abpLoginResultTypeHelper.CreateExceptionForFailedLoginAttempt(loginResult.Result, null, tenancyName);
+            }
+        }
+
+        private async Task<AbpLoginResult<Tenant, User>> GetLoginResultMezonHashAsync(MezonHashAuthDto authDto)
+        {
+            Logger.Info("GetLoginResultMezonHashAsync");
+            var loginResult = await _logInManager.LoginHashMezonAsnyc(authDto);
+
+            switch (loginResult.Result)
+            {
+                case AbpLoginResultType.Success:
+                    return loginResult;
+                default:
+                    throw _abpLoginResultTypeHelper.CreateExceptionForFailedLoginAttempt(loginResult.Result, null, authDto.TenancyName);
             }
         }
 

@@ -21,7 +21,7 @@ export class AppComponent extends AppComponentBase implements OnInit {
     injector: Injector,
     private renderer: Renderer2,
     private _layoutStore: LayoutStoreService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef
   ) {
     super(injector);
 
