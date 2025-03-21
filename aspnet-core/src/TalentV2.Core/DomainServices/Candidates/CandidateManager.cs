@@ -249,6 +249,7 @@ namespace TalentV2.DomainServices.Candidates
                 },
                 InterviewTime = s.InterviewTime,
                 CreationTime = s.CreationTime,
+                InterviewUrl = s.InterviewUrl
             })
             .OrderByDescending(x => x.CreationTime)
             .FirstOrDefaultAsync();
@@ -1187,6 +1188,13 @@ namespace TalentV2.DomainServices.Candidates
             requestCv.InterviewTime = input.InterviewTime;
             await WorkScope.UpdateAsync(requestCv);
         }
+        public async Task UpdateInterviewUrl(UpdateInterviewUrlDto data)
+        {
+            var requestCv = await WorkScope.GetAsync<RequestCV>(data.RequestCVId);
+            requestCv.InterviewUrl = data.Url;
+            await WorkScope.UpdateAsync(requestCv);
+        }
+
 
         public async Task DeleteRequestCVInterview(long id)
         {
@@ -1372,7 +1380,8 @@ namespace TalentV2.DomainServices.Candidates
                              TimeInterview = s.InterviewTime.Value,
                              PositionName = s.CV.SubPosition.Name,
                              UserType = s.CV.UserType,
-                         }
+                         },
+                         InterviewUrl = s.InterviewUrl
                      })
                      .ToList();
 
