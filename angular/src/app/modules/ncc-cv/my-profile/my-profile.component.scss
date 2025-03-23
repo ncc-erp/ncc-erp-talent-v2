@@ -16,6 +16,12 @@
     max-width: 700px;
     margin: auto;
   }
+
+  .profile-avatar {
+    object-fit: cover;
+    width: 250px;
+    height: 250px;
+  }
 }
 
 .card-title {

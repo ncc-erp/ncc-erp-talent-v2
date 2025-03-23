@@ -3422,6 +3422,9 @@ namespace TalentV2.Migrations
                     b.Property<DateTime?>("InterviewTime")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("InterviewUrl")
+                        .HasColumnType("text");
+
                     b.Property<bool?>("Interviewed")
                         .HasColumnType("boolean");
 

@@ -60,17 +60,18 @@
         border-collapse: separate;
         width: 100%;
 
-        thead {
+        thead, tbody tr:first-child {
             position: sticky;
             top: 0;
-            &::before {
-                content: "";
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                background: white;
-                z-index: -1;
-            }
+        }
+
+        thead::before {
+            content: "";
+            position: absolute;
+            width: calc(100% + 1px);
+            height: 100%;
+            background: white;
+            z-index: -1;
         }
 
         th,

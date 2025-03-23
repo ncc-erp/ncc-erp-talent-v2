@@ -18,9 +18,9 @@ export class AppConfigurationService extends BaseApiService {
   getConfiguration():Observable<any>{
     return this.http.get(this.rootUrl + '/Get')
   }
-  getGoogleClientAppId():Observable<any>{
-    return this.http.get(this.rootUrl + '/GetGoogleClientAppId')
-  }
+  // getGoogleClientAppId():Observable<any>{
+  //   return this.http.get(this.rootUrl + '/GetGoogleClientAppId')
+  // }
   editConfiguration(item:any):Observable<any>{
     return this.http.post(this.rootUrl + '/Change', item)
   }

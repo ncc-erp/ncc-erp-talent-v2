@@ -1,23 +1,25 @@
-﻿using System;
+﻿using Abp.Authorization;
+using Abp.Authorization.Users;
+using Abp.MultiTenancy;
+using Abp.Runtime.Security;
+using Abp.UI;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Abp.Authorization;
-using Abp.Authorization.Users;
-using Abp.MultiTenancy;
-using Abp.Runtime.Security;
-using Abp.UI;
 using TalentV2.Authentication.External;
 using TalentV2.Authentication.JwtBearer;
 using TalentV2.Authorization;
+using TalentV2.Authorization.Dto;
 using TalentV2.Authorization.Users;
+using TalentV2.Controllers.Dtos;
 using TalentV2.Models.TokenAuth;
 using TalentV2.MultiTenancy;
-using TalentV2.Controllers.Dtos;
+using TalentV2.WebServices.ExternalServices.Mezon;
 
 namespace TalentV2.Controllers
 {
@@ -31,6 +33,7 @@ namespace TalentV2.Controllers
         private readonly IExternalAuthConfiguration _externalAuthConfiguration;
         private readonly IExternalAuthManager _externalAuthManager;
         private readonly UserRegistrationManager _userRegistrationManager;
+        private readonly MezonService _mezonService;
 
         public TokenAuthController(
             LogInManager logInManager,
@@ -39,7 +42,8 @@ namespace TalentV2.Controllers
             TokenAuthConfiguration configuration,
             IExternalAuthConfiguration externalAuthConfiguration,
             IExternalAuthManager externalAuthManager,
-            UserRegistrationManager userRegistrationManager)
+            UserRegistrationManager userRegistrationManager,
+            MezonService mezonService)
         {
             _logInManager = logInManager;
             _tenantCache = tenantCache;
@@ -48,6 +52,7 @@ namespace TalentV2.Controllers
             _externalAuthConfiguration = externalAuthConfiguration;
             _externalAuthManager = externalAuthManager;
             _userRegistrationManager = userRegistrationManager;
+            _mezonService = mezonService;
         }
 
         [HttpPost]
@@ -70,17 +75,63 @@ namespace TalentV2.Controllers
             };
         }
 
-        [HttpPost]
-        public async Task<AuthenticateResultModel> GoogleAuthenticate([FromBody] TokenDto model)
+        [HttpGet]
+        public IActionResult MezonRedirect()
         {
-            Logger.Info("GoogleAuthenticate");
-            var loginResult = await GetLoginResultGoogleAsync(
-                model.googleToken,
-                GetTenancyNameOrNull(),
-                model.secretCode
+            var authUrl = _mezonService.GenerateOAuthUrl();
+            return Redirect(authUrl);
+        }
+
+        //[HttpPost]
+        //public async Task<AuthenticateResultModel> GoogleAuthenticate([FromBody] TokenDto model)
+        //{
+        //    Logger.Info("GoogleAuthenticate");
+        //    var loginResult = await GetLoginResultGoogleAsync(
+        //        model.googleToken,
+        //        GetTenancyNameOrNull(),
+        //        model.secretCode
+        //    );
+
+        //    Logger.Info("GoogleAuthenticate");
+
+        //    var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity));
+
+        //    return new AuthenticateResultModel
+        //    {
+        //        AccessToken = accessToken,
+        //        EncryptedAccessToken = GetEncryptedAccessToken(accessToken),
+        //        ExpireInSeconds = (int)_configuration.Expiration.TotalSeconds,
+        //        UserId = loginResult.User.Id
+        //    };
+        //}
+
+        [HttpPost]
+        public async Task<AuthenticateResultModel> MezonHashAuthenticate([FromBody] MezonHashAuthDto model)
+        {
+            var loginResult = await GetLoginResultMezonHashAsync(
+               model
             );
 
-            Logger.Info("GoogleAuthenticate");
+            var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity));
+            return new AuthenticateResultModel
+            {
+                AccessToken = accessToken,
+                EncryptedAccessToken = GetEncryptedAccessToken(accessToken),
+                ExpireInSeconds = (int)_configuration.Expiration.TotalSeconds,
+                UserId = loginResult.User.Id
+            };
+        }
+
+        [HttpPost]
+        public async Task<AuthenticateResultModel> MezonAuthenticate([FromBody] OAuth2TokenDto model)
+        {
+            Logger.Info("MezonAuthenticate");
+            var loginResult = await GetLoginResultMezonAsync(
+                model.Token,
+                GetTenancyNameOrNull()
+            );
+
+            Logger.Info("MezonAuthenticate");
 
             var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity));
 
@@ -91,6 +142,34 @@ namespace TalentV2.Controllers
                 ExpireInSeconds = (int)_configuration.Expiration.TotalSeconds,
                 UserId = loginResult.User.Id
             };
+        }
+
+        private async Task<AbpLoginResult<Tenant, User>> GetLoginResultMezonAsync(string token, string tenancyName)
+        {
+            Logger.Info("GetLoginResultMezonAsync");
+            var loginResult = await _logInManager.LoginOAuth2Async(token, tenancyName, false);
+
+            switch (loginResult.Result)
+            {
+                case AbpLoginResultType.Success:
+                    return loginResult;
+                default:
+                    throw _abpLoginResultTypeHelper.CreateExceptionForFailedLoginAttempt(loginResult.Result, null, tenancyName);
+            }
+        }
+
+        private async Task<AbpLoginResult<Tenant, User>> GetLoginResultMezonHashAsync(MezonHashAuthDto authDto)
+        {
+            Logger.Info("GetLoginResultMezonHashAsync");
+            var loginResult = await _logInManager.LoginHashMezonAsnyc(authDto);
+
+            switch (loginResult.Result)
+            {
+                case AbpLoginResultType.Success:
+                    return loginResult;
+                default:
+                    throw _abpLoginResultTypeHelper.CreateExceptionForFailedLoginAttempt(loginResult.Result, null, authDto.TenancyName);
+            }
         }
 
         private async Task<AbpLoginResult<Tenant, User>> GetLoginResultGoogleAsync(string token, string tenancyName, string secretCode)
@@ -155,7 +234,7 @@ namespace TalentV2.Controllers
                         }
 
                         var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity));
-                        
+
                         return new ExternalAuthenticateResultModel
                         {
                             AccessToken = accessToken,
@@ -176,6 +255,7 @@ namespace TalentV2.Controllers
 
         private async Task<User> RegisterExternalUserAsync(ExternalAuthUserInfo externalUser)
         {
+
             var user = await _userRegistrationManager.RegisterAsync(
                 externalUser.Name,
                 externalUser.Surname,
@@ -186,14 +266,14 @@ namespace TalentV2.Controllers
             );
 
             user.Logins = new List<UserLogin>
-            {
-                new UserLogin
                 {
-                    LoginProvider = externalUser.Provider,
-                    ProviderKey = externalUser.ProviderKey,
-                    TenantId = user.TenantId
-                }
-            };
+                    new UserLogin
+                    {
+                        LoginProvider = externalUser.Provider,
+                        ProviderKey = externalUser.ProviderKey,
+                        TenantId = user.TenantId
+                    }
+                };
 
             await CurrentUnitOfWork.SaveChangesAsync();
 

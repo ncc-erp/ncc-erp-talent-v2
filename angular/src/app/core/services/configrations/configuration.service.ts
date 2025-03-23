@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { nullToEmpty } from '@app/core/helpers/utils.helper';
 import { Observable } from 'rxjs';
-import { GetResultConnectDto, ConfigurationSetting, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TimesheetSetting } from '../../models/configuration/configuration.model';
+import { GetResultConnectDto, ConfigurationSetting, EmailSetting, KomuSetting, LMSSetting, TimesheetSetting } from '../../models/configuration/configuration.model';
 import { BaseApiService } from '../apis/base-api.service';
 import { ApiResponse } from './../../../../shared/paged-listing-component-base';
 
@@ -46,9 +46,9 @@ export class ConfigurationService extends BaseApiService {
     return this.get("/GetLMSSettings");
   }
 
-  getGoogleClientAppSettings(): Observable<ApiResponse<GoogleClientAppSetting>> {
-    return this.get("/GetGoogleClientAppSettings");
-  }
+  // getGoogleClientAppSettings(): Observable<ApiResponse<GoogleClientAppSetting>> {
+  //   return this.get("/GetGoogleClientAppSettings");
+  // }
 
   getTalentSecretCode(): Observable<ApiResponse<TalentSecretCode>> {
     return this.get("/GetTalentSecretCode");
@@ -81,9 +81,9 @@ export class ConfigurationService extends BaseApiService {
     return this.create(payload, `/SetEmailSetting`);
   }
 
-  setGoogleClientAppSettings(googleClientApp: GoogleClientAppSetting): Observable<ApiResponse<GoogleClientAppSetting>> {
-    return this.create(googleClientApp, `/SetGoogleClientAppSettings`);
-  }
+  // setGoogleClientAppSettings(googleClientApp: GoogleClientAppSetting): Observable<ApiResponse<GoogleClientAppSetting>> {
+  //   return this.create(googleClientApp, `/SetGoogleClientAppSettings`);
+  // }
 
   setTalentSecretCode(payload: TalentSecretCode): Observable<ApiResponse<TalentSecretCode>> {
     return this.create(payload, `/SetTalentSecretCode`);

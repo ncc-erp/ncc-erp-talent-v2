@@ -194,6 +194,32 @@
       </p-panel>
     </div>
 
+    <div id="interview-panel-url" class="panel">
+      <p-panel *ngIf="
+          candidateRequisiton?.currentRequisition &&
+          validPermissionUserType(
+            userType,
+            PS.Pages_CandidateIntern_ViewDetail_RequestCV_ViewEditInterview,
+            PS.Pages_CandidateStaff_ViewDetail_RequestCV_ViewEditInterview
+          )
+        " formGroupName="interviewUrlForm" [toggleable]="false">
+        <ng-template pTemplate="header">
+          <div class="d-flex align-items-center">
+            <label class="panel-title">Interview URL</label>
+            <div class="ml-4">
+              <input
+                class="w-100"
+                type="text"
+                pInputText
+                [placeholder]="'Enter URL...'"
+                formControlName="interviewUrl"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-panel>
+    </div>
+
     <div id="interview-panel" class="panel">
       <p-panel *ngIf="
           candidateRequisiton?.currentRequisition &&

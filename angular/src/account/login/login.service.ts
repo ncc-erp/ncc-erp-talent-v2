@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { GoogleLoginService } from '@app/core/services/apis/google-api.service';
+import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
+import { HttpErrorResponse } from '@node_modules/@angular/common/http';
+import { Observable, of, throwError } from '@node_modules/rxjs';
 import { AppConsts } from '@shared/AppConsts';
 import { UrlHelper } from '@shared/helpers/UrlHelper';
-import { AuthenticateModel, AuthenticateResultModel, TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AuthenticateModel, AuthenticateResultModel, ExternalAuthenticateModel, ExternalAuthenticateResultModel, ExternalLoginProviderInfoModel, TokenAuthServiceProxy } from '@shared/service-proxies/service-proxies';
 import { LogService, MessageService, PermissionCheckerService, TokenService, UtilsService } from 'abp-ng2-module';
-import { finalize } from 'rxjs/operators';
+import { catchError, finalize, map, startWith } from 'rxjs/operators';
+
+export interface IHashMezonAuthModel {
+    hashData: string;
+    tenancyName: string;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -25,11 +32,20 @@ export class LoginService {
         private _utilsService: UtilsService,
         private _tokenService: TokenService,
         private _logService: LogService,
-        private _googleLoginService: GoogleLoginService,
-        private _message: MessageService
+        private _message: MessageService,
+        private _mezonService: MezonLoginService
         //private _permissionChecker: PermissionCheckerService
     ) {
         this.clear();
+    }
+
+    logout(reload?: boolean): void {
+        abp.auth.clearToken();
+        abp.utils.deleteCookie(AppConsts.authorization.encryptedAuthTokenName);
+
+        if (reload !== false) {
+            location.href = AppConsts.appBaseUrl;
+        }
     }
 
     authenticate(finallyCallback?: () => void): void {
@@ -43,17 +59,43 @@ export class LoginService {
             });
     }
 
-    authenticateGoogle(googleToken: string, finallyCallback?: () => void): void {
-        finallyCallback = finallyCallback || (() => { });
-
-        this._googleLoginService.googleAuthenticate(googleToken)
-            .subscribe((result: any) => {
-                this.processAuthenticateResult(result.result);
-            }, (error) => {
-                const errObj = error?.error?.error;
-                this._message.error(errObj?.details, errObj?.message);
-            });
+    authenticateMezon(token: string, scope: string): Observable<any> {
+        return this._mezonService.mezonAuthenticate(token).pipe(
+            map(data => {
+                var result = this.processAuthenticateResult(data.result);
+                return { ...data, loading: false }
+            }),
+            startWith({ loading: true, success: false }),
+            catchError((err: HttpErrorResponse) => {
+                return of({ loading: false, success: false, error: err.error.error });
+            }),
+        );
     }
+
+    authenticateMezonHash(authDto: IHashMezonAuthModel): Observable<any> {
+        return this._mezonService.mezonHashAuthenticate(authDto).pipe(
+            map(data => {
+                this.processAuthenticateResult(data.result);
+                return { ...data, loading: false }
+            }),
+            startWith({ loading: true, success: false }),
+            catchError((err: HttpErrorResponse) => {
+                return of({ loading: false, success: false, error: err.error.error });
+            }),
+        );
+    }
+
+    // authenticateGoogle(googleToken: string, finallyCallback?: () => void): void {
+    //     finallyCallback = finallyCallback || (() => { });
+
+    //     this._googleLoginService.googleAuthenticate(googleToken)
+    //         .subscribe((result: any) => {
+    //             this.processAuthenticateResult(result.result);
+    //         }, (error) => {
+    //             const errObj = error?.error?.error;
+    //             this._message.error(errObj?.details, errObj?.message);
+    //         });
+    // }
 
     private processAuthenticateResult(authenticateResult: AuthenticateResultModel) {
         this.authenticateResult = authenticateResult;
@@ -76,7 +118,6 @@ export class LoginService {
     private login(accessToken: string, encryptedAccessToken: string, expireInSeconds: number, rememberMe?: boolean): void {
 
         const tokenExpireDate = rememberMe ? (new Date(new Date().getTime() + 1000 * expireInSeconds)) : undefined;
-
         this._tokenService.setToken(
             accessToken,
             tokenExpireDate
@@ -96,7 +137,7 @@ export class LoginService {
 
         location.href = initialUrl;
     }
-        
+
     selectBestRoute(): string {
         return '/app';
     }

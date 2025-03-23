@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,11 @@ namespace TalentV2.Controllers.Dtos
     {
         public string googleToken { get; set; }
         public string secretCode { get; set; }
+    }
+
+    public class OAuth2TokenDto
+    {
+        [JsonProperty("token")]
+        public string Token { get; set; }
     }
 }

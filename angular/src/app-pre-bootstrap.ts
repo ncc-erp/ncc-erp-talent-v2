@@ -7,7 +7,7 @@ declare var $: any;
 export class AppPreBootstrap {
     static run(appRootUrl: string, callback: () => void): void {
         AppPreBootstrap.getApplicationConfig(appRootUrl, () => {
-            AppPreBootstrap.getGoogleClientAppId(callback);
+            AppPreBootstrap.getMezonAppId(callback);
             AppPreBootstrap.getEnableNormalLogin(callback);
         });
     }
@@ -34,22 +34,39 @@ export class AppPreBootstrap {
         });
     }
 
-    private static getGoogleClientAppId(callback: () => void) {
+    // private static getGoogleClientAppId(callback: () => void) {
+    //     if (AppConsts.backendIsNotABP) {
+    //         callback();
+    //     } else {
+    //         return $.ajax({
+    //             url: AppConsts.remoteServiceBaseUrl + '/api/services/app/Configuration/GetGoogleClientAppId',
+    //             method: 'GET',
+    //             headers: {
+    //                 'Abp.TenantId': abp.multiTenancy.getTenantIdCookie()
+    //             }
+    //         }).done(res => {
+    //             AppConsts.googleClientAppId = res.result;
+    //             callback();
+    //         });
+    //     }
+
+    // }
+
+    private static getMezonAppId(callback: () => void) {
         if (AppConsts.backendIsNotABP) {
             callback();
         } else {
             return $.ajax({
-                url: AppConsts.remoteServiceBaseUrl + '/api/services/app/Configuration/GetGoogleClientAppId',
+                url: AppConsts.remoteServiceBaseUrl + '/api/services/app/Configuration/GetMezonAppId',
                 method: 'GET',
                 headers: {
                     'Abp.TenantId': abp.multiTenancy.getTenantIdCookie()
                 }
             }).done(res => {
-                AppConsts.googleClientAppId = res.result;
+                AppConsts.mezonAppId = res.result;
                 callback();
             });
         }
-
     }
 
     private static getEnableNormalLogin(callback: () => void) {

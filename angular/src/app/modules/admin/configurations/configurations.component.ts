@@ -1,6 +1,6 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
-import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, GoogleClientAppSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentContestUrl, INoticeCVAutomationDto } from '@app/core/models/configuration/configuration.model';
+import { GetResultConnectDto ,ConfigurationSetting, DiscordChannelSettings, NoticeInterviewSettingDto, EmailSetting, KomuSetting, LMSSetting, TalentSecretCode, TalentContestUrl, INoticeCVAutomationDto } from '@app/core/models/configuration/configuration.model';
 import { MESSAGE } from '@shared/AppConsts';
 import { DefaultRoute, ToastMessageType } from '@shared/AppEnums';
 import { NccAppComponentBase } from '@shared/ncc-component-base';
@@ -14,7 +14,6 @@ enum SETTING_TYPE {
   DISCORD_CHANEL = 'discordChanel',
   HRM = 'hrm',
   EMAIL = 'email',
-  GOOGLE_LOGIN = 'google',
   TALENT = 'talent',
   NOTIFY_TIMER_INTERVIEWER = 'noticeTimerInterviewer',
   CONTEST = 'contest',
@@ -41,7 +40,6 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
   komuSetting: KomuSetting;
   discordChanelSetting = {} as DiscordChannelSettings;
   hrmSetting: ConfigurationSetting;
-  googleClientAppSetting: GoogleClientAppSetting;
   emailSetting: EmailSetting;
   lmsSetting: LMSSetting;
   talentSecretCode: TalentSecretCode;
@@ -60,7 +58,6 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     hrm: false,
     lms: false,
     email: false,
-    google: false,
     talent: false,
     noticeTimerInterviewer: false,
     contest: false,
@@ -72,7 +69,6 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     discordChanel: null,
     hrm: null,
     email: null,
-    google: null,
     talent: null,
     lms: null,
     noticeTimerInterviewer: null,
@@ -86,7 +82,6 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     hrm: false,
     lms: false,
     email: false,
-    google: false,
     talent: false,
     contest: false,
     noticeTimerInterviewer: false,
@@ -122,8 +117,8 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
         return this.hrmSetting = { ...this.originalData[settingType] };
       case SETTING_TYPE.EMAIL:
         return this.emailSetting = { ...this.originalData[settingType] };
-      case SETTING_TYPE.GOOGLE_LOGIN:
-        return this.googleClientAppSetting = { ...this.originalData[settingType] };
+      // case SETTING_TYPE.GOOGLE_LOGIN:
+      //   return this.googleClientAppSetting = { ...this.originalData[settingType] };
       case SETTING_TYPE.TALENT:
         return this.talentSecretCode = { ...this.originalData[settingType] };
       case SETTING_TYPE.NOTIFY_TIMER_INTERVIEWER:
@@ -150,9 +145,9 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
       case SETTING_TYPE.EMAIL:
         this.saveEmailSetting();
         return;
-      case SETTING_TYPE.GOOGLE_LOGIN:
-        this.saveGoogleLoginSetting();
-        return;
+      // case SETTING_TYPE.GOOGLE_LOGIN:
+      //   this.saveGoogleLoginSetting();
+      //   return;
       case SETTING_TYPE.TALENT:
         this.saveTalentSecretCode();
         return;
@@ -208,18 +203,18 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     );
   }
 
-  saveGoogleLoginSetting() {
-    this.subs.add(
-      this._configuration.setGoogleClientAppSettings(this.googleClientAppSetting).subscribe(res => {
-        this.isLoading = res.loading;
-        if (res.success) {
-          this.originalData.google = _.cloneDeep(res.result);
-          this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Google login Setting');
-          this.toggleEditing(SETTING_TYPE.GOOGLE_LOGIN);
-        }
-      })
-    );
-  }
+  // saveGoogleLoginSetting() {
+  //   this.subs.add(
+  //     this._configuration.setGoogleClientAppSettings(this.googleClientAppSetting).subscribe(res => {
+  //       this.isLoading = res.loading;
+  //       if (res.success) {
+  //         this.originalData.google = _.cloneDeep(res.result);
+  //         this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, 'Google login Setting');
+  //         this.toggleEditing(SETTING_TYPE.GOOGLE_LOGIN);
+  //       }
+  //     })
+  //   );
+  // }
 
   saveEmailSetting() {
     this.subs.add(
@@ -348,7 +343,7 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     this.getKomuSetting();
     this.getDiscordChanelSetting();
     this.getHRMSettings();
-    this.getGoogleLoginSetting();
+    // this.getGoogleLoginSetting();
     this.getEmailsetting();
     this.geLMSSetting();
     this.getTalentSecretCode();
@@ -396,19 +391,19 @@ export class ConfigurationsComponent extends NccAppComponentBase implements OnIn
     );
   }
 
-  private getGoogleLoginSetting() {
-    if (!this.isGranted(this.PS.Pages_Configurations_ViewGoogleClientAppSettings)) return;
+  // private getGoogleLoginSetting() {
+  //   if (!this.isGranted(this.PS.Pages_Configurations_ViewGoogleClientAppSettings)) return;
 
-    this.subs.add(
-      this._configuration.getGoogleClientAppSettings().subscribe(res => {
-        this.isLoading = res.loading;
-        if (res.success) {
-          this.googleClientAppSetting = res.result;
-          this.originalData.google = _.cloneDeep(res.result);
-        }
-      })
-    );
-  }
+  //   this.subs.add(
+  //     this._configuration.getGoogleClientAppSettings().subscribe(res => {
+  //       this.isLoading = res.loading;
+  //       if (res.success) {
+  //         this.googleClientAppSetting = res.result;
+  //         this.originalData.google = _.cloneDeep(res.result);
+  //       }
+  //     })
+  //   );
+  // }
 
   private geLMSSetting() {
     if (!this.isGranted(this.PS.Pages_Configurations_ViewLMSSettings)) return;

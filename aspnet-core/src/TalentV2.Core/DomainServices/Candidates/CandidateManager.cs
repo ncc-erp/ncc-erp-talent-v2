@@ -21,6 +21,7 @@ using TalentV2.Constants.Dictionary;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Candidates.Dtos;
 using TalentV2.DomainServices.Categories.Dtos;
+using TalentV2.DomainServices.Interviews.Dtos;
 using TalentV2.Entities;
 using TalentV2.FileServices.Services.Candidates;
 using TalentV2.Notifications.Komu;
@@ -248,6 +249,7 @@ namespace TalentV2.DomainServices.Candidates
                 },
                 InterviewTime = s.InterviewTime,
                 CreationTime = s.CreationTime,
+                InterviewUrl = s.InterviewUrl
             })
             .OrderByDescending(x => x.CreationTime)
             .FirstOrDefaultAsync();
@@ -271,7 +273,7 @@ namespace TalentV2.DomainServices.Candidates
                 || personBio.BranchId != input.BranchId
                 || (!string.IsNullOrEmpty(personBio.Phone) && !personBio.Phone.Equals(input.Phone))
                 || (!string.IsNullOrEmpty(personBio.Email) && !personBio.Email.Equals(input.Email));
-            if (input?.Note != requestCVs?.HRNote && requestCVs?.HRNote != null)
+            if (input?.Note != requestCVs?.HRNote && requestCVs != null)
             {
                 requestCVs.HRNote = input.Note;
 
@@ -1186,6 +1188,13 @@ namespace TalentV2.DomainServices.Candidates
             requestCv.InterviewTime = input.InterviewTime;
             await WorkScope.UpdateAsync(requestCv);
         }
+        public async Task UpdateInterviewUrl(UpdateInterviewUrlDto data)
+        {
+            var requestCv = await WorkScope.GetAsync<RequestCV>(data.RequestCVId);
+            requestCv.InterviewUrl = data.Url;
+            await WorkScope.UpdateAsync(requestCv);
+        }
+
 
         public async Task DeleteRequestCVInterview(long id)
         {
@@ -1335,6 +1344,48 @@ namespace TalentV2.DomainServices.Candidates
             cv.Note = input.Note;
             await CurrentUnitOfWork.SaveChangesAsync();
             return input;
+        }
+
+        public List<InterviewInfoDto> GetInterviewInfo()
+        {
+            DateTime now = DateTimeUtils.GetNow();
+            var startOfDay = now.Date;
+            var endOfDay = now.Date.AddDays(1).AddTicks(-1);
+
+            var interviews = WorkScope.GetAll<RequestCV>()
+                     .Include(x => x.RequestCVInterviews)
+                     .Where(x => x.InterviewTime.HasValue)
+                     .Where(x => x.RequestCVInterviews.Any())
+                     .Where(x => x.Status == RequestCVStatus.ScheduledInterview)
+                     .Where(x => x.Request.Status == StatusRequest.InProgress)
+                     .Where(x => x.InterviewTime >= startOfDay && x.InterviewTime <= endOfDay)
+                     .Select(s => new InterviewInfoDto
+                     {
+                         HrEmail = s.CV.LastModifierUser.EmailAddress,
+                         Interviewer = s.RequestCVInterviews
+                             .Select(rci => new InterviewerDto
+                             {
+                                 Id = rci.Id,
+                                 InterviewerId = rci.Interview.Id,
+                                 InterviewerName = rci.Interview.UserName,
+                                 InterviewerEmail = rci.Interview.EmailAddress
+                             }).FirstOrDefault(),
+                         TimeInterview = s.InterviewTime.Value,
+                         CVInfo = new CVDto
+                         {
+                             CVId = s.CV.Id,
+                             BranchName = s.CV.Branch.Name,
+                             CandidateFulName = s.CV.Name,
+                             RequestCVId = s.Id,
+                             TimeInterview = s.InterviewTime.Value,
+                             PositionName = s.CV.SubPosition.Name,
+                             UserType = s.CV.UserType,
+                         },
+                         InterviewUrl = s.InterviewUrl
+                     })
+                     .ToList();
+
+            return interviews;
         }
 
         #region export infomation
