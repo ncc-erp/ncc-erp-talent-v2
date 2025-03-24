@@ -183,13 +183,19 @@ namespace TalentV2.Authorization
                 var appToken = mezonConfig.AppToken ?? throw new UserFriendlyException("Invalid AppToken");
                 var rawHashData = hashAuthDto.HashData.DecodeBase64();
 
-                var hashData = HashParamsParser(rawHashData);
-                var hashParams = new BaseHashData { query_id = hashData.query_id, user = hashData.user, auth_date = hashData.auth_date, signature = hashData.signature }; 
-                var mezonUser = JsonConvert.DeserializeObject<MezonUser>(hashParams.user);
-                byte[] secretKey = HashingUtils.HMAC_SHA256(Encoding.UTF8.GetBytes(appToken), Encoding.UTF8.GetBytes("WebAppData"));
-                var hashedData = HashingUtils.HEX(HashingUtils.HMAC_SHA256(secretKey, Encoding.UTF8.GetBytes(HashParamsStringify(hashParams))));
+                var delimiter = "&hash=";
 
-                if (hashData.hash.Equals(hashedData) == false)
+                var index = rawHashData.IndexOf(delimiter);
+                var queryId = rawHashData.Substring(0, index);
+                var mezonHash = rawHashData.Substring(index + delimiter.Length);
+                var hashData = HashParamsParser(queryId);
+
+                var mezonUser = JsonConvert.DeserializeObject<MezonUser>(hashData.user);
+
+                byte[] secretKey = HashingUtils.HMAC_SHA256(Encoding.UTF8.GetBytes(appToken), Encoding.UTF8.GetBytes("WebAppData"));
+                var hashedData = HashingUtils.HEX(HashingUtils.HMAC_SHA256(secretKey, Encoding.UTF8.GetBytes(queryId)));
+
+                if (mezonHash.Equals(hashedData) == false)
                 {
                     return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, null); ;
                 }
