@@ -18,6 +18,7 @@ namespace TalentV2.DomainServices.Interviews.Dtos
         public DateTime TimeInterview { get; set; }
 
         public CVDto CVInfo {  get; set; }
+        public string InterviewUrl { get; set; }
     }
 
     public class InterviewerDto

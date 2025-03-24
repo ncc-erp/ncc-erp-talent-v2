@@ -48,6 +48,7 @@ namespace TalentV2.DomainServices.Candidates
         Task<List<long>> GetCVIdsHaveAllSkillAsync(List<long> skillIds);
         Task<List<IdAndNameDto>> GetUserCreated(UserType userType);
         Task UpdateInterviewTime(UpdateInterviewTimeDto input);
+        Task UpdateInterviewUrl(UpdateInterviewUrlDto input);
         Task DeleteRequestCVInterview(long id);
         Task<string> UpdateAvatar(UpdateFileAvatarDto input);
         Task<string> UpdateCV(UpdateFileCVDto input);

@@ -34,11 +34,11 @@ namespace TalentV2.Configuration
             await SettingManager.ChangeSettingForUserAsync(AbpSession.ToUserIdentifier(), AppSettingNames.UiTheme, input.Theme);
         }
 
-        [AbpAllowAnonymous]
-        public async Task<string> GetGoogleClientAppId()
-        {
-            return await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.GoogleClientAppId);
-        }
+        //[AbpAllowAnonymous]
+        //public async Task<string> GetGoogleClientAppId()
+        //{
+        //    return await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.GoogleClientAppId);
+        //}
 
         [HttpPost]
         [AbpAuthorize(PermissionNames.Pages_Configurations_EditEmailSettings)]
@@ -169,6 +169,13 @@ namespace TalentV2.Configuration
             };
         }
 
+        [HttpGet]
+        public async Task<string> GetMezonAppId()
+        {
+            var config = _appConfiguration.GetValue<string>("MezonService:AppId");
+            return config;
+        }
+
         [HttpPost]
         //[AbpAuthorize(PermissionNames.Pages_Configurations_EditProjectSettings)]
         public async Task<InternalToolSettingInput> SetProjectSettings(InternalToolSettingInput input)
@@ -190,29 +197,29 @@ namespace TalentV2.Configuration
             };
         }
 
-        [HttpGet]
-        [AbpAuthorize(PermissionNames.Pages_Configurations_ViewGoogleClientAppSettings)]
-        public async Task<GoogleClientAppSettingDto> GetGoogleClientAppSettings()
-        {
-            string textEnableNormalLogin = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableNormalLogin);
-            return new GoogleClientAppSettingDto
-            {
-                GoogleClientAppId = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.GoogleClientAppId),
-                EnableNormalLogin = textEnableNormalLogin == "true" ? true : false
-            };
-        }
+        //[HttpGet]
+        //[AbpAuthorize(PermissionNames.Pages_Configurations_ViewGoogleClientAppSettings)]
+        //public async Task<GoogleClientAppSettingDto> GetGoogleClientAppSettings()
+        //{
+        //    string textEnableNormalLogin = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.EnableNormalLogin);
+        //    return new GoogleClientAppSettingDto
+        //    {
+        //        GoogleClientAppId = await SettingManager.GetSettingValueForApplicationAsync(AppSettingNames.GoogleClientAppId),
+        //        EnableNormalLogin = textEnableNormalLogin == "true" ? true : false
+        //    };
+        //}
 
-        [HttpPost]
-        [AbpAuthorize(PermissionNames.Pages_Configurations_EditGoogleClientAppSettings)]
-        public async Task<GoogleClientAppSettingDto> SetGoogleClientAppSettings(GoogleClientAppSettingDto input)
-        {
-            string txtEnableNormalLogin = "false";
-            if (input.EnableNormalLogin)
-                txtEnableNormalLogin = "true";
-            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.GoogleClientAppId, input.GoogleClientAppId);
-            await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.EnableNormalLogin, txtEnableNormalLogin);
-            return input;
-        }
+        //[HttpPost]
+        //[AbpAuthorize(PermissionNames.Pages_Configurations_EditGoogleClientAppSettings)]
+        //public async Task<GoogleClientAppSettingDto> SetGoogleClientAppSettings(GoogleClientAppSettingDto input)
+        //{
+        //    string txtEnableNormalLogin = "false";
+        //    if (input.EnableNormalLogin)
+        //        txtEnableNormalLogin = "true";
+        //    await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.GoogleClientAppId, input.GoogleClientAppId);
+        //    await SettingManager.ChangeSettingForApplicationAsync(AppSettingNames.EnableNormalLogin, txtEnableNormalLogin);
+        //    return input;
+        //}
 
         [AbpAllowAnonymous]
         public async Task<bool> GetEnableNormalLogin()

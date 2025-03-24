@@ -16,7 +16,7 @@ import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
                     { path: 'register', component: RegisterComponent }
                 ]
             },
-            { path: 'login/callback', component: AuthCallbackComponent }
+            { path: 'login/callback', component: AuthCallbackComponent },
         ])
     ],
     exports: [

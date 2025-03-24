@@ -310,5 +310,12 @@ namespace TalentV2.APIs
         {
             return await _candidateManager.ExportReport(input);
         }
+        [HttpPut]
+        [AbpAuthorize(PermissionNames.Pages_CandidateIntern_ViewDetail_RequestCV_ViewEditInterview)]
+        public async Task<IActionResult> UpdateInterviewUrl(UpdateInterviewUrlDto data)
+        {
+            await _candidateManager.UpdateInterviewUrl(data);
+            return new OkObjectResult("Updated Successfully");
+        }
     }
 }

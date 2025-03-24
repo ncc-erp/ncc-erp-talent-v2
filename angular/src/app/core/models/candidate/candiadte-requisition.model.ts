@@ -13,6 +13,7 @@ export class CandidateRequisiton {
   interviewed: CandidateInterviewed;
   interviewTime: string;
   creationTime: string;
+  interviewUrl: string
 }
 
 export class CurrentRequisition {
@@ -124,4 +125,9 @@ export class CandidateInterviewedPayload {
 
 export class CandidateInterviewed {
   interviewed?: boolean;
+}
+
+export class CandidateInterviewUrlPayload {
+  requestCvId: number;
+  url: string;
 }
