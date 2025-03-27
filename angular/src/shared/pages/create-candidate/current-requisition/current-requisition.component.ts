@@ -51,6 +51,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   isEditingAll = false;
   isEditingFactors = false;
   isAddingInterviewer = false;
+  isEditInterviewUrl = false;
+  interviewUrl = "";
   requisitionDetail: CurrentRequisition;
   ref: DynamicDialogRef;
   private destroy$ = new Subject<void>(); 
@@ -142,11 +144,14 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   get isAllowSendMail() { return this.applyResultForm.get('mailDetail')?.value?.isAllowSendMail; }
   get isSentMailStatus() { return this.applyResultForm.get('mailDetail')?.value?.isSentMailStatus; }
   get interviewLevelForm() { return this.form.get('interviewLevelForm') as FormGroup; }
-  get interviewUrlForm() { return this.form.get('interviewUrlForm') as FormGroup; }
 
 
   onToggleAddInterviewer() {
     this.isAddingInterviewer = !this.isAddingInterviewer;
+  }
+
+  onToggleAddInterviewerUrl() {
+    this.isEditInterviewUrl = !this.isEditInterviewUrl;
   }
 
   setTimeInterviewChange(date: Date) {
@@ -604,7 +609,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
           this.updateValueInterviewTime(this.candidateRequisiton);
           this.updateValueApplyResultForm(appilicationResult);
           this.updateValueInterviewLevelForm(interviewLevel);
-          this.setValueInterviewUrlForm(rs.result.interviewUrl)
+          this.setValueInterviewUrlForm(rs.result?.interviewUrl)
           setTimeout(() => this.listenFragment())
           this.OnReqCvStatus();
           this.totalScore();
@@ -694,9 +699,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
         value: null,
         disabled: !this.validPermissionUserType(this.userType, this.PS_ViewEditInterviewTimeIntern, this.PS_ViewEditInterviewTimeStaff)
       },
-    })
-
-    const interviewUrlForm = this.fb.group({
       interviewUrl: ''
     })
 
@@ -729,8 +731,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
       requisitonForm: requisitonForm,
       interviewForm: interviewForm,
       applyResultForm: applyResultForm,
-      interviewLevelForm: interviewLevelForm,
-      interviewUrlForm
+      interviewLevelForm: interviewLevelForm
     });
 
     this.interviewForm.get('interviewTime').valueChanges.pipe(
@@ -749,7 +750,6 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     this.requisitonForm.disable();
     this.applyResultForm.disable();
     this.interviewLevelForm.disable();
-    this.handleSubscribeInterviewUrlValueChange()
   }
 
   private onResetInterviewForm() {
@@ -837,8 +837,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   }
 
   private setValueInterviewUrlForm(interviewUrl: string) {
+    this.interviewUrl = interviewUrl;    
     if(!interviewUrl) return;
-    this.interviewUrlForm.patchValue({interviewUrl});      
+    this.interviewForm.get('interviewUrl').patchValue(interviewUrl, { emitEvent: false });
   }
 
   private updateValueInterviewTime(candidateRequisiton: CandidateRequisiton) {
@@ -1073,19 +1074,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     })
   }
 
-  handleSubscribeInterviewUrlValueChange () {
-    this.interviewUrlForm.get('interviewUrl').valueChanges
-      .pipe(
-        skip(1),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$),
-        debounceTime(this.DEBOUNE_1S))
-      .subscribe(url => {
-        this.handleChangeMeetingUrl(url)
-      })
-  }
-
-  handleChangeMeetingUrl(url: string) {
+  handleChangeMeetingUrl() {
+    const url = this.interviewForm.get('interviewUrl').value;    
     const googleMeetRegex = /^https:\/\/meet\.google\.com\/[a-zA-Z0-9]{3}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{3}$/
     if (!googleMeetRegex.test(url)) {
       this.showToastMessage(ToastMessageType.ERROR, 'Invalid URL. Please enter a valid Google Meet link.');
@@ -1098,8 +1088,15 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     }
     this._candidate.updateInterviewUrl(payload).subscribe((res) => {
       if(res.success) {
+        this.interviewUrl = url;
+        this.isEditInterviewUrl = false;
         this.showToastMessage(ToastMessageType.SUCCESS, 'Update meeting URL successfully');
       }
     })
+  }
+
+  onCancelInterviewerUrl() {
+    this.onToggleAddInterviewerUrl();
+    this.interviewForm.get('interviewUrl').setValue(this.interviewUrl)
   }
 }
