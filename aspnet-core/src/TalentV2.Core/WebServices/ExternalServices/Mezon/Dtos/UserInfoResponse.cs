@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 using System;
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TalentV2.WebServices.ExternalServices.Mezon.Dtos
 {
-    public class MezonUser: UserInfoResponse
+    public class MezonUser : UserInfoResponse
     {
         [JsonProperty("id")]
         public string Id { get; set; }
