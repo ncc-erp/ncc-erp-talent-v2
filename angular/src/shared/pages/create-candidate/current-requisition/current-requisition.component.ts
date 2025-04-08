@@ -1076,9 +1076,8 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
 
   handleChangeMeetingUrl() {
     const url = this.interviewForm.get('interviewUrl').value;    
-    const googleMeetRegex = /^https:\/\/meet\.google\.com\/[a-zA-Z0-9]{3}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{3}$/
-    if (!googleMeetRegex.test(url)) {
-      this.showToastMessage(ToastMessageType.ERROR, 'Invalid URL. Please enter a valid Google Meet link.');
+    if (!url) {
+      this.showToastMessage(ToastMessageType.ERROR, 'Please enter meeting url');
       return;
     }
 
