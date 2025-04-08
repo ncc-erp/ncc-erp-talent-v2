@@ -85,5 +85,6 @@ namespace TalentV2.DomainServices.RequestCVs.Dtos
         public string HREmail { get; set; }
         public string SignatureContact { get; set; }
         public string Percentage { get; set; }
+        public string InterviewUrl { get; set; }
     }
 }
