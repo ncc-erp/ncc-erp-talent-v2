@@ -296,6 +296,7 @@ namespace TalentV2.Notifications.Mail
                     Salary = 1000000,
                     Status = RequestCVStatus.AcceptedOffer,
                     Percentage= "",
+                    InterviewUrl = ""
                 };
                 SetSignatureContact(fakeData);
                 return new ResultTemplateEmail<AllInformationRequestCVDto>
@@ -331,6 +332,7 @@ namespace TalentV2.Notifications.Mail
                     RequestBranchAddress = s.Request.Branch.Address,
                     CVBranchAddress = s.CV.Branch.Address,
                     CVBranchName = s.CV.Branch.Name,
+                    InterviewUrl = s.InterviewUrl
                 }).FirstOrDefaultAsync();
             SetSignatureContact(result);
             return new ResultTemplateEmail<AllInformationRequestCVDto>
