@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using TalentV2.Constants.Dictionary;
 using TalentV2.DomainServices.Webhook.Dtos;
 using TalentV2.Entities;
 
@@ -19,8 +20,8 @@ namespace TalentV2.DomainServices.Webhook
                                        Id = m.Id,
                                        Name = m.Name,
                                        Url = m.Url,
+                                       Functions = m.Functions,
                                        IsActive = m.IsActive,
-                                       Destination = m.Destination,
                                    };
             return qallMezonWebhook;
         }
@@ -39,12 +40,12 @@ namespace TalentV2.DomainServices.Webhook
                 throw new UserFriendlyException("Mezon Webhook have not already existed!");
             }
 
-            CheckUrlAndDestinationMaxLength(input);
+            ValidateWebhookInput(input);
 
             webhook.Name = input.Name.Trim();
             webhook.Url = input.Url.Trim();
+            webhook.Functions = input.Functions;
             webhook.IsActive = input.IsActive;
-            webhook.Destination = input.Destination.Trim();
 
             await WorkScope.UpdateAsync(webhook);
             return IQGetAllMezonWebhook().FirstOrDefault(s => s.Id == webhook.Id);
@@ -52,15 +53,14 @@ namespace TalentV2.DomainServices.Webhook
 
         public async Task<MezonWebhookDto> CreateMezonWebhook(MezonWebhookDto input)
         {
-            CheckUrlAndDestinationMaxLength(input);
+            ValidateWebhookInput(input);
 
             input.Name = input.Name.Trim();
             input.Url = input.Url.Trim();
-            input.Destination = input.Destination.Trim();
 
             MezonWebhook webhook = ObjectMapper.Map<MezonWebhook>(input);
 
-            long id = await WorkScope.InsertOrUpdateAndGetIdAsync<MezonWebhook>(webhook);
+            long id = await WorkScope.InsertOrUpdateAndGetIdAsync(webhook);
             await CurrentUnitOfWork.SaveChangesAsync();
 
             return await IQGetAllMezonWebhook()
@@ -75,7 +75,7 @@ namespace TalentV2.DomainServices.Webhook
             await CurrentUnitOfWork.SaveChangesAsync();
         }
 
-        private void CheckUrlAndDestinationMaxLength(MezonWebhookDto input)
+        private void ValidateWebhookInput(MezonWebhookDto input)
         {
             var maxUrlLength = typeof(MezonWebhook)
                 .GetProperty("Url")
@@ -87,14 +87,15 @@ namespace TalentV2.DomainServices.Webhook
                 throw new UserFriendlyException($"Webhook Url length is greater than {maxUrlLength}!");
             }
 
-            var maxDestinationLength = typeof(MezonWebhook)
-                .GetProperty("Url")
-                .GetCustomAttributes(typeof(MaxLengthAttribute), false)
-                .Cast<MaxLengthAttribute>()
-                .FirstOrDefault()?.Length;
-            if (input.Url.Length > maxDestinationLength)
+            if (input.Functions == null || input.Functions.Count == 0)
             {
-                throw new UserFriendlyException($"Webhook Destination length is greater than {maxDestinationLength}!");
+                throw new UserFriendlyException($"Mezon message function is required!");
+            }
+
+            var notSupportedElements = input.Functions.Except(DictionaryHelper.MessageFunctionDic.Keys);
+            if (notSupportedElements.Any())
+            {
+                throw new UserFriendlyException($"Message functions {string.Join(", ", notSupportedElements)} are not supported!");
             }
         }
     }

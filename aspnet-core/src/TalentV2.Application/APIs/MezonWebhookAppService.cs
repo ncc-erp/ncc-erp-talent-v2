@@ -14,13 +14,10 @@ namespace TalentV2.APIs
     public class MezonWebhookAppService : TalentV2AppServiceBase
     {
         private readonly IMezonWebhookManager _mezonWebhookManager;
-        protected readonly MezonWebhookService _mezonWebhookService;
         public MezonWebhookAppService(
-            IMezonWebhookManager mezonWebhookManager, 
-            MezonWebhookService mezonWebhookService)
+            IMezonWebhookManager mezonWebhookManager)
         {
             _mezonWebhookManager = mezonWebhookManager;
-            _mezonWebhookService = mezonWebhookService;
         }
 
         [HttpPost]

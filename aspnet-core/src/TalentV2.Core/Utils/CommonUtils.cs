@@ -269,6 +269,13 @@ namespace TalentV2.Utils
                 Name = s.ToString(),
             }).ToList();
 
+        public static List<MezonMessageFunctionDto> ListSupportedMezonMessageFunction => DictionaryHelper.MessageFunctionDic
+            .Select(s => new MezonMessageFunctionDto
+            {
+                Key = s.Key,
+                Name = s.Value.ToString(),
+            }).ToList();
+
         public static List<UserTypeDto> ListUserType => Enum.GetValues(typeof(UserType))
             .Cast<UserType>()
             .Select(s => new UserTypeDto

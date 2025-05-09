@@ -1,22 +1,21 @@
 ﻿using Abp.Domain.Entities.Auditing;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TalentV2.Entities
 {
     public class MezonWebhook : FullAuditedEntity<long>
     {
-        [MaxLength(32)]
+        [MaxLength(255)]
         public string Name { get; set; }
+
         [MaxLength(2048)]
         public string Url { get; set; }
-        public bool IsActive { get; set; }
-        [MaxLength(2048)]
-        public string Destination { get; set; }
 
+        [Column(TypeName = "jsonb")]
+        public List<string> Functions { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

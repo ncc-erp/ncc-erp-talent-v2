@@ -9,191 +9,181 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using TalentV2.Constants.Dictionary;
 using TalentV2.Entities;
 using TalentV2.NccCore;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks.Dtos;
 
 namespace TalentV2.WebServices.ExternalServices.MezonWebhooks
 {
+    /// <summary>
+    /// Service for sending webhook notifications to Mezon.
+    /// It handles the logic of identifying relevant webhooks based on function names,
+    /// checking if notifications are enabled, and sending messages asynchronously.
+    /// </summary>
     public class MezonWebhookService : BaseWebService
     {
         protected IWorkScope WorkScope;
-        private const string serviceName = "MezonWebhookService";
-        private readonly string _isNotifyToMezonWebhook;
+        protected readonly bool MezonWebhookNotificationEnabled = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MezonWebhookService"/> class.
+        /// </summary>
+        /// <param name="httpClient">The HTTP client for making requests.</param>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="logger">The logger for logging messages.</param>
+        /// <param name="abpSession">The ABP session for accessing current user and tenant information.</param>
         public MezonWebhookService(
-            HttpClient httpClient, 
-            IConfiguration configuration, 
-            ILogger<MezonWebhookService> logger, 
+            HttpClient httpClient,
+            IConfiguration configuration,
+            ILogger<MezonWebhookService> logger,
             IAbpSession abpSession)
            : base(httpClient, logger, abpSession)
         {
-            _isNotifyToMezonWebhook = configuration.GetValue<string>($"{serviceName}:EnableMezonWebhookNotification");
+            MezonWebhookNotificationEnabled = configuration.GetValue<bool>("MezonWebhookService:MezonWebhookNotificationEnabled");
             WorkScope = IocManager.Instance.Resolve<IWorkScope>();
         }
 
-        public async Task NotifyToWebhookUrl(string webhookMessage, string url)
+        /// <summary>
+        /// Sends a message to Mezon webhooks that are configured for the specified function name.
+        /// The message is sent asynchronously.
+        /// </summary>
+        /// <param name="webhookDto">The message data to send.</param>
+        /// <param name="functionName">The name of the function triggering the webhook, used to filter relevant webhooks.</param>
+        public void SendMessage(MezonWebhookMessageDto webhookDto, string functionName)
         {
-            if (_isNotifyToMezonWebhook != "true")
+            logger.LogInformation("Sending message to Mezon.");
+
+            if (!MezonWebhookNotificationEnabled)
             {
-                logger.LogInformation("_isNotifyToMezonWebhook=" + _isNotifyToMezonWebhook + " => stop");
-                return;
+                logger.LogInformation("Mezon notification feature has been disabled. MezonWebhookNotificationEnabled={value}.", MezonWebhookNotificationEnabled.ToString());
             }
 
-            List<Task> taskList = new List<Task>();
-            var webhooks = WorkScope.GetAll<MezonWebhook>().Where(m => m.Url == url && m.IsActive).ToList();
-
-            if (webhooks.Count == 0)
+            if (!DictionaryHelper.MessageFunctionDic.Keys.Any(x => x == functionName))
             {
-                logger.LogInformation($"There is no available Mezon Webhook with Url: {url}!");
-                return;
+                logger.LogInformation("Message function {functionName} is not supported.", functionName);
             }
+            var webhooks = WorkScope.GetAll<MezonWebhook>().ToList();
+            webhooks = webhooks.Where(x => x.Functions.Any(f => f == functionName)).ToList();
 
-            webhooks.ForEach(w =>
-            {
-                var content = new SendingContent
-                {
-                    type = "APP",
-                    message = new Message
-                    {
-                        t = webhookMessage,
-                        username = w.Name
-                    }
-                };
-                Task task = Task.Run(() => Post(w.Url, content));
-                taskList.Add(task);
-            });
-            await Task.WhenAll(taskList);
-        }
-
-        public async Task NotifyToWebhookWithUsername(string webhookMessage, string name)
-        {
-            if (_isNotifyToMezonWebhook != "true")
-            {
-                logger.LogInformation("_isNotifyToMezonWebhook=" + _isNotifyToMezonWebhook + " => stop");
-                return;
-            }
-
-            List<Task> taskList = new List<Task>();
-            var webhooks = WorkScope.GetAll<MezonWebhook>().Where(m => m.Name == name && m.IsActive).ToList();
-
-            if (webhooks.Count == 0)
-            {
-                logger.LogInformation($"There is no available Mezon Webhook with username: {name}!");
-                return;
-            }
-
-            webhooks.ForEach(w =>
-            {
-                var content = new SendingContent
-                {
-                    type = "APP",
-                    message = new Message
-                    {
-                        t = webhookMessage,
-                        username = w.Name
-                    }
-                };
-                Task task = Task.Run(() => Post(w.Url, content));
-                taskList.Add(task);
-            });
-            await Task.WhenAll(taskList);
-        }
-
-        public async Task NotifyToWebhookId(string webhookMessage, long id)
-        {
-            if (_isNotifyToMezonWebhook != "true")
-            {
-                logger.LogInformation("_isNotifyToMezonWebhook=" + _isNotifyToMezonWebhook + " => stop");
-                return;
-            }
-
-            try
-            {
-                MezonWebhook webhook = await WorkScope.GetAsync<MezonWebhook>(id);
-                if (webhook == null)
-                {
-                    logger.LogInformation("Mezon Webhook Id have not already existed!");
-                    return;
-                }
-                if (!webhook.IsActive)
-                {
-                    logger.LogInformation($"Mezon Webhook Id: {id} is not actice!");
-                    return;
-                }
-                var content = new SendingContent
-                {
-                    type = "APP",
-                    message = new Message
-                    {
-                        t = webhookMessage,
-                        username = webhook.Name
-                    }
-                };
-                Post(webhook.Url, content);
-            }
-            catch (Exception ex)
-            {
-                logger.LogInformation(ex.Message);
-            }    
-        }
-
-        public async Task NotifyToWebhookIds(string webhookMessage, params int[] ids)
-        {
-            if (_isNotifyToMezonWebhook != "true")
-            {
-                logger.LogInformation("_isNotifyToMezonWebhook=" + _isNotifyToMezonWebhook + " => stop");
-                return;
-            }
-
-            List<Task> taskList = new List<Task>();
-            List<MezonWebhook> webhooks = new List<MezonWebhook>();
-
-            foreach (int id in ids)
+            Task.Run(async () =>
             {
                 try
                 {
-                    MezonWebhook webhook = await WorkScope.GetAsync<MezonWebhook>(id);
-                    if (webhook == null)
-                        logger.LogInformation($"Mezon Webhook Id: {id} have not already existed!");
-                    else if (!webhook.IsActive)
-                        logger.LogInformation($"Mezon Webhook Id: {id} is not actice!");
-                    else
-                        webhooks.Add(webhook);
-                }
-                catch (Exception ex) {
-                    logger.LogInformation(ex.Message);
-                }
-            }
-
-            webhooks.ForEach(w =>
-            {
-                var content = new SendingContent
-                {
-                    type = "APP",
-                    message = new Message
+                    List<Task> sendMessageTasks = new();
+                    foreach (var webhook in webhooks)
                     {
-                        t = webhookMessage,
-                        username = w.Name
+                        if (!webhook.IsActive || webhook.IsDeleted)
+                        {
+                            logger.LogInformation("Mezon webhook {name} has been disabled.", webhook.Name);
+                            continue;
+                        }
+
+                        Task task = Task.Run(() => Post(webhook.Url, webhookDto));
+                        sendMessageTasks.Add(task);
                     }
-                };
-                Task task = Task.Run(() => Post(w.Url, content));
-                taskList.Add(task);
+
+                    await Task.WhenAll(sendMessageTasks);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "SendMessage {functionName} to mezon failed. Error: {error}", functionName, ex.Message);
+                }
             });
-            await Task.WhenAll(taskList);
         }
 
-        protected override void Post(string url, object input)
+        /// <summary>
+        /// Sends a message to a predefined list of Mezon webhooks.
+        /// The message is sent asynchronously.
+        /// </summary>
+        /// <param name="webhookDto">The message data to send.</param>
+        /// <param name="webhooks">A list of MezonWebhook entities to send the message to.</param>
+        public void SendMessage(MezonWebhookMessageDto webhookDto, List<MezonWebhook> webhooks)
         {
-            string strInput = JsonConvert.SerializeObject(input);
+            Task.Run(async () =>
+            {
+                try
+                {
+                    logger.LogInformation("Sending message to Mezon.");
+                    if (!MezonWebhookNotificationEnabled)
+                    {
+                        logger.LogInformation("Mezon notification feature has been disabled. MezonWebhookNotificationEnabled={value}.", MezonWebhookNotificationEnabled.ToString());
+                    }
+
+                    List<Task> sendMessageTasks = new();
+                    foreach (var webhook in webhooks)
+                    {
+                        if (!webhook.IsActive || webhook.IsDeleted)
+                        {
+                            logger.LogInformation("Mezon webhook {name} has been disabled.", webhook.Name);
+                            continue;
+                        }
+
+                        Task task = Task.Run(() => Post(webhook.Url, webhookDto));
+                        sendMessageTasks.Add(task);
+                    }
+
+                    await Task.WhenAll(sendMessageTasks);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "SendMessage to mezon failed. Error: {error}", ex.Message);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Sends a message to a single, specific Mezon webhook.
+        /// The message is sent synchronously within this method's direct call to Post, but the Post method itself fires an asynchronous HTTP request.
+        /// </summary>
+        /// <param name="webhookDto">The message data to send.</param>
+        /// <param name="webhook">The MezonWebhook entity to send the message to.</param>
+        public void SendMessage(MezonWebhookMessageDto webhookDto, MezonWebhook webhook)
+        {
             try
             {
-                logger.LogInformation($"Post: {url} input: {strInput}");
-                var contentString = new StringContent(strInput, Encoding.UTF8, "application/json");
-                HttpClient.PostAsync(url, contentString);
+                logger.LogInformation("Sending message to Mezon.");
+                if (!MezonWebhookNotificationEnabled)
+                {
+                    logger.LogInformation("Mezon notification feature has been disabled. MezonWebhookNotificationEnabled={value}.", MezonWebhookNotificationEnabled.ToString());
+                }
+
+                if (!webhook.IsActive || webhook.IsDeleted)
+                {
+                    logger.LogInformation("Mezon webhook {name} has been disabled.", webhook.Name);
+                }
+
+                Post(webhook.Url, webhookDto);
+
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.LogError($"Post: {url} input: {strInput} Error: {e.Message}");
+                logger.LogError(ex, "SendMessage to mezon failed. Error: {error}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Posts the given input object as JSON to the specified URL.
+        /// The actual HTTP POST request is performed asynchronously.
+        /// JSON serialization ignores null values.
+        /// </summary>
+        /// <param name="url">The URL to post the data to.</param>
+        /// <param name="input">The object to serialize as JSON and send.</param>
+        protected override void Post(string url, object input)
+        {
+            string payload = JsonConvert.SerializeObject(input, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            try
+            {
+                logger.LogInformation("Post: {url}. Data: {payload}", url, payload);
+                var contentString = new StringContent(payload, Encoding.UTF8, "application/json");
+                Task.Run(async () => await HttpClient.PostAsync(url, contentString));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Post: {url}. Data: {payload}. Error: {error}", url, payload, ex.Message);
             }
         }
     }

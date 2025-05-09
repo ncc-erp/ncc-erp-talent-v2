@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TalentV2.Migrations
 {
-    public partial class Add_MezonWebhooks_table : Migration
+    public partial class Add_MezonWebhook_table : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,10 +17,10 @@ namespace TalentV2.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Url = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Functions = table.Column<List<string>>(type: "jsonb", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    Destination = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
