@@ -17,42 +17,50 @@ namespace TalentV2.APIs
     [AbpAuthorize]
     public class CommonAppService : TalentV2AppServiceBase
     {
-        public CommonAppService(){}
+        public CommonAppService() { }
+
         [HttpGet]
         public List<CategoryDto> GetRequestStatus()
         {
             return CommonUtils.ListRequestStatus;
         }
+
         [HttpGet]
         public List<CategoryDto> GetRequestCVStatus()
         {
             return CommonUtils.ListRequestCVStatus;
         }
+
         [HttpGet]
         public List<CategoryDto> GetPriority()
         {
             return CommonUtils.ListPriority;
         }
+
         [HttpGet]
         public List<LevelDto> GetLevel()
         {
             return CommonUtils.ListLevel;
         }
+
         [HttpGet]
         public List<CategoryDto> GetStatusCandidateOffer()
         {
             return CommonUtils.ListStatusCandidateOffer;
         }
+
         [HttpGet]
         public List<CategoryDto> GetStatusCandidateOnboard()
         {
             return CommonUtils.ListStatusCandidateOnboard;
         }
-        [HttpGet] 
+
+        [HttpGet]
         public List<CategoryDto> GetStatusRequest()
         {
             return CommonUtils.ListRequestStatus;
         }
+
         [HttpGet]
         public async Task<List<UserReferenceDto>> GetAllUser()
         {
@@ -67,17 +75,18 @@ namespace TalentV2.APIs
                     UserName = s.UserName,
                 }).ToListAsync();
         }
-        [HttpGet] 
+
+        [HttpGet]
         public async Task<List<DropdownPositionDto>> GetDropdownPositions()
         {
             return await WorkScope.GetAll<SubPosition>()
-                .GroupBy(s => new { s.PositionId , s.Position.Name})
+                .GroupBy(s => new { s.PositionId, s.Position.Name })
                 .Select(gr => new DropdownPositionDto
                 {
                     Id = gr.Key.PositionId,
                     Position = gr.Key.Name,
                     Items = gr.Select(s => new DropdownSubPositionDto
-                    { 
+                    {
                         Id = s.Id,
                         SubPosition = s.Name
                     }).ToList()
@@ -85,46 +94,61 @@ namespace TalentV2.APIs
                 .OrderBy(s => s.Position)
                 .ToListAsync();
         }
+
         [HttpGet]
         public List<CategoryDto> GetRequestLevel()
         {
             return CommonUtils.ListRequestLevel;
         }
+
         [HttpGet]
         public List<InternSalaryDto> GetInternSalary()
         {
             return CommonUtils.ListSalaryIntern;
         }
+
         [HttpGet]
         public List<LevelDto> GetLevelStaff()
         {
             return CommonUtils.ListLevelStaff;
         }
+
         [HttpGet]
         public List<CategoryDto> GetListCVStatus()
         {
             return CommonUtils.ListCVStatus;
         }
+
         [HttpGet]
         public List<CategoryDto> GetListCVSourceReferenceType()
         {
             return CommonUtils.ListCVSourceReferenceType;
         }
+
         [HttpGet]
         public List<CategoryDto> GetListInterviewStatus()
         {
             return CommonUtils.ListInterviewStatus;
         }
+
+        [HttpGet]
+        public List<MezonMessageFunctionDto> GetSupportedMezonMessageFunction()
+        {
+            return CommonUtils.ListSupportedMezonMessageFunction;
+        }
+
         [HttpGet]
         public List<LevelDto> GetLevelInterviewStaff()
         {
             return CommonUtils.ListLevelInterviewStaff;
         }
+
         [HttpGet]
         public List<LevelDto> GetLevelFinalStaff()
         {
             return CommonUtils.ListLevelFinalStaff;
         }
+
         [HttpGet]
         public List<InternSalaryDto> GetLevelFinalIntern()
         {

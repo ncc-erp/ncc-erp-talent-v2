@@ -240,5 +240,56 @@ namespace NccCore.Extension
             a[0] = char.ToUpper(a[0]);
             return new string(a);
         }
+
+        public static List<(int StartIndex, int EndIndex)> FindStringFormatIndices(this string parentString, string startDelimiter, string endDelimiter)
+        {
+            List<(int StartIndex, int EndIndex)> indices = new();
+
+            if (string.IsNullOrEmpty(parentString) || string.IsNullOrEmpty(startDelimiter) || string.IsNullOrEmpty(endDelimiter))
+            {
+                return indices;
+            }
+
+            int startDelimiterLength = startDelimiter.Length;
+            int endDelimiterLength = endDelimiter.Length;
+
+            int startIndex = -1;
+            int currentIndex = 0;
+
+            while (currentIndex <= parentString.Length - startDelimiterLength)
+            {
+                if (parentString.Substring(currentIndex, startDelimiterLength) == startDelimiter)
+                {
+                    startIndex = currentIndex;
+                    currentIndex += startDelimiterLength;
+
+                    while (currentIndex <= parentString.Length - endDelimiterLength)
+                    {
+                        if (parentString.Substring(currentIndex, endDelimiterLength) == endDelimiter)
+                        {
+                            indices.Add((startIndex, currentIndex + endDelimiterLength - 1));
+                            currentIndex += endDelimiterLength;
+                            startIndex = -1;
+                            break;
+                        }
+                        else
+                        {
+                            currentIndex++;
+                        }
+                    }
+                    if (startIndex != -1)
+                    {
+                        currentIndex = startIndex + 1;
+                    }
+
+                }
+                else
+                {
+                    currentIndex++;
+                }
+            }
+
+            return indices;
+        }
     }
 }
