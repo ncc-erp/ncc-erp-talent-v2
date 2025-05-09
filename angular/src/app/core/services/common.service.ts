@@ -3,6 +3,7 @@ import {
   InternSalaryCatalog,
   LevelInfo,
   MailTemplateCatalog,
+  MezonMessageFunctionCatalog,
   PositionCatalog,
 } from "./../models/common/common.dto";
 import { HttpClient } from "@angular/common/http";
@@ -70,6 +71,10 @@ export class CommonService extends BaseApiService {
 
   getListInterviewStatus(): Observable<ApiResponse<CatalogModel[]>> {
     return this.getAll("/GetListInterviewStatus");
+  }
+
+  getSupportedMezonMessageFunction(): Observable<ApiResponse<MezonMessageFunctionCatalog[]>> {
+    return this.getAll("/GetSupportedMezonMessageFunction");
   }
 
   getListCVSourceReferenceType(): Observable<ApiResponse<CatalogModel[]>> {

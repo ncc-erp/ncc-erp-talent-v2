@@ -54,27 +54,6 @@
       </div>
     </div>
     <div class="form-group row required">
-      <label class="col-md-3 col-form-label" for="destination">
-        {{ "Destination" | localize }}
-      </label>
-      <div *ngIf="webhook" class="col-md-9">
-        <input
-          type="text"
-          class="form-control"
-          name="destination"
-          id="destination"
-          required
-          [(ngModel)]="webhook.destination"
-          #destinationModel="ngModel"
-          #destinationEl
-        />
-        <abp-validation-summary
-          [control]="destinationModel"
-          [controlEl]="destinationEl"
-        ></abp-validation-summary>
-      </div>
-    </div>
-    <div class="form-group row mb-0">
       <label class="col-3 col-form-label">
         {{ "IsActive" | localize }}
       </label>
@@ -89,6 +68,19 @@
           />
           <label class="custom-control-label mt-2" for="isActive"></label>
         </div>
+      </div>
+    </div>
+    <div class="form-group row required mb-0">
+      <label class="col-3 col-form-label">
+        {{ "Message Functions" | localize }}
+      </label>
+      <div class="w-100">
+        <talent-multi-select-h-radio
+          [catalogConfig]="filterMessageFunctionConfig"
+          [headerSelectionConfig]="null"
+          [valueSeletecd]="webhook.functions"
+          (onChange)="onFunctionChange($event)"
+        ></talent-multi-select-h-radio>
       </div>
     </div>
   </div>

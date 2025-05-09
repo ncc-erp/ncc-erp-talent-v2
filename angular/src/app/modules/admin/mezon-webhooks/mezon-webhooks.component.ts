@@ -8,6 +8,8 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { EditMezonWebhookDialogComponent } from './edit-mezon-webhook-dialog/edit-mezon-webhook-dialog.component';
 import { API_RESPONSE_STATUS, DefaultRoute } from '@shared/AppEnums';
 import { CreateMezonWebhookDialogComponent } from './create-mezon-webhook-dialog/create-mezon-webhook-dialog.component';
+import { UtilitiesService } from '@app/core/services/utilities.service';
+import { CommonService } from '@app/core/services/common.service';
 
 @Component({
   templateUrl: './mezon-webhooks.component.html',
@@ -22,6 +24,7 @@ export class MezonWebhooksComponent extends PagedListingComponentBase<MezonWebho
   constructor(
     injector: Injector,
     public dialogService: DialogService,
+    public _common: CommonService,
     private _mezonWebhookService: MezonWebhookService,
     private _modalService: BsModalService
   ) {
@@ -30,6 +33,7 @@ export class MezonWebhooksComponent extends PagedListingComponentBase<MezonWebho
   }
 
   ngOnInit(): void {
+    
   }
 
   protected list(
