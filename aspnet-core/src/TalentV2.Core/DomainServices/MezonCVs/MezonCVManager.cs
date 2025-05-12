@@ -7,10 +7,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories;
+using TalentV2.DomainServices.CVAutomation.Dto;
 using TalentV2.DomainServices.ExternalCVs.Dtos;
 using TalentV2.DomainServices.MezonCVs.Dtos;
 using TalentV2.Entities;
 using TalentV2.FileServices.Services.Candidates;
+using TalentV2.Utils;
 
 namespace TalentV2.DomainServices.MezonCVs
 {
@@ -57,7 +59,9 @@ namespace TalentV2.DomainServices.MezonCVs
         {
             if (input == null) throw new UserFriendlyException("Input data cannot be null");
 
-            if (string.IsNullOrWhiteSpace(input.Name) || string.IsNullOrWhiteSpace(input.Email) || string.IsNullOrWhiteSpace(input.Phone))
+            if (string.IsNullOrWhiteSpace(input.Name) 
+                || string.IsNullOrWhiteSpace(input.Email) 
+                || string.IsNullOrWhiteSpace(input.Phone))
                 throw new UserFriendlyException("Name, email and phone number are required");
 
             var branch = await WorkScope.GetAll<Branch>()
@@ -76,7 +80,6 @@ namespace TalentV2.DomainServices.MezonCVs
             {
                 Name = input.Name,
                 Email = input.Email,
-                Phone = Utils.StringExtensions.ReplaceWhitespace(input.Phone),
                 UserType = UserType.Intern,
                 BranchId = branch.Id,
                 CVSourceId = cvSource.Id,
@@ -87,6 +90,9 @@ namespace TalentV2.DomainServices.MezonCVs
                 Note = input.Note,
                 CVStatus = CVStatus.Draft
             };
+
+            string phoneNumber = StringExtensions.FormatPhoneNumber(input.Phone);
+            cv.Phone = phoneNumber.Length > 12 ? string.Empty : phoneNumber;
 
             IFormFile cvFile = null;
             try
