@@ -37,5 +37,6 @@
         public string CVAutomationNoticeMode { get; set; }
         public string CVAutomationNoticeChannelId { get; set; }
         public string CVAutomationNotifyToUser { get; set; }
+        public string MezonBotSignature { get; set; }
     }
 }
