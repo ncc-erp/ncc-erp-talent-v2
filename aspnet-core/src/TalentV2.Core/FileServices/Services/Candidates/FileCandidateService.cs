@@ -76,9 +76,9 @@ namespace TalentV2.FileServices.Services.Candidates
                         if (headResponse.Content.Headers.ContentLength.HasValue)
                         {
                             long fileSize = headResponse.Content.Headers.ContentLength.Value;
-                            if (fileSize > 52428800) // 50MB
+                            if (fileSize > 104857600)
                             {
-                                throw new Exception("File too large (max 50MB)");
+                                throw new Exception("File too large (max 100MB)");
                             }
                         }
                     }

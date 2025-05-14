@@ -64,6 +64,20 @@ namespace TalentV2.DomainServices.MezonCVs
                 || string.IsNullOrWhiteSpace(input.Phone))
                 throw new UserFriendlyException("Name, email and phone number are required");
 
+            var existingEmailCV = await WorkScope.GetAll<CV>()
+                .FirstOrDefaultAsync(c => c.Email == input.Email && c.isClone != true);
+            if (existingEmailCV != null)
+                throw new UserFriendlyException($"A candidate with email {input.Email} already exists in the system");
+
+            string phoneNumber = StringExtensions.FormatPhoneNumber(input.Phone);
+            if (phoneNumber.Length > 12)
+                throw new UserFriendlyException("Invalid phone number format");
+
+            var existingPhoneCV = await WorkScope.GetAll<CV>()
+                .FirstOrDefaultAsync(c => c.Phone == phoneNumber && c.isClone != true);
+            if (existingPhoneCV != null)
+                throw new UserFriendlyException($"A candidate with phone number {phoneNumber} already exists in the system");
+
             var branch = await WorkScope.GetAll<Branch>()
                 .FirstOrDefaultAsync(b => b.Id == input.BranchId);
             if (branch == null) throw new UserFriendlyException($"Branch with ID {input.BranchId} not found");
@@ -88,11 +102,9 @@ namespace TalentV2.DomainServices.MezonCVs
                 IsFemale = input.IsFemale,
                 Address = input.Address,
                 Note = input.Note,
-                CVStatus = CVStatus.Draft
+                CVStatus = CVStatus.Draft,
+                Phone = phoneNumber
             };
-
-            string phoneNumber = StringExtensions.FormatPhoneNumber(input.Phone);
-            cv.Phone = phoneNumber.Length > 12 ? string.Empty : phoneNumber;
 
             IFormFile cvFile = null;
             try
