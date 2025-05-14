@@ -23,6 +23,9 @@ using System;
 using TalentV2.DomainServices.Interviews.Dtos;
 using TalentV2.Utils;
 using TalentV2.DomainServices.Candidates;
+using TalentV2.Ncc;
+using TalentV2.DomainServices.MezonCVs;
+using TalentV2.DomainServices.MezonCVs.Dtos;
 
 namespace TalentV2.APIs.Public
 {
@@ -33,15 +36,21 @@ namespace TalentV2.APIs.Public
         private readonly ICategoryManager _categoryManager;
         private readonly IApplyCvManager _applyCvManager;
         private readonly ICandidateManager _candidateManager;
+        private readonly IMezonCVManager _mezonCvManager;
 
-
-        public PublicAppService(IExternalCVManager externalCVManager, ICategoryManager categoryManager, IApplyCvManager applyCvManager, ICandidateManager candidateManager)
+        public PublicAppService(
+            IExternalCVManager externalCVManager,
+            ICategoryManager categoryManager, 
+            IApplyCvManager applyCvManager, 
+            ICandidateManager candidateManager,
+            IMezonCVManager mezonCvManager)
         {
             _httpContextAccessor = IocManager.Instance.Resolve<IHttpContextAccessor>();
             _externalCVManager = externalCVManager;
             _categoryManager = categoryManager;
             _applyCvManager = applyCvManager;
             _candidateManager = candidateManager;
+            _mezonCvManager = mezonCvManager;
         }
         [AbpAllowAnonymous]
         [HttpGet]
@@ -256,6 +265,21 @@ namespace TalentV2.APIs.Public
             result.Message = "Connected";
             result.InterviewInfo = _candidateManager.GetInterviewInfo();
             return result;
+        }
+
+        [HttpPost]
+        [MezonBotAuth]
+        public async Task<MezonInternCVDto> CreateMezonInternCV([FromForm] CreateMezonInternCVDto createApplyCVDto)
+        {
+            var cv = await _mezonCvManager.CreateMezonInternCV(createApplyCVDto);
+            return await _mezonCvManager.GetCVById(cv);
+        }
+
+        [HttpGet]
+        [MezonBotAuth]
+        public async Task<MezonCVFormDto> GetMezonCVFormData()
+        {
+            return await _mezonCvManager.GetMezonCVFormData();
         }
     }
 }

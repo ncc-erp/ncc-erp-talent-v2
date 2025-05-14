@@ -1,30 +1,27 @@
 ﻿using Abp.UI;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TalentV2.Configuration;
+using TalentV2.Constants.Const;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.DomainServices.RequestCVs.Dtos;
 using TalentV2.Entities;
-using TalentV2.Notifications;
-using TalentV2.Notifications.Komu;
-using TalentV2.Notifications.Templates;
+using TalentV2.Notifications.MezonMessageTemplates;
 using TalentV2.Notifications.Templates.Dtos;
-using TalentV2.Utils;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks;
 
 namespace TalentV2.DomainServices.RequestCVs
 {
     public class RequestCVManager : BaseManager, IRequestCVManager
     {
-        private readonly IKomuNotification _komuNotification;
-        public RequestCVManager(IKomuNotification komuNotification)
+        private readonly MezonWebhookService _mezonWebhookService;
+
+        public RequestCVManager(MezonWebhookService mezonWebhookService)
         {
-            _komuNotification = komuNotification;
+            _mezonWebhookService = mezonWebhookService;
         }
+
         public IQueryable<CandidateOfferDto> IQGetRequestCV()
         {
             var query = from rc in WorkScope.GetAll<RequestCV>()
@@ -80,6 +77,7 @@ namespace TalentV2.DomainServices.RequestCVs
                         };
             return query;
         }
+
         public async Task<long> UpdateCandidateOffer(UpdateCandidateOfferDto input)
         {
             var requestCV = await WorkScope.GetAsync<RequestCV>(input.Id);
@@ -91,15 +89,39 @@ namespace TalentV2.DomainServices.RequestCVs
             ObjectMapper.Map(input, requestCV);
             await CurrentUnitOfWork.SaveChangesAsync();
 
-            if(isSendNotification)
+            if (isSendNotification)
             {
                 var isFirstAcceptedOffer = (requestCV.Status != RequestCVStatus.AcceptedOffer && input.Status == RequestCVStatus.AcceptedOffer)
                     && (!requestCV.OnboardDate.HasValue && input.OnboardDate.HasValue);
 
-                _komuNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
+                var dataTemplate = WorkScope.GetAll<RequestCV>()
+                    .Where(q => q.Id == requestCV.Id)
+                    .Select(s => new CandidateOfferAcceptedTemplate
+                    {
+                        CVId = s.CVId,
+                        FullName = s.CV.Name,
+                        BranchName = s.CV.Branch.DisplayName,
+                        OnboardDateTime = s.OnboardDate,
+                        Skills = string.Join(",", s.CV.CVSkills.Select(s => s.Skill.Name).ToList()),
+                        Email = s.CV.Email,
+                        NCCEmail = s.CV.NCCEmail,
+                        UserType = s.CV.UserType,
+                        Phone = s.CV.Phone,
+                        SubPositionName = s.CV.SubPosition.Name
+                    }).FirstOrDefault();
+
+                if (requestCV.Status == RequestCVStatus.RejectedOffer)
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.RejectedOfferTemplate(dataTemplate), MezonWebhookConstant.MessageFunction.RejectedOfferFunction);
+                }
+                else
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.AcceptedOfferTemplate(dataTemplate, isFirstAcceptedOffer), MezonWebhookConstant.MessageFunction.AcceptedOfferFunction);
+                }
             }
             return requestCV.Id;
         }
+
         public async Task<long> UpdateCandidateOnboard(UpdateCandidateOnboardDto input)
         {
             if (input.Status == RequestCVStatus.Onboarded && !input.OnboardDate.HasValue)
@@ -110,7 +132,7 @@ namespace TalentV2.DomainServices.RequestCVs
             bool isSendNotification = ((requestCV.Status != RequestCVStatus.RejectedOffer && input.Status == RequestCVStatus.RejectedOffer)
                 || (requestCV.Status == RequestCVStatus.RejectedOffer && input.Status != RequestCVStatus.RejectedOffer)
                 || (input.Status == RequestCVStatus.AcceptedOffer && requestCV.OnboardDate != input.OnboardDate));
-            
+
             bool isFirstAcceptedOffer = true;
             if (input.Status == RequestCVStatus.AcceptedOffer && requestCV.OnboardDate != input.OnboardDate)
             {
@@ -124,7 +146,30 @@ namespace TalentV2.DomainServices.RequestCVs
 
             if (isSendNotification)
             {
-                _komuNotification.NotifyAcceptedOrRejectedOffer(requestCV.Status, requestCV.Id, isFirstAcceptedOffer);
+                var dataTemplate = WorkScope.GetAll<RequestCV>()
+                    .Where(q => q.Id == requestCV.Id)
+                    .Select(s => new CandidateOfferAcceptedTemplate
+                    {
+                        CVId = s.CVId,
+                        FullName = s.CV.Name,
+                        BranchName = s.CV.Branch.DisplayName,
+                        OnboardDateTime = s.OnboardDate,
+                        Skills = string.Join(",", s.CV.CVSkills.Select(s => s.Skill.Name).ToList()),
+                        Email = s.CV.Email,
+                        NCCEmail = s.CV.NCCEmail,
+                        UserType = s.CV.UserType,
+                        Phone = s.CV.Phone,
+                        SubPositionName = s.CV.SubPosition.Name
+                    }).FirstOrDefault();
+
+                if (requestCV.Status == RequestCVStatus.RejectedOffer)
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.RejectedOfferTemplate(dataTemplate), MezonWebhookConstant.MessageFunction.RejectedOfferFunction);
+                }
+                else
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.AcceptedOfferTemplate(dataTemplate, isFirstAcceptedOffer), MezonWebhookConstant.MessageFunction.AcceptedOfferFunction);
+                }
             }
 
             return requestCV.Id;

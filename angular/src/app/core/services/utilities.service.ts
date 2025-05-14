@@ -21,7 +21,7 @@ import { JobPosition } from "../../core/models/categories/job-position.model";
 import { Branch } from "../models/categories/branch.model";
 import { CVSource } from "../models/categories/cv-source.model";
 import { EducationType } from "../models/categories/education-type.model";
-import { CatalogModel, LevelInfo, PositionCatalog } from "../models/common/common.dto";
+import { CatalogModel, LevelInfo, MezonMessageFunctionCatalog, PositionCatalog } from "../models/common/common.dto";
 import { Skill } from "./../models/categories/skill.model";
 import {
   InternSalaryCatalog,
@@ -77,6 +77,7 @@ export class UtilitiesService {
   catCvStatus: CatalogModel[];
   catCvSource: CVSource[];
   catInterviewStatus: CatalogModel[];
+  catSupportedMezonMessageFunctions: MezonMessageFunctionCatalog[];
   catReqStatus: CatalogModel[];
   catCanOnboardStatus: CatalogModel[];
   catCanOfferStatus: CatalogModel[];
@@ -246,6 +247,15 @@ export class UtilitiesService {
       this.catStaffLeveL = res[11].result;
       this.catCvStatus = res[12].result;
       this.catPosition = res[13].result;
+    });
+  }
+
+  async loadCatalogForMezonWebhook(): Promise<void> {
+    const promises = [
+      this._common.getSupportedMezonMessageFunction().toPromise(),
+    ];
+    return await Promise.all(promises).then((res) => {
+      this.catSupportedMezonMessageFunctions = res[0].result;
     });
   }
 

@@ -27,8 +27,11 @@ using TalentV2.FileServices.Services.Candidates;
 using TalentV2.Notifications.Komu;
 using TalentV2.Notifications.Mail;
 using TalentV2.Notifications.Mail.Dtos;
+using TalentV2.Notifications.MezonMessageTemplates;
 using TalentV2.Notifications.Templates;
+using TalentV2.Notifications.Templates.Dtos;
 using TalentV2.Utils;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks;
 using TalentV2.WebServices.InternalServices.HRM;
 using TalentV2.WebServices.InternalServices.HRM.Dtos;
 using TalentV2.WebServices.InternalServices.LMS;
@@ -41,25 +44,25 @@ namespace TalentV2.DomainServices.Candidates
         private readonly IFileCandidateService _fileCandidate;
         private readonly IMailService _mailService;
         private readonly LMSService _lmsService;
-        private readonly IKomuNotification _komuNotification;
-        private readonly HRMService _hrmService;        
+        private readonly MezonWebhookService _mezonWebhookService;
+        private readonly HRMService _hrmService;
         private readonly IConfiguration _configuration;
 
         public CandidateManager(
             IFileCandidateService fileCandidate,
             IMailService mailService,
             LMSService lmsService,
-            IKomuNotification komuNotification,
             HRMService hrmService,
-            IConfiguration configuration
+            IConfiguration configuration,
+            MezonWebhookService mezonWebhookService
         )
         {
             _fileCandidate = fileCandidate;
             _mailService = mailService;
             _lmsService = lmsService;
-            _komuNotification = komuNotification;
             _hrmService = hrmService;
             _configuration = configuration;
+            _mezonWebhookService = mezonWebhookService;
         }
 
         public async Task<long> CreateCV(CreateCandidateDto input)
@@ -266,28 +269,43 @@ namespace TalentV2.DomainServices.Candidates
         public async Task<PersonBioDto> UpdateCV(UpdatePersonBioDto input)
         {
             var personBio = await WorkScope.GetAsync<CV>(input.Id);
-            var requestCVs = await WorkScope.GetAll<RequestCV>()
+            var requestCV = await WorkScope.GetAll<RequestCV>()
             .FirstOrDefaultAsync(r => r.CVId == input.Id);
-         
+
             var isSendNotification = personBio.UserType != input.UserType
                 || personBio.BranchId != input.BranchId
                 || (!string.IsNullOrEmpty(personBio.Phone) && !personBio.Phone.Equals(input.Phone))
                 || (!string.IsNullOrEmpty(personBio.Email) && !personBio.Email.Equals(input.Email));
-            if (input?.Note != requestCVs?.HRNote && requestCVs != null)
+            if (input?.Note != requestCV?.HRNote && requestCV != null)
             {
-                requestCVs.HRNote = input.Note;
+                requestCV.HRNote = input.Note;
 
             }
-            ObjectMapper.Map<UpdatePersonBioDto, CV>(input, personBio);
+            ObjectMapper.Map(input, personBio);
             personBio.Phone = Utils.StringExtensions.ReplaceWhitespace(personBio.Phone);
             await CurrentUnitOfWork.SaveChangesAsync();
 
             if (isSendNotification)
             {
-                var requestCV = await WorkScope.GetAll<RequestCV>()
-                    .FirstOrDefaultAsync(r => r.CVId == input.Id);
                 if (requestCV != null && requestCV.Status == RequestCVStatus.AcceptedOffer)
-                    await _komuNotification.NotifyUpdatedPersonalInfoTemplate(requestCV.Id);
+                {
+                    var dataTemplate = await WorkScope.GetAll<RequestCV>()
+                    .Where(q => q.Id == requestCV.Id)
+                    .Select(s => new CandidateOfferAcceptedTemplate
+                    {
+                        CVId = s.CVId,
+                        FullName = s.CV.Name,
+                        BranchName = s.CV.Branch.DisplayName,
+                        OnboardDateTime = s.OnboardDate,
+                        Skills = string.Join(",", s.CV.CVSkills.Select(s => s.Skill.Name).ToList()),
+                        Email = s.CV.Email,
+                        NCCEmail = s.CV.NCCEmail,
+                        UserType = s.CV.UserType,
+                        Phone = s.CV.Phone,
+                    }).FirstOrDefaultAsync();
+
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.UpdatedPersonalInfoTemplate(dataTemplate), MezonWebhookConstant.MessageFunction.UpdatedPersonalInfoFunction);
+                }
             }
 
             return await GetCVById(personBio.Id);
@@ -407,7 +425,8 @@ namespace TalentV2.DomainServices.Candidates
 
                 var cvCapabilityResult = await WorkScope.GetAll<RequestCVCapabilityResult>()
                     .Where(q => q.RequestCVId == currentRequestCV.Id)
-                    .Select(q => new CVCapabilityResultDto{
+                    .Select(q => new CVCapabilityResultDto
+                    {
                         CapabilityId = q.CapabilityId,
                         Score = q.Score,
                         Note = q.Note,
@@ -416,20 +435,20 @@ namespace TalentV2.DomainServices.Candidates
 
                 foreach (var requestCVInterview in currentRequestCVInterview)
                 {
-                   await AddInterviewerInCVRequest(new CreateInterviewerCVRequestDto
-                   {
-                       InterviewerId = requestCVInterview.InterviewId,
-                       RequestCvId = requestCvId,
-                   });
-                } 
+                    await AddInterviewerInCVRequest(new CreateInterviewerCVRequestDto
+                    {
+                        InterviewerId = requestCVInterview.InterviewId,
+                        RequestCvId = requestCvId,
+                    });
+                }
 
                 foreach (var requestCVStatusHistories in currentRequestCVStatusHistories)
                 {
-                  await CreateRequestCVHistory(new HistoryRequestCVDto
+                    await CreateRequestCVHistory(new HistoryRequestCVDto
                     {
-                    Id = requestCvId,
-                    Status = requestCVStatusHistories.Status,
-                  });
+                        Id = requestCvId,
+                        Status = requestCVStatusHistories.Status,
+                    });
                 }
                 foreach (var requestCVStatusChangeHistory in currentRequestCVStatusChangeHistory)
                 {
@@ -442,9 +461,9 @@ namespace TalentV2.DomainServices.Candidates
                 }
 
                 return input.CvId;
-            } 
+            }
             await AddRequestCVCapabilityResult(requestCvId, request.UserType, request.SubPositionId);
-   
+
             await CreateRequestCVHistory(new HistoryRequestCVDto
             {
                 Id = requestCv.Id,
@@ -762,7 +781,30 @@ namespace TalentV2.DomainServices.Candidates
                 var isFirstAcceptedOffer = (oldStatus != RequestCVStatus.AcceptedOffer && input.Status == RequestCVStatus.AcceptedOffer)
                     && (!oldOnboardDate.HasValue && input.OnboardDate.HasValue);
 
-                _komuNotification.NotifyAcceptedOrRejectedOffer(applicationResult.Status, applicationResult.Id, isFirstAcceptedOffer);
+                var dataTemplate = WorkScope.GetAll<RequestCV>()
+                    .Where(q => q.Id == applicationResult.Id)
+                    .Select(s => new CandidateOfferAcceptedTemplate
+                    {
+                        CVId = s.CVId,
+                        FullName = s.CV.Name,
+                        BranchName = s.CV.Branch.DisplayName,
+                        OnboardDateTime = s.OnboardDate,
+                        Skills = string.Join(",", s.CV.CVSkills.Select(s => s.Skill.Name).ToList()),
+                        Email = s.CV.Email,
+                        NCCEmail = s.CV.NCCEmail,
+                        UserType = s.CV.UserType,
+                        Phone = s.CV.Phone,
+                        SubPositionName = s.CV.SubPosition.Name
+                    }).FirstOrDefault();
+
+                if (applicationResult.Status == RequestCVStatus.RejectedOffer)
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.RejectedOfferTemplate(dataTemplate), MezonWebhookConstant.MessageFunction.RejectedOfferFunction);
+                }
+                else
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.AcceptedOfferTemplate(dataTemplate, isFirstAcceptedOffer), MezonWebhookConstant.MessageFunction.AcceptedOfferFunction);
+                }
             }
 
             return await GetApplicationResultByRequestCVId(applicationResult.Id);
@@ -1674,11 +1716,11 @@ namespace TalentV2.DomainServices.Candidates
                 .Select(s => new { s.LMSCourseId, s.LMSCourseName })
                 .FirstOrDefault();
 
-              if (course == null || !course.LMSCourseId.HasValue)
-                throw new UserFriendlyException($"Not Found Course With UserType: {CommonUtils.GetEnumName(cv.UserType)} and SubPosition {cv.SubPositionName}");
+                if (course == null || !course.LMSCourseId.HasValue)
+                    throw new UserFriendlyException($"Not Found Course With UserType: {CommonUtils.GetEnumName(cv.UserType)} and SubPosition {cv.SubPositionName}");
                 accountStudent.CourseInstanceId = course.LMSCourseId.Value;
 
-              var newStudent = await _lmsService.CreateAccountStudent(accountStudent);
+                var newStudent = await _lmsService.CreateAccountStudent(accountStudent);
                 if (newStudent == null)
                     throw new UserFriendlyException("Create Account From LMS Failed! Please again.");
                 requestCV.LMSInfo = TemplateHelper.ContentLMSInfo(newStudent.UserName, newStudent.Password, course.LMSCourseName, newStudent.CourseInstanceId);

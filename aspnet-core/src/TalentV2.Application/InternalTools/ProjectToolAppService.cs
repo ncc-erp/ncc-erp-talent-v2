@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TalentV2.Constants.Const;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories;
 using TalentV2.DomainServices.Categories.Dtos;
@@ -15,7 +16,10 @@ using TalentV2.InternalTools.Dtos;
 using TalentV2.Ncc;
 using TalentV2.Notifications.Komu;
 using TalentV2.Notifications.Komu.Dtos;
+using TalentV2.Notifications.MezonMessageTemplates;
+using TalentV2.Notifications.Templates.Dtos;
 using TalentV2.Utils;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks;
 
 namespace TalentV2.InternalTools
 {
@@ -23,16 +27,16 @@ namespace TalentV2.InternalTools
     {
         private readonly ICategoryManager _categoryManager;
         private readonly IRequisitionManager _requisitionManager;
-        private readonly IKomuNotification _komuNotification;
+        private readonly MezonWebhookService _mezonWebhookService;
         public ProjectToolAppService(
             ICategoryManager categoryManager,
             IRequisitionManager requisitionManager,
-            IKomuNotification komuNotification
+            MezonWebhookService mezonWebhookService
         )
         {
             _categoryManager = categoryManager;
             _requisitionManager = requisitionManager;
-            _komuNotification = komuNotification;
+            _mezonWebhookService = mezonWebhookService;
         }
 
         [HttpGet]
@@ -121,22 +125,41 @@ namespace TalentV2.InternalTools
                     type = UserType.Intern.GetHashCode();
                     perPath = "req-intern";
                 }
-                string uri = $"app/requisition/{perPath}/{requestId}?type={type}";
-                await _komuNotification.NotifyRequestFromProject(new NotificationRequestFromProject
+                string appUrl = $"app/requisition/{perPath}/{requestId}?type={type}";
+
+                var branchName = await WorkScope.GetAll<Branch>()
+                    .Where(s => s.Id == input.BranchId)
+                    .Select(s => s.Name)
+                    .FirstOrDefaultAsync();
+                var subPosisitonName = await WorkScope.GetAll<SubPosition>()
+                    .Where(s => s.Id == input.SubPositionId)
+                    .Select(s => s.Name)
+                    .FirstOrDefaultAsync();
+
+                var dataTemplate = new RequestFromProjectTemplate
                 {
                     Note = input.Note,
                     UserType = (UserType)type,
                     RequestId = requestId,
-                    BranchId = input.BranchId,
-                    SubPositionId = input.SubPositionId,
-                    URI = uri,
+                    BranchName = branchName,
+                    SubPositionName = subPosisitonName,
+                    URL = TalentConstants.BaseFEAddress + appUrl,
                     Level = input.Level,
-                });
+                };
+
+                if (dataTemplate.UserType == UserType.Staff)
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.RequestStaffFromProject(dataTemplate), MezonWebhookConstant.MessageFunction.RequestStaffFromProjectFunction);
+                }
+                else
+                {
+                    _mezonWebhookService.SendMessage(MezonMessageTemplate.RequestInternFromProject(dataTemplate), MezonWebhookConstant.MessageFunction.RequestInternFromProjectFunction);
+                }
 
                 return new ProjectToolReponseDto
                 {
                     Success = true,
-                    Result = uri
+                    Result = appUrl
                 };
             }
         }

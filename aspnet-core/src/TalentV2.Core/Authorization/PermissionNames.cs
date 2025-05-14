@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TalentV2.Authorization.Roles;
 using TalentV2.Constants.Const;
+using TalentV2.Entities;
 
 namespace TalentV2.Authorization
 {
@@ -61,6 +62,14 @@ namespace TalentV2.Authorization
         public const string Pages_Configurations_EditTalentNotifyInterviewSettings = "Pages.Configurations.EditTalentNotifyInterviewSettings";
         public const string Pages_Configurations_EditTalentNotifyCVAutomationSettings = "Pages.Configurations.EditTalentNotifyCVAutomationSettings";
         public const string PermissionNames_Pages_Configurations_ConfigureContestUrl = "PermissionNames.Pages_Configurations.ConfigureContestUrl";
+        #endregion
+
+        #region Page MezonWebhooks
+        public const string Pages_MezonWebhooks = "Pages.MezonWebhooks";
+        public const string Pages_MezonWebhooks_ViewList = "Pages.MezonWebhooks.ViewList";
+        public const string Pages_MezonWebhooks_Create = "Pages.MezonWebhooks.Create";
+        public const string Pages_MezonWebhooks_Edit = "Pages.MezonWebhooks.Edit";
+        public const string Pages_MezonWebhooks_Delete = "Pages.MezonWebhooks.Delete";
         #endregion
 
         public const string TabCategory = "Category";
@@ -453,6 +462,14 @@ namespace TalentV2.Authorization
                     PermissionNames.Pages_Mails_Edit,
                     PermissionNames.Pages_Mails_Preview,
                     PermissionNames.Pages_Mails_SendMail,
+                    //MezonWebhooks
+                    PermissionNames.Pages_MezonWebhooks,
+                    PermissionNames.Pages_MezonWebhooks_ViewList,
+                    PermissionNames.Pages_MezonWebhooks_Create,
+                    PermissionNames.Pages_MezonWebhooks_Edit,
+                    PermissionNames.Pages_MezonWebhooks_Delete,
+                    
+
                     #endregion
 
                     #region Tab Category
@@ -1236,6 +1253,13 @@ namespace TalentV2.Authorization
                 new SystemPermission {Name = PermissionNames.Pages_Mails_Edit, DisplayName = "Edit Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Mails_Preview, DisplayName = "Preview Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                 new SystemPermission {Name = PermissionNames.Pages_Mails_SendMail, DisplayName = "Send Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                //MezonWebhooks
+                new SystemPermission { Name = PermissionNames.Pages_MezonWebhooks, DisplayName = "Page Mezon Webhooks",MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission { Name = PermissionNames.Pages_MezonWebhooks_ViewList, DisplayName = "View List Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission { Name = PermissionNames.Pages_MezonWebhooks_Create, DisplayName = "Create Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission { Name = PermissionNames.Pages_MezonWebhooks_Edit, DisplayName = "Edit Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                new SystemPermission { Name = PermissionNames.Pages_MezonWebhooks_Delete, DisplayName = "Delete Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+               
                 #endregion
                 #region Tab Category
                 new SystemPermission {Name = PermissionNames.TabCategory, DisplayName = "Tab Category", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
@@ -1641,6 +1665,21 @@ namespace TalentV2.Authorization
                                 new SystemPermission {Name = PermissionNames.Pages_Mails_Edit, DisplayName = "Edit Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission {Name = PermissionNames.Pages_Mails_Preview, DisplayName = "Preview Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                                 new SystemPermission {Name = PermissionNames.Pages_Mails_SendMail, DisplayName = "Send Mail", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                            }
+                        },
+                        #endregion
+                        #region Page MezonWebhooks
+                        new SystemPermission
+                        {
+                            Name = PermissionNames.Pages_MezonWebhooks,
+                            DisplayName = "Page Mezon Webhooks",
+                            MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant,
+                            Children = new List<SystemPermission>()
+                            {
+                                new SystemPermission {Name = PermissionNames.Pages_MezonWebhooks_ViewList, DisplayName = "View List Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission {Name = PermissionNames.Pages_MezonWebhooks_Edit, DisplayName = "Edit Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission {Name = PermissionNames.Pages_MezonWebhooks_Create, DisplayName = "Create Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
+                                new SystemPermission {Name = PermissionNames.Pages_MezonWebhooks_Delete, DisplayName = "Delete Mezon Webhooks", MultiTenancySides = MultiTenancySides.Host | MultiTenancySides.Tenant},
                             }
                         },
                         #endregion

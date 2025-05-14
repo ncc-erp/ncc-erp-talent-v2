@@ -76,7 +76,13 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     '/app/admin/mail',
                     'fas fa-envelope',
                     PERMISSIONS_CONSTANT.Pages_Mails
-                )
+                ),
+                new MenuItem(
+                    this.l('Mezon Webhooks'),
+                    '/app/admin/mezon-webhooks',
+                    'fas fa-anchor',
+                    PERMISSIONS_CONSTANT.Pages_MezonWebhooks
+                ),
             ]),
             new MenuItem('Categories', '', 'fas fa-folder-open', PERMISSIONS_CONSTANT.TabCategory, [
                 new MenuItem(
