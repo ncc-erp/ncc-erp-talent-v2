@@ -43,3 +43,9 @@ export class MailTemplateCatalog {
     name: string;
     version: string;
 }
+
+export class MezonMessageFunctionCatalog {
+    id: number;
+    key: string;
+    name: string;
+}

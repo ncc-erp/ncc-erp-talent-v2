@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TalentV2.WebServices.ExternalServices.Autobot;
 using TalentV2.WebServices.ExternalServices.Komu;
 using TalentV2.WebServices.ExternalServices.Mezon;
+using TalentV2.WebServices.ExternalServices.MezonWebhooks;
 using TalentV2.WebServices.InternalServices.HRM;
 using TalentV2.WebServices.InternalServices.LMS;
 
@@ -38,6 +35,10 @@ namespace TalentV2.WebServices
                 options.DefaultRequestHeaders.Add("X-Secret-Key", _appConfiguration.GetValue<string>("AutobotService:SecurityCode"));
             });
             services.AddHttpClient<MezonService>(options =>
+            {
+                options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("MezonService:BaseAddress"));
+            });
+            services.AddHttpClient<MezonWebhookService>(options =>
             {
                 options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("MezonService:BaseAddress"));
             });

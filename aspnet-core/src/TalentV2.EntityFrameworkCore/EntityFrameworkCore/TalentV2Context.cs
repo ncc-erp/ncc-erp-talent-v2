@@ -39,6 +39,7 @@ namespace TalentV2.EntityFrameworkCore
         public DbSet<ScoreSetting> ScoreSettings { get; set; }
         public DbSet<ScoreRange> ScoreRanges { get; set; }
         public DbSet<FirebaseCareerLog> FirebaseCareerLogs { get; set; }
+        public DbSet<MezonWebhook> MezonWebhooks { get; set; }
 
         #region Ncc CVs
         public DbSet<EmployeeEducation> EmployeeEducations { get; set; }

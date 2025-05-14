@@ -8,6 +8,7 @@ import { ConfigurationsComponent } from './configurations/configurations.compone
 import { EditRoleDialogComponent } from './roles/edit-role/edit-role-dialog.component';
 import { CreateRoleDialogComponent } from './roles/create-role/create-role-dialog.component';
 import { PERMISSIONS_CONSTANT } from '@shared/permission/permissions';
+import { MezonWebhooksComponent } from './mezon-webhooks/mezon-webhooks.component';
 
 const routes: Routes = [
   {
@@ -44,6 +45,11 @@ const routes: Routes = [
     path: "mail",
     component: MailComponent,
     data: { permission: PERMISSIONS_CONSTANT.Pages_Mails },
+  }, 
+  {
+    path: "mezon-webhooks",
+    component: MezonWebhooksComponent,
+    data: { permission: PERMISSIONS_CONSTANT.Pages_MezonWebhooks },
   }
 ];
 

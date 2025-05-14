@@ -12,5 +12,6 @@ namespace TalentV2.FileServices.Services.Candidates
     {
         Task<string> UploadCV(IFormFile file);
         Task<string> UploadAvatar(IFormFile file);
+        Task<IFormFile> DownloadFileAsync(string url);
     }
 }

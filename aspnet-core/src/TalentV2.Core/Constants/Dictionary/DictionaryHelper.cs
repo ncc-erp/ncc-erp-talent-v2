@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TalentV2.Constants.Const;
 using TalentV2.Constants.Enum;
 using TalentV2.DomainServices.Categories.Dtos;
 using TalentV2.Notifications.Templates.Dtos;
@@ -339,5 +340,15 @@ namespace TalentV2.Constants.Dictionary
                 }
             },
         };
+
+        public static readonly Dictionary<string, string> MessageFunctionDic =
+            new Dictionary<string, string>()
+            {
+                {MezonWebhookConstant.MessageFunction.AcceptedOfferFunction, "Accepted Offer Function" },
+                {MezonWebhookConstant.MessageFunction.RejectedOfferFunction, "Rejected Offer Function" },
+                {MezonWebhookConstant.MessageFunction.UpdatedPersonalInfoFunction, "Updated Personal Info Function" },
+                {MezonWebhookConstant.MessageFunction.RequestInternFromProjectFunction, "Request Intern From Project Function" },
+                {MezonWebhookConstant.MessageFunction.RequestStaffFromProjectFunction, "Request Staff From Project Function" },
+            };
     }
 }

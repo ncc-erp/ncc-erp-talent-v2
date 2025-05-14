@@ -196,6 +196,11 @@ namespace TalentV2.Configuration
                     _defaultValue.EnableNormalLogin,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                 ),
+                 new SettingDefinition(
+                    AppSettingNames.MezonBotSignature,
+                    _defaultValue.MezonBotSignature,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                ),
             };
         }
     }

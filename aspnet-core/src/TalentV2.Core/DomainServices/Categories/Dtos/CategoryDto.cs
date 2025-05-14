@@ -31,4 +31,9 @@ namespace TalentV2.DomainServices.Categories.Dtos
     {
         public string Version { get; set; }
     }
+    
+    public class MezonMessageFunctionDto : CategoryDto
+    {
+        public string Key { get; set; }
+    }
 }
