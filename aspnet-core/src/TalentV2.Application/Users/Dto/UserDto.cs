@@ -27,6 +27,8 @@ namespace TalentV2.Users.Dto
         [StringLength(AbpUserBase.MaxEmailAddressLength)]
         public string EmailAddress { get; set; }
 
+        public string MezonUserId { get; set; }
+
         public bool IsActive { get; set; }
 
         public string FullName { get; set; }
@@ -35,7 +37,6 @@ namespace TalentV2.Users.Dto
         public DateTime? LastLoginTime { get; set; }
 
         public DateTime CreationTime { get; set; }
-
         public string[] RoleNames { get; set; }
         public long? BranchId { get; set; }
         public string PhoneNumber { get; set; }
