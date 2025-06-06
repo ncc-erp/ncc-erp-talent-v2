@@ -118,6 +118,23 @@
             />
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-md-3 col-form-label" for="mezonUserId">
+            {{ "Mezon User ID" | localize }}
+          </label>
+          <div class="col-md-9">
+            <input
+              type="text"
+              class="form-control"
+              name="mezonUserId"
+              id="mezonUserId"
+              maxlength="256"
+              [(ngModel)]="user.mezonUserId"
+              #mezonUserIdModel="ngModel"
+              #mezonUserIdEl
+            />
+          </div>
+        </div>
         <div
           class="form-group row mb-0"
           *ngIf="permission.isGranted(PS.Pages_Users_Activation)"

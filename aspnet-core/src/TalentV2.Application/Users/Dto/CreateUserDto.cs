@@ -40,6 +40,8 @@ namespace TalentV2.Users.Dto
 
         public string PhoneNumber { get; set; }
 
+        public string MezonUserId { get; set; }
+
         public void Normalize()
         {
             if (RoleNames == null)

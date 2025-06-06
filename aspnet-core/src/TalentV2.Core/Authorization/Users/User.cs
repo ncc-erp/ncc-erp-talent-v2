@@ -46,6 +46,8 @@ namespace TalentV2.Authorization.Users
         public long? BranchId { get; set; }
         public long? PositionId { get; set; }
         public string SignatureContact { get; set; }
+        [MaxLength(100)]
+        public string MezonUserId { get; set; }
         [DefaultValue(false)]
         [ForeignKey(nameof(BranchId))]
         public Branch Branch { get; set; }
