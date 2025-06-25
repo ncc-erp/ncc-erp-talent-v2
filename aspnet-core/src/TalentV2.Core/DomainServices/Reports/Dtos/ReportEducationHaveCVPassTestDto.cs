@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace TalentV2.DomainServices.Reports.Dtos
 {
@@ -12,11 +8,21 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public string BranchName { get; set; }
         public IEnumerable<T> Educations { get; set; }
     }
+
     public class ReportEducationHaveCVPassTestDto
     {
         public long EducationId { get; set; }
         public string EducationName { get; set; }
         public string ColorCode { get; set; }
         public int TotalCV { get; set; }
+    }
+
+    public class CandidateQuantityInUniversity : ReportEducationHaveCVPassTestDto
+    {
+        public int PassCV { get; set; }
+        public int PassTest { get; set; }
+        public int PassInterview { get; set; }
+        public int Onboard { get; set; }
+        public int Other { get; set; }
     }
 }
