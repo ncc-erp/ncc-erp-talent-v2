@@ -14,8 +14,6 @@ namespace TalentV2.WebServices.ExternalServices.Mezon.Dtos
         public string DisplayName { get; set; }
         [JsonProperty("avatar_url")]
         public string AvatarUrl { get; set; }
-        [JsonProperty("mezon_id")]
-        public string MezonId { get; set; }
     }
 
     public class UserInfoResponse
@@ -37,6 +35,12 @@ namespace TalentV2.WebServices.ExternalServices.Mezon.Dtos
 
         [JsonProperty("sub")]
         public string Subject { get; set; }
+
+        [JsonProperty("mezon_id")]
+        public string MezonId { get; set; }
+
+        [JsonProperty("user_id")]
+        public string UserId { get; set; }
 
         public DateTime AuthTimeUtc => DateTimeOffset.FromUnixTimeSeconds(AuthTime).UtcDateTime;
         public DateTime IssuedAtUtc => DateTimeOffset.FromUnixTimeSeconds(IssuedAt).UtcDateTime;

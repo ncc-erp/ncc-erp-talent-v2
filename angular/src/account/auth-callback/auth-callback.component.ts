@@ -25,13 +25,24 @@ export class AuthCallbackComponent extends AppComponentBase implements OnInit {
 
       const code = params['code'];
       const scope = params['scope'];
-      const state = params['state']
-      if (code && scope && state) {
-        this.showToastMessage(ToastMessageType.ERROR, 'something went wrong!');
+
+      if (!code) {
+        this.isLoading = false;
+        this.showToastMessage(ToastMessageType.ERROR, 'Invalid authentication parameters!');
+        this.router.navigate(['/account/login']);
       }
 
-      this.loginService.authenticateMezon(code, scope).subscribe(res => {
-        this.isLoading = res.loading;
+      this.loginService.authenticateMezon(code, scope).subscribe({
+        next: (res) => {
+          this.isLoading = res.loading;
+          if (res.error) {
+            this.router.navigate(['/account/login']);
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.router.navigate(['/account/login']);
+        }
       });
     });
   }

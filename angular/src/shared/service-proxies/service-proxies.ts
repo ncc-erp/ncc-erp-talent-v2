@@ -2303,6 +2303,7 @@ export class CreateUserDto implements ICreateUserDto {
     password: string;
     branchId?: number;
     phoneNumber?: string;
+    mezonUserId?: string;
 
     constructor(data?: ICreateUserDto) {
         if (data) {
@@ -2328,6 +2329,7 @@ export class CreateUserDto implements ICreateUserDto {
                     this.roleNames.push(item);
             }
             this.password = _data["password"];
+            this.mezonUserId = _data["mezonUserId"];
         }
     }
 
@@ -2353,6 +2355,7 @@ export class CreateUserDto implements ICreateUserDto {
                 data["roleNames"].push(item);
         }
         data["password"] = this.password;
+        data["mezonUserId"] = this.mezonUserId;
         return data;
     }
 
@@ -2374,6 +2377,7 @@ export interface ICreateUserDto {
     password: string;
     branchId?: number;
     phoneNumber?: string;
+    mezonUserId?: string;
 }
 
 export class ExternalAuthenticateModel implements IExternalAuthenticateModel {
@@ -3627,6 +3631,7 @@ export class UserDto implements IUserDto {
     branchId?: number;
     branchName?: string;
     phoneNumber?: string;
+    mezonUserId?: string;
 
     constructor(data?: IUserDto) {
         if (data) {
@@ -3652,6 +3657,7 @@ export class UserDto implements IUserDto {
             this.branchId = _data["branchId"];
             this.branchName = _data["branchName"];
             this.phoneNumber = _data["phoneNumber"];
+            this.mezonUserId = _data["mezonUserId"];
             if (Array.isArray(_data["roleNames"])) {
                 this.roleNames = [] as any;
                 for (let item of _data["roleNames"])
@@ -3682,6 +3688,7 @@ export class UserDto implements IUserDto {
         data["branchId"] = this.branchId;
         data["branchName"] = this.branchName;
         data["phoneNumber"] = this.phoneNumber;
+        data["mezonUserId"] = this.mezonUserId;
         if (Array.isArray(this.roleNames)) {
             data["roleNames"] = [];
             for (let item of this.roleNames)
@@ -3714,6 +3721,7 @@ export interface IUserDto {
     branchId?: number;
     branchName?: string;
     phoneNumber?: string;
+    mezonUserId?: string;
 }
 
 export class UserDtoPagedResultDto implements IUserDtoPagedResultDto {
