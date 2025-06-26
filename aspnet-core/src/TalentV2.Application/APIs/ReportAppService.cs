@@ -67,9 +67,15 @@ namespace TalentV2.APIs
         }
 
         [HttpGet]
-        public async Task<ReportEducationByBranchDto<CandidateQuantityInUniversity>> GetCandidateQuantityInUniversity(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
+        public async Task<ReportEducationByBranchDto<CandidateQuantityByEducationReportDto>> GetCandidateQuantityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
         {
-            return await _reportManager.GetCandidateQuantityInUniversity(fd, td, branchId);
+            return await _reportManager.ReportCandidateQuantityByEducation(fd, td, branchId);
+        }
+
+        [HttpGet]
+        public async Task<ReportEducationByBranchDto<CandidateDensityByEducationReportDto>> GetCandidateDensityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
+        {
+            return await _reportManager.ReportCandidateDensityByEducation(fd, td, branchId);
         }
 
         [AbpAuthorize(PermissionNames.Pages_Reports_Overview_Export)]
