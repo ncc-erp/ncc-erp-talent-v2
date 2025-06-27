@@ -8,7 +8,7 @@ namespace TalentV2.Constants.Const
 {
     public static class TalentConstants
     {
-        public const float LAUNCH_ALLOWANCE = 900000;
+        public const float LAUNCH_ALLOWANCE = 1000000;
         public const string PROJECT_NAME = "talent";
         public const long MEGA_BYTE = 1024 * 1024;
         public static string UploadFileProvider { get; set; }
