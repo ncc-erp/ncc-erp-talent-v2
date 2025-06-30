@@ -1,14 +1,12 @@
 <div class="breadcrumb header">
   <div class="w-100 d-flex justify-content-between">
     <div>
-      <talent-section-breadcrumb
-      [breadcrumbConfig]="breadcrumbConfig"
-    ></talent-section-breadcrumb>
+      <talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig"></talent-section-breadcrumb>
     </div>
     <div>
       <button class="btn btn-success ml-2"
-      *ngIf="permission.isGranted(PS.Pages_Reports_Intern_Education_Export)"
-      (click)="exportInternEducation()">
+        *ngIf="permission.isGranted(PS.Pages_Reports_Intern_Education_Export)"
+        (click)="exportInternEducation()">
         <i class="pi pi-download fa-download mr-1"></i>
         Export
       </button>
@@ -25,8 +23,8 @@
             [label]="'Time'"
             [defaultOption]="defaultOptionTime"
             (selectChange)="onTalentDateChange($event)"
-            class="talent-date"
-          ></talent-date-selector>
+            class="talent-date">
+          </talent-date-selector>
         </div>
         <div class="col-12 col-md-4 item-group">
           <label for="branch" class="mr-2">{{ "Branch" | localize }}</label>
@@ -37,8 +35,8 @@
               [(ngModel)]="filterBranch"
               defaultLabel="Select a Branch"
               optionLabel="name"
-              (onChange)="onSelectChangeBranch($event)"
-            ></p-multiSelect>
+              (onChange)="onSelectChangeBranch($event)">
+            </p-multiSelect>
           </div>
         </div>
       </div>
@@ -52,8 +50,8 @@
               type="pie"
               [data]="item.dataChart"
               [plugins]="chartPlugins"
-              [options]="chartOptionsPie"
-            ></p-chart>
+              [options]="chartOptionsPie">
+            </p-chart>
             <h4 class="text-bold mt-3">
               {{ item.branchName }} - {{ "Onboarded" | localize }}
             </h4>
@@ -64,14 +62,41 @@
               type="bar"
               [data]="dataBarChart[i]?.dataChart"
               [plugins]="chartPlugins"
-              [options]="chartOptionsBar"
-            ></p-chart>
+              [options]="chartOptionsBar">
+            </p-chart>
             <h4 class="text-bold mt-3">
               {{ item.branchName }} - {{ "Pass test" | localize }}
             </h4>
           </div>
         </ng-container>
       </div>
+      
+      <ng-container *ngIf="recruitmentQuantityCharts.length > 0 || recruitmentPercentageCharts.length > 0">
+        <div class="divider"></div>
+        <div class="section-header mb-4">
+          <h3 class="section-title">
+            <i class="pi pi-chart-bar mr-2"></i>
+            {{ "Recruitment Status" | localize }}
+          </h3>
+        </div>
+      </ng-container>
+
+      <div class="chart-filters mt-4" 
+           *ngIf="recruitmentQuantityCharts.length > 0 || recruitmentPercentageCharts.length > 0">
+        <stage-filter 
+          [filters]="stageFilters"
+          (filtersChange)="onStageFilterChange($event)">
+        </stage-filter>
+      </div>
+
+      <quantity-chart 
+        [chartData]="recruitmentQuantityCharts">
+      </quantity-chart>
+
+      <percentage-chart 
+        [chartData]="recruitmentPercentageCharts">
+      </percentage-chart>
+
     </div>
   </div>
 </section>
