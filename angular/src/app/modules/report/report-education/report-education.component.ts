@@ -16,7 +16,6 @@ import { ReportInternService } from './../../../core/services/report/report-inte
 import {ExportDialogComponent} from '../../../../shared/components/export-dialog/export-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {ExportDialogService} from '../../../core/services/export/export-dialog.service';
-import { setOptionsStageChart, setOptionsCombinedChart } from './helpers/report-education.helper';
 @Component({
   selector: 'talent-report-education',
   templateUrl: './report-education.component.html',
@@ -47,17 +46,6 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   recruitmentPercentageCharts: any[] = [];
   candidateQuantityData: BranchEducationData[] = [];
   candidateDensityData: BranchEducationData[] = [];
-  public chartOptionsQuantity: ChartOptions;
-  public chartOptionsDensity: ChartOptions;
-
-  stageFilters = {
-    passCV: true,
-    passTest: true, 
-    passInterview: true,
-    other: true,
-    onboard: true
-  };
-
 
   constructor(
     injector: Injector,
@@ -72,8 +60,7 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   ngOnInit(): void {
     this.setDropdownFilterBranch();
     this.setOptionsCharts();
-    this.chartOptionsDensity = setOptionsStageChart();
-    this.chartOptionsQuantity = setOptionsCombinedChart()
+
   }
 
   onTalentDateChange(talentDateTime: TalentDateTime) {
@@ -90,12 +77,6 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
     this.getAllInternEducationPassTest();
     this.getCandidateDensityByEducation();
     this.getCandidateQuantityByEducation();
-  }
-
-  onStageFilterChange(filters: any): void {
-    this.stageFilters = filters;
-    this.mapToQuantityChart(false);
-    this.mapToPercentageChart(false);
   }
 
   private getAllInternEducationOnboard(isChangeTime = false): void {
@@ -230,60 +211,50 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
       const labels = activeEducations.map(e => e.educationName);
       const datasets = [];
       
-      if (this.stageFilters.onboard) {
-        datasets.push({
-          label: 'Onboard',
-          data: activeEducations.map(e => e.onboard || 0),
-          backgroundColor: '#28a745',
-          borderColor: '#28a745',
-          borderWidth: 0,
-          stack: 'stack1'
-        });
-      }
+      datasets.push({
+        label: 'Onboard',
+        data: activeEducations.map(e => e.onboard || 0),
+        backgroundColor: '#28a745',
+        borderColor: '#28a745',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
       
-      if (this.stageFilters.passInterview) {
-        datasets.push({
-          label: 'Pass Interview', 
-          data: activeEducations.map(e => e.passInterview || 0),
-          backgroundColor: '#17a2b8',
-          borderColor: '#17a2b8',
-          borderWidth: 0,
-          stack: 'stack1'
-        });
-      }
+      datasets.push({
+        label: 'Pass Interview', 
+        data: activeEducations.map(e => e.passInterview || 0),
+        backgroundColor: '#17a2b8',
+        borderColor: '#17a2b8',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
       
-      if (this.stageFilters.passTest) {
-        datasets.push({
-          label: 'Pass Test',
-          data: activeEducations.map(e => e.passTest || 0),
-          backgroundColor: '#ffc107',
-          borderColor: '#ffc107',
-          borderWidth: 0,
-          stack: 'stack1'
-        });
-      }
+      datasets.push({
+        label: 'Pass Test',
+        data: activeEducations.map(e => e.passTest || 0),
+        backgroundColor: '#ffc107',
+        borderColor: '#ffc107',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
       
-      if (this.stageFilters.passCV) {
-        datasets.push({
-          label: 'Pass CV',
-          data: activeEducations.map(e => e.passCV || 0),
-          backgroundColor: '#fd7e14',
-          borderColor: '#fd7e14',
-          borderWidth: 0,
-          stack: 'stack1'
-        });
-      }
+      datasets.push({
+        label: 'Pass CV',
+        data: activeEducations.map(e => e.passCV || 0),
+        backgroundColor: '#fd7e14',
+        borderColor: '#fd7e14',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
       
-      if (this.stageFilters.other) {
-        datasets.push({
-          label: 'Other',
-          data: activeEducations.map(e => e.other || 0),
-          backgroundColor: '#6c757d',
-          borderColor: '#6c757d',
-          borderWidth: 0,
-          stack: 'stack1'
-        });
-      }
+      datasets.push({
+        label: 'Other',
+        data: activeEducations.map(e => e.other || 0),
+        backgroundColor: '#6c757d',
+        borderColor: '#6c757d',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
 
       this.recruitmentQuantityCharts.push({
         branchId: branch.id,
@@ -321,12 +292,7 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
 
       if (activeEducations.length === 0) return;
 
-      const stages = [];
-      if (this.stageFilters.passCV) stages.push('Pass CV');
-      if (this.stageFilters.passTest) stages.push('Pass Test');
-      if (this.stageFilters.passInterview) stages.push('Pass Interview');
-      if (this.stageFilters.other) stages.push('Other');
-      if (this.stageFilters.onboard) stages.push('Onboard');
+      const stages = ['Pass CV', 'Pass Test', 'Pass Interview', 'Other', 'Onboard'];
 
       this.recruitmentPercentageCharts.push({
         branchId: branch.id,
@@ -334,13 +300,13 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
         dataChart: {
           labels: stages,
           datasets: activeEducations.map((education) => {
-            const data = [];
-            
-            if (this.stageFilters.passCV) data.push(education.passCV || 0);
-            if (this.stageFilters.passTest) data.push(education.passTest || 0);
-            if (this.stageFilters.passInterview) data.push(education.passInterview || 0);
-            if (this.stageFilters.other) data.push(education.other || 0);
-            if (this.stageFilters.onboard) data.push(education.onboard || 0);
+            const data = [
+              education.passCV || 0,
+              education.passTest || 0,
+              education.passInterview || 0,
+              education.other || 0,
+              education.onboard || 0
+            ];
 
             return {
               label: education.educationName,
@@ -481,6 +447,14 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
         }
       }
     }
+  }
+
+  getQuantityChartByBranch(branchId: any): any {
+    return this.recruitmentQuantityCharts.find(chart => chart.branchId === branchId);
+  }
+
+  getPercentageChartByBranch(branchId: any): any {
+    return this.recruitmentPercentageCharts.find(chart => chart.branchId === branchId);
   }
 
   private getPercentage(value: number, arrObj: Array<number>, sumAvailabel?: number) {

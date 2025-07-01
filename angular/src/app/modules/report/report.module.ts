@@ -11,8 +11,6 @@ import { InternRecruitmentPerformanceComponent } from './intern-recruitment-perf
 import { ReportEducationComponent } from './report-education/report-education.component';
 import { PercentageChartComponent } from './report-education/components/percentage-chart.component'
 import { QuantityChartComponent } from './report-education/components/quantity-chart.component'
-import { StageFilterComponent } from './report-education/components/stage-filter.component'
-
 @NgModule({
   declarations: [
     RecruitmentOverviewComponent,
@@ -21,7 +19,6 @@ import { StageFilterComponent } from './report-education/components/stage-filter
     ReportEducationComponent,
     PercentageChartComponent,
     QuantityChartComponent,
-    StageFilterComponent
   ],
   imports: [
     CommonModule,

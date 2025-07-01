@@ -17,13 +17,7 @@ import { ChartOptions } from 'chart.js';
       
       <div class="row">
         <div class="col-12" *ngFor="let item of chartData">
-          <div class="chart-container mb-4">
-            <div class="chart-header">
-              <h4 class="chart-title">
-                {{ item.branchName }}
-              </h4>
-            </div>
-            
+          <div class="chart-container mb-4">            
             <div class="chart-wrapper">
               <p-chart
                 type="bar"
@@ -107,7 +101,13 @@ export class QuantityChartComponent implements OnInit {
             pointStyle: 'rect',
             padding: 15,
             font: { size: 12 }
-          }
+          },
+          onHover: (event, legendItem, legend) => {
+            legend.chart.canvas.style.cursor = 'pointer';
+          },
+          onLeave: (event, legendItem, legend) => {
+            legend.chart.canvas.style.cursor = 'default';
+          },
         },
         tooltip: {
           mode: 'index',
