@@ -34,6 +34,14 @@ export class ReportInternService extends BaseApiService {
     return this.get(`/GetEducationPassTest?${this.params(fd, td, branchId).toString()}`);
   }
 
+  public getCandidateDensityByEducation(fd: string, td: string, branchId: number): Observable<ApiResponse<EducationStatistic>> {
+    return this.get(`/GetCandidateDensityByEducation?${this.params(fd, td, branchId).toString()}`);
+  }
+
+  public getCandidateQuantityByEducation(fd: string, td: string, branchId: number): Observable<ApiResponse<EducationStatistic>> {
+    return this.get(`/GetCandidateQuantityByEducation?${this.params(fd, td, branchId).toString()}`);
+  }
+
   public getEducationInternOnboarded(fd: string, td: string, branchId: number): Observable<ApiResponse<EducationStatistic>> {
     return this.get(`/GetEducationInternOnboarded?${this.params(fd, td, branchId).toString()}`);
   }
