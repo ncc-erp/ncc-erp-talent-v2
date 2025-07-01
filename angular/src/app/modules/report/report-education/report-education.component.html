@@ -1,15 +1,13 @@
 <div class="breadcrumb header">
   <div class="w-100 d-flex justify-content-between">
     <div>
-      <talent-section-breadcrumb
-      [breadcrumbConfig]="breadcrumbConfig"
-    ></talent-section-breadcrumb>
+      <talent-section-breadcrumb [breadcrumbConfig]="breadcrumbConfig"></talent-section-breadcrumb>
     </div>
     <div>
       <button class="btn btn-success ml-2"
-      *ngIf="permission.isGranted(PS.Pages_Reports_Intern_Education_Export)"
-      (click)="exportInternEducation()">
-        <i class="pi pi-download fa-download mr-1"></i>
+        *ngIf="permission.isGranted(PS.Pages_Reports_Intern_Education_Export)"
+        (click)="exportInternEducation()">
+        <i class="pi pi-downloadm fa-edownload mr-1"></i>
         Export
       </button>
     </div>
@@ -25,8 +23,8 @@
             [label]="'Time'"
             [defaultOption]="defaultOptionTime"
             (selectChange)="onTalentDateChange($event)"
-            class="talent-date"
-          ></talent-date-selector>
+            class="talent-date">
+          </talent-date-selector>
         </div>
         <div class="col-12 col-md-4 item-group">
           <label for="branch" class="mr-2">{{ "Branch" | localize }}</label>
@@ -37,41 +35,67 @@
               [(ngModel)]="filterBranch"
               defaultLabel="Select a Branch"
               optionLabel="name"
-              (onChange)="onSelectChangeBranch($event)"
-            ></p-multiSelect>
+              (onChange)="onSelectChangeBranch($event)">
+            </p-multiSelect>
           </div>
         </div>
       </div>
     </div>
-
+    
     <div class="card-body mb-0">
-      <div class="report-edu-chart">
+      <!-- COMMENT USING LATER -->
+      <!-- <div class="report-edu-chart">
         <ng-container *ngFor="let item of dataPieChart; let i = index">
           <div>
             <p-chart
               type="pie"
               [data]="item.dataChart"
               [plugins]="chartPlugins"
-              [options]="chartOptionsPie"
-            ></p-chart>
+              [options]="chartOptionsPie">
+            </p-chart>
             <h4 class="text-bold mt-3">
               {{ item.branchName }} - {{ "Onboarded" | localize }}
             </h4>
           </div>
-
+          
           <div>
             <p-chart
               type="bar"
               [data]="dataBarChart[i]?.dataChart"
               [plugins]="chartPlugins"
-              [options]="chartOptionsBar"
-            ></p-chart>
+              [options]="chartOptionsBar">
+            </p-chart>
             <h4 class="text-bold mt-3">
               {{ item.branchName }} - {{ "Pass test" | localize }}
             </h4>
           </div>
         </ng-container>
-      </div>
+      </div> -->
+
+      <ng-container *ngFor="let branch of filterBranch ; let isLast = last">
+        <ng-container *ngIf="getQuantityChartByBranch(branch.id) || getPercentageChartByBranch(branch.id)">
+          <div class="branch-chart-section mb-5">
+            <h4 class="branch-title mb-3">
+              <i class="pi pi-building mr-2"></i>
+              {{ (branch.displayName || branch.name) + ' - ' + 'Branch'}}
+            </h4>
+            
+            <div class="charts-container">
+              <quantity-chart 
+                *ngIf="getQuantityChartByBranch(branch.id)"
+                [chartData]="[getQuantityChartByBranch(branch.id)]">
+              </quantity-chart>
+              
+              <percentage-chart 
+                *ngIf="getPercentageChartByBranch(branch.id)"
+                [chartData]="[getPercentageChartByBranch(branch.id)]">
+              </percentage-chart>
+            </div>
+          </div>
+        </ng-container>
+        <div *ngIf="!isLast" class="divider"></div>
+      </ng-container>
+      
     </div>
   </div>
 </section>

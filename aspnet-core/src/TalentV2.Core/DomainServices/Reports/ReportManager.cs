@@ -179,7 +179,7 @@ namespace TalentV2.DomainServices.Reports
 
             List<CVStatistic> filterCVs = branchId.HasValue ? CVs.FindAll(CV => CV.BranchId == branchId) : CVs;
             List<RequestStatistic> filterRequests = branchId.HasValue ? requests.FindAll(request => request.BranchId == branchId) : requests;
-            
+
             List<SubPositionDto> subPositions = new List<SubPositionDto>();
             foreach (var CV in filterCVs)
             {
@@ -938,6 +938,133 @@ namespace TalentV2.DomainServices.Reports
             var branch = await WorkScope.GetAsync<Branch>(branchId.Value);
             propBranchName.SetValue(dto, branch.Name);
             propBranchId.SetValue(dto, branch.Id);
+        }
+
+        public async Task<ReportEducationByBranchDto<CandidateQuantityByEducationReportDto>> ReportCandidateQuantityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
+        {
+            var startDate = fd.Date;
+            var endDate = td.Date.AddDays(1);
+
+            Expression<Func<RequestCV, bool>> requestCVPredicate = q =>
+                (q.Request.UserType == userType)
+                && (q.LastModificationTime >= startDate && q.LastModificationTime < endDate)
+                && (!branchId.HasValue || q.CV.BranchId == branchId.Value);
+
+            var requestCVs = WorkScope.GetAll<RequestCV>()
+                .Where(requestCVPredicate)
+                .GroupBy(x => x.CVId)
+                .Select(x => new
+                {
+                    CVId = x.Key,
+                    RequestCVStatus = x.OrderByDescending(r => r.LastModificationTime).FirstOrDefault().Status,
+                    EducationId = x.OrderByDescending(r => r.LastModificationTime).FirstOrDefault().CV.CVEducations.Any() ? x.OrderByDescending(r => r.LastModificationTime).FirstOrDefault().CV.CVEducations.OrderBy(e => e.CreationTime).FirstOrDefault().EducationId : (long?)null
+                })
+                .ToList();
+
+            var educations = WorkScope.GetAll<Education>()
+                .AsEnumerable()
+                .Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.ColorCode,
+                    CVs = requestCVs.Where(x => x.EducationId == e.Id).ToList()
+                }).ToList();
+
+            var report = educations.Select(x => new CandidateQuantityByEducationReportDto
+            {
+                EducationId = x.Id,
+                EducationName = x.Name,
+                ColorCode = x.ColorCode,
+                TotalCV = x.CVs.Count,
+                PassCV = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV),
+                PassTest = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest),
+                PassInterview = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview),
+                Onboard = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded),
+                Other = x.CVs.Count(cv => cv.RequestCVStatus != RequestCVStatus.AddedCV
+                                    && cv.RequestCVStatus != RequestCVStatus.PassedTest
+                                    && cv.RequestCVStatus != RequestCVStatus.PassedInterview
+                                    && cv.RequestCVStatus != RequestCVStatus.Onboarded)
+            }).ToList();
+
+            var result = new ReportEducationByBranchDto<CandidateQuantityByEducationReportDto>
+            {
+                Educations = report
+            };
+            await GetBranchInfo(result, branchId);
+
+            return result;
+        }
+
+        public async Task<ReportEducationByBranchDto<CandidateDensityByEducationReportDto>> ReportCandidateDensityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
+        {
+            var startDate = fd.Date;
+            var endDate = td.Date.AddDays(1);
+
+            Expression<Func<RequestCV, bool>> requestCVPredicate = q =>
+                (q.Request.UserType == userType)
+                && (q.LastModificationTime >= startDate && q.LastModificationTime < endDate)
+                && (!branchId.HasValue || q.CV.BranchId == branchId.Value);
+
+            var requestCVs = WorkScope.GetAll<RequestCV>()
+                .Where(requestCVPredicate)
+                .GroupBy(x => x.CVId)
+                .Select(x => new
+                {
+                    CVId = x.Key,
+                    RequestCVStatus = x.OrderByDescending(r => r.LastModificationTime).FirstOrDefault().Status,
+                    EducationId = x.OrderByDescending(r => r.LastModificationTime).FirstOrDefault().CV.CVEducations.Any() ? x.OrderByDescending(r => r.LastModificationTime).FirstOrDefault().CV.CVEducations.OrderBy(e => e.CreationTime).FirstOrDefault().EducationId : (long?)null
+                })
+                .ToList();
+
+            var educations = WorkScope.GetAll<Education>()
+                .AsEnumerable()
+                .Select(e => new
+                {
+                    e.Id,
+                    e.Name,
+                    e.ColorCode,
+                    CVs = requestCVs.Where(x => x.EducationId == e.Id).ToList()
+                }).ToList();
+
+            var report = educations.Select(x => new CandidateDensityByEducationReportDto
+            {
+                EducationId = x.Id,
+                EducationName = x.Name,
+                ColorCode = x.ColorCode,
+                PassCV = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV)),
+                PassTest = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest)),
+                PassInterview = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview)),
+                Onboard = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded)),
+                Other = CaculateCandidateDensity(x.CVs.Count(cv =>
+                                    cv.RequestCVStatus != RequestCVStatus.AddedCV
+                                    && cv.RequestCVStatus != RequestCVStatus.PassedTest
+                                    && cv.RequestCVStatus != RequestCVStatus.PassedInterview
+                                    && cv.RequestCVStatus != RequestCVStatus.Onboarded)
+                                    , requestCVs.Count(cv =>
+                                    cv.RequestCVStatus != RequestCVStatus.AddedCV
+                                    && cv.RequestCVStatus != RequestCVStatus.PassedTest
+                                    && cv.RequestCVStatus != RequestCVStatus.PassedInterview
+                                    && cv.RequestCVStatus != RequestCVStatus.Onboarded))
+            }).ToList();
+
+            var result = new ReportEducationByBranchDto<CandidateDensityByEducationReportDto>
+            {
+                Educations = report
+            };
+            await GetBranchInfo(result, branchId);
+
+            return result;
+        }
+
+        private double CaculateCandidateDensity(int numerator, int denominator)
+        {
+            if (numerator == 0 || denominator == 0)
+            {
+                return Math.Round((double)0, 2);
+            }
+
+            return Math.Round((double)numerator / denominator * 100, 2);
         }
     }
 }

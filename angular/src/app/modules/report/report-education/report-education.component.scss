@@ -22,6 +22,10 @@
   .item-group {
     padding: 0.25rem;
   }
+
+  .chart-filters {
+    margin-top: 2rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -31,10 +35,26 @@
     }
   }
 }
+
+.divider {
+  border-bottom: 1px solid #dee2e6;
+  margin: 20px 0px;
+}
+
+.branch-title {
+  color: #495057;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  .pi {
+    font-size: 1.5rem;
+  }
+}
+
 .breadcrumb {
   padding: 0px;
 }
-.btn{
+
+.btn {
   margin: 10px;
 }
-

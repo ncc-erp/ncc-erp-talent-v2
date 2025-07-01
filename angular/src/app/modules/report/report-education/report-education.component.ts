@@ -1,3 +1,4 @@
+import { BranchEducationData } from './interfaces/report-education.interface';
 import { Component, Injector, OnInit } from '@angular/core';
 import { Branch } from '@app/core/models/categories/branch.model';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
@@ -15,7 +16,6 @@ import { ReportInternService } from './../../../core/services/report/report-inte
 import {ExportDialogComponent} from '../../../../shared/components/export-dialog/export-dialog.component';
 import {MatDialog} from '@angular/material/dialog';
 import {ExportDialogService} from '../../../core/services/export/export-dialog.service';
-
 @Component({
   selector: 'talent-report-education',
   templateUrl: './report-education.component.html',
@@ -42,6 +42,10 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   public chartOptionsPie: ChartOptions;
   public chartOptionsBar: ChartOptions;
   isDialogOpen = false;
+  recruitmentQuantityCharts: any[] = []; 
+  recruitmentPercentageCharts: any[] = [];
+  candidateQuantityData: BranchEducationData[] = [];
+  candidateDensityData: BranchEducationData[] = [];
 
   constructor(
     injector: Injector,
@@ -56,18 +60,23 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   ngOnInit(): void {
     this.setDropdownFilterBranch();
     this.setOptionsCharts();
+
   }
 
   onTalentDateChange(talentDateTime: TalentDateTime) {
     this.searchWithCreationTime = talentDateTime;
     this.getAllInternEducationOnboard(true);
     this.getAllInternEducationPassTest(true);
+    this.getCandidateDensityByEducation(true);
+    this.getCandidateQuantityByEducation(true);
   }
 
   onSelectChangeBranch($event) {
     if (this.checkRemoveReport($event)) return;
     this.getAllInternEducationOnboard();
     this.getAllInternEducationPassTest();
+    this.getCandidateDensityByEducation();
+    this.getCandidateQuantityByEducation();
   }
 
   private getAllInternEducationOnboard(isChangeTime = false): void {
@@ -110,6 +119,206 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
       });
       this.mapToDataBarChart(isChangeTime);
     })
+  }
+
+  private getCandidateQuantityByEducation(isChangeTime = false): void {
+    let promises = [];
+    const fd = this.searchWithCreationTime?.fromDate.format(DateFormat.YYYY_MM_DD);
+    const td = this.searchWithCreationTime?.toDate.format(DateFormat.YYYY_MM_DD);
+
+    if (!fd) return;
+
+    this.filterBranch.forEach((branch: Branch) => {
+      promises.push(this._reportIntern.getCandidateQuantityByEducation(fd, td, branch.id));
+    });
+
+    forkJoin(promises).subscribe({
+      next: (res: ApiResponse<BranchEducationData>[]) => {        
+        if (isChangeTime) this.candidateQuantityData = [];
+        res.forEach((element, index) => {
+          if (element && element.result) {
+            this.candidateQuantityData[index] = element.result;
+          } else {
+            this.candidateQuantityData[index] = {
+              branchId: this.filterBranch[index].id,
+              branchName: this.filterBranch[index].displayName || this.filterBranch[index].name,
+              educations: []
+            };
+          }
+        });
+        this.mapToQuantityChart(isChangeTime);
+      },
+      error: (error) => {
+        console.error('Error loading quantity data:', error);
+      }
+    });
+  }
+
+  private getCandidateDensityByEducation(isChangeTime = false): void {
+    let promises = [];
+    const fd = this.searchWithCreationTime?.fromDate.format(DateFormat.YYYY_MM_DD);
+    const td = this.searchWithCreationTime?.toDate.format(DateFormat.YYYY_MM_DD);
+    if (!fd) return;
+    this.filterBranch.forEach((branch: Branch) => {
+      promises.push(this._reportIntern.getCandidateDensityByEducation(fd, td, branch.id));
+    });
+
+    forkJoin(promises).subscribe({
+      next: (res: ApiResponse<BranchEducationData>[]) => {        
+        if (isChangeTime) this.candidateDensityData = [];
+        res.forEach((element, index) => {
+          if (element && element.result) {
+            this.candidateDensityData[index] = element.result;
+          } else {
+            this.candidateDensityData[index] = {
+              branchId: this.filterBranch[index].id,
+              branchName: this.filterBranch[index].displayName || this.filterBranch[index].name,
+              educations: []
+            };
+          }
+        });
+        this.mapToPercentageChart(isChangeTime);
+      },
+      error: (error) => {
+        console.error('Error loading density data:', error);
+      }
+    });
+  }
+
+  private mapToQuantityChart(isChangeTime: boolean): void {
+    if (isChangeTime) this.recruitmentQuantityCharts = [];
+
+    if (this.candidateQuantityData.length === 0) {
+      return;
+    }
+
+    this.filterBranch.forEach((branch, branchIndex) => {
+      if (!isChangeTime && this.recruitmentQuantityCharts.findIndex(s => s.branchId == branch.id) >= 0) {
+        const existingIndex = this.recruitmentQuantityCharts.findIndex(s => s.branchId == branch.id);
+        if (existingIndex >= 0) {
+          this.recruitmentQuantityCharts.splice(existingIndex, 1);
+        }
+      }
+
+      const quantityBranchData = this.candidateQuantityData[branchIndex];
+      if (!quantityBranchData) return;
+
+      const quantityEducations = quantityBranchData.educations || [];
+      const activeEducations = quantityEducations.filter(q => q && q.totalCV && q.totalCV > 0);
+      
+      if (activeEducations.length === 0) return;
+
+      const labels = activeEducations.map(e => e.educationName);
+      const datasets = [];
+      
+      datasets.push({
+        label: 'Onboard',
+        data: activeEducations.map(e => e.onboard || 0),
+        backgroundColor: '#28a745',
+        borderColor: '#28a745',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
+      
+      datasets.push({
+        label: 'Pass Interview', 
+        data: activeEducations.map(e => e.passInterview || 0),
+        backgroundColor: '#17a2b8',
+        borderColor: '#17a2b8',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
+      
+      datasets.push({
+        label: 'Pass Test',
+        data: activeEducations.map(e => e.passTest || 0),
+        backgroundColor: '#ffc107',
+        borderColor: '#ffc107',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
+      
+      datasets.push({
+        label: 'Pass CV',
+        data: activeEducations.map(e => e.passCV || 0),
+        backgroundColor: '#fd7e14',
+        borderColor: '#fd7e14',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
+      
+      datasets.push({
+        label: 'Other',
+        data: activeEducations.map(e => e.other || 0),
+        backgroundColor: '#6c757d',
+        borderColor: '#6c757d',
+        borderWidth: 0,
+        stack: 'stack1'
+      });
+
+      this.recruitmentQuantityCharts.push({
+        branchId: branch.id,
+        branchName: branch.displayName || branch.name,
+        dataChart: {
+          labels: labels,
+          datasets: datasets
+        }
+      });
+    });
+  }
+
+  private mapToPercentageChart(isChangeTime: boolean): void {
+    if (isChangeTime) this.recruitmentPercentageCharts = [];
+
+    if (this.candidateDensityData.length === 0) {
+      return;
+    }
+
+    this.filterBranch.forEach((branch, branchIndex) => {
+      if (!isChangeTime && this.recruitmentPercentageCharts.findIndex(s => s.branchId == branch.id) >= 0) {
+        const existingIndex = this.recruitmentPercentageCharts.findIndex(s => s.branchId == branch.id);
+        if (existingIndex >= 0) {
+          this.recruitmentPercentageCharts.splice(existingIndex, 1);
+        }
+      }
+
+      const densityBranchData = this.candidateDensityData[branchIndex];
+      if (!densityBranchData) return;
+
+      const densityEducations = densityBranchData.educations || [];
+      const activeEducations = densityEducations.filter(d => 
+        d && (d.passCV > 0 || d.passTest > 0 || d.passInterview > 0 || d.onboard > 0 || d.other > 0)
+      );
+
+      if (activeEducations.length === 0) return;
+
+      const stages = ['Pass CV', 'Pass Test', 'Pass Interview', 'Other', 'Onboard'];
+
+      this.recruitmentPercentageCharts.push({
+        branchId: branch.id,
+        branchName: branch.displayName || branch.name,
+        dataChart: {
+          labels: stages,
+          datasets: activeEducations.map((education) => {
+            const data = [
+              education.passCV || 0,
+              education.passTest || 0,
+              education.passInterview || 0,
+              education.other || 0,
+              education.onboard || 0
+            ];
+
+            return {
+              label: education.educationName,
+              data: data,
+              backgroundColor: education.colorCode,
+              borderColor: education.colorCode,
+              borderWidth: 0
+            };
+          })
+        }
+      });
+    });
   }
 
   private mapToDataBarChart(isChangeTime: boolean): void {
@@ -160,12 +369,16 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
     });
   }
 
-  private checkRemoveReport($event) {
+ private checkRemoveReport($event) {
     if ($event.value.length == 0) {
       this.dataPieChart = [];
       this.dataBarChart = [];
       this.educationOnboarded = [];
       this.educationPassTest = [];
+      this.recruitmentQuantityCharts = [];
+      this.recruitmentPercentageCharts = [];
+      this.candidateQuantityData = [];
+      this.candidateDensityData = [];
       return true;
     }
 
@@ -177,6 +390,10 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
     this.dataBarChart.splice(index, 1);
     this.educationOnboarded.splice(index, 1);
     this.educationPassTest.splice(index, 1);
+    this.recruitmentQuantityCharts.splice(index, 1);
+    this.recruitmentPercentageCharts.splice(index, 1);
+    this.candidateQuantityData.splice(index, 1);
+    this.candidateDensityData.splice(index, 1);
     return true;
   }
 
@@ -230,6 +447,14 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
         }
       }
     }
+  }
+
+  getQuantityChartByBranch(branchId: any): any {
+    return this.recruitmentQuantityCharts.find(chart => chart.branchId === branchId);
+  }
+
+  getPercentageChartByBranch(branchId: any): any {
+    return this.recruitmentPercentageCharts.find(chart => chart.branchId === branchId);
   }
 
   private getPercentage(value: number, arrObj: Array<number>, sumAvailabel?: number) {

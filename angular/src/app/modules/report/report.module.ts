@@ -9,15 +9,16 @@ import { StaffRecruitmentPerformanceComponent } from './staff-recruitment-perfor
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InternRecruitmentPerformanceComponent } from './intern-recruitment-performance/intern-recruitment-performance.component';
 import { ReportEducationComponent } from './report-education/report-education.component';
-
-
-
+import { PercentageChartComponent } from './report-education/components/percentage-chart.component'
+import { QuantityChartComponent } from './report-education/components/quantity-chart.component'
 @NgModule({
   declarations: [
     RecruitmentOverviewComponent,
     StaffRecruitmentPerformanceComponent,
     InternRecruitmentPerformanceComponent,
-    ReportEducationComponent
+    ReportEducationComponent,
+    PercentageChartComponent,
+    QuantityChartComponent,
   ],
   imports: [
     CommonModule,
