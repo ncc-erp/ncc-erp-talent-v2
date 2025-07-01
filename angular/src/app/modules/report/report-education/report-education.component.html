@@ -7,7 +7,7 @@
       <button class="btn btn-success ml-2"
         *ngIf="permission.isGranted(PS.Pages_Reports_Intern_Education_Export)"
         (click)="exportInternEducation()">
-        <i class="pi pi-download fa-download mr-1"></i>
+        <i class="pi pi-downloadm fa-edownload mr-1"></i>
         Export
       </button>
     </div>
@@ -41,9 +41,10 @@
         </div>
       </div>
     </div>
-
+    
     <div class="card-body mb-0">
-      <div class="report-edu-chart">
+      <!-- COMMENT USING LATER -->
+      <!-- <div class="report-edu-chart">
         <ng-container *ngFor="let item of dataPieChart; let i = index">
           <div>
             <p-chart
@@ -56,7 +57,7 @@
               {{ item.branchName }} - {{ "Onboarded" | localize }}
             </h4>
           </div>
-
+          
           <div>
             <p-chart
               type="bar"
@@ -69,34 +70,32 @@
             </h4>
           </div>
         </ng-container>
-      </div>
-      
-      <ng-container *ngIf="recruitmentQuantityCharts.length > 0 || recruitmentPercentageCharts.length > 0">
-        <div class="divider"></div>
-        <div class="section-header mb-4">
-          <h3 class="section-title">
-            <i class="pi pi-chart-bar mr-2"></i>
-            {{ "Recruitment Status" | localize }}
-          </h3>
-        </div>
+      </div> -->
+
+      <ng-container *ngFor="let branch of filterBranch ; let isLast = last">
+        <ng-container *ngIf="getQuantityChartByBranch(branch.id) || getPercentageChartByBranch(branch.id)">
+          <div class="branch-chart-section mb-5">
+            <h4 class="branch-title mb-3">
+              <i class="pi pi-building mr-2"></i>
+              {{ (branch.displayName || branch.name) + ' - ' + 'Branch'}}
+            </h4>
+            
+            <div class="charts-container">
+              <quantity-chart 
+                *ngIf="getQuantityChartByBranch(branch.id)"
+                [chartData]="[getQuantityChartByBranch(branch.id)]">
+              </quantity-chart>
+              
+              <percentage-chart 
+                *ngIf="getPercentageChartByBranch(branch.id)"
+                [chartData]="[getPercentageChartByBranch(branch.id)]">
+              </percentage-chart>
+            </div>
+          </div>
+        </ng-container>
+        <div *ngIf="!isLast" class="divider"></div>
       </ng-container>
-
-      <div class="chart-filters mt-4" 
-           *ngIf="recruitmentQuantityCharts.length > 0 || recruitmentPercentageCharts.length > 0">
-        <stage-filter 
-          [filters]="stageFilters"
-          (filtersChange)="onStageFilterChange($event)">
-        </stage-filter>
-      </div>
-
-      <quantity-chart 
-        [chartData]="recruitmentQuantityCharts">
-      </quantity-chart>
-
-      <percentage-chart 
-        [chartData]="recruitmentPercentageCharts">
-      </percentage-chart>
-
+      
     </div>
   </div>
 </section>

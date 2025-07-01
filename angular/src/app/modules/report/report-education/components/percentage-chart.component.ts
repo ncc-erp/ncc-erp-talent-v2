@@ -19,13 +19,6 @@ import { ChartOptions } from 'chart.js';
       <div class="row">
         <div class="col-12" *ngFor="let item of chartData">
           <div class="chart-container mb-4">
-            <div class="chart-header">
-              <h4 class="chart-title">
-                <i class="pi pi-building mr-2"></i>
-                {{ item.branchName }}
-              </h4>
-            </div>
-            
             <div class="chart-wrapper">
               <p-chart
                 type="bar"
@@ -124,7 +117,13 @@ export class PercentageChartComponent implements OnInit {
             pointStyle: 'rect',
             padding: 10,
             font: { size: 11 }
-          }
+          },
+          onHover: (event, legendItem, legend) => {
+            legend.chart.canvas.style.cursor = 'pointer';
+          },
+          onLeave: (event, legendItem, legend) => {
+            legend.chart.canvas.style.cursor = 'default';
+          },
         },
         tooltip: {
           callbacks: {
@@ -141,7 +140,8 @@ export class PercentageChartComponent implements OnInit {
           max: 100,
           title: {
             display: true,
-            text: 'Proportion (%)'
+            text: 'Proportion (%)',
+            font: { size: 14, weight: 'bold' }
           },
           ticks: {
             callback: function(value) {
@@ -153,7 +153,8 @@ export class PercentageChartComponent implements OnInit {
           stacked: true,
           title: {
             display: true,
-            text: 'Recruitment status'
+            text: 'Recruitment status',
+            font: { size: 14, weight: 'bold' }
           }
         }
       }

@@ -41,21 +41,13 @@
   margin: 20px 0px;
 }
 
-.section-header {
-  .section-title {
-    color: #495057;
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    
-    .pi {
-      color: #6f42c1;
-    }
-  }
-  
-  .section-description {
-    font-size: 0.9rem;
-    margin-bottom: 0;
+.branch-title {
+  color: #495057;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  .pi {
+    font-size: 1.5rem;
   }
 }
 
