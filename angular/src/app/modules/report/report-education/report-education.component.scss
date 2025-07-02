@@ -58,3 +58,7 @@
 .btn {
   margin: 10px;
 }
+
+::ng-deep .p-checkbox-label {
+  color: #495057 !important;
+}
