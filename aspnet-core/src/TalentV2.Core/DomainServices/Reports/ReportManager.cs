@@ -977,7 +977,8 @@ namespace TalentV2.DomainServices.Reports
                 EducationName = x.Name,
                 ColorCode = x.ColorCode,
                 TotalCV = x.CVs.Count,
-                PassCV = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.ScheduledTest
+                PassCV = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV
+                                    || cv.RequestCVStatus == RequestCVStatus.ScheduledTest
                                     || cv.RequestCVStatus == RequestCVStatus.FailedTest
                                     || cv.RequestCVStatus == RequestCVStatus.RejectedTest
                                     || cv.RequestCVStatus == RequestCVStatus.RejectedApply),
@@ -1031,7 +1032,8 @@ namespace TalentV2.DomainServices.Reports
                     CVs = requestCVs.Where(x => x.EducationId == e.Id).ToList()
                 }).ToList();
 
-            var totalPassCV = requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.ScheduledTest
+            var totalPassCV = requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV
+                                                || cv.RequestCVStatus == RequestCVStatus.ScheduledTest
                                                 || cv.RequestCVStatus == RequestCVStatus.FailedTest
                                                 || cv.RequestCVStatus == RequestCVStatus.RejectedTest
                                                 || cv.RequestCVStatus == RequestCVStatus.RejectedApply);
@@ -1050,7 +1052,8 @@ namespace TalentV2.DomainServices.Reports
                 EducationId = x.Id,
                 EducationName = x.Name,
                 ColorCode = x.ColorCode,
-                PassCV = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.ScheduledTest
+                PassCV = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV
+                                                                    || cv.RequestCVStatus == RequestCVStatus.ScheduledTest
                                                                     || cv.RequestCVStatus == RequestCVStatus.FailedTest
                                                                     || cv.RequestCVStatus == RequestCVStatus.RejectedTest
                                                                     || cv.RequestCVStatus == RequestCVStatus.RejectedApply), totalPassCV),
