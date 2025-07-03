@@ -75,19 +75,32 @@
       <ng-container *ngFor="let branch of filterBranch ; let isLast = last">
         <ng-container *ngIf="getQuantityChartByBranch(branch.id) || getPercentageChartByBranch(branch.id)">
           <div class="branch-chart-section mb-5">
-            <h4 class="branch-title mb-3">
-              <i class="pi pi-building mr-2"></i>
-              {{ (branch.displayName || branch.name) + ' - ' + 'Branch'}}
-            </h4>
-            
+            <div class="d-flex justify-content-between">
+              <div class="d-flex gap-4">
+                <h4 class="branch-title mb-3">
+                <i class="pi pi-building mr-2"></i>
+                  {{ (branch.displayName || branch.name) + ' ' + 'Branch' + ' - ' + ("Total CVs" | localize) +': ' +  formatNumber(getTotalCVByBranch(branch.id))}}
+              </h4>
+              </div>
+              <p-checkbox
+                [(ngModel)]="filterModeMap[branch.id]"
+                binary="true"
+                inputId="toggleFilter-{{ branch.id }}"
+                styleClass="section-title text-sm"
+                label="{{ 'Hide universities or statuses with no data' | localize }}">
+              </p-checkbox>
+            </div>
+
             <div class="charts-container">
               <quantity-chart 
                 *ngIf="getQuantityChartByBranch(branch.id)"
+                [filterEnabled]="filterModeMap[branch.id]"
                 [chartData]="[getQuantityChartByBranch(branch.id)]">
               </quantity-chart>
               
               <percentage-chart 
                 *ngIf="getPercentageChartByBranch(branch.id)"
+                [filterEnabled]="filterModeMap[branch.id]"
                 [chartData]="[getPercentageChartByBranch(branch.id)]">
               </percentage-chart>
             </div>

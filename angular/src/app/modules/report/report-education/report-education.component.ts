@@ -46,6 +46,7 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   recruitmentPercentageCharts: any[] = [];
   candidateQuantityData: BranchEducationData[] = [];
   candidateDensityData: BranchEducationData[] = [];
+  filterModeMap: { [branchId: string]: boolean } = {};
 
   constructor(
     injector: Injector,
@@ -246,15 +247,6 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
         borderWidth: 0,
         stack: 'stack1'
       });
-      
-      datasets.push({
-        label: 'Other',
-        data: activeEducations.map(e => e.other || 0),
-        backgroundColor: '#6c757d',
-        borderColor: '#6c757d',
-        borderWidth: 0,
-        stack: 'stack1'
-      });
 
       this.recruitmentQuantityCharts.push({
         branchId: branch.id,
@@ -292,7 +284,7 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
 
       if (activeEducations.length === 0) return;
 
-      const stages = ['Pass CV', 'Pass Test', 'Pass Interview', 'Other', 'Onboard'];
+      const stages = ['Pass CV', 'Pass Test', 'Pass Interview', 'Onboard'];
 
       this.recruitmentPercentageCharts.push({
         branchId: branch.id,
@@ -319,6 +311,24 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
         }
       });
     });
+  }
+
+  getTotalCVByBranch(branchId: any): number {
+    const branchData = this.candidateQuantityData.find(data => 
+      data.branchId === branchId || (data.branchId === 0 && branchId === null)
+    );
+    
+    if (!branchData || !branchData.educations) {
+      return 0;
+    }
+    
+    return branchData.educations.reduce((total, education) => {
+      return total + (education.totalCV || 0);
+    }, 0);
+  }
+  
+  formatNumber(num: number): string {
+    return num.toLocaleString();
   }
 
   private mapToDataBarChart(isChangeTime: boolean): void {
