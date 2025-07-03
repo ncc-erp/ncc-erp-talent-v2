@@ -977,14 +977,19 @@ namespace TalentV2.DomainServices.Reports
                 EducationName = x.Name,
                 ColorCode = x.ColorCode,
                 TotalCV = x.CVs.Count,
-                PassCV = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV),
-                PassTest = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest),
-                PassInterview = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview),
-                Onboard = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded),
-                Other = x.CVs.Count(cv => cv.RequestCVStatus != RequestCVStatus.AddedCV
-                                    && cv.RequestCVStatus != RequestCVStatus.PassedTest
-                                    && cv.RequestCVStatus != RequestCVStatus.PassedInterview
-                                    && cv.RequestCVStatus != RequestCVStatus.Onboarded)
+                PassCV = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV
+                                    || cv.RequestCVStatus == RequestCVStatus.ScheduledTest
+                                    || cv.RequestCVStatus == RequestCVStatus.FailedTest
+                                    || cv.RequestCVStatus == RequestCVStatus.RejectedTest
+                                    || cv.RequestCVStatus == RequestCVStatus.RejectedApply),
+                PassTest = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest
+                                    || cv.RequestCVStatus == RequestCVStatus.ScheduledInterview
+                                    || cv.RequestCVStatus == RequestCVStatus.FailedInterview
+                                    || cv.RequestCVStatus == RequestCVStatus.RejectedInterview),
+                PassInterview = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview
+                                    || cv.RequestCVStatus == RequestCVStatus.AcceptedOffer
+                                    || cv.RequestCVStatus == RequestCVStatus.RejectedOffer),
+                Onboard = x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded)
             }).ToList();
 
             var result = new ReportEducationByBranchDto<CandidateQuantityByEducationReportDto>
@@ -1027,25 +1032,39 @@ namespace TalentV2.DomainServices.Reports
                     CVs = requestCVs.Where(x => x.EducationId == e.Id).ToList()
                 }).ToList();
 
+            var totalPassCV = requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV
+                                                || cv.RequestCVStatus == RequestCVStatus.ScheduledTest
+                                                || cv.RequestCVStatus == RequestCVStatus.FailedTest
+                                                || cv.RequestCVStatus == RequestCVStatus.RejectedTest
+                                                || cv.RequestCVStatus == RequestCVStatus.RejectedApply);
+
+            var totalPassTest = requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest
+                                                || cv.RequestCVStatus == RequestCVStatus.ScheduledInterview
+                                                || cv.RequestCVStatus == RequestCVStatus.FailedInterview
+                                                || cv.RequestCVStatus == RequestCVStatus.RejectedInterview);
+
+            var totalPassInterview = requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview
+                                                || cv.RequestCVStatus == RequestCVStatus.AcceptedOffer
+                                                || cv.RequestCVStatus == RequestCVStatus.RejectedOffer);
+
             var report = educations.Select(x => new CandidateDensityByEducationReportDto
             {
                 EducationId = x.Id,
                 EducationName = x.Name,
                 ColorCode = x.ColorCode,
-                PassCV = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV)),
-                PassTest = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest)),
-                PassInterview = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview)),
-                Onboard = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded)),
-                Other = CaculateCandidateDensity(x.CVs.Count(cv =>
-                                    cv.RequestCVStatus != RequestCVStatus.AddedCV
-                                    && cv.RequestCVStatus != RequestCVStatus.PassedTest
-                                    && cv.RequestCVStatus != RequestCVStatus.PassedInterview
-                                    && cv.RequestCVStatus != RequestCVStatus.Onboarded)
-                                    , requestCVs.Count(cv =>
-                                    cv.RequestCVStatus != RequestCVStatus.AddedCV
-                                    && cv.RequestCVStatus != RequestCVStatus.PassedTest
-                                    && cv.RequestCVStatus != RequestCVStatus.PassedInterview
-                                    && cv.RequestCVStatus != RequestCVStatus.Onboarded))
+                PassCV = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.AddedCV
+                                                                    || cv.RequestCVStatus == RequestCVStatus.ScheduledTest
+                                                                    || cv.RequestCVStatus == RequestCVStatus.FailedTest
+                                                                    || cv.RequestCVStatus == RequestCVStatus.RejectedTest
+                                                                    || cv.RequestCVStatus == RequestCVStatus.RejectedApply), totalPassCV),
+                PassTest = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedTest
+                                                                    || cv.RequestCVStatus == RequestCVStatus.ScheduledInterview
+                                                                    || cv.RequestCVStatus == RequestCVStatus.FailedInterview
+                                                                    || cv.RequestCVStatus == RequestCVStatus.RejectedInterview), totalPassTest),
+                PassInterview = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.PassedInterview
+                                                                    || cv.RequestCVStatus == RequestCVStatus.AcceptedOffer
+                                                                    || cv.RequestCVStatus == RequestCVStatus.RejectedOffer), totalPassInterview),
+                Onboard = CaculateCandidateDensity(x.CVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded), requestCVs.Count(cv => cv.RequestCVStatus == RequestCVStatus.Onboarded))
             }).ToList();
 
             var result = new ReportEducationByBranchDto<CandidateDensityByEducationReportDto>
