@@ -15,13 +15,13 @@ namespace TalentV2.APIs
     public class ReportAppService : TalentV2AppServiceBase
     {
         private readonly IReportManager _reportManager;
-        public ReportAppService(IReportManager reportManager) 
+        public ReportAppService(IReportManager reportManager)
         {
             _reportManager = reportManager;
         }
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Reports_Overview)]
-        public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId , long? userId)
+        public async Task<OverviewHiringDto> GetOverviewHiring(DateTime fd, DateTime td, UserType? userType, long? branchId, long? userId)
         {
             return await _reportManager.GetOverviewHiring(fd, td, userType, branchId, userId);
         }
@@ -39,27 +39,43 @@ namespace TalentV2.APIs
         {
             return await _reportManager.GetPerformanceCVSource(fd, td, UserType.Staff, branchId);
         }
+
         [HttpGet]
         [AbpAuthorize(PermissionNames.Pages_Reports_Intern_Performance)]
         public async Task<CVSourceStatisticDto> GetPerformanceInternCVSource(DateTime fd, DateTime td, long? branchId)
         {
             return await _reportManager.GetPerformanceCVSource(fd, td, UserType.Intern, branchId);
         }
+
         [HttpGet]
         public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassTest(DateTime fd, DateTime td, long? branchId)
         {
             return await _reportManager.GetEducationPassTest(fd, td, branchId);
         }
+
         [HttpGet]
         public async Task<ReportEducationByBranchDto<ReportEducationHaveCVOnboardDto>> GetEducationInternOnboarded(DateTime fd, DateTime td, long? branchId)
         {
-            return await _reportManager.GetEducationInternOnboarded(fd,td,branchId);
+            return await _reportManager.GetEducationInternOnboarded(fd, td, branchId);
 
         }
+
         [HttpGet]
         public async Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId)
         {
             return await _reportManager.GetEducationPassInterView(fd, td, branchId);
+        }
+
+        [HttpGet]
+        public async Task<ReportEducationByBranchDto<CandidateQuantityByEducationReportDto>> GetCandidateQuantityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
+        {
+            return await _reportManager.ReportCandidateQuantityByEducation(fd, td, branchId);
+        }
+
+        [HttpGet]
+        public async Task<ReportEducationByBranchDto<CandidateDensityByEducationReportDto>> GetCandidateDensityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern)
+        {
+            return await _reportManager.ReportCandidateDensityByEducation(fd, td, branchId);
         }
 
         [AbpAuthorize(PermissionNames.Pages_Reports_Overview_Export)]

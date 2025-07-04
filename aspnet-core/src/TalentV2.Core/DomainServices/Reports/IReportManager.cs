@@ -20,5 +20,7 @@ namespace TalentV2.DomainServices.Reports
         Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassTest(DateTime fd, DateTime td, long? branchId);
         Task<ReportEducationByBranchDto<ReportEducationHaveCVOnboardDto>> GetEducationInternOnboarded(DateTime fd, DateTime td, long? branchId);
         Task<ReportEducationByBranchDto<ReportEducationHaveCVPassTestDto>> GetEducationPassInterView(DateTime fd, DateTime td, long? branchId);
+        Task<ReportEducationByBranchDto<CandidateQuantityByEducationReportDto>> ReportCandidateQuantityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern);
+        Task<ReportEducationByBranchDto<CandidateDensityByEducationReportDto>> ReportCandidateDensityByEducation(DateTime fd, DateTime td, long? branchId, UserType? userType = UserType.Intern);
     }
 }
