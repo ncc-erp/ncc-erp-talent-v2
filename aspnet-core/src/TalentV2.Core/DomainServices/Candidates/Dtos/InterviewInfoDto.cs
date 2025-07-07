@@ -13,7 +13,7 @@ namespace TalentV2.DomainServices.Interviews.Dtos
     }
     public class InterviewInfoDto
     {
-        public InterviewerDto Interviewer { get; set; }
+        public List<InterviewerDto> Interviewers { get; set; }
         public string HrEmail { get; set; }
         public DateTime TimeInterview { get; set; }
 
