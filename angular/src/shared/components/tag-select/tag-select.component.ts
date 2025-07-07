@@ -10,6 +10,7 @@ export class TagSelectComponent implements OnInit {
   @Input() currentItem;
   @Input() seletedIds: number[] = [];
   @Input() nameId = 'id';
+  @Input() disabled = false;
 
   @Output() onTagSelected = new EventEmitter<any>();
 
@@ -23,6 +24,7 @@ export class TagSelectComponent implements OnInit {
   }
 
   seletedItem() {
+    if (this.disabled) return;
     if (!this.seletedIds.includes(this.currentItem[this.nameId])) {
       this.seletedIds.push(this.currentItem[this.nameId]);
       this.onTagSelected.emit(this.currentItem);

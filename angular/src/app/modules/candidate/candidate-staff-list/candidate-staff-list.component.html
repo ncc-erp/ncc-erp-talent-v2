@@ -300,6 +300,7 @@
             [currentItem]="item"
             [seletedIds]="staffIdsInReqList"
             (onTagSelected)="onReqSeletedCandidate($event)"
+            [disabled]="!isSelectable(item)"
           >
           </talent-tag-select>
         </td>

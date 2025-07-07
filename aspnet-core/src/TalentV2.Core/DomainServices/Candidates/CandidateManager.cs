@@ -323,6 +323,10 @@ namespace TalentV2.DomainServices.Candidates
                 .FirstOrDefaultAsync();
             var cv = await WorkScope.GetAsync<CV>(input.CvId);
             var requestCVStatus = input.RequestCVStatus.HasValue ? input.RequestCVStatus.Value : RequestCVStatus.AddedCV;
+            if (cv == null || cv.CVStatus != CVStatus.Passed)
+            {
+                throw new UserFriendlyException("You must set the CV status to 'Passed' before adding to a requisition.");
+            }
             var requestCv = new RequestCV
             {
                 RequestId = input.RequestId,
@@ -385,6 +389,10 @@ namespace TalentV2.DomainServices.Candidates
            .FirstOrDefaultAsync();
 
             var cv = await WorkScope.GetAsync<CV>(input.CvId);
+            if (cv == null || cv.CVStatus != CVStatus.Passed)
+            {
+                throw new UserFriendlyException("You must set the CV status to 'Passed' before adding to a requisition.");
+            }
             var requestCVStatus = input.RequestCVStatus.HasValue ? input.RequestCVStatus.Value : RequestCVStatus.AddedCV;
             var requestCv = new RequestCV
             {

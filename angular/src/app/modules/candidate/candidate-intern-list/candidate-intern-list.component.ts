@@ -18,6 +18,7 @@ import {
   UserType,
   DefaultRoute,
   CANDIDATE_DETAILT_TAB_DEFAULT,
+  ECVStatus,
 } from "@shared/AppEnums";
 import { TalentDateTime } from "@shared/components/date-selector/date-selector.component";
 import {
@@ -378,5 +379,9 @@ export class CandidateInternListComponent
         userType: userType,
       },
     });
+  }
+
+  isSelectable(item: CandidateIntern): boolean {
+    return item.cvStatusName === 'Passed' || item.cvStatus === ECVStatus.Passed;
   }
 }

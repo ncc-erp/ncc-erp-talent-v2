@@ -5,15 +5,20 @@
         <ng-template pTemplate="header">
           <div class="d-flex align-items-center">
             <a class="panel-title tl-link" (click)="navigateToRequestDetail()" target="_blank">
-              {{ headerCurrentReq }}</a>
+              {{ headerCurrentReq }}
+            </a>
             <div>
-              <p-button *ngIf="
-                  validPermissionUserType(
-                    userType,
-                    PS.Pages_CandidateIntern_ViewDetail_RequestCV_Create,
-                    PS.Pages_CandidateStaff_ViewDetail_RequestCV_Create
-                  )
-                " icon="pi pi-plus" styleClass="p-button-sm ml-4" (onClick)="addCurentReq()"></p-button>
+              <p-button
+                *ngIf="validPermissionUserType(
+                  userType,
+                  PS.Pages_CandidateIntern_ViewDetail_RequestCV_Create,
+                  PS.Pages_CandidateStaff_ViewDetail_RequestCV_Create
+                )"
+                icon="pi pi-plus"
+                styleClass="p-button-sm ml-4"
+                (onClick)="addCurentReq()"
+                [disabled]="!isCVPassed"
+              ></p-button>
             </div>
           </div>
         </ng-template>
