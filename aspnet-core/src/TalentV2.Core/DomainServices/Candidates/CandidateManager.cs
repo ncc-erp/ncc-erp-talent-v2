@@ -1404,14 +1404,14 @@ namespace TalentV2.DomainServices.Candidates
                      .Select(s => new InterviewInfoDto
                      {
                          HrEmail = s.CV.LastModifierUser.EmailAddress,
-                         Interviewer = s.RequestCVInterviews
+                         Interviewers = s.RequestCVInterviews
                              .Select(rci => new InterviewerDto
                              {
                                  Id = rci.Id,
                                  InterviewerId = rci.Interview.Id,
                                  InterviewerName = rci.Interview.UserName,
                                  InterviewerEmail = rci.Interview.EmailAddress
-                             }).FirstOrDefault(),
+                             }).ToList(),
                          TimeInterview = s.InterviewTime.Value,
                          CVInfo = new CVDto
                          {

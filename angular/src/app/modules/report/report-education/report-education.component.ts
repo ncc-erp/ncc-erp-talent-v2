@@ -296,7 +296,6 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
               education.passCV || 0,
               education.passTest || 0,
               education.passInterview || 0,
-              education.other || 0,
               education.onboard || 0
             ];
 
