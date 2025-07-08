@@ -4,7 +4,7 @@ import { Component, Injector, OnInit, Optional } from '@angular/core';
 import { CandidateStaffService } from '@app/core/services/candidate/candidate-staff.service';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { FILTER_TIME, DateFormat, MESSAGE } from '@shared/AppConsts';
-import { API_RESPONSE_STATUS, COMPARISION_OPERATOR, CreationTimeEnum, DefaultRoute, SearchType, SortType, ToastMessageType, UserType, CANDIDATE_DETAILT_TAB_DEFAULT } from '@shared/AppEnums';
+import { API_RESPONSE_STATUS, COMPARISION_OPERATOR, CreationTimeEnum, DefaultRoute, SearchType, SortType, ToastMessageType, UserType, CANDIDATE_DETAILT_TAB_DEFAULT, ECVStatus } from '@shared/AppEnums';
 import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
 import { Filter, PagedListingComponentBase, PagedRequestDto } from '@shared/paged-listing-component-base';
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -316,5 +316,9 @@ export class CandidateStaffListComponent extends PagedListingComponentBase<Candi
       userType: userType,
       },
     });
+  }
+
+  isSelectable(item: CandidateStaff): boolean {
+    return item.cvStatusName === 'Passed' || item.cvStatus === ECVStatus.Passed;
   }
 }

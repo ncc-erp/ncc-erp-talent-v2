@@ -12,7 +12,7 @@ import { RequisitionInternComponent } from '@app/modules/requisitiion/requisitio
 import { RequisitionStaffComponent } from '@app/modules/requisitiion/requisition-staff/requisition-staff.component';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DateFormat, MESSAGE, TOOL_URL } from '@shared/AppConsts';
-import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, MailFunc, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
+import { ActionEnum, API_RESPONSE_STATUS, CANDIDATE_DETAILT_TAB_DEFAULT, ECVStatus, MailFunc, REQUEST_CV_STATUS, StatusCreateAccount, ToastMessageType, UserType } from '@shared/AppEnums';
 import * as moment from 'moment';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import * as _ from 'lodash';
@@ -25,6 +25,7 @@ import { ScoreSettingService } from '@app/core/services/categories/score-setting
 import { ApiResponse } from '@shared/paged-listing-component-base';
 import { CommonService } from '@app/core/services/common.service';
 import { Subject } from '@node_modules/rxjs';
+import { Candidate } from '@app/core/models/candidate/candidate.model';
 
 @Component({
   selector: 'talent-current-requisition',
@@ -35,6 +36,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   @Input() userType: number;
   @Input() candidateId: number;
   @Input() _candidate: CandidateInternService | CandidateStaffService;
+  @Input() candidate: Candidate;
 
   public readonly DATE_FORMAT = DateFormat
   public readonly DEBOUNE_1S = 1000;
@@ -145,6 +147,9 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
   get isSentMailStatus() { return this.applyResultForm.get('mailDetail')?.value?.isSentMailStatus; }
   get interviewLevelForm() { return this.form.get('interviewLevelForm') as FormGroup; }
 
+  get isCVPassed(): boolean {
+    return this.candidate?.cvStatusName === 'Passed' || this.candidate?.cvStatus === ECVStatus.Passed;
+  }
 
   onToggleAddInterviewer() {
     this.isAddingInterviewer = !this.isAddingInterviewer;
