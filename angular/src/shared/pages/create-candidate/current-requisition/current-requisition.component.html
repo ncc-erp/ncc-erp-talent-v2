@@ -7,7 +7,7 @@
             <a class="panel-title tl-link" (click)="navigateToRequestDetail()" target="_blank">
               {{ headerCurrentReq }}
             </a>
-            <div>
+            <div class="d-flex align-items-center">
               <p-button
                 *ngIf="validPermissionUserType(
                   userType,
@@ -19,6 +19,9 @@
                 (onClick)="addCurentReq()"
                 [disabled]="!isCVPassed"
               ></p-button>
+              <span *ngIf="!isCVPassed" class="text-warning ml-2">
+                Need to change CV status to "PASSED" before adding to request
+              </span>
             </div>
           </div>
         </ng-template>
