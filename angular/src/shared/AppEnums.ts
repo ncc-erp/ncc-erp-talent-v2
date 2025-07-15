@@ -234,3 +234,12 @@ export enum MailFunc {
     AcceptedOfferJob = 6,
     RejectedOffer = 7,
 }
+
+export enum ECVStatus
+{
+    New = 0,
+    Contacting = 1,
+    Passed = 2,
+    Failed = 10,
+    Draft = 20
+}
