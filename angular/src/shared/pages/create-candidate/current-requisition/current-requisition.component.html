@@ -5,15 +5,23 @@
         <ng-template pTemplate="header">
           <div class="d-flex align-items-center">
             <a class="panel-title tl-link" (click)="navigateToRequestDetail()" target="_blank">
-              {{ headerCurrentReq }}</a>
-            <div>
-              <p-button *ngIf="
-                  validPermissionUserType(
-                    userType,
-                    PS.Pages_CandidateIntern_ViewDetail_RequestCV_Create,
-                    PS.Pages_CandidateStaff_ViewDetail_RequestCV_Create
-                  )
-                " icon="pi pi-plus" styleClass="p-button-sm ml-4" (onClick)="addCurentReq()"></p-button>
+              {{ headerCurrentReq }}
+            </a>
+            <div class="d-flex align-items-center">
+              <p-button
+                *ngIf="validPermissionUserType(
+                  userType,
+                  PS.Pages_CandidateIntern_ViewDetail_RequestCV_Create,
+                  PS.Pages_CandidateStaff_ViewDetail_RequestCV_Create
+                )"
+                icon="pi pi-plus"
+                styleClass="p-button-sm ml-4"
+                (onClick)="addCurentReq()"
+                [disabled]="!isCVPassed"
+              ></p-button>
+              <span *ngIf="!isCVPassed" class="text-warning ml-2">
+                Need to change CV status to "PASSED" before adding to request
+              </span>
             </div>
           </div>
         </ng-template>
