@@ -192,7 +192,8 @@ namespace TalentV2.Authorization
 
                 var mezonUser = JsonConvert.DeserializeObject<MezonUser>(hashData.user);
 
-                byte[] secretKey = HashingUtils.HMAC_SHA256(Encoding.UTF8.GetBytes(appToken), Encoding.UTF8.GetBytes("WebAppData"));
+                string hashedBotToken = HashingUtils.MD5(appToken);
+                byte[] secretKey = HashingUtils.HMAC_SHA256(Encoding.UTF8.GetBytes(hashedBotToken), Encoding.UTF8.GetBytes("WebAppData"));
                 var hashedData = HashingUtils.HEX(HashingUtils.HMAC_SHA256(secretKey, Encoding.UTF8.GetBytes(queryId)));
 
                 if (mezonHash.Equals(hashedData) == false)
