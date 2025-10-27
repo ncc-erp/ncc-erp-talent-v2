@@ -67,7 +67,7 @@ namespace TalentV2.DomainServices.RequestCVs.Dtos
         public string LaunchAllowance => string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:#,##0}", TalentConstants.LAUNCH_ALLOWANCE);
         public string InternalAccumulation => string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:#,##0}", TalentConstants.INTERNAL_ACCUMULATION);
         public string SalaryToString => string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:#,##0}", Salary);
-        public string TotalSalary => string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:#,##0}", (TalentConstants.LAUNCH_ALLOWANCE + TalentConstants.INTERNAL_ACCUMULATION + Salary));
+        public string TotalSalary => string.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:#,##0}", (TalentConstants.LAUNCH_ALLOWANCE + Salary));
         public string FullName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
