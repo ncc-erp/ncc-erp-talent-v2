@@ -2,17 +2,7 @@
   <h4 class="text-center mb-3">{{ "LogIn" | localize }}</h4>
 
   <form novalidate autocomplete="off" #loginForm="ngForm" (ngSubmit)="login()">
-      <div *ngIf="isMezonApp" class="text-center">
-          <p-progressSpinner *ngIf="isLoading" [style]="{
-        width: '50px',
-        height: '50px',
-        justifyContent: 'center',
-        display: 'flex'
-      }" styleClass="custom-spinner" strokeWidth="8" fill="var(--surface-ground)"
-                             animationDuration=".5s"></p-progressSpinner>
-      </div>
-
-      <div *ngIf="enableNormalLogin && !isMezonApp">
+      <div *ngIf="enableNormalLogin">
           <div class="form-group">
               <div class="input-group">
                   <input type="text" class="form-control" name="userNameOrEmailAddress"
@@ -65,14 +55,14 @@
               Log In With Google
           </button>
         </div> -->
-      <div *ngIf="!isMezonApp" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center" style="margin-top: 25px;">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center" style="margin-top: 25px;">
           <button mat-flat-button type="button" (click)="signInWithMezon()" color="primary" style="width: 100%">
               Log In With Mezon
           </button>
       </div>
   </form>
 
-  <p *ngIf="isSelfRegistrationAllowed && !isMezonApp" class="mb-1">
+  <p *ngIf="isSelfRegistrationAllowed" class="mb-1">
     <a [routerLink]="['../register']">
       <i class="fa fa-plus-circle"></i> {{ "Register" | localize }}
     </a>
