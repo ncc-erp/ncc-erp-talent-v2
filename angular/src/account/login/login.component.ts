@@ -16,8 +16,6 @@ export class LoginComponent extends AppComponentBase implements OnInit, OnDestro
   isShowPassword = true;
   enableNormalLogin: boolean = AppConsts.enableNormalLogin;
 
-  isMezonApp: boolean = false;
-
   hashData: string;
   
   constructor(
@@ -28,16 +26,16 @@ export class LoginComponent extends AppComponentBase implements OnInit, OnDestro
   ) {
     super(injector);
 
-    this.isMezonApp = isFromMezon();
     this.isLoading = true;
   }
 
   ngOnInit(): void {
-    this.mezonLoginService.userHashData$.subscribe((userHashData) => {
-      this.isLoading = true;
-      this.hashData = userHashData;
-      this.loginWithHash(this.hashData);
-    });
+    this.mezonLoginService.hashDataParams$
+      .subscribe((userHashData) => {
+        this.isLoading = true;
+        this.hashData = userHashData;
+        this.loginWithHash(this.hashData);
+      });
   }
 
   ngOnDestroy(): void {

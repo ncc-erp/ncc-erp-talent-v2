@@ -57,5 +57,9 @@ export function isValidEmail(email: string): boolean {
 }
 
 export function isFromMezon(): boolean {
-  return window.self !== window.top;
+  if (window.Mezon && window.Mezon.WebView) {
+    return true;
+  }
+
+  return false;
 }

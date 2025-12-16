@@ -1,5 +1,5 @@
 import { Injectable, InjectionToken } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { BaseApiService } from './base-api.service';
 import { IHashMezonAuthModel } from 'account/login/login.service';
@@ -12,12 +12,14 @@ import { MezonWebViewEvent, MezonAppEvent } from 'types/mezon/webview';
 export class MezonLoginService extends BaseApiService {
   private userHashData = new Subject<string>();
   private isInMezon = new Subject<boolean>();
+  private hashDataParams = new BehaviorSubject<string>(null);
+  private _isMezonEnvironment = false;
 
   private eventListenersRegistered = false;
 
   userHashData$ = this.userHashData.asObservable();
   isInMezon$ = this.isInMezon.asObservable();
-
+  hashDataParams$ = this.hashDataParams.asObservable();
 
   changeUrl(): string {
      return 'Mezon';
@@ -29,6 +31,16 @@ export class MezonLoginService extends BaseApiService {
     super(http);
   }
 
+  public setMezonHashData(hashData ?: string): void {
+      if (hashData) {
+        this._isMezonEnvironment = true;
+        this.hashDataParams.next(hashData);
+      }
+  }
+
+  public isMezonEnvironment(): boolean {
+    return this._isMezonEnvironment;
+  }
 
   public initMezonEventListeners(): void {
       if (this.eventListenersRegistered)
