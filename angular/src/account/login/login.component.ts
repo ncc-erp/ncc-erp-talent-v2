@@ -1,11 +1,11 @@
 import { IHashMezonAuthModel, LoginService } from './login.service';
 import { Component, Injector, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { AbpSessionService } from 'abp-ng2-module';
 import { AppComponentBase } from '@shared/app-component-base';
 import { accountModuleAnimation } from '@shared/animations/routerTransition';
 import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
 import { AppConsts } from '@shared/AppConsts';
-import { isFromMezon } from '@app/core/helpers/utils.helper';
+import { UrlHelper } from '@shared/helpers/UrlHelper';
+import { AppSessionService } from '@shared/session/app-session.service';
 @Component({
   templateUrl: './login.component.html',
   animations: [accountModuleAnimation()]
@@ -16,50 +16,52 @@ export class LoginComponent extends AppComponentBase implements OnInit, OnDestro
   isShowPassword = true;
   enableNormalLogin: boolean = AppConsts.enableNormalLogin;
 
-  isMezonApp: boolean = false;
-
   hashData: string;
   
   constructor(
     injector: Injector,
-    private _sessionService: AbpSessionService,
+    private _sessionService: AppSessionService,
     public loginService: LoginService,
     public mezonLoginService: MezonLoginService
   ) {
     super(injector);
 
-    this.isMezonApp = isFromMezon();
     this.isLoading = true;
   }
 
   ngOnInit(): void {
-    this.mezonLoginService.userHashData$.subscribe((userHashData) => {
-      this.isLoading = true;
-      this.hashData = userHashData;
-      this.loginWithHash(this.hashData);
-    });
+    if(this._sessionService.isActiveSession){
+      this.router.navigate([UrlHelper.getInitialUrl()]);
+      return;
+    }
+    this.mezonLoginService.hashDataParams$
+      .subscribe((userHashData) => {
+        this.isLoading = true;
+        this.hashData = userHashData;
+        this.loginWithHash(this.hashData);
+      });
   }
 
   ngOnDestroy(): void {
     this.mezonLoginService.removeEventListeners();
   }
 
-  get multiTenancySideIsTeanant(): boolean {
-    return this._sessionService.tenantId > 0;
-  }
+  // get multiTenancySideIsTeanant(): boolean {
+  //   return this._sessionService.tenantId > 0;
+  // }
 
-  get isSelfRegistrationAllowed(): boolean {
-    if (!this._sessionService.tenantId) {
-      return false;
-    }
+  // get isSelfRegistrationAllowed(): boolean {
+  //   if (!this._sessionService.tenantId) {
+  //     return false;
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
-  login(): void {
-    this.submitting = true;
-    this.loginService.authenticate(() => (this.submitting = false));
-  }
+  // login(): void {
+  //   this.submitting = true;
+  //   this.loginService.authenticate(() => (this.submitting = false));
+  // }
   // signInWithGoogle(): void {
   //   this._authSocialService.signIn(GoogleLoginProvider.PROVIDER_ID).then((rs: any) =>{
   //     this.loginService.authenticateGoogle(rs.idToken)
