@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { AppRoutes } from '@shared/AppRoutes';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -22,7 +23,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
   private handleAuthError(err: HttpErrorResponse): Observable<any> {
     if (err.status === 401) {
-      this.router.navigateByUrl(`/account/login`);
+      this.router.navigateByUrl(AppRoutes.ACCOUNT.LOGIN);
       abp.notify.error('Your session is expired, please login again', 'Authentication Failed');
       return;
     }

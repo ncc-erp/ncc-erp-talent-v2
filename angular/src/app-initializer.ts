@@ -19,6 +19,7 @@ export class AppInitializer {
 
   init(): () => Promise<boolean> {
     return () => {
+      abp.multiTenancy.tenantIdCookieName = 'Abp-TenantId';
       abp.ui.setBusy();
       return new Promise<boolean>((resolve, reject) => {
         AppConsts.appBaseHref = this.getBaseHref();
