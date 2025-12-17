@@ -21,10 +21,6 @@ export class AppSessionService {
         ) {
     }
 
-    get isActiveSession(): boolean {
-        return !!this.user;
-    }
-
     get application(): ApplicationInfoDto {
         return this._application;
     }
@@ -66,12 +62,6 @@ export class AppSessionService {
                 reject(err);
             });
         });
-    }
-
-    clearSession(): void {
-        this._user = null;
-        this._tenant = null;
-        this._application = null;
     }
 
     changeTenantIfNeeded(tenantId?: number): boolean {

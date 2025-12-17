@@ -8,9 +8,7 @@ import {
     RouterStateSnapshot,
     CanActivateChild
 } from '@angular/router';
-import { UrlHelper } from '@shared/helpers/UrlHelper';
-import { AppRoutes } from '@shared/AppRoutes';
-import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
+import { ToastMessageType } from '@shared/AppEnums';
 
 @Injectable()
 export class AppRouteGuard implements CanActivate, CanActivateChild {
@@ -19,13 +17,15 @@ export class AppRouteGuard implements CanActivate, CanActivateChild {
         private _permissionChecker: PermissionCheckerService,
         private _router: Router,
         private _sessionService: AppSessionService,
-        private _mezonLoginService: MezonLoginService,
+        private _message: MessageService
     ) {}
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-        if (!this._sessionService.isActiveSession) {
-            UrlHelper.setRedirectUrl(state.url);
-            this._mezonLoginService.redirectToOAuth()
+        if (!this._sessionService.user) {
+            const loginRoute = '/account/login';
+
+            this._router.navigate([loginRoute]);
+
             return false;
         }
 
@@ -37,11 +37,18 @@ export class AppRouteGuard implements CanActivate, CanActivateChild {
             return true;
         }
 
-        this._router.navigate([AppRoutes.APP.HOME]);
+        this._router.navigate([this.selectBestRoute()]);
         return false;
     }
 
     canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
         return this.canActivate(route, state);
+    }
+
+    selectBestRoute(): string {
+        if (!this._sessionService.user) {
+            return '/account/login';
+        }
+        return '/app/home';
     }
 }
