@@ -1,9 +1,7 @@
 import { Component, Injector, OnInit } from '@angular/core';
-import { HttpClient } from '@node_modules/@angular/common/http';
-import { ActivatedRoute, Router } from '@node_modules/@angular/router/router';
 import { AppComponentBase } from '@shared/app-component-base';
 import { ToastMessageType } from '@shared/AppEnums';
-import { API_BASE_URL } from '@shared/service-proxies/service-proxies';
+import { AppRoutes } from '@shared/AppRoutes';
 import { LoginService } from 'account/login/login.service';
 
 @Component({
@@ -29,19 +27,19 @@ export class AuthCallbackComponent extends AppComponentBase implements OnInit {
       if (!code) {
         this.isLoading = false;
         this.showToastMessage(ToastMessageType.ERROR, 'Invalid authentication parameters!');
-        this.router.navigate(['/account/login']);
+        this.router.navigate([AppRoutes.ACCOUNT.LOGIN]);
       }
 
       this.loginService.authenticateMezon(code, scope).subscribe({
         next: (res) => {
           this.isLoading = res.loading;
           if (res.error) {
-            this.router.navigate(['/account/login']);
+            this.router.navigate([AppRoutes.ACCOUNT.LOGIN]);
           }
         },
         error: (error) => {
           this.isLoading = false;
-          this.router.navigate(['/account/login']);
+          this.router.navigate([AppRoutes.ACCOUNT.LOGIN]);
         }
       });
     });

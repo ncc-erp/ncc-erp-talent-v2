@@ -1,12 +1,13 @@
-import { MESSAGE } from '@shared/AppConsts';
 import { Component, Injector, OnDestroy, OnInit } from "@angular/core";
 import { SkillService } from '@app/core/services/categories/skill.service';
+import { MESSAGE } from '@shared/AppConsts';
 import {
   ActionEnum,
   API_RESPONSE_STATUS,
   DefaultRoute,
   ToastMessageType
 } from "@shared/AppEnums";
+import { AppRoutes } from '@shared/AppRoutes';
 import {
   ApiResponse,
   PagedListingComponentBase,
@@ -90,7 +91,7 @@ export class SkillComponent extends PagedListingComponentBase<Skill> implements 
   private getBreadcrumbConfig() {
     return {
       menuItem: [{ label: "Categories", routerLink: DefaultRoute.Category, styleClass: 'menu-item-click' }, { label: "Skills",}],
-      homeItem: { icon: "pi pi-home", routerLink: "/app/home" },
+      homeItem: { icon: "pi pi-home", routerLink: AppRoutes.APP.HOME },
     };
   }
 }
