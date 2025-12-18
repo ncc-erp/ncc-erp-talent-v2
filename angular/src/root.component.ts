@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
-import { isFromMezon } from '@app/core/helpers/utils.helper';
+import { isFromMezonApp } from '@app/core/helpers/utils.helper';
+import { LoginService } from 'account/login/login.service';
 
 @Component({
     selector: 'app-root',
@@ -9,19 +10,21 @@ import { isFromMezon } from '@app/core/helpers/utils.helper';
 export class RootComponent implements OnInit {
 
     constructor(
-        private mezonService: MezonLoginService
+        private mezonService: MezonLoginService,
+        private loginService: LoginService
     ) {
         this.initializeMezonIntegration();
     }
 
     ngOnInit(): void {
+        this.loginService.checkSilentAuthOnce();
     }
 
     private async initializeMezonIntegration() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const hashData = urlParams.get('data');
-        const isMezon = isFromMezon();
-        
-        if (isMezon && hashData) this.mezonService.setMezonHashData(hashData);
+      if (!isFromMezonApp()) return;
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashData = urlParams.get("data");
+      this.mezonService.setMezonHashData(hashData);
     }
 }
+

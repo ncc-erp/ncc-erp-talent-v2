@@ -56,10 +56,15 @@ export function isValidEmail(email: string): boolean {
   return emailPattern.test(email);
 }
 
-export function isFromMezon(): boolean {
-  if (window.Mezon && window.Mezon.WebView) {
-    return true;
-  }
+export function isFromMezonApp(): boolean {
+  const isHaveEncodedParam = (() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentUrl = new URL(window.location.href);
+    const hasOnlyDataParam = urlParams.has('data') && Array.from(urlParams.keys()).length === 1;
+    const hasNoPathOrRootPath = currentUrl.pathname === '/' || currentUrl.pathname === '';
+    return hasOnlyDataParam && hasNoPathOrRootPath;
+  })();
+  
+ return window.Mezon && window.Mezon.WebView && isHaveEncodedParam;
 
-  return false;
 }
