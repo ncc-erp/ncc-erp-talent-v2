@@ -11,13 +11,11 @@ export class RootComponent implements OnInit {
 
     constructor(
         private mezonService: MezonLoginService,
-        private loginService: LoginService
     ) {
         this.initializeMezonIntegration();
     }
 
     ngOnInit(): void {
-        this.loginService.checkSilentAuthOnce();
     }
 
     private async initializeMezonIntegration() {

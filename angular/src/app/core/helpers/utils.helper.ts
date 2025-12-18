@@ -60,7 +60,7 @@ export function isFromMezonApp(): boolean {
   const isHaveEncodedParam = (() => {
     const urlParams = new URLSearchParams(window.location.search);
     const currentUrl = new URL(window.location.href);
-    const hasOnlyDataParam = urlParams.has('data') && Array.from(urlParams.keys()).length === 1;
+    const hasOnlyDataParam = urlParams.has('data');
     const hasNoPathOrRootPath = currentUrl.pathname === '/' || currentUrl.pathname === '';
     return hasOnlyDataParam && hasNoPathOrRootPath;
   })();
