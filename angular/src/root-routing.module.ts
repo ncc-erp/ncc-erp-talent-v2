@@ -1,11 +1,10 @@
 import { ApplyCvComponent } from "./apply-cv/apply-cv.component";
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AppRoutes } from "@shared/AppRoutes";
 import { PageErrorComponent } from '@shared/pages/page-error/page-error.component';
 
 const routes: Routes = [
-    { path: '', redirectTo: AppRoutes.APP.HOME, pathMatch: 'full' },
+    { path: '', redirectTo: '/app/home', pathMatch: 'full' },
     {
         path: 'account',
         loadChildren: () => import('account/account.module').then(m => m.AccountModule), // Lazy load account module

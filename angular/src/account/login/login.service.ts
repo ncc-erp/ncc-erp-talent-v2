@@ -27,11 +27,14 @@ export class LoginService {
     rememberMe: boolean;
 
     constructor(
+        private _tokenAuthService: TokenAuthServiceProxy,
         private _router: Router,
         private _utilsService: UtilsService,
         private _tokenService: TokenService,
         private _logService: LogService,
+        private _message: MessageService,
         private _mezonService: MezonLoginService
+        //private _permissionChecker: PermissionCheckerService
     ) {
         this.clear();
     }
@@ -45,29 +48,16 @@ export class LoginService {
         }
     }
 
-    // authenticate(finallyCallback?: () => void): void {
-    //     finallyCallback = finallyCallback || (() => { });
+    authenticate(finallyCallback?: () => void): void {
+        finallyCallback = finallyCallback || (() => { });
 
-    //     this._tokenAuthService
-    //         .authenticate(this.authenticateModel)
-    //         .pipe(finalize(() => { finallyCallback(); }))
-    //         .subscribe((result: AuthenticateResultModel) => {
-    //             this.processAuthenticateResult(result);
-    //         });
-    // }
-
-
-    // authenticateGoogle(googleToken: string, finallyCallback?: () => void): void {
-    //     finallyCallback = finallyCallback || (() => { });
-
-    //     this._googleLoginService.googleAuthenticate(googleToken)
-    //         .subscribe((result: any) => {
-    //             this.processAuthenticateResult(result.result);
-    //         }, (error) => {
-    //             const errObj = error?.error?.error;
-    //             this._message.error(errObj?.details, errObj?.message);
-    //         });
-    // }
+        this._tokenAuthService
+            .authenticate(this.authenticateModel)
+            .pipe(finalize(() => { finallyCallback(); }))
+            .subscribe((result: AuthenticateResultModel) => {
+                this.processAuthenticateResult(result);
+            });
+    }
 
     authenticateMezon(token: string, scope: string): Observable<any> {
         return this._mezonService.mezonAuthenticate(token).pipe(
@@ -95,6 +85,17 @@ export class LoginService {
         );
     }
 
+    // authenticateGoogle(googleToken: string, finallyCallback?: () => void): void {
+    //     finallyCallback = finallyCallback || (() => { });
+
+    //     this._googleLoginService.googleAuthenticate(googleToken)
+    //         .subscribe((result: any) => {
+    //             this.processAuthenticateResult(result.result);
+    //         }, (error) => {
+    //             const errObj = error?.error?.error;
+    //             this._message.error(errObj?.details, errObj?.message);
+    //         });
+    // }
 
     private processAuthenticateResult(authenticateResult: AuthenticateResultModel) {
         this.authenticateResult = authenticateResult;
@@ -129,7 +130,7 @@ export class LoginService {
             abp.appPath
         );
 
-        let initialUrl = UrlHelper.getInitialUrl();
+        let initialUrl = UrlHelper.initialUrl;
         if (initialUrl.indexOf('/login') > 0) {
             initialUrl = AppConsts.appBaseUrl;
         }
