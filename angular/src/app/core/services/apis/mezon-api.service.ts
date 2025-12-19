@@ -86,6 +86,10 @@ export class MezonLoginService extends BaseApiService {
     window.location.href = `${this.baseUrl}/api/TokenAuth/MezonRedirect`;
   }
 
+  getSilenetOathUrl(): Observable<any> {
+    return this.http.get<string>(`${this.baseUrl}/api/TokenAuth/MezonSilentOAuthUrl`);
+  }
+
   mezonAuthenticate(token: string): Observable<any> {
     return this.http.post(this.baseUrl + '/api/TokenAuth/MezonAuthenticate', {token: token});
   }

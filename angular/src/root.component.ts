@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
-import { isFromMezon } from '@app/core/helpers/utils.helper';
+import { isFromMezonApp } from '@app/core/helpers/utils.helper';
+import { LoginService } from 'account/login/login.service';
 
 @Component({
     selector: 'app-root',
@@ -10,8 +10,7 @@ import { isFromMezon } from '@app/core/helpers/utils.helper';
 export class RootComponent implements OnInit {
 
     constructor(
-        private router: Router,
-        private mezonService: MezonLoginService
+        private mezonService: MezonLoginService,
     ) {
         this.initializeMezonIntegration();
     }
@@ -20,11 +19,10 @@ export class RootComponent implements OnInit {
     }
 
     private async initializeMezonIntegration() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const hashData = urlParams.get('data');
-        
-        const isMezon = isFromMezon();
-        
-        if (isMezon && hashData) this.mezonService.setMezonHashData(hashData);
+      if (!isFromMezonApp()) return;
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashData = urlParams.get("data");
+      this.mezonService.setMezonHashData(hashData);
     }
 }
+
