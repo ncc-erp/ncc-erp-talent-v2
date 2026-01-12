@@ -34,18 +34,45 @@
     </div>
     <div class="card-body mb-0">
       <div class="row">
-        <div *ngFor="let item of data" class="col-12 col-md-4 col-sm-12 mb-4">
+        <div *ngFor="let item of data" class="col-12 col-md-12 col-sm-12 mb-4">
           <div class="row">
-            <div class="col-md-12">
-              <p-chart
-                type="pie"
-                [data]="item.dataChart"
-                [plugins]="chartPlugins"
-                [options]="chartOptions"
-              ></p-chart>
+            <div class="col-md-12 col-lg-6">
+              <div style="width: 90%; margin: 0 auto;">
+                <p-chart
+                  type="pie"
+                  [data]="item.dataChart"
+                  [plugins]="chartPlugins"
+                  [options]="chartOptions"
+                ></p-chart>
+              </div>
+              <div class="text-center mt-2">
+                <h4 class="text-bold">{{ item.branchName }}</h4>
+              </div>
             </div>
-            <div class="col-md-12 text-center">
-              <h4 class="text-bold">{{ item.branchName }}</h4>
+            <div class="col-md-12 col-lg-6">
+              <p-table [value]="item.sourcePerformances" [autoLayout]="true">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Source</th>
+                    <th class="text-center">Percentage</th>
+                    <th class="text-center">Quantity</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-source>
+                  <tr>
+                    <td>{{ source.sourceName }}</td>
+                    <td class="text-center">{{ source.percentage }}%</td>
+                    <td class="text-center">{{ source.totalCV }}</td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                  <tr>
+                    <td>Total</td>
+                    <td class="text-center">100%</td>
+                    <td class="text-center">{{ item.totalBranchCV }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
             </div>
           </div>
         </div>

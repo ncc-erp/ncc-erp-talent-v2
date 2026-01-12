@@ -82,6 +82,13 @@ namespace TalentV2.Controllers
             return Redirect(authUrl);
         }
 
+        [HttpGet]
+        public IActionResult MezonSilentOAuthUrl()
+        {
+            var authUrl = _mezonService.GenerateOAuthUrlSilent();
+            return Ok(authUrl);
+        }
+
         //[HttpPost]
         //public async Task<AuthenticateResultModel> GoogleAuthenticate([FromBody] TokenDto model)
         //{

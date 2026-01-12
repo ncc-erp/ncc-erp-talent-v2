@@ -1,8 +1,8 @@
 <div [@routerTransition]>
   <h4 class="text-center mb-3">{{ "LogIn" | localize }}</h4>
 
-  <form novalidate autocomplete="off" #loginForm="ngForm" (ngSubmit)="login()">
-      <div *ngIf="enableNormalLogin">
+  <form novalidate autocomplete="off" #loginForm="ngForm" >
+      <!-- <div *ngIf="enableNormalLogin">
           <div class="form-group">
               <div class="input-group">
                   <input type="text" class="form-control" name="userNameOrEmailAddress"
@@ -50,7 +50,7 @@
               </div>
           </div>
       </div>
-      <!-- <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center" style="margin-top: 25px;">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center" style="margin-top: 25px;">
           <button mat-flat-button type="button" (click)="signInWithGoogle()" color="primary" style="width: 100%">
               Log In With Google
           </button>

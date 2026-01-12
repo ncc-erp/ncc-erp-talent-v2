@@ -571,7 +571,7 @@ namespace TalentV2.DomainServices.Reports
 
             var report = educations
                 .GroupBy(e => e.Name)
-                .Select(e => new ReportEducationHaveCVOnboardDto
+                .Select(e => new ReportEducationHaveCVPassTestDto
                 {
                     EducationId = e.First().Id,
                     EducationName = e.Key,
@@ -730,12 +730,13 @@ namespace TalentV2.DomainServices.Reports
                 var templatesCvSource = cvSourceStatistics?.Select(s => new Templates
                 {
                     Key = s.Name,
-                    Percent = sumtotalOverviewHiring > percentDefault ? totalOverviewHiring[cvSourceStatistics.IndexOf(s)] / (float)sumtotalOverviewHiring : percentDefault,
+                    Percent = sumtotalOverviewHiring > percentDefault ? (totalOverviewHiring[cvSourceStatistics.IndexOf(s)] / (float)sumtotalOverviewHiring) : percentDefault,
+                    Quantity = (totalOverviewHiring[cvSourceStatistics.IndexOf(s)])
                 }).ToList();
                 pieChartCvSource.ModelCharts.Add(new ModelChart
                 {
                     BranchName = branch.DisplayName,
-                    Temaplates = templatesCvSource ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } },
+                    Temaplates = templatesCvSource ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } },
                 });
 
                 var statusStatistics = subPositionStatistics?.StatusStatistics.ToList();
@@ -745,13 +746,14 @@ namespace TalentV2.DomainServices.Reports
                 var templatesStatistics = statusStatistics?.Select(s => new Templates
                 {
                     Key = s.Name,
-                    Percent = sumtotalStatus > percentDefault ? (totalStatus[statusStatistics.IndexOf(s)] / (float)sumtotalStatus) : percentDefault
+                    Percent = sumtotalStatus > percentDefault ? (totalStatus[statusStatistics.IndexOf(s)] / (float)sumtotalStatus) : percentDefault,
+                    Quantity = totalStatus[statusStatistics.IndexOf(s)]
                 }).ToList();
 
                 pieChartStatusStatistics.ModelCharts.Add(new ModelChart
                 {
                     BranchName = branch.DisplayName,
-                    Temaplates = templatesStatistics ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } },
+                    Temaplates = templatesStatistics ?? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } },
                 });
             }
 
@@ -791,11 +793,12 @@ namespace TalentV2.DomainServices.Reports
                 {
                     Key = s.EducationName,
                     Percent = sumtotalEducationInternOnboarded > percentDefault ? (s.TotalCV / (float)sumtotalEducationInternOnboarded) : percentDefault,
+                    Quantity = s.TotalCV
                 }).ToList();
                 columChartOnbore.ModelCharts.Add(new ModelChart
                 {
                     BranchName = branch.DisplayName,
-                    Temaplates = pieCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : pieCharts,
+                    Temaplates = pieCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : pieCharts,
                 });
                 var listGetEducationPassTest = await GetEducationPassTest(input.FromDate.Value, input.ToDate.Value, branch.Id);
                 var educationPassTests = listGetEducationPassTest?.Educations.ToList();
@@ -808,11 +811,12 @@ namespace TalentV2.DomainServices.Reports
                 {
                     Key = s.EducationName,
                     Percent = sumtotaleducationPassTests > percentDefault ? (s.TotalCV / (float)sumtotaleducationPassTests) : percentDefault,
+                    Quantity = s.TotalCV
                 }).ToList();
                 columChartPassTest.ModelCharts.Add(new ModelChart
                 {
                     BranchName = branch.DisplayName,
-                    Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : columnCharts,
+                    Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : columnCharts,
                 });
 
                 var listGetEducationPassInterView = await GetEducationPassInterView(input.FromDate.Value, input.ToDate.Value, branch.Id);
@@ -823,12 +827,14 @@ namespace TalentV2.DomainServices.Reports
                 {
                     Key = s.EducationName,
                     Percent = sumtotaleducationPassInterView > percentDefault ? (s.TotalCV / (float)sumtotaleducationPassInterView) : percentDefault,
+                    Quantity = s.TotalCV
                 }).ToList();
                 columChartPassInterView.ModelCharts.Add(new ModelChart
                 {
                     BranchName = branch.DisplayName,
-                    Temaplates = pieChartPassInterViews.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault } } : pieChartPassInterViews,
+                    Temaplates = pieChartPassInterViews.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : pieChartPassInterViews,
                 });
+
             }
             columChartOnbore.NameSheet = "Education Intern Onboarded";
             var excelBytesEducationInternOnboarded = await AddChart(columChartOnbore, ChartType.Column);
@@ -836,7 +842,7 @@ namespace TalentV2.DomainServices.Reports
             var excelBytesEducationPassTests = await AddChart(columChartPassTest, ChartType.Column);
             columChartPassInterView.NameSheet = "Education Intern PassIterview";
             var excelBytesEducationPassInreView = await AddChart(columChartPassInterView, ChartType.Column);
-
+            
             var combinedBytes = CombineExcelFiles(excelBytesEducationInternOnboarded, excelBytesEducationPassTests, excelBytesEducationPassInreView);
             return new FileContentResult(combinedBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
@@ -862,10 +868,26 @@ namespace TalentV2.DomainServices.Reports
                     worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     endRow = (startRow + item.Temaplates.Count);
                     worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"].Style.Numberformat.Format = "0.00%";
+
+                    var totalRow = endRow + 1;
+                    worksheet.Cells[$"{columnKey}{totalRow}"].Value = "Total";
+                    worksheet.Cells[$"{columnKey}{totalRow}"].Style.Font.Bold = true;
+
+                    var columnPercent = GetColumnNameFromNumber(startColumn + 1);
+                    var sumPercent = item.Temaplates.Sum(s => s.Percent);
+                    worksheet.Cells[$"{columnPercent}{totalRow}"].Value = sumPercent;
+                    worksheet.Cells[$"{columnPercent}{totalRow}"].Style.Numberformat.Format = "0.00%";
+                    worksheet.Cells[$"{columnPercent}{totalRow}"].Style.Font.Bold = true;
+
+                    var columnQuantity = GetColumnNameFromNumber(startColumn + 2);
+                    var sumQuantity = item.Temaplates.Sum(s => s.Quantity);
+                    worksheet.Cells[$"{columnQuantity}{totalRow}"].Value = sumQuantity;
+                    worksheet.Cells[$"{columnQuantity}{totalRow}"].Style.Font.Bold = true;
+
                     var labelsRange = worksheet.Cells[$"{columnKey}{startRow + 1}:{columnKey}{endRow}"];
                     var chartRange = worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"];
                     input.Row = startRow - 1;
-                    input.Column = endColumn + 2;
+                    input.Column = endColumn + 3;
                     switch (typeChart)
                     {
                         case ChartType.Pie:
@@ -1085,5 +1107,6 @@ namespace TalentV2.DomainServices.Reports
 
             return Math.Round((double)numerator / denominator * 100, 2);
         }
+
     }
 }
