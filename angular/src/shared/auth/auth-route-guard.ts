@@ -1,47 +1,60 @@
-import { MessageService } from 'primeng/api';
-import { Injectable } from '@angular/core';
-import { PermissionCheckerService } from 'abp-ng2-module';
-import { AppSessionService } from '../session/app-session.service';
+import { Injectable } from "@angular/core";
 import {
-    CanActivate, Router,
-    ActivatedRouteSnapshot,
-    RouterStateSnapshot,
-    CanActivateChild
-} from '@angular/router';
-import { UrlHelper } from '@shared/helpers/UrlHelper';
-import { AppRoutes } from '@shared/AppRoutes';
-import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
+  ActivatedRouteSnapshot,
+  CanActivate,
+  CanActivateChild,
+  Router,
+  RouterStateSnapshot,
+} from "@angular/router";
+import { AppRoutes } from "@shared/AppRoutes";
+import { PermissionCheckerService } from "abp-ng2-module";
+import { MessageService } from "primeng/api";
+import { AppSessionService } from "../session/app-session.service";
 
 @Injectable()
 export class AppRouteGuard implements CanActivate, CanActivateChild {
+  constructor(
+    private _permissionChecker: PermissionCheckerService,
+    private _router: Router,
+    private _sessionService: AppSessionService,
+    private _message: MessageService
+  ) {}
 
-    constructor(
-        private _permissionChecker: PermissionCheckerService,
-        private _router: Router,
-        private _sessionService: AppSessionService,
-        private _mezonLoginService: MezonLoginService,
-    ) {}
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    if (!this._sessionService.user) {
+      const loginRoute = "/account/login";
 
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-        if (!this._sessionService.isActiveSession) {
-            UrlHelper.setRedirectUrl(state.url);
-            this._mezonLoginService.redirectToOAuth()
-            return false;
-        }
+      this._router.navigate([loginRoute]);
 
-        if (!route.data || !route.data['permission']) {
-            return true;
-        }
-
-        if (this._permissionChecker.isGranted(route.data['permission'])) {
-            return true;
-        }
-
-        this._router.navigate([AppRoutes.APP.HOME]);
-        return false;
+      return false;
     }
 
-    canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-        return this.canActivate(route, state);
+    if (!route.data || !route.data["permission"]) {
+      return true;
     }
+
+    if (this._permissionChecker.isGranted(route.data["permission"])) {
+      return true;
+    }
+
+    this._router.navigate([this.selectBestRoute()]);
+    return false;
+  }
+
+  canActivateChild(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean {
+    return this.canActivate(route, state);
+  }
+
+  selectBestRoute(): string {
+    if (!this._sessionService.user) {
+      return "/account/login";
+    }
+    return AppRoutes.APP.HOME;
+  }
 }

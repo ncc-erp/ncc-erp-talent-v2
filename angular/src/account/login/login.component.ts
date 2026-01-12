@@ -55,22 +55,18 @@ export class LoginComponent
     this.mezonLoginService.removeEventListeners();
   }
 
-  // get multiTenancySideIsTeanant(): boolean {
-  //   return this._sessionService.tenantId > 0;
-  // }
+  get multiTenancySideIsTeanant(): boolean {
+    return this._sessionService.tenantId > 0;
+  }
 
-  // get isSelfRegistrationAllowed(): boolean {
-  //   if (!this._sessionService.tenantId) {
-  //     return false;
-  //   }
+  get isSelfRegistrationAllowed(): boolean {
+    if (!this._sessionService.tenantId) {
+      return false;
+    }
 
-  //   return true;
-  // }
+    return true;
+  }
 
-  // login(): void {
-  //   this.submitting = true;
-  //   this.loginService.authenticate(() => (this.submitting = false));
-  // }
   // signInWithGoogle(): void {
   //   this._authSocialService.signIn(GoogleLoginProvider.PROVIDER_ID).then((rs: any) =>{
   //     this.loginService.authenticateGoogle(rs.idToken)

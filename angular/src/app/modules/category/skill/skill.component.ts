@@ -1,28 +1,34 @@
 import { Component, Injector, OnDestroy, OnInit } from "@angular/core";
-import { SkillService } from '@app/core/services/categories/skill.service';
-import { MESSAGE } from '@shared/AppConsts';
+import { SkillService } from "@app/core/services/categories/skill.service";
+import { MESSAGE } from "@shared/AppConsts";
 import {
   ActionEnum,
   API_RESPONSE_STATUS,
   DefaultRoute,
-  ToastMessageType
+  ToastMessageType,
 } from "@shared/AppEnums";
-import { AppRoutes } from '@shared/AppRoutes';
+import { AppRoutes } from "@shared/AppRoutes";
 import {
   ApiResponse,
   PagedListingComponentBase,
-  PagedRequestDto
+  PagedRequestDto,
 } from "@shared/paged-listing-component-base";
 import { DialogService, DynamicDialogRef } from "primeng/dynamicdialog";
-import { Skill, SkillConfigDiaLog } from '../../../core/models/categories/skill.model';
-import { SkillDialogComponent } from './skill-dialog/skill-dialog.component';
+import {
+  Skill,
+  SkillConfigDiaLog,
+} from "../../../core/models/categories/skill.model";
+import { SkillDialogComponent } from "./skill-dialog/skill-dialog.component";
 
 @Component({
   selector: "app-skill",
   templateUrl: "./skill.component.html",
   styleUrls: ["./skill.component.scss"],
 })
-export class SkillComponent extends PagedListingComponentBase<Skill> implements OnInit, OnDestroy {
+export class SkillComponent
+  extends PagedListingComponentBase<Skill>
+  implements OnInit, OnDestroy
+{
   public skills: Skill[] = [];
   dialogRef: DynamicDialogRef;
 
@@ -40,11 +46,14 @@ export class SkillComponent extends PagedListingComponentBase<Skill> implements 
 
   ngOnDestroy() {
     super.ngOnDestroy();
-    if (this.dialogRef) this.dialogRef.close()
+    if (this.dialogRef) this.dialogRef.close();
   }
 
   openDialog(obj: Skill, dialogAction: ActionEnum) {
-    const dialogConfig: SkillConfigDiaLog = { skill: obj, action: dialogAction }
+    const dialogConfig: SkillConfigDiaLog = {
+      skill: obj,
+      action: dialogAction,
+    };
     this.dialogRef = this.dialogService.open(SkillDialogComponent, {
       header: `${dialogConfig.action} Skill`,
       width: "40%",
@@ -54,17 +63,25 @@ export class SkillComponent extends PagedListingComponentBase<Skill> implements 
     });
 
     this.dialogRef.onClose.subscribe((res: ApiResponse<Skill>) => {
-      if (dialogConfig.action === ActionEnum.UPDATE && res ) {
+      if (dialogConfig.action === ActionEnum.UPDATE && res) {
         const index = this.skills.findIndex((x) => x.id == res.result.id);
         this.skills[index] = res.result;
-        this.showToastMessage(ToastMessageType.SUCCESS, MESSAGE.UPDATE_SUCCESS, res.result.name);
+        this.showToastMessage(
+          ToastMessageType.SUCCESS,
+          MESSAGE.UPDATE_SUCCESS,
+          res.result.name
+        );
         return;
       }
       this.refresh();
     });
   }
 
-  protected list(request: PagedRequestDto, pageNumber: number, finishedCallback: Function): void {
+  protected list(
+    request: PagedRequestDto,
+    pageNumber: number,
+    finishedCallback: Function
+  ): void {
     this.subs.add(
       this._skill.getAllPagging(request).subscribe((rs) => {
         this.skills = [];
@@ -80,7 +97,10 @@ export class SkillComponent extends PagedListingComponentBase<Skill> implements 
   protected delete(entity: Skill): void {
     const deleteRequest = this._skill.delete(entity.id);
     this.subs.add(
-      this.deleteConfirmAndShowToastMessage(deleteRequest, entity.name).subscribe((message) => {
+      this.deleteConfirmAndShowToastMessage(
+        deleteRequest,
+        entity.name
+      ).subscribe((message) => {
         if (message === API_RESPONSE_STATUS.SUCCESS) {
           this.refresh();
         }
@@ -90,7 +110,14 @@ export class SkillComponent extends PagedListingComponentBase<Skill> implements 
 
   private getBreadcrumbConfig() {
     return {
-      menuItem: [{ label: "Categories", routerLink: DefaultRoute.Category, styleClass: 'menu-item-click' }, { label: "Skills",}],
+      menuItem: [
+        {
+          label: "Categories",
+          routerLink: DefaultRoute.Category,
+          styleClass: "menu-item-click",
+        },
+        { label: "Skills" },
+      ],
       homeItem: { icon: "pi pi-home", routerLink: AppRoutes.APP.HOME },
     };
   }
