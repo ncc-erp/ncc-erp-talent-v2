@@ -1,5 +1,5 @@
-import { BranchEducationData } from './interfaces/report-education.interface';
 import { Component, Injector, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Branch } from '@app/core/models/categories/branch.model';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
 import { UtilitiesService } from '@app/core/services/utilities.service';
@@ -11,11 +11,11 @@ import { ApiResponse } from '@shared/paged-listing-component-base';
 import { ChartOptions } from 'chart.js';
 import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 import { forkJoin } from 'rxjs';
+import { ExportDialogComponent } from '../../../../shared/components/export-dialog/export-dialog.component';
+import { ExportDialogService } from '../../../core/services/export/export-dialog.service';
 import { EducationStatistic } from './../../../core/models/report/report-education.model';
 import { ReportInternService } from './../../../core/services/report/report-intern.service';
-import {ExportDialogComponent} from '../../../../shared/components/export-dialog/export-dialog.component';
-import {MatDialog} from '@angular/material/dialog';
-import {ExportDialogService} from '../../../core/services/export/export-dialog.service';
+import { BranchEducationData } from './interfaces/report-education.interface';
 @Component({
   selector: 'talent-report-education',
   templateUrl: './report-education.component.html',
@@ -148,6 +148,7 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
           }
         });
         this.mapToQuantityChart(isChangeTime);
+        this.mapToPercentageChart(isChangeTime);
       },
       error: (error) => {
         console.error('Error loading quantity data:', error);
@@ -275,6 +276,8 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
       }
 
       const densityBranchData = this.candidateDensityData[branchIndex];
+      const quantityBranchData = this.candidateQuantityData[branchIndex];
+
       if (!densityBranchData) return;
 
       const densityEducations = densityBranchData.educations || [];
@@ -299,12 +302,21 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
               education.onboard || 0
             ];
 
+            const quantityEducation = quantityBranchData?.educations?.find(e => e.educationName === education.educationName);
+            const counts = [
+              quantityEducation?.passCV || 0,
+              quantityEducation?.passTest || 0,
+              quantityEducation?.passInterview || 0,
+              quantityEducation?.onboard || 0
+            ];
+
             return {
               label: education.educationName,
               data: data,
               backgroundColor: education.colorCode,
               borderColor: education.colorCode,
-              borderWidth: 0
+              borderWidth: 0,
+              counts: counts
             };
           })
         }

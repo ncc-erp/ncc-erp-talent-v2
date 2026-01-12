@@ -151,6 +151,7 @@ namespace TalentV2.DomainServices.Reports.Dtos
     {
         public string Key { get; set; }
         public float Percent { get; set; }
+        public long Quantity { get; set; }
     }
     public class BranchDtoExport
     {
