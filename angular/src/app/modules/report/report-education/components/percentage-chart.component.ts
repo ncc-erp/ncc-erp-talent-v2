@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ChartOptions } from 'chart.js';
+import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 
 @Component({
   selector: 'percentage-chart',
@@ -24,6 +25,7 @@ import { ChartOptions } from 'chart.js';
                 type="bar"
                 [data]="filteredChartData"
                 [options]="chartOptions"
+                [plugins]="chartPlugins"
                 [height]="400">
               </p-chart>
             </div>
@@ -79,6 +81,7 @@ export class PercentageChartComponent implements OnInit, OnChanges, AfterViewIni
   @Input() filterEnabled: boolean = false;
   @ViewChild('chartRef') chartRef: any;
 
+  public chartPlugins = [pluginDataLabels.default];
   chartOptions: ChartOptions = {};
   filteredChartData: any;
   originalChartData: any;
@@ -200,6 +203,20 @@ export class PercentageChartComponent implements OnInit, OnChanges, AfterViewIni
         tooltip: {
           callbacks: {
             label: (context) => `${context.dataset.label}: ${context.parsed.x.toFixed(1)}%`
+          }
+        },
+        datalabels: {
+          formatter: (value, ctx) => {
+            if (value <= 0) return "";
+            // Access counts from the dataset (this property was added in mapToPercentageChart)
+            // Note: ctx.dataset is typed as ChartDataSets which might not have 'counts' property in standard types
+            const dataset: any = ctx.dataset;
+            const count = dataset.counts ? dataset.counts[ctx.dataIndex] : 0;
+            return value.toFixed(1) + '% (' + count + ')';
+          },
+          color: '#fff',
+          font: { 
+            size: 11 
           }
         }
       },

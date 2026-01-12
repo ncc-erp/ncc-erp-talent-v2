@@ -93,6 +93,12 @@ namespace TalentV2.WebServices.ExternalServices.Mezon
                    $"state={state}";
         }
 
+        public string GenerateOAuthUrlSilent()
+        {
+            var oauthUrl = GenerateOAuthUrl();
+            return oauthUrl + "&prompt=none";
+        }
+
         public MezonServiceConfig GetConfig()
         {
             return new MezonServiceConfig

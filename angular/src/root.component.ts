@@ -1,30 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { MezonLoginService } from '@app/core/services/apis/mezon-api.service';
-import { isFromMezon } from '@app/core/helpers/utils.helper';
+import { Component, OnInit } from "@angular/core";
+import { isFromMezonApp } from "@app/core/helpers/utils.helper";
+import { MezonLoginService } from "@app/core/services/apis/mezon-api.service";
 
 @Component({
-    selector: 'app-root',
-    template: `<router-outlet></router-outlet>`
+  selector: "app-root",
+  template: `<router-outlet></router-outlet>`,
 })
 export class RootComponent implements OnInit {
+  constructor(private mezonService: MezonLoginService) {
+    this.initializeMezonIntegration();
+  }
 
-    constructor(
-        private router: Router,
-        private mezonService: MezonLoginService
-    ) {
-        this.initializeMezonIntegration();
-    }
+  ngOnInit(): void {}
 
-    ngOnInit(): void {
-    }
-
-    private async initializeMezonIntegration() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const hashData = urlParams.get('data');
-        
-        const isMezon = isFromMezon();
-        
-        if (isMezon && hashData) this.mezonService.setMezonHashData(hashData);
-    }
+  private async initializeMezonIntegration() {
+    if (!isFromMezonApp()) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashData = urlParams.get("data");
+    this.mezonService.setMezonHashData(hashData);
+  }
 }

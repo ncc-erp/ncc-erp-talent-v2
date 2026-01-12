@@ -1,15 +1,15 @@
 import { Component, Injector, OnInit } from '@angular/core';
 import { Branch } from '@app/core/models/categories/branch.model';
+import { SourceStatistic } from "@app/core/models/report/report-performance.model";
 import { ReportOverviewService } from '@app/core/services/report/report-overview.service';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { AppComponentBase } from '@shared/app-component-base';
 import { DateFormat } from '@shared/AppConsts';
 import { CreationTimeEnum, DefaultRoute } from '@shared/AppEnums';
 import { TalentDateTime } from '@shared/components/date-selector/date-selector.component';
-import { SourceStatistic } from "@app/core/models/report/report-performance.model";
 import { ApiResponse } from '@shared/paged-listing-component-base';
-import { forkJoin, Subscription } from 'rxjs';
 import * as pluginDataLabels from 'chartjs-plugin-datalabels';
+import { forkJoin, Subscription } from 'rxjs';
 
 @Component({
   selector: 'talent-staff-recruitment-performance',
@@ -77,9 +77,18 @@ export class StaffRecruitmentPerformanceComponent extends AppComponentBase imple
     if (isChangeTime) this.data = [];
     this.reports.forEach((element) => {
       if (!isChangeTime && this.data.findIndex(s => s.branchId == element.branchId) >= 0) return;
+
+      const totalBranchCV = element.sourcePerformances.reduce((sum, item) => sum + item.totalCV, 0);
+      const sourcePerformancesWithPercent = element.sourcePerformances.map(item => ({
+        ...item,
+        percentage: totalBranchCV > 0 ? (item.totalCV * 100 / totalBranchCV).toFixed(2) : 0
+      }));
+
       this.data.push({
         branchId: element.branchId,
         branchName: element.branchName,
+        sourcePerformances: sourcePerformancesWithPercent,
+        totalBranchCV: totalBranchCV,
         dataChart:
         {
           labels: element.sourcePerformances.map(e => e.sourceName),
@@ -106,7 +115,7 @@ export class StaffRecruitmentPerformanceComponent extends AppComponentBase imple
             if (value <= 0) return "";
             let dataArr = ctx.chart.data.datasets[0].data;
             let percentage = this.getPercentage(value, dataArr);
-            return percentage + '%';
+            return percentage + '% (' + value + ')';
           },
           color: '#fff',
         }

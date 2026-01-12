@@ -3,3 +3,21 @@
         <span class="sr-only">Loading...</span>
     </div>
 </div>
+
+<!-- Show different content for popup context -->
+<div *ngIf="window.opener" style="display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; font-family: Arial, sans-serif;">
+  <div>
+    <h3>Processing authentication...</h3>
+    <p>This window will close automatically.</p>
+    <div style="margin-top: 20px;">
+      <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
