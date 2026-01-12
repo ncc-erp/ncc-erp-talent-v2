@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import { TokenService, LogService, UtilsService } from 'abp-ng2-module';
 import { AppConsts } from '@shared/AppConsts';
-import { AppRoutes } from '@shared/AppRoutes';
 import { UrlHelper } from '@shared/helpers/UrlHelper';
 import {
     AuthenticateModel,
     AuthenticateResultModel,
     TokenAuthServiceProxy,
 } from '@shared/service-proxies/service-proxies';
-import { AppSessionService } from '@shared/session/app-session.service';
-import { LogService, TokenService, UtilsService } from 'abp-ng2-module';
-import { finalize } from 'rxjs/operators';
 
 @Injectable()
 export class AppAuthService {
@@ -23,17 +21,18 @@ export class AppAuthService {
         private _router: Router,
         private _utilsService: UtilsService,
         private _tokenService: TokenService,
-        private _logService: LogService,
-        private _appSessionService: AppSessionService
+        private _logService: LogService
     ) {
         this.clear();
     }
 
-    logout(): void {
+    logout(reload?: boolean): void {
         abp.auth.clearToken();
         abp.utils.deleteCookie(AppConsts.authorization.encryptedAuthTokenName);
-        this._appSessionService.clearSession();
-        location.href = AppConsts.appBaseUrl + AppRoutes.ACCOUNT.LOGIN;
+        
+        if (reload !== false) {
+            location.href = AppConsts.appBaseUrl;
+        }
     }
 
     authenticate(finallyCallback?: () => void): void {
@@ -91,7 +90,7 @@ export class AppAuthService {
             abp.appPath
         );
 
-        let initialUrl = UrlHelper.getInitialUrl();
+        let initialUrl = UrlHelper.initialUrl;
         if (initialUrl.indexOf('/login') > 0) {
             initialUrl = AppConsts.appBaseUrl;
         }

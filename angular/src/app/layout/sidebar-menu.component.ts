@@ -10,7 +10,6 @@ import { BehaviorSubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { MenuItem } from '@shared/layout/menu-item';
 import { PERMISSIONS_CONSTANT } from '@shared/permission/permissions';
-import { AppRoutes } from '@shared/AppRoutes';
 
 @Component({
     selector: 'sidebar-menu',
@@ -21,7 +20,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
     menuItemsMap: { [key: number]: MenuItem } = {};
     activatedMenuItems: MenuItem[] = [];
     routerEvents: BehaviorSubject<RouterEvent> = new BehaviorSubject(undefined);
-    homeRoute = AppRoutes.APP.HOME;
+    homeRoute = '/app/home';
 
     constructor(injector: Injector) {
         super(injector);
@@ -45,7 +44,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
 
     getMenuItems(): MenuItem[] {
         return [
-            new MenuItem(this.l('Home'), AppRoutes.APP.HOME, 'fas fa-home'),
+            new MenuItem(this.l('Home'), '/app/home', 'fas fa-home'),
             new MenuItem('Admin', '', 'fas fa-user-cog', PERMISSIONS_CONSTANT.TabAdmin, [
                 new MenuItem(
                     this.l('Roles'),
