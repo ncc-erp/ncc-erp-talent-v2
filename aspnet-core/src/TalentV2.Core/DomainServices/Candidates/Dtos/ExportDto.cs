@@ -30,6 +30,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public DateTime? Time { get; set; }
         public string Positon { get; set; }
         public string Branch { get; set; }
+        public string CVSource { get; set; }
         public RequestCVStatus? Status { get; set; }
         public string InterviewLevel { get; set; }
         public string ApplyLevel { get; set; }
@@ -49,6 +50,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public DateTime? Time { get; set; }
         public string Positon { get; set; }
         public string Branch { get; set; }
+        public string CVSource { get; set; }
         public RequestCVStatus? Status { get; set; }
         public string InterviewLevel { get; set; }
         public string ApplyLevel { get; set; }

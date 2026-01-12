@@ -20,6 +20,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
         public ProcessCVStatus ProcessCVStatus { get; set; }
         public DateTime? LatestModifiedTime { get; set; }
         public bool IsDeleted { get; set; }
+        public string CVSourceName { get; set; }
     }
     public class SkillCandidatePagingDto
     {

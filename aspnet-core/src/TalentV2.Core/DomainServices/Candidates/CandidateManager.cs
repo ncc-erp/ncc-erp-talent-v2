@@ -1057,6 +1057,7 @@ namespace TalentV2.DomainServices.Candidates
                             SubPositionName = candidate.SubPosition.Name,
                             BranchId = candidate.BranchId,
                             BranchName = candidate.Branch.Name,
+                            CVSourceName = candidate.CVSource.Name,
                             CreatorUserId = candidate.CreatorUserId,
                             CreationTime = candidate.CreationTime,
                             CreatorName = candidate.CreatorUserId.HasValue ?
@@ -1465,6 +1466,7 @@ namespace TalentV2.DomainServices.Candidates
                     CvStatus = u.CvStatus,
                     Education = string.Join(Environment.NewLine, u.CVEducations.Select(e => bulletPoint + e.EducationName)),
                     Branch = u.BranchName,
+                    CVSource = u.CVSourceName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.FirstOrDefault()?.RequestCVStatus,
                     Time = u.LastModifiedTime,
@@ -1500,6 +1502,7 @@ namespace TalentV2.DomainServices.Candidates
                     Name = u.FullName,
                     Email = u.Email,
                     Branch = u.BranchName,
+                    CVSource = u.CVSourceName,
                     Positon = u.SubPositionName,
                     Status = u.RequisitionInfos.FirstOrDefault()?.RequestCVStatus,
                     Time = u.RequisitionInfos.FirstOrDefault()?.InterviewTime,
