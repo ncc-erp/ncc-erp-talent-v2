@@ -571,7 +571,7 @@ namespace TalentV2.DomainServices.Reports
 
             var report = educations
                 .GroupBy(e => e.Name)
-                .Select(e => new ReportEducationHaveCVOnboardDto
+                .Select(e => new ReportEducationHaveCVPassTestDto
                 {
                     EducationId = e.First().Id,
                     EducationName = e.Key,
@@ -834,6 +834,7 @@ namespace TalentV2.DomainServices.Reports
                     BranchName = branch.DisplayName,
                     Temaplates = pieChartPassInterViews.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : pieChartPassInterViews,
                 });
+
             }
             columChartOnbore.NameSheet = "Education Intern Onboarded";
             var excelBytesEducationInternOnboarded = await AddChart(columChartOnbore, ChartType.Column);
@@ -841,7 +842,7 @@ namespace TalentV2.DomainServices.Reports
             var excelBytesEducationPassTests = await AddChart(columChartPassTest, ChartType.Column);
             columChartPassInterView.NameSheet = "Education Intern PassIterview";
             var excelBytesEducationPassInreView = await AddChart(columChartPassInterView, ChartType.Column);
-
+            
             var combinedBytes = CombineExcelFiles(excelBytesEducationInternOnboarded, excelBytesEducationPassTests, excelBytesEducationPassInreView);
             return new FileContentResult(combinedBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
@@ -886,7 +887,7 @@ namespace TalentV2.DomainServices.Reports
                     var labelsRange = worksheet.Cells[$"{columnKey}{startRow + 1}:{columnKey}{endRow}"];
                     var chartRange = worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"];
                     input.Row = startRow - 1;
-                    input.Column = endColumn + 2;
+                    input.Column = endColumn + 3;
                     switch (typeChart)
                     {
                         case ChartType.Pie:
@@ -1106,5 +1107,6 @@ namespace TalentV2.DomainServices.Reports
 
             return Math.Round((double)numerator / denominator * 100, 2);
         }
+
     }
 }
