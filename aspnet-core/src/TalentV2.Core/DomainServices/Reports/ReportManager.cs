@@ -747,7 +747,7 @@ namespace TalentV2.DomainServices.Reports
                 {
                     Key = s.Name,
                     Percent = sumtotalStatus > percentDefault ? (totalStatus[statusStatistics.IndexOf(s)] / (float)sumtotalStatus) : percentDefault,
-                    Quantity = s.TotalCV
+                    Quantity = totalStatus[statusStatistics.IndexOf(s)]
                 }).ToList();
 
                 pieChartStatusStatistics.ModelCharts.Add(new ModelChart
@@ -867,6 +867,22 @@ namespace TalentV2.DomainServices.Reports
                     worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     endRow = (startRow + item.Temaplates.Count);
                     worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"].Style.Numberformat.Format = "0.00%";
+
+                    var totalRow = endRow + 1;
+                    worksheet.Cells[$"{columnKey}{totalRow}"].Value = "Total";
+                    worksheet.Cells[$"{columnKey}{totalRow}"].Style.Font.Bold = true;
+
+                    var columnPercent = GetColumnNameFromNumber(startColumn + 1);
+                    var sumPercent = item.Temaplates.Sum(s => s.Percent);
+                    worksheet.Cells[$"{columnPercent}{totalRow}"].Value = sumPercent;
+                    worksheet.Cells[$"{columnPercent}{totalRow}"].Style.Numberformat.Format = "0.00%";
+                    worksheet.Cells[$"{columnPercent}{totalRow}"].Style.Font.Bold = true;
+
+                    var columnQuantity = GetColumnNameFromNumber(startColumn + 2);
+                    var sumQuantity = item.Temaplates.Sum(s => s.Quantity);
+                    worksheet.Cells[$"{columnQuantity}{totalRow}"].Value = sumQuantity;
+                    worksheet.Cells[$"{columnQuantity}{totalRow}"].Style.Font.Bold = true;
+
                     var labelsRange = worksheet.Cells[$"{columnKey}{startRow + 1}:{columnKey}{endRow}"];
                     var chartRange = worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"];
                     input.Row = startRow - 1;
