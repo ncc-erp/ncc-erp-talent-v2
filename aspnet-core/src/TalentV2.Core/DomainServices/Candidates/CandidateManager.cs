@@ -1,4 +1,4 @@
-﻿using Abp.Authorization.Users;
+using Abp.Authorization.Users;
 using Abp.Collections.Extensions;
 using Abp.Linq.Extensions;
 using Abp.UI;
@@ -1445,10 +1445,12 @@ namespace TalentV2.DomainServices.Candidates
         {
             var clientUrl = _configuration.GetValue<string>($"App:ClientRootAddress");
             var bulletPoint = "\u002B" + "\x20";
+            var shouldExportApplicationStatus = !input.candidateStatus.HasValue || input.candidateStatus == CVStatus.Passed;
 
             var exportCandidates = await IQGetAllCVs()
                .Where(q => q.UserType.Equals(input.userType) && !q.IsDeleted)
-               .WhereIf(input.reqCvStatus.HasValue, q => q.RequisitionInfos.Any(s => s.RequestCVStatus == input.reqCvStatus))
+               .WhereIf(input.candidateStatus.HasValue, q => q.CvStatus == input.candidateStatus)
+               .WhereIf(shouldExportApplicationStatus && input.reqCvStatus.HasValue, q => q.RequisitionInfos.Any(s => s.RequestCVStatus == input.reqCvStatus))
                .WhereIf(input.FromStatus.HasValue, q => q.HistoryChangeStatuses.Any(s => s.FromStatus == input.FromStatus))
                .WhereIf(input.ToStatus.HasValue, q => q.HistoryChangeStatuses.Any(s => s.ToStatus == input.ToStatus))
                .WhereIf(input.FromDate.HasValue, q => q.LastModifiedTime.Value.Date >= input.FromDate.Value.Date)
@@ -1463,7 +1465,7 @@ namespace TalentV2.DomainServices.Candidates
                     Phone = u.Phone,
                     Email = u.Email,
                     Sex = u.IsFemale ? "Male" : "Female",
-                    CvStatus = u.CvStatus,
+                    CandidateStatus = u.CvStatus.ToString(),
                     Education = string.Join(Environment.NewLine, u.CVEducations.Select(e => bulletPoint + e.EducationName)),
                     Branch = u.BranchName,
                     CVSource = u.CVSourceName,
@@ -1489,30 +1491,12 @@ namespace TalentV2.DomainServices.Candidates
                 RequestCVStatus.RejectedOffer,
                 RequestCVStatus.Onboarded
             };
-            var interviewedResult = exportCandidates
+            var interviewedCandidates = exportCandidates
                 .Where(candidate =>
                 {
                     var requestCVStatus = candidate.RequisitionInfos.FirstOrDefault()?.RequestCVStatus;
-                    if (requestCVStatus.HasValue) return interviewedRequestCVStatus.Contains(requestCVStatus.Value);
-                    return false;
+                    return requestCVStatus.HasValue && interviewedRequestCVStatus.Contains(requestCVStatus.Value);
                 })
-                .Select((u, index) => new InterviewReport
-                {
-                    No = 1 + index++,
-                    Name = u.FullName,
-                    Email = u.Email,
-                    Branch = u.BranchName,
-                    CVSource = u.CVSourceName,
-                    Positon = u.SubPositionName,
-                    Status = u.RequisitionInfos.FirstOrDefault()?.RequestCVStatus,
-                    Time = u.RequisitionInfos.FirstOrDefault()?.InterviewTime,
-                    ApplyLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.ApplyLevel),
-                    FinalLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.FinalLevel),
-                    InterviewLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.InterviewLevel),
-                    Score = CalculateScore(u.RequisitionInfos.FirstOrDefault()?.CapabilityResults),
-                    TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
-                }
-                )
                 .ToList();
 
             using (var package = new ExcelPackage())
@@ -1522,15 +1506,43 @@ namespace TalentV2.DomainServices.Candidates
                 var columnKey = GetColumnNameFromNumber(startColumn);
 
                 var candidatesReportWorksheet = package.Workbook.Worksheets.Add("CandidatesReport");
-                candidatesReportWorksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(candidatesResult, true, TableStyles.Light9);
+                if (shouldExportApplicationStatus)
+                {
+                    candidatesReportWorksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(candidatesResult, true, TableStyles.Light9);
+                }
+                else
+                {
+                    var candidateStatusResults = candidatesResult.Select(c => new CandidateStatusReport
+                    {
+                        No = c.No,
+                        Name = c.Name,
+                        Phone = c.Phone,
+                        Email = c.Email,
+                        Sex = c.Sex,
+                        CandidateStatus = c.CandidateStatus,
+                        Education = c.Education,
+                        Branch = c.Branch,
+                        CVSource = c.CVSource,
+                        Positon = c.Positon,
+                        Time = c.Time,
+                        ApplyLevel = c.ApplyLevel,
+                        FinalLevel = c.FinalLevel,
+                        InterviewLevel = c.InterviewLevel,
+                        Score = c.Score,
+                        Note = c.Note,
+                        TalentLink = c.TalentLink
+                    }).ToList();
+                    candidatesReportWorksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(candidateStatusResults, true, TableStyles.Light9);
+                }
                 var reportRow = candidatesReportWorksheet.Dimension.Start.Row;
                 candidatesReportWorksheet.Column(8).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
-                candidatesResult.ForEach(candidate =>
+                var candidateLinks = candidatesResult.Select(c => c.TalentLink).ToList();
+                candidateLinks.ForEach(candidateLink =>
                 {
                     var talentLinkCell = candidatesReportWorksheet.Cells[++reportRow, candidatesReportWorksheet.Dimension.End.Column];
-                    if (!string.IsNullOrWhiteSpace(candidate.TalentLink))
+                    if (!string.IsNullOrWhiteSpace(candidateLink))
                     {
-                        talentLinkCell.Hyperlink = new ExcelHyperLink(candidate.TalentLink) { Display = "Talent link" };
+                        talentLinkCell.Hyperlink = new ExcelHyperLink(candidateLink) { Display = "Talent link" };
                         talentLinkCell.Style.Font.UnderLine = true;
                         talentLinkCell.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
                     }
@@ -1539,15 +1551,56 @@ namespace TalentV2.DomainServices.Candidates
                 candidatesReportWorksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 var interviewedReportWorksheet = package.Workbook.Worksheets.Add("InterviewedReport");
-                interviewedReportWorksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(interviewedResult, true, TableStyles.Light9);
+                var interviewedResult = interviewedCandidates.Select((u, index) => new InterviewReport
+                {
+                    No = 1 + index,
+                    Name = u.FullName,
+                    Email = u.Email,
+                    Branch = u.BranchName,
+                    CVSource = u.CVSourceName,
+                    Positon = u.SubPositionName,
+                    CandidateStatus = u.CvStatus.ToString(),
+                    Status = u.RequisitionInfos.FirstOrDefault()?.RequestCVStatus,
+                    Time = u.RequisitionInfos.FirstOrDefault()?.InterviewTime,
+                    ApplyLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.ApplyLevel),
+                    FinalLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.FinalLevel),
+                    InterviewLevel = GetLevelStandardName(u.RequisitionInfos.FirstOrDefault()?.InterviewLevel),
+                    Score = CalculateScore(u.RequisitionInfos.FirstOrDefault()?.CapabilityResults),
+                    TalentLink = clientUrl + "app/candidate/" + (u.UserType == UserType.Staff ? "staff-list" : "intern-list") + $"/{u.Id}?userType={(int)u.UserType}&tab=3"
+                }).ToList();
+                if (shouldExportApplicationStatus)
+                {
+                    interviewedReportWorksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(interviewedResult, true, TableStyles.Light9);
+                }
+                else
+                {
+                    var interviewedCandidateStatusResult = interviewedResult.Select(i => new InterviewCandidateStatusReport
+                    {
+                        No = i.No,
+                        Name = i.Name,
+                        Email = i.Email,
+                        Branch = i.Branch,
+                        CVSource = i.CVSource,
+                        Positon = i.Positon,
+                        CandidateStatus = i.CandidateStatus,
+                        Time = i.Time,
+                        ApplyLevel = i.ApplyLevel,
+                        FinalLevel = i.FinalLevel,
+                        InterviewLevel = i.InterviewLevel,
+                        Score = i.Score,
+                        TalentLink = i.TalentLink
+                    }).ToList();
+                    interviewedReportWorksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(interviewedCandidateStatusResult, true, TableStyles.Light9);
+                }
                 var interviewedRow = interviewedReportWorksheet.Dimension.Start.Row;
                 interviewedReportWorksheet.Column(4).Style.Numberformat.Format = "yyyy-mm-dd hh:mm:ss";
-                interviewedResult.ForEach(interview =>
+                var interviewLinks = interviewedResult.Select(i => i.TalentLink).ToList();
+                interviewLinks.ForEach(interviewLink =>
                 {
                     var talentLinkCell = interviewedReportWorksheet.Cells[++interviewedRow, interviewedReportWorksheet.Dimension.End.Column];
-                    if (!string.IsNullOrWhiteSpace(interview.TalentLink))
+                    if (!string.IsNullOrWhiteSpace(interviewLink))
                     {
-                        talentLinkCell.Hyperlink = new ExcelHyperLink(interview.TalentLink) { Display = "Talent link" };
+                        talentLinkCell.Hyperlink = new ExcelHyperLink(interviewLink) { Display = "Talent link" };
                         talentLinkCell.Style.Font.UnderLine = true;
                         talentLinkCell.Style.Font.Color.SetColor(System.Drawing.Color.Blue);
                     }

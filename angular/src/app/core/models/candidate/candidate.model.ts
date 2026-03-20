@@ -105,9 +105,10 @@ export class CandidateReportPayload {
   userType: UserType;
   fromDate:string;
   toDate:string;
-  reqCvStatus: number ;
-  toStatus: number;
-  fromStatus: number;
+  candidateStatus?: number;
+  reqCvStatus?: number;
+  toStatus?: number;
+  fromStatus?: number;
 }
 
 export interface ICandidateReportExtractCV {
