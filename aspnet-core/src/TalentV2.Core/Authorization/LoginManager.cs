@@ -136,7 +136,7 @@ namespace TalentV2.Authorization
                 using (UnitOfWorkManager.Current.SetTenantId(tenantId))
                 {
                     await UserManager.InitializeOptionsAsync(tenantId);
-                    var user = UserManager.Users.FirstOrDefault(x => x.MezonUserId == userInfo.UserId || x.EmailAddress == userInfo.MezonId);
+                    var user = UserManager.Users.FirstOrDefault(x => x.MezonUserId == userInfo.UserId || x.EmailAddress == userInfo.Email);
                     if (user == null)
                     {
                         return new AbpLoginResult<Tenant, User>(AbpLoginResultType.InvalidUserNameOrEmailAddress, tenant);

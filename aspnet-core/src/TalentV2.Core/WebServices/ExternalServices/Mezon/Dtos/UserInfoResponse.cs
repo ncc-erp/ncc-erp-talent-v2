@@ -42,6 +42,8 @@ namespace TalentV2.WebServices.ExternalServices.Mezon.Dtos
         [JsonProperty("user_id")]
         public string UserId { get; set; }
 
+        [JsonProperty("email")]
+        public string Email { get; set; }
         public DateTime AuthTimeUtc => DateTimeOffset.FromUnixTimeSeconds(AuthTime).UtcDateTime;
         public DateTime IssuedAtUtc => DateTimeOffset.FromUnixTimeSeconds(IssuedAt).UtcDateTime;
         public DateTime RequestedAtUtc => DateTimeOffset.FromUnixTimeSeconds(RequestedAt).UtcDateTime;

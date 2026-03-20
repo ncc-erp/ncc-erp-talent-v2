@@ -71,6 +71,26 @@
 
         <div class="flex-center-vertical w-100">
           <div class="input-wrapper">
+            <label for="candidateStatus">Candidate Status</label>
+            <p-dropdown
+              inputId="candidateStatus"
+              [(ngModel)]="candidateStatus"
+              [ngModelOptions]="{standalone: true}"
+              [options]="_utilities.catCvStatus"
+              placeholder="All"
+              optionLabel="name"
+              optionValue="id"
+              styleClass="w-100"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              (onChange)="onDropdownCandidateStatus($event)"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <div class="flex-center-vertical w-100" *ngIf="shouldShowApplicationStatus()">
+          <div class="input-wrapper">
             <label for="status">Application Status</label>
             <p-dropdown
               inputId="status"

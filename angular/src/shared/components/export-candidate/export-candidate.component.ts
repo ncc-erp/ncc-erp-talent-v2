@@ -1,9 +1,9 @@
-import { Component, Injector, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Injector, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CandidateInternService } from '@app/core/services/candidate/candidate-intern.service';
 import { AppComponentBase } from '@shared/app-component-base';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { ToastMessageType, UserType } from '@shared/AppEnums';
+import { ECVStatus, ToastMessageType, UserType } from '@shared/AppEnums';
 import { UtilitiesService } from '@app/core/services/utilities.service';
 import { CandidateReportPayload } from '@app/core/models/candidate/candidate.model';
 import { finalize } from 'rxjs/operators';
@@ -19,9 +19,10 @@ export class ExportCandidateComponent extends AppComponentBase {
   exportForm: FormGroup;
   loading = false;
   infomation:boolean = false ;
-  reqCvStatus: number;
-  reqCvToStatus: number;
-  reqCvFromStatus: number;
+  reqCvStatus: number | null = null;
+  reqCvToStatus: number | null = null;
+  reqCvFromStatus: number | null = null;
+  candidateStatus: number | null = null;
   statusHistory: boolean = false;
 
   @Input() userType: UserType.INTERN | UserType.STAFF;
@@ -52,11 +53,27 @@ export class ExportCandidateComponent extends AppComponentBase {
   onDropdownChange(status: any) {
     this.reqCvStatus = status.value;
   }
+  
+  onDropdownCandidateStatus(status: any) {
+    this.candidateStatus = status.value;
+    if (!this.shouldShowApplicationStatus()) {
+      this.reqCvStatus = null;
+    }
+  }
+
+  ngOnInit(): void {
+    this.candidateStatus = ECVStatus.Passed;
+  }
+
   onDropdownFromStatus(fromstatus: any) {
     this.reqCvFromStatus = fromstatus.value;
   }
   onDropdownToStatus(tostatus: any) {
     this.reqCvToStatus = tostatus.value;
+  }
+
+  shouldShowApplicationStatus(): boolean {    
+    return !this.candidateStatus || this.candidateStatus === ECVStatus.Passed;
   }
 
   public onExportReport() {
@@ -99,7 +116,8 @@ export class ExportCandidateComponent extends AppComponentBase {
       userType: userType ,
       fromDate: formattedFromDate,
       toDate: formattedToDate,
-      reqCvStatus: this?.reqCvStatus,
+      candidateStatus: this.candidateStatus,
+      reqCvStatus: this.shouldShowApplicationStatus() ? this?.reqCvStatus : null,
       toStatus: this.statusHistory ? this.reqCvToStatus : null,
       fromStatus: this.statusHistory ? this.reqCvFromStatus : null,
     };
