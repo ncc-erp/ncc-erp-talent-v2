@@ -21,6 +21,7 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
 {
     public class AutobotService : BaseWebService
     {
+        private static readonly TimeSpan ExtractCVTimeout = TimeSpan.FromMinutes(5);
         private double _sleepTime = 5;
         private const string ExtractV2 = "extract-cv-vision";
         private const string ExtractCV = "extract-cv";
@@ -49,7 +50,8 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                     { new StreamContent(file.OpenReadStream()), "file", file.FileName }
                 };
                 request.Content = content;
-                var response = await HttpClient.SendAsync(request);
+                using var cancellationTokenSource = new CancellationTokenSource(ExtractCVTimeout);
+                var response = await HttpClient.SendAsync(request, cancellationTokenSource.Token);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -83,7 +85,8 @@ namespace TalentV2.WebServices.ExternalServices.Autobot
                     streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                     content.Add(streamContent, "file", fileName);
 
-                    var response = await HttpClient.PostAsync(fullUrl, content);
+                    using var cancellationTokenSource = new CancellationTokenSource(ExtractCVTimeout);
+                    var response = await HttpClient.PostAsync(fullUrl, content, cancellationTokenSource.Token);
                     int statusCode = (int)response.StatusCode;
 
                     if (response.IsSuccessStatusCode)
