@@ -33,6 +33,7 @@ namespace TalentV2.WebServices
             {
                 options.BaseAddress = new Uri(_appConfiguration.GetValue<string>("AutobotService:BaseAddress"));
                 options.DefaultRequestHeaders.Add("X-Secret-Key", _appConfiguration.GetValue<string>("AutobotService:SecurityCode"));
+                options.Timeout = TimeSpan.FromMinutes(5);
             });
             services.AddHttpClient<MezonService>(options =>
             {
