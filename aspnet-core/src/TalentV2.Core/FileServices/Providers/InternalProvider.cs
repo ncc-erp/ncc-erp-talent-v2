@@ -1,4 +1,4 @@
-﻿using Abp.Dependency;
+using Abp.Dependency;
 using Castle.Core.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +27,8 @@ namespace TalentV2.FileServices.Providers
             newPaths.Insert(0, _hostingEnvironment.WebRootPath);
             var path = Path.Combine(newPaths.ToArray());
             CreateIfNotExist(path);
-            var fileName = $"{DateTimeUtils.GetNow().ToString("yyyyMMddHHmmss")}_{file.FileName}";
+            var cleanFileName = FileNameHelper.Sanitize(file.FileName);
+            var fileName = $"{DateTimeUtils.GetNow().ToString("yyyyMMddHHmmss")}_{cleanFileName}";
             var endPath = Path.Combine(path, fileName);
 
             using (var stream = File.Create(endPath))
