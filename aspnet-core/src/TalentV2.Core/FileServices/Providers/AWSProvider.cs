@@ -1,4 +1,4 @@
-﻿using Abp.Dependency;
+using Abp.Dependency;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Castle.Core.Logging;
@@ -25,7 +25,8 @@ namespace TalentV2.FileServices.Providers
 
         public async Task<string> UploadFileAsync(List<string> paths, IFormFile file)
         {
-            var key = $"{string.Join("/", paths)}/{DateTimeUtils.GetNow().ToString("yyyyMMddHHmmss")}_{file.FileName}";
+            var cleanFileName = FileNameHelper.Sanitize(file.FileName);
+            var key = $"{string.Join("/", paths)}/{DateTimeUtils.GetNow().ToString("yyyyMMddHHmmss")}_{cleanFileName}";
             _logger.Info($"UploadFileAsync() Key: {key}");
             var request = new PutObjectRequest()
             {
