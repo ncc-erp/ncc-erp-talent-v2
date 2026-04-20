@@ -99,6 +99,13 @@ namespace TalentV2.Constants.Dictionary
                         Description = "Tester Test invitation, sent when candidate has passed the test and is scheduled for interview",
                         Subject = "[NCC]_THƯ MỜI LÀM BÀI TEST",
                         Version = "Tester"
+                    },
+                    new()
+                    {
+                        Name = "[Test Mail] HR Test",
+                        Description = "This is a template for test",
+                        Subject = "[NCC]_TEST_MAIL",
+                        Version = "Test"
                     }
                 }
             },
