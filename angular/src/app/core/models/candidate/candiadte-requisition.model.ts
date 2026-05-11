@@ -5,6 +5,7 @@ import { Skill } from "./../categories/skill.model";
 export class CandidateRequisiton {
   id: number; //requestCvID
   cvName: string;
+  note: string;
   currentRequisition: CurrentRequisition;
   interviewCandidate: CandidatInterviewer[];
   capabilityCandidate: CandidateCapability[];
