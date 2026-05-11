@@ -815,6 +815,7 @@ export class CurrentRequisitionComponent extends AppComponentBase implements OnI
     if (applyResult) {
       this.applyResultForm.patchValue({
         ...applyResult,
+        hrNote: this.candidateRequisiton?.note ?? applyResult.hrNote ?? '',
         onboardDate: applyResult.onboardDate ? new Date(applyResult.onboardDate) : null,
       });
 

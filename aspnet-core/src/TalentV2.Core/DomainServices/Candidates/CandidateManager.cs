@@ -218,6 +218,7 @@ namespace TalentV2.DomainServices.Candidates
             {
                 Id = s.Id,
                 CVName = s.CV.Name,
+                Note = s.CV.Note,
                 CurrentRequisition = new CurrentRequisitionDto
                 {
                     Id = s.RequestId,

@@ -15,6 +15,7 @@ namespace TalentV2.DomainServices.Candidates.Dtos
     {
         public long Id { get; set; }
         public string CVName { get; set; }
+        public string Note { get; set; }
         public CurrentRequisitionDto CurrentRequisition { get; set; }
         public List<InterviewCandidateDto> InterviewCandidate { get; set; }
         public List<CapabilityCandidateDto> CapabilityCandidate { get; set; }
