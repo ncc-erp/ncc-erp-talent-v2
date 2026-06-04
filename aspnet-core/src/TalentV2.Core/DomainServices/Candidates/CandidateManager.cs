@@ -741,10 +741,6 @@ namespace TalentV2.DomainServices.Candidates
             }
             var getCv = entity.CV;
             var applicationResult = entity.RequestCV;
-            if (getCv?.Note != input?.HRNote && input?.HRNote != null)
-            {
-                getCv.Note = input.HRNote;
-            }
             var oldStatus = applicationResult.Status;
             var oldOnboardDate = applicationResult.OnboardDate;
             if (input.Status == RequestCVStatus.Onboarded || applicationResult.Status != input.Status)
@@ -776,6 +772,7 @@ namespace TalentV2.DomainServices.Candidates
             }
 
             ObjectMapper.Map(input, applicationResult);
+            await SyncCandidateAndRequestCvNotes(applicationResult.CVId, input.HRNote);
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
@@ -1392,10 +1389,24 @@ namespace TalentV2.DomainServices.Candidates
 
         public async Task<UpdateCandidateNoteDto> UpdateNote(UpdateCandidateNoteDto input)
         {
-            var cv = await WorkScope.GetAsync<CV>(input.CVId);
-            cv.Note = input.Note;
+            await SyncCandidateAndRequestCvNotes(input.CVId, input.Note);
             await CurrentUnitOfWork.SaveChangesAsync();
             return input;
+        }
+
+        private async Task SyncCandidateAndRequestCvNotes(long cvId, string note)
+        {
+            var cv = await WorkScope.GetAsync<CV>(cvId);
+            cv.Note = note;
+
+            var requestCvs = await WorkScope.GetAll<RequestCV>()
+                .Where(s => s.CVId == cvId)
+                .ToListAsync();
+
+            foreach (var requestCv in requestCvs)
+            {
+                requestCv.HRNote = note;
+            }
         }
 
         public List<InterviewInfoDto> GetInterviewInfo()
