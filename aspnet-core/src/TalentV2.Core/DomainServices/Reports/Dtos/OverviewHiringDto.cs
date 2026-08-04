@@ -168,6 +168,18 @@ namespace TalentV2.DomainServices.Reports.Dtos
     public class ExportChartEducationInput : DateInput
     {
         public List<BranchDtoExport> Branchs { get; set; }
+        public List<InternEducationCVStatus> CVStatuses { get; set; }
+        public List<RequestCVStatus> CandidateStatuses { get; set; }
+    }
+
+    public enum InternEducationCVStatus
+    {
+        NewUnprocessed = 0,
+        NewNormal = 1,
+        Contacting = 2,
+        Passed = 3,
+        Failed = 4,
+        Draft = 5
     }
 
 }
