@@ -875,8 +875,8 @@ namespace TalentV2.DomainServices.Reports
 
         private async Task<List<InternEducationStatusExportDto>> GetInternEducationStatusDataForExport(ExportChartEducationInput input)
         {
-            var fromDate = input.FromDate.Value.Date;
-            var toDate = input.ToDate.Value.Date.AddDays(1);
+            var fromDate = input.FromDate.Value.ToLocalTime().Date;
+            var toDate = input.ToDate.Value.ToLocalTime().Date.AddDays(1);
             var selectedBranches = input.Branchs ?? new List<BranchDtoExport>();
             var selectedBranchIds = selectedBranches
                 .Where(branch => branch.Id.HasValue)
@@ -885,21 +885,22 @@ namespace TalentV2.DomainServices.Reports
                 .ToList();
             var isAllBranch = selectedBranches.Count == 0 || selectedBranches.Any(branch => !branch.Id.HasValue);
 
-            var requestCVs = await WorkScope.GetAll<RequestCV>()
-                .Where(requestCV => requestCV.Request.UserType == UserType.Intern)
-                .Where(requestCV => requestCV.LastModificationTime >= fromDate && requestCV.LastModificationTime < toDate)
-                .WhereIf(!isAllBranch, requestCV => selectedBranchIds.Contains(requestCV.CV.BranchId))
-                .Select(requestCV => new
+            var cvs = await WorkScope.GetAll<CV>()
+                .Where(cv => cv.LastModificationTime >= fromDate && cv.LastModificationTime < toDate)
+                .Where(cv => cv.UserType == UserType.Intern && !cv.IsDeleted)
+                .WhereIf(!isAllBranch, cv => selectedBranchIds.Contains(cv.BranchId))
+                .Select(cv => new
                 {
-                    requestCV.Id,
-                    requestCV.CVId,
-                    CandidateStatus = requestCV.Status,
-                    requestCV.LastModificationTime,
-                    BranchId = requestCV.CV.BranchId,
-                    CVStatus = requestCV.CV.CVStatus,
-                    CVCreationTime = requestCV.CV.CreationTime,
-                    CVLastModificationTime = requestCV.CV.LastModificationTime,
-                    EducationId = requestCV.CV.CVEducations
+                    cv.BranchId,
+                    cv.CVStatus,
+                    CVCreationTime = cv.CreationTime,
+                    CVLastModificationTime = cv.LastModificationTime,
+                    CandidateStatus = cv.RequestCVs
+                        .Where(requestCV => !requestCV.IsDeleted)
+                        .OrderByDescending(requestCV => requestCV.LastModificationTime)
+                        .Select(requestCV => (RequestCVStatus?)requestCV.Status)
+                        .FirstOrDefault(),
+                    EducationId = cv.CVEducations
                         .OrderBy(education => education.CreationTime)
                         .Select(education => (long?)education.EducationId)
                         .FirstOrDefault()
@@ -911,21 +912,19 @@ namespace TalentV2.DomainServices.Reports
                 .AsNoTracking()
                 .ToDictionaryAsync(education => education.Id, education => education.Name);
 
-            return requestCVs
-                .GroupBy(requestCV => requestCV.CVId)
-                .Select(group => group
-                    .OrderByDescending(requestCV => requestCV.LastModificationTime)
-                    .ThenByDescending(requestCV => requestCV.Id)
-                    .First())
-                .Where(requestCV => requestCV.EducationId.HasValue && educationNames.ContainsKey(requestCV.EducationId.Value))
-                .Select(requestCV => new InternEducationStatusExportDto
+            return cvs
+                .Select(cv => new InternEducationStatusExportDto
                 {
-                    BranchId = requestCV.BranchId,
-                    EducationId = requestCV.EducationId.Value,
-                    EducationName = educationNames[requestCV.EducationId.Value],
-                    CVStatus = requestCV.CVStatus,
-                    CandidateStatus = requestCV.CandidateStatus,
-                    CVStatusTime = requestCV.CVLastModificationTime ?? requestCV.CVCreationTime
+                    BranchId = cv.BranchId,
+                    EducationId = cv.EducationId.HasValue && educationNames.ContainsKey(cv.EducationId.Value)
+                        ? cv.EducationId.Value
+                        : 0,
+                    EducationName = cv.EducationId.HasValue && educationNames.ContainsKey(cv.EducationId.Value)
+                        ? educationNames[cv.EducationId.Value]
+                        : "No Education",
+                    CVStatus = cv.CVStatus,
+                    CandidateStatus = cv.CandidateStatus,
+                    CVStatusTime = cv.CVLastModificationTime ?? cv.CVCreationTime
                 })
                 .ToList();
         }
