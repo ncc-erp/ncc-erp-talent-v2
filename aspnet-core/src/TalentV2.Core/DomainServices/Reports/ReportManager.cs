@@ -770,86 +770,235 @@ namespace TalentV2.DomainServices.Reports
         }
         public async Task<FileContentResult> ExportInternEducation(ExportChartEducationInput input)
         {
-            var noData = "NoData";
-            var percentDefault = 0;
-            var columChartOnbore = new Chart();
-            var columChartPassTest = new Chart();
-            var columChartPassInterView = new Chart();
+            var statusData = await GetInternEducationStatusDataForExport(input);
+            var selectedBranches = input.Branchs != null && input.Branchs.Any()
+                ? input.Branchs
+                : new List<BranchDtoExport>
+                {
+                    new BranchDtoExport
+                    {
+                        Id = null,
+                        DisplayName = "All Branch"
+                    }
+                };
+            var selectedCVStatuses = input.CVStatuses ?? new List<InternEducationCVStatus>();
+            var selectedCandidateStatuses = input.CandidateStatuses ?? new List<RequestCVStatus>();
 
-            columChartOnbore.ModelCharts = new List<ModelChart>();
-            columChartPassTest.ModelCharts = new List<ModelChart>();
-            columChartPassInterView.ModelCharts = new List<ModelChart>();
-
-            foreach (var branch in input.Branchs)
+            // Keep the API backward compatible for callers that do not send status filters.
+            if (!selectedCVStatuses.Any() && !selectedCandidateStatuses.Any())
             {
-                var listEducationInternOnboarded = await GetEducationInternOnboarded(input.FromDate.Value, input.ToDate.Value, branch.Id);
-                var educationInternOnboardeds = listEducationInternOnboarded?.Educations.ToList();
-                var top10EducationInternOnboardeds = educationInternOnboardeds
-                  .OrderByDescending(s => s.TotalCV)
-                  .Take(10)
-                  .ToList();
-                var sumtotalEducationInternOnboarded = educationInternOnboardeds.Select(s => s.TotalCV).ToList().Sum();
-                var pieCharts = top10EducationInternOnboardeds?.Select(s => new Templates
-                {
-                    Key = s.EducationName,
-                    Percent = sumtotalEducationInternOnboarded > percentDefault ? (s.TotalCV / (float)sumtotalEducationInternOnboarded) : percentDefault,
-                    Quantity = s.TotalCV
-                }).ToList();
-                columChartOnbore.ModelCharts.Add(new ModelChart
-                {
-                    BranchName = branch.DisplayName,
-                    Temaplates = pieCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : pieCharts,
-                });
-                var listGetEducationPassTest = await GetEducationPassTest(input.FromDate.Value, input.ToDate.Value, branch.Id);
-                var educationPassTests = listGetEducationPassTest?.Educations.ToList();
-                var top10educationPassTests = educationPassTests
-               .OrderByDescending(s => s.TotalCV)
-               .Take(10)
-               .ToList();
-                var sumtotaleducationPassTests = educationPassTests.Select(s => s.TotalCV).ToList().Sum();
-                var columnCharts = top10educationPassTests?.Select(s => new Templates
-                {
-                    Key = s.EducationName,
-                    Percent = sumtotaleducationPassTests > percentDefault ? (s.TotalCV / (float)sumtotaleducationPassTests) : percentDefault,
-                    Quantity = s.TotalCV
-                }).ToList();
-                columChartPassTest.ModelCharts.Add(new ModelChart
-                {
-                    BranchName = branch.DisplayName,
-                    Temaplates = columnCharts.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : columnCharts,
-                });
-
-                var listGetEducationPassInterView = await GetEducationPassInterView(input.FromDate.Value, input.ToDate.Value, branch.Id);
-                var educationPassInterView = listGetEducationPassInterView?.Educations.ToList();
-                var sumtotaleducationPassInterView = educationPassInterView.Select(s => s.TotalCV).ToList().Sum();
-
-                var pieChartPassInterViews = educationPassInterView?.Select(s => new Templates
-                {
-                    Key = s.EducationName,
-                    Percent = sumtotaleducationPassInterView > percentDefault ? (s.TotalCV / (float)sumtotaleducationPassInterView) : percentDefault,
-                    Quantity = s.TotalCV
-                }).ToList();
-                columChartPassInterView.ModelCharts.Add(new ModelChart
-                {
-                    BranchName = branch.DisplayName,
-                    Temaplates = pieChartPassInterViews.Count() <= 0 ? new List<Templates>() { new Templates { Key = noData, Percent = percentDefault, Quantity = 0 } } : pieChartPassInterViews,
-                });
-
+                selectedCVStatuses = Enum.GetValues(typeof(InternEducationCVStatus))
+                    .Cast<InternEducationCVStatus>()
+                    .ToList();
+                selectedCandidateStatuses = Enum.GetValues(typeof(RequestCVStatus))
+                    .Cast<RequestCVStatus>()
+                    .ToList();
             }
-            columChartOnbore.NameSheet = "Education Intern Onboarded";
-            var excelBytesEducationInternOnboarded = await AddChart(columChartOnbore, ChartType.Column);
-            columChartPassTest.NameSheet = "Education Pass Test";
-            var excelBytesEducationPassTests = await AddChart(columChartPassTest, ChartType.Column);
-            columChartPassInterView.NameSheet = "Education Intern PassIterview";
-            var excelBytesEducationPassInreView = await AddChart(columChartPassInterView, ChartType.Column);
-            
-            var combinedBytes = CombineExcelFiles(excelBytesEducationInternOnboarded, excelBytesEducationPassTests, excelBytesEducationPassInreView);
+
+            var excelFiles = new List<byte[]>();
+            var now = DateTime.Now;
+
+            foreach (var selectedCVStatus in selectedCVStatuses
+                .Where(status => Enum.IsDefined(typeof(InternEducationCVStatus), status))
+                .Distinct()
+                .OrderBy(status => status))
+            {
+                string sheetName;
+                Func<InternEducationStatusExportDto, bool> statusFilter;
+
+                switch (selectedCVStatus)
+                {
+                    case InternEducationCVStatus.NewUnprocessed:
+                        sheetName = "CV - New Unprocessed";
+                        statusFilter = candidate =>
+                            candidate.CVStatus == CVStatus.New
+                            && candidate.CVStatusTime.AddDays(3) < now;
+                        break;
+                    case InternEducationCVStatus.NewNormal:
+                        sheetName = "CV - New Normal";
+                        statusFilter = candidate =>
+                            candidate.CVStatus == CVStatus.New
+                            && candidate.CVStatusTime.AddDays(3) >= now;
+                        break;
+                    case InternEducationCVStatus.Contacting:
+                        sheetName = "CV - Contacting";
+                        statusFilter = candidate => candidate.CVStatus == CVStatus.Contacting;
+                        break;
+                    case InternEducationCVStatus.Passed:
+                        sheetName = "CV - Passed";
+                        statusFilter = candidate => candidate.CVStatus == CVStatus.Passed;
+                        break;
+                    case InternEducationCVStatus.Failed:
+                        sheetName = "CV - Failed";
+                        statusFilter = candidate => candidate.CVStatus == CVStatus.Failed;
+                        break;
+                    case InternEducationCVStatus.Draft:
+                        sheetName = "CV - Draft";
+                        statusFilter = candidate => candidate.CVStatus == CVStatus.Draft;
+                        break;
+                    default:
+                        continue;
+                }
+
+                excelFiles.Add(await AddChart(
+                    BuildInternEducationStatusChart(
+                        sheetName,
+                        selectedBranches,
+                        statusData,
+                        statusFilter),
+                    ChartType.Column,
+                    includeBranch: true));
+            }
+
+            foreach (var candidateStatus in selectedCandidateStatuses
+                .Where(status => Enum.IsDefined(typeof(RequestCVStatus), status))
+                .Distinct()
+                .OrderBy(status => status))
+            {
+                var candidateStatusName = DictionaryHelper.RequestCVStatusDict[candidateStatus];
+                excelFiles.Add(await AddChart(
+                    BuildInternEducationStatusChart(
+                        $"Candidate - {candidateStatusName}",
+                        selectedBranches,
+                        statusData,
+                        candidate => candidate.CandidateStatus == candidateStatus),
+                    ChartType.Column,
+                    includeBranch: true));
+            }
+
+            var combinedBytes = CombineExcelFiles(excelFiles.ToArray());
             return new FileContentResult(combinedBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
                 FileDownloadName = "exported_data.xlsx"
             };
         }
-        private async Task<byte[]> AddChart(Chart input, ChartType typeChart)
+
+        private async Task<List<InternEducationStatusExportDto>> GetInternEducationStatusDataForExport(ExportChartEducationInput input)
+        {
+            var fromDate = input.FromDate.Value.Date;
+            var toDate = input.ToDate.Value.Date.AddDays(1);
+            var selectedBranches = input.Branchs ?? new List<BranchDtoExport>();
+            var selectedBranchIds = selectedBranches
+                .Where(branch => branch.Id.HasValue)
+                .Select(branch => branch.Id.Value)
+                .Distinct()
+                .ToList();
+            var isAllBranch = selectedBranches.Count == 0 || selectedBranches.Any(branch => !branch.Id.HasValue);
+
+            var requestCVs = await WorkScope.GetAll<RequestCV>()
+                .Where(requestCV => requestCV.Request.UserType == UserType.Intern)
+                .Where(requestCV => requestCV.LastModificationTime >= fromDate && requestCV.LastModificationTime < toDate)
+                .WhereIf(!isAllBranch, requestCV => selectedBranchIds.Contains(requestCV.CV.BranchId))
+                .Select(requestCV => new
+                {
+                    requestCV.Id,
+                    requestCV.CVId,
+                    CandidateStatus = requestCV.Status,
+                    requestCV.LastModificationTime,
+                    BranchId = requestCV.CV.BranchId,
+                    CVStatus = requestCV.CV.CVStatus,
+                    CVCreationTime = requestCV.CV.CreationTime,
+                    CVLastModificationTime = requestCV.CV.LastModificationTime,
+                    EducationId = requestCV.CV.CVEducations
+                        .OrderBy(education => education.CreationTime)
+                        .Select(education => (long?)education.EducationId)
+                        .FirstOrDefault()
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            var educationNames = await WorkScope.GetAll<Education>()
+                .AsNoTracking()
+                .ToDictionaryAsync(education => education.Id, education => education.Name);
+
+            return requestCVs
+                .GroupBy(requestCV => requestCV.CVId)
+                .Select(group => group
+                    .OrderByDescending(requestCV => requestCV.LastModificationTime)
+                    .ThenByDescending(requestCV => requestCV.Id)
+                    .First())
+                .Where(requestCV => requestCV.EducationId.HasValue && educationNames.ContainsKey(requestCV.EducationId.Value))
+                .Select(requestCV => new InternEducationStatusExportDto
+                {
+                    BranchId = requestCV.BranchId,
+                    EducationId = requestCV.EducationId.Value,
+                    EducationName = educationNames[requestCV.EducationId.Value],
+                    CVStatus = requestCV.CVStatus,
+                    CandidateStatus = requestCV.CandidateStatus,
+                    CVStatusTime = requestCV.CVLastModificationTime ?? requestCV.CVCreationTime
+                })
+                .ToList();
+        }
+
+        private Chart BuildInternEducationStatusChart(
+            string sheetName,
+            List<BranchDtoExport> branches,
+            List<InternEducationStatusExportDto> statusData,
+            Func<InternEducationStatusExportDto, bool> statusFilter)
+        {
+            var chart = new Chart
+            {
+                NameSheet = GetSafeWorksheetName(sheetName),
+                ModelCharts = new List<ModelChart>()
+            };
+
+            foreach (var branch in branches)
+            {
+                var branchData = statusData
+                    .Where(statusFilter)
+                    .Where(candidate => !branch.Id.HasValue || candidate.BranchId == branch.Id.Value)
+                    .GroupBy(candidate => new
+                    {
+                        candidate.EducationId,
+                        candidate.EducationName
+                    })
+                    .Select(group => new
+                    {
+                        group.Key.EducationName,
+                        Quantity = group.Count()
+                    })
+                    .OrderByDescending(education => education.Quantity)
+                    .ThenBy(education => education.EducationName)
+                    .ToList();
+
+                var total = branchData.Sum(education => education.Quantity);
+                var templates = branchData
+                    .Select(education => new Templates
+                    {
+                        Key = education.EducationName,
+                        Percent = total > 0 ? education.Quantity / (float)total : 0,
+                        Quantity = education.Quantity
+                    })
+                    .ToList();
+
+                if (templates.Count == 0)
+                {
+                    templates.Add(new Templates
+                    {
+                        Key = "NoData",
+                        Percent = 0,
+                        Quantity = 0
+                    });
+                }
+
+                chart.ModelCharts.Add(new ModelChart
+                {
+                    BranchName = string.IsNullOrWhiteSpace(branch.DisplayName) ? "All Branch" : branch.DisplayName,
+                    Temaplates = templates
+                });
+            }
+
+            return chart;
+        }
+
+        private string GetSafeWorksheetName(string sheetName)
+        {
+            return sheetName.Length <= 31
+                ? sheetName
+                : sheetName.Substring(0, 31);
+        }
+
+        private async Task<byte[]> AddChart(Chart input, ChartType typeChart, bool includeBranch = false)
         {
             using (var package = new ExcelPackage())
             {
@@ -863,7 +1012,21 @@ namespace TalentV2.DomainServices.Reports
                 var worksheet = package.Workbook.Worksheets.Add(input.NameSheet);
                 foreach (var item in input.ModelCharts)
                 {
-                    worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(item?.Temaplates, true, TableStyles.Light9);
+                    if (includeBranch)
+                    {
+                        var rows = item.Temaplates.Select(template => new
+                        {
+                            Key = template.Key,
+                            Percent = template.Percent,
+                            Quantity = template.Quantity,
+                            Branch = item.BranchName ?? "All Branch"
+                        }).ToList();
+                        worksheet.Cells[$"A{startRow}"].LoadFromCollection(rows, true, TableStyles.Light9);
+                    }
+                    else
+                    {
+                        worksheet.Cells[$"{columnKey}{startRow}"].LoadFromCollection(item?.Temaplates, true, TableStyles.Light9);
+                    }
                     worksheet.Cells.AutoFitColumns();
                     worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     endRow = (startRow + item.Temaplates.Count);
@@ -883,6 +1046,7 @@ namespace TalentV2.DomainServices.Reports
                     var sumQuantity = item.Temaplates.Sum(s => s.Quantity);
                     worksheet.Cells[$"{columnQuantity}{totalRow}"].Value = sumQuantity;
                     worksheet.Cells[$"{columnQuantity}{totalRow}"].Style.Font.Bold = true;
+
 
                     var labelsRange = worksheet.Cells[$"{columnKey}{startRow + 1}:{columnKey}{endRow}"];
                     var chartRange = worksheet.Cells[$"{columnValue}{startRow + 1}:{columnValue}{endRow}"];

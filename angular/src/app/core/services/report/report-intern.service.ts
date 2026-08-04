@@ -46,7 +46,13 @@ export class ReportInternService extends BaseApiService {
     return this.get(`/GetEducationInternOnboarded?${this.params(fd, td, branchId).toString()}`);
   }
   
-  exportInternEducation(payload: {fromDate: string, toDate: string,branchs?: any[] }): Observable<Blob> {
+  exportInternEducation(payload: {
+    fromDate: string,
+    toDate: string,
+    branchs?: any[],
+    cvStatuses?: number[],
+    candidateStatuses?: number[]
+  }): Observable<Blob> {
     return this.generateExport(payload, '/ExportInternEducation');
   }
 }

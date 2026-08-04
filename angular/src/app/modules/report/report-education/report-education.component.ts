@@ -1,5 +1,4 @@
 import { Component, Injector, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Branch } from '@app/core/models/categories/branch.model';
 import { BreadCrumbConfig } from '@app/core/models/common/common.dto';
 import { UtilitiesService } from '@app/core/services/utilities.service';
@@ -11,10 +10,10 @@ import { ApiResponse } from '@shared/paged-listing-component-base';
 import { ChartOptions } from 'chart.js';
 import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 import { forkJoin } from 'rxjs';
-import { ExportDialogComponent } from '../../../../shared/components/export-dialog/export-dialog.component';
-import { ExportDialogService } from '../../../core/services/export/export-dialog.service';
+import { BsModalService } from 'ngx-bootstrap/modal';
 import { EducationStatistic } from './../../../core/models/report/report-education.model';
 import { ReportInternService } from './../../../core/services/report/report-intern.service';
+import { ExportInternEducationComponent } from './components/export-intern-education/export-intern-education.component';
 import { BranchEducationData } from './interfaces/report-education.interface';
 @Component({
   selector: 'talent-report-education',
@@ -41,7 +40,6 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   public chartPlugins = [pluginDataLabels.default];
   public chartOptionsPie: ChartOptions;
   public chartOptionsBar: ChartOptions;
-  isDialogOpen = false;
   recruitmentQuantityCharts: any[] = []; 
   recruitmentPercentageCharts: any[] = [];
   candidateQuantityData: BranchEducationData[] = [];
@@ -52,8 +50,7 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
     injector: Injector,
     public _utilities: UtilitiesService,
     private _reportIntern: ReportInternService,
-    public dialogService: MatDialog,
-    private _exportService: ExportDialogService
+    private _modalService: BsModalService
   ) {
     super(injector);
   }
@@ -491,37 +488,24 @@ export class ReportEducationComponent extends NccAppComponentBase implements OnI
   }
 
   exportInternEducation() {
-    const dialogConfig = {
-      hasBackdrop: false,
-      position: {
-        top: "40%",
-        right: "50px",
-      },
-      panelClass: "custom-dialog",
-    };
-    const fd = this.searchWithCreationTime?.fromDate.format(DateFormat.YYYY_MM_DD);
-    const td = this.searchWithCreationTime?.toDate.format(DateFormat.YYYY_MM_DD);
+    const fd = this.searchWithCreationTime?.fromDate.format('YYYY-MM-DD');
+    const td = this.searchWithCreationTime?.toDate.format('YYYY-MM-DD');
     const branches = this.filterBranch.map(branch => {
       return { id: branch.id !== null ? branch.id : "", displayName: branch.displayName };
     });
-    if (branches.length === 0 ) {
+
+    if (branches.length === 0) {
       this.showToastMessage(ToastMessageType.ERROR, "Please select branch");
-      this.isDialogOpen = false;
       return;
     }
-      if (!this.isDialogOpen) {
-      const modalPopup= this.dialogService.open(ExportDialogComponent,dialogConfig)
-      const sendataIntern =
-      {
+
+    this._modalService.show(ExportInternEducationComponent, {
+      class: 'modal-lg',
+      initialState: {
         fromDate: fd,
         toDate: td,
-        branchs: branches,
+        branchs: branches
       }
-      this._exportService.exportInternEducation(sendataIntern);
-
-      setTimeout(() => {
-        modalPopup.close();
-      }, 5000);
-    }
+    });
   }
 }

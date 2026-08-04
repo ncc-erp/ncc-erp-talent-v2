@@ -11,6 +11,7 @@ import { InternRecruitmentPerformanceComponent } from './intern-recruitment-perf
 import { ReportEducationComponent } from './report-education/report-education.component';
 import { PercentageChartComponent } from './report-education/components/percentage-chart.component'
 import { QuantityChartComponent } from './report-education/components/quantity-chart.component'
+import { ExportInternEducationComponent } from './report-education/components/export-intern-education/export-intern-education.component';
 @NgModule({
   declarations: [
     RecruitmentOverviewComponent,
@@ -19,6 +20,7 @@ import { QuantityChartComponent } from './report-education/components/quantity-c
     ReportEducationComponent,
     PercentageChartComponent,
     QuantityChartComponent,
+    ExportInternEducationComponent,
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,82 @@
+<form #form="ngForm" (ngSubmit)="onExport()">
+  <abp-modal-header
+    class="tabset"
+    [title]="'Export Intern Education' | localize"
+    (onCloseClick)="closePopup()">
+  </abp-modal-header>
+
+  <div class="modal-body edit-user-body">
+    <div class="export-form-container d-flex flex-column">
+      <div class="date-row d-flex w-100">
+        <div class="input-wrapper d-flex flex-column">
+          <label for="educationExportFromDate">From Date:</label>
+          <input
+            class="p-inputtext w-100"
+            type="date"
+            id="educationExportFromDate"
+            name="educationExportFromDate"
+            [(ngModel)]="fromDate">
+        </div>
+
+        <div class="input-wrapper d-flex flex-column">
+          <label for="educationExportToDate">To Date:</label>
+          <input
+            class="p-inputtext w-100"
+            type="date"
+            id="educationExportToDate"
+            name="educationExportToDate"
+            [(ngModel)]="toDate">
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <label for="educationExportCVStatus">CV Status</label>
+        <p-dropdown
+          inputId="educationExportCVStatus"
+          name="educationExportCVStatus"
+          [options]="cvStatusOptions"
+          [(ngModel)]="selectedCVStatus"
+          placeholder="Select CV Status"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-100"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true">
+        </p-dropdown>
+      </div>
+
+      <div class="input-wrapper">
+        <label for="educationExportCandidateStatus">Candidate Status</label>
+        <p-dropdown
+          inputId="educationExportCandidateStatus"
+          name="educationExportCandidateStatus"
+          [options]="candidateStatusOptions"
+          [(ngModel)]="selectedCandidateStatus"
+          placeholder="Select Candidate Status"
+          optionLabel="name"
+          optionValue="id"
+          styleClass="w-100"
+          [filter]="true"
+          filterBy="name"
+          [showClear]="true">
+        </p-dropdown>
+      </div>
+    </div>
+
+    <div class="club-bt mt-3">
+      <button type="button" class="btn btn-danger" (click)="closePopup()">
+        <i class="pi pi-times mr-1"></i>
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-success" [disabled]="loading">
+        <i class="pi pi-download mr-1"></i>
+        Export
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</form>
