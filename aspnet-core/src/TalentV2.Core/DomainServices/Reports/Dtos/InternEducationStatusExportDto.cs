@@ -9,7 +9,7 @@ namespace TalentV2.DomainServices.Reports.Dtos
         public long EducationId { get; set; }
         public string EducationName { get; set; }
         public CVStatus CVStatus { get; set; }
-        public RequestCVStatus CandidateStatus { get; set; }
+        public RequestCVStatus? CandidateStatus { get; set; }
         public DateTime CVStatusTime { get; set; }
     }
 }

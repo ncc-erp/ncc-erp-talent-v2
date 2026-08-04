@@ -149,7 +149,8 @@ export class RecruitmentOverviewComponent
             !candidateStatusHeaders.some(
               (item) => item.id === candidateStatus.id
             ) &&
-            candidateStatus.id
+            candidateStatus.id !== null &&
+            candidateStatus.id !== undefined
           )
             candidateStatusHeaders.push({
               id: candidateStatus.id,
