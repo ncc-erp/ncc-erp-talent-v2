@@ -30,11 +30,22 @@ namespace TalentV2.EntityFrameworkCore.Seed.Emails
         private void CreateMailTemplate()
         {
             var mailTemplates = new List<EmailTemplate>();
-            var mails = _context.EmailTemplates.IgnoreQueryFilters().Where(q => q.TenantId == _tenantId).Select(x => new
+            var mails = _context.EmailTemplates
+                .IgnoreQueryFilters()
+                .Where(q => q.TenantId == _tenantId)
+                .ToList();
+
+            var legacyFailedCV = mails.FirstOrDefault(x =>
+                x.Type == MailFuncEnum.FailedCV && string.IsNullOrEmpty(x.Version));
+            if (legacyFailedCV != null)
             {
-                x.Type,
-                x.Version
-            }).ToList();
+                var staffMailSeed = DictionaryHelper.SeedMailDic[MailFuncEnum.FailedCV]
+                    .First(x => x.Version == nameof(UserType.Staff));
+                legacyFailedCV.Version = nameof(UserType.Staff);
+                legacyFailedCV.Name = staffMailSeed.Name;
+                legacyFailedCV.Description = staffMailSeed.Description;
+            }
+
             Enum.GetValues(typeof(MailFuncEnum))
                 .Cast<MailFuncEnum>()
                 .ToList()
@@ -45,35 +56,20 @@ namespace TalentV2.EntityFrameworkCore.Seed.Emails
                     {
                         foreach (var mail in mailSeeds)
                         {
-                            if (!mails.Any(x => x.Type.Equals(e)))
+                            if (!mails.Any(x => x.Type == e && x.Version == mail.Version))
                             {
-                                mailTemplates.Add(
-                                    new EmailTemplate
-                                    {
-                                        Subject = mail.Subject,
-                                        Name = mail.Name,
-                                        BodyMessage = TemplateHelper.ContentEmailTemplate(e),
-                                        Description = mail.Description,
-                                        Type = e,
-                                        Version = mail.Version,
-                                        TenantId = _tenantId
-                                    }
-                                );
-                            }
-                            else if (!string.IsNullOrEmpty(mail.Version) && !mails.Any(x => x.Type.Equals(e) && mail.Version.Equals(x.Version)))
-                            {
-                                mailTemplates.Add(
-                                    new EmailTemplate
-                                    {
-                                        Subject = mail.Subject,
-                                        Name = mail.Name,
-                                        BodyMessage = TemplateHelper.ContentEmailTemplate(e),
-                                        Description = mail.Description,
-                                        Type = e,
-                                        Version = mail.Version,
-                                        TenantId = _tenantId
-                                    }
-                                );
+                                var mailTemplate = new EmailTemplate
+                                {
+                                    Subject = mail.Subject,
+                                    Name = mail.Name,
+                                    BodyMessage = TemplateHelper.ContentEmailTemplate(e),
+                                    Description = mail.Description,
+                                    Type = e,
+                                    Version = mail.Version,
+                                    TenantId = _tenantId
+                                };
+                                mailTemplates.Add(mailTemplate);
+                                mails.Add(mailTemplate);
                             }
                         }
                     }
