@@ -43,7 +43,12 @@ namespace TalentV2.Notifications.Mail
 
         public async Task<MailPreviewInfoDto> GetContentMailCV(long cvId)
         {
-            return await PreviewContentMail(cvId, MailFuncEnum.FailedCV);
+            var userType = await _workScope.GetAll<CV>()
+                .Where(q => q.Id == cvId)
+                .Select(q => q.UserType)
+                .FirstOrDefaultAsync();
+
+            return await PreviewContentMail(cvId, MailFuncEnum.FailedCV, userType.ToString());
         }
 
         public async Task<MailPreviewInfoDto> GetContentMailRequestCV(long requestCVId)
