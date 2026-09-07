@@ -58,9 +58,17 @@ namespace TalentV2.Constants.Dictionary
                 {
                     new()
                     {
-                        Name = "[Failed CV] Thank-you mail",
-                        Description = "Thank-you mail, sent when the CV has been considered failed",
+                        Name = "[Failed CV Staff] Thank-you mail",
+                        Description = "Thank-you mail, sent when a staff candidate's CV has been considered failed",
                         Subject = "[NCC]_THƯ CẢM ƠN",
+                        Version = nameof(UserType.Staff)
+                    },
+                    new()
+                    {
+                        Name = "[Failed CV Intern] Thank-you mail",
+                        Description = "Thank-you mail, sent when an intern candidate's CV has been considered failed",
+                        Subject = "[NCC]_THƯ CẢM ƠN",
+                        Version = nameof(UserType.Intern)
                     }
                 }
             },
