@@ -41,7 +41,7 @@ namespace TalentV2.InternalTools
             {
                 var user = new User
                 {
-                    UserName = input.EmailAddress.Replace("@ncc.asia", ""),
+                    UserName = EmailUtils.GetNccUserName(input.EmailAddress),
                     Name = input.Name,
                     Surname = input.Surname,
                     EmailAddress = input.EmailAddress
