@@ -26,6 +26,8 @@ using TalentV2.DomainServices.Candidates;
 using TalentV2.Ncc;
 using TalentV2.DomainServices.MezonCVs;
 using TalentV2.DomainServices.MezonCVs.Dtos;
+using TalentV2.DomainServices.AIInterviews;
+using TalentV2.DomainServices.AIInterviews.Dtos;
 
 namespace TalentV2.APIs.Public
 {
@@ -37,14 +39,17 @@ namespace TalentV2.APIs.Public
         private readonly IApplyCvManager _applyCvManager;
         private readonly ICandidateManager _candidateManager;
         private readonly IMezonCVManager _mezonCvManager;
+        private readonly IAIInterviewManager _aiInterviewManager;
 
         public PublicAppService(
             IExternalCVManager externalCVManager,
-            ICategoryManager categoryManager, 
-            IApplyCvManager applyCvManager, 
+            ICategoryManager categoryManager,
+            IApplyCvManager applyCvManager,
             ICandidateManager candidateManager,
-            IMezonCVManager mezonCvManager)
+            IMezonCVManager mezonCvManager,
+            IAIInterviewManager aiInterviewManager)
         {
+            _aiInterviewManager = aiInterviewManager;
             _httpContextAccessor = IocManager.Instance.Resolve<IHttpContextAccessor>();
             _externalCVManager = externalCVManager;
             _categoryManager = categoryManager;
@@ -280,6 +285,20 @@ namespace TalentV2.APIs.Public
         public async Task<MezonCVFormDto> GetMezonCVFormData()
         {
             return await _mezonCvManager.GetMezonCVFormData();
+        }
+
+        /// <summary>
+        /// Webhook for the AI interview bot. Auth: header X-Secret-Key = App.AIInterviewWebhookSecret.
+        /// </summary>
+        [AbpAllowAnonymous]
+        [HttpPost]
+        [AIInterviewBotAuth]
+        public async Task<AIInterviewWebhookResultDto> ReceiveAIInterviewResult([FromBody] AIInterviewWebhookDto input)
+        {
+            using (CurrentUnitOfWork.SetTenantId(AbpSession.TenantId))
+            {
+                return await _aiInterviewManager.ReceiveResult(input);
+            }
         }
     }
 }

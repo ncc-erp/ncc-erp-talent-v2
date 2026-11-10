@@ -1,6 +1,7 @@
 ﻿using Abp.Runtime.Session;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,25 @@ namespace TalentV2.WebServices.ExternalServices.Komu
         public void SendMessageToUser(string username, string message)
         {
             Post(KomuUrlConstant.KOMU_USER_ONLY, new { username = username, message = message });
+        }
+
+        public Task SendMessageToUserAsync(string username, string message)
+        {
+            return SendDirectMessageAsync(new { username, message });
+        }
+
+        // Komu expects the Mezon user ID in the JSON field "userId".
+        public Task SendMessageToUserByIdAsync(string mezonUserId, string message)
+        {
+            return SendDirectMessageAsync(new { userId = mezonUserId, message });
+        }
+
+        private async Task SendDirectMessageAsync(object payload)
+        {
+            using var content = new StringContent(
+                JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            using var response = await HttpClient.PostAsync(KomuUrlConstant.KOMU_USER_ONLY, content);
+            response.EnsureSuccessStatusCode();
         }
     }
 }

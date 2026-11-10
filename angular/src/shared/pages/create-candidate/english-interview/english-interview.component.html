@@ -1,0 +1,90 @@
+<section class="english-interview" [attr.aria-busy]="isLoading">
+  <div class="interview-toolbar">
+    <div>
+      <h3>English interview result</h3>
+      <p>Scores and feedback from the latest interview.</p>
+    </div>
+    <button type="button" pButton icon="pi pi-refresh" label="Refresh"
+      class="p-button-outlined" [disabled]="isLoading" (click)="loadResults()"></button>
+  </div>
+
+  <div *ngIf="isLoading" class="interview-state" role="status">
+    <i class="pi pi-spin pi-spinner" aria-hidden="true"></i> Loading interview result...
+  </div>
+  <div *ngIf="!isLoading && loadFailed" class="interview-state text-danger" role="alert">
+    Unable to load interview result. Please try again.
+  </div>
+  <div *ngIf="!isLoading && !loadFailed && !result" class="interview-state">
+    <i class="fas fa-language" aria-hidden="true"></i>
+    <p>No English interview result yet.</p>
+  </div>
+
+  <article *ngIf="!isLoading && !loadFailed && result" class="interview-result">
+    <header class="interview-result-header">
+      <h4>{{ result.scenarioTitle || 'English interview' }}</h4>
+      <div class="interview-metadata">
+        <time *ngIf="result.interviewedAt" [attr.datetime]="result.interviewedAt">
+          <i class="pi pi-calendar" aria-hidden="true"></i>
+          {{ result.interviewedAt | date:'dd/MM/yyyy HH:mm' }}
+        </time>
+        <span *ngIf="result.durationSeconds != null">
+          <i class="pi pi-clock" aria-hidden="true"></i>
+          {{ result.durationSeconds / 60 | number:'1.0-1' }} min
+        </span>
+        <span *ngIf="result.coachName">Coach: {{ result.coachName }}</span>
+      </div>
+    </header>
+
+    <div class="interview-body">
+      <section class="score-overview" aria-label="Interview score summary">
+        <div class="summary-card summary-card--overall">
+          <span>Overall score</span>
+          <strong class="summary-value">{{ result.overallScore != null ? (result.overallScore | number:'1.0-2') : '—' }}</strong>
+        </div>
+        <div class="summary-card summary-card--level">
+          <span>CEFR level</span>
+          <strong class="summary-value">{{ result.cefrLevel || '—' }}</strong>
+        </div>
+        <div class="summary-card">
+          <span>IELTS Speaking</span>
+          <strong class="summary-value">{{ result.ieltsBand != null ? (result.ieltsBand | number:'1.0-2') : '—' }}</strong>
+        </div>
+        <div class="summary-card">
+          <span>TOEFL Speaking</span>
+          <strong class="summary-value">{{ result.toeflScore != null ? (result.toeflScore | number:'1.0-2') : '—' }}</strong>
+        </div>
+      </section>
+
+      <section class="skill-section" aria-labelledby="english-interview-skill-heading">
+        <h4 id="english-interview-skill-heading" class="section-title">Skill scores</h4>
+        <div class="interview-scores">
+          <div *ngFor="let score of result.scores" class="skill-card">
+            <span>{{ score.label }}</span>
+            <strong>{{ score.value != null ? (score.value | number:'1.0-2') : '—' }}</strong>
+          </div>
+        </div>
+        <dl *ngIf="result.speakingMetrics.length" class="speaking-metrics">
+          <div *ngFor="let metric of result.speakingMetrics">
+            <dt>{{ metric.label }}</dt>
+            <dd>{{ metric.value }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="feedback-section" aria-labelledby="english-interview-feedback-heading">
+        <h4 id="english-interview-feedback-heading" class="section-title">Interview feedback</h4>
+        <div class="report-sections">
+          <section *ngFor="let section of result.sections" class="report-section">
+            <h5>{{ section.title }}</h5>
+            <ul *ngIf="section.entries.length">
+              <li *ngFor="let entry of section.entries">
+                <strong *ngIf="entry.label">{{ entry.label }}: </strong>{{ entry.value }}
+              </li>
+            </ul>
+          </section>
+        </div>
+        <p *ngIf="!result.sections.length" class="text-muted">No detailed feedback available.</p>
+      </section>
+    </div>
+  </article>
+</section>
