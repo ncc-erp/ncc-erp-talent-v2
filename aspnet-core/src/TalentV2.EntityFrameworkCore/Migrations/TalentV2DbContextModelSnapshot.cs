@@ -1592,6 +1592,135 @@ namespace TalentV2.Migrations
                     b.ToTable("AbpUsers");
                 });
 
+            modelBuilder.Entity("TalentV2.Entities.AIInterviewResult", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("CVId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CandidateEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("CandidateMezonUserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CandidateName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("CefrLevel")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("CoachName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<double?>("DomainScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("DurationSeconds")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("FluencyScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("GrammarScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("IeltsBand")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime?>("InterviewedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<double?>("OverallScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<byte>("ProcessStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<double?>("PronunciationScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Report")
+                        .HasColumnType("jsonb");
+
+                    b.Property<long?>("RequestCVId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ScenarioId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ScenarioTitle")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("ToeflScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("VocabularyScore")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CVId");
+
+                    b.HasIndex("CandidateEmail");
+
+                    b.HasIndex("CreatorUserId");
+
+                    b.HasIndex("LastModifierUserId");
+
+                    b.HasIndex("RequestCVId");
+
+                    b.HasIndex("SessionId")
+                        .IsUnique();
+
+                    b.ToTable("AIInterviewResults");
+                });
+
             modelBuilder.Entity("TalentV2.Entities.ApplyCV", b =>
                 {
                     b.Property<long>("Id")
@@ -4242,6 +4371,33 @@ namespace TalentV2.Migrations
                     b.Navigation("LastModifierUser");
 
                     b.Navigation("Position");
+                });
+
+            modelBuilder.Entity("TalentV2.Entities.AIInterviewResult", b =>
+                {
+                    b.HasOne("TalentV2.Entities.CV", "CV")
+                        .WithMany()
+                        .HasForeignKey("CVId");
+
+                    b.HasOne("TalentV2.Authorization.Users.User", "CreatorUser")
+                        .WithMany()
+                        .HasForeignKey("CreatorUserId");
+
+                    b.HasOne("TalentV2.Authorization.Users.User", "LastModifierUser")
+                        .WithMany()
+                        .HasForeignKey("LastModifierUserId");
+
+                    b.HasOne("TalentV2.Entities.RequestCV", "RequestCV")
+                        .WithMany()
+                        .HasForeignKey("RequestCVId");
+
+                    b.Navigation("CV");
+
+                    b.Navigation("CreatorUser");
+
+                    b.Navigation("LastModifierUser");
+
+                    b.Navigation("RequestCV");
                 });
 
             modelBuilder.Entity("TalentV2.Entities.ApplyCV", b =>
