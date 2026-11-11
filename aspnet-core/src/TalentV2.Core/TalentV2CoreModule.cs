@@ -103,6 +103,7 @@ namespace TalentV2
                 appSettingProviderDefaultValue.CVAutomationNoticeChannelId = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNoticeChannelId);
                 appSettingProviderDefaultValue.CVAutomationNotifyToUser = appSettingValueProvider.GetValue<string>(AppSettingNames.CVAutomationNotifyToUser);
                 appSettingProviderDefaultValue.MezonBotSignature = appSettingValueProvider.GetValue<string>(AppSettingNames.MezonBotSignature);
+                appSettingProviderDefaultValue.AIInterviewWebhookSecret = appSettingValueProvider.GetValue<string>(AppSettingNames.AIInterviewWebhookSecret);
             }
             Configuration.Settings.Providers.Add<AppSettingProvider>();
         }

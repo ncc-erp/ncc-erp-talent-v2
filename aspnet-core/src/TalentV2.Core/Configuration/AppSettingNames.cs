@@ -23,6 +23,7 @@
 
         public const string TalentSecurityCode = "App.TalentSercurityCode";
         public const string MezonBotSignature = "App.MezonBotSignature";
+        public const string AIInterviewWebhookSecret = "App.AIInterviewWebhookSecret";
 
         public const string NoticeInterviewStartAtHour = "App.NoticeInterviewStartAtHour";
         public const string NoticeInterviewEndAtHour = "App.NoticeInterviewEndAtHour";
