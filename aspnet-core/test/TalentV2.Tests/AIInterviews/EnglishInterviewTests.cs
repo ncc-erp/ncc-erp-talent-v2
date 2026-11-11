@@ -3,6 +3,7 @@ using Abp.Authorization;
 using Abp.Domain.Uow;
 using Abp.Configuration;
 using Abp.Runtime.Session;
+using Abp.Runtime.Validation;
 using Castle.MicroKernel.Registration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
@@ -164,6 +165,11 @@ namespace TalentV2.Tests.AIInterviews
         [InlineData("configured-secret", "wrong-secret", false)]
         [InlineData("configured-secret", "", false)]
         [InlineData("", "configured-secret", false)]
+        [InlineData(null, "configured-secret", false)]
+        [InlineData(" ", " ", false)]
+        [InlineData("yourAIInterviewWebhookSecret", "yourAIInterviewWebhookSecret", false)]
+        [InlineData("YOURAIINTERVIEWWEBHOOKSECRET", "YOURAIINTERVIEWWEBHOOKSECRET", false)]
+        [InlineData(" yourAIInterviewWebhookSecret ", " yourAIInterviewWebhookSecret ", false)]
         public async Task Webhook_logs_arrival_and_auth_rejection_without_exposing_keys(string secret, string received, bool accepted)
         {
             var settings = Substitute.For<ISettingManager>();
@@ -196,6 +202,71 @@ namespace TalentV2.Tests.AIInterviews
             logger.Entries.ShouldContain(x => x.Message.Contains("Webhook finished") && x.Message.Contains("ElapsedMs:"));
             string.Join("\n", logger.Entries.Select(x => x.Message)).ShouldNotContain("configured-secret");
             string.Join("\n", logger.Entries.Select(x => x.Message)).ShouldNotContain("wrong-secret");
+            string.Join("\n", logger.Entries.Select(x => x.Message)).ShouldNotContain("yourAIInterviewWebhookSecret");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("{}")]
+        [InlineData("{\"cefr_level\":\"B1\"}")]
+        [InlineData("{\"overall_score\":null}")]
+        [InlineData("{\"overall_score\":\"invalid\"}")]
+        [InlineData("{\"overall_score\":\"NaN\"}")]
+        [InlineData("{\"overall_score\":\"Infinity\"}")]
+        public async Task Invalid_report_is_rejected_without_consuming_session_or_notifying(string report)
+        {
+            await SeedCandidate(UserType.Staff);
+            var input = Payload();
+            input.Report = report == null ? null : JObject.Parse(report);
+
+            var exception = await Should.ThrowAsync<AbpValidationException>(() => _manager.ReceiveResult(input));
+
+            exception.ValidationErrors.ShouldContain(x => x.MemberNames.Any(name => name.StartsWith("report")));
+            (await _context.Set<AIInterviewResult>().CountAsync()).ShouldBe(0);
+            (await _context.Set<RequestCV>().SingleAsync()).Interviewed.ShouldBeNull();
+            _handler.Messages.ShouldBeEmpty();
+
+            // The bot can correct its report and reuse the same session ID.
+            input.Report = Payload().Report;
+            (await _manager.ReceiveResult(input)).Message.ShouldBe("Saved");
+            (await _manager.GetResultsByCVId(10)).Single().OverallScore.ShouldBe(0);
+            _handler.Messages.Count.ShouldBe(2);
+        }
+
+        [Fact]
+        public async Task Overlong_session_is_rejected_before_saving_or_notifying()
+        {
+            await SeedCandidate(UserType.Staff);
+            var input = Payload();
+            input.SessionId = new string('a', 256);
+
+            var exception = await Should.ThrowAsync<AbpValidationException>(() => _manager.ReceiveResult(input));
+
+            exception.ValidationErrors.ShouldContain(x => x.MemberNames.Contains("session_id"));
+            (await _context.Set<AIInterviewResult>().CountAsync()).ShouldBe(0);
+            (await _context.Set<RequestCV>().SingleAsync()).Interviewed.ShouldBeNull();
+            _handler.Messages.ShouldBeEmpty();
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Session_at_length_limit_is_preserved_and_deduplicated_after_trimming(bool padded)
+        {
+            await SeedCandidate(UserType.Staff);
+            var sessionId = new string('a', 255);
+            var input = Payload();
+            input.SessionId = padded ? " " + sessionId + " " : sessionId;
+
+            var first = await _manager.ReceiveResult(input);
+            input.SessionId = sessionId;
+            var duplicate = await _manager.ReceiveResult(input);
+
+            first.Message.ShouldBe("Saved");
+            duplicate.Message.ShouldBe("Session already received");
+            duplicate.ResultId.ShouldBe(first.ResultId);
+            (await _context.Set<AIInterviewResult>().SingleAsync()).SessionId.ShouldBe(sessionId);
+            _handler.Messages.Count.ShouldBe(2);
         }
 
         [Fact]

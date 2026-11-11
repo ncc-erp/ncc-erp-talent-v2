@@ -263,6 +263,17 @@ namespace TalentV2.DomainServices.AIInterviews
                     errors.Add(new ValidationResult("candidate_email is required", new[] { "candidate_email" }));
                 if (string.IsNullOrWhiteSpace(input.SessionId))
                     errors.Add(new ValidationResult("session_id is required", new[] { "session_id" }));
+                else if (input.SessionId.Trim().Length > 255)
+                    errors.Add(new ValidationResult("session_id must not exceed 255 characters", new[] { "session_id" }));
+
+                if (input.Report == null || !input.Report.HasValues)
+                    errors.Add(new ValidationResult("report is required", new[] { "report" }));
+                else
+                {
+                    var overallScore = GetDouble(input.Report, "overall_score");
+                    if (!overallScore.HasValue || !double.IsFinite(overallScore.Value))
+                        errors.Add(new ValidationResult("report.overall_score must be a finite number", new[] { "report.overall_score" }));
+                }
             }
             if (errors.Any())
                 throw new AbpValidationException("Invalid AI interview payload", errors);
@@ -280,7 +291,7 @@ namespace TalentV2.DomainServices.AIInterviews
 
             return new AIInterviewResult
             {
-                SessionId = Truncate(sessionId, 255),
+                SessionId = sessionId,
                 CandidateEmail = Truncate(email, 255),
                 CandidateMezonUserId = Truncate(input.UserId, 100),
                 CandidateName = Truncate(input.CandidateName, 255),

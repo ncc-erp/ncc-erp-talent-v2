@@ -64,11 +64,13 @@ namespace TalentV2.Ncc
             var header = context.HttpContext.Request.Headers;
             var secret = settingManager.GetSettingValueForApplication(AppSettingNames.AIInterviewWebhookSecret);
             var received = header["X-Secret-Key"].ToString();
+            var secretNotConfigured = string.IsNullOrWhiteSpace(secret)
+                || string.Equals(secret.Trim(), "yourAIInterviewWebhookSecret", StringComparison.OrdinalIgnoreCase);
 
-            if (string.IsNullOrEmpty(secret) || !FixedTimeEquals(secret, received))
+            if (secretNotConfigured || !FixedTimeEquals(secret, received))
             {
                 logger.LogWarning("[AIInterview] Webhook rejected (401). TraceId: {TraceId}, Reason: {Reason}",
-                    context.HttpContext.TraceIdentifier, string.IsNullOrEmpty(secret) ? "Webhook secret is not configured" : "Missing or invalid secret key");
+                    context.HttpContext.TraceIdentifier, secretNotConfigured ? "Webhook secret is not configured" : "Missing or invalid secret key");
                 context.Result = new UnauthorizedObjectResult(new { success = false, message = "Invalid secret key" });
                 return;
             }
