@@ -1,0 +1,130 @@
+.english-interview {
+  padding: 1rem;
+}
+
+.interview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  h3 { font-size: 1.25rem; margin-bottom: .25rem; }
+  p { color: #6c757d; margin: 0; }
+}
+
+.interview-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6c757d;
+
+  p { margin-top: .75rem; }
+}
+
+.interview-result {
+  border: 1px solid #dee2e6;
+  border-radius: .4rem;
+  overflow: hidden;
+}
+
+.interview-result-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e5e9f0;
+  padding: 1.25rem;
+
+  h4 { font-size: 1.05rem; font-weight: 600; margin: 0 0 .6rem; line-height: 1.5; }
+}
+
+.interview-metadata {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem 1.25rem;
+  color: #6c757d;
+  font-size: .875rem;
+
+  i { margin-right: .3rem; font-size: .875rem; }
+}
+
+.interview-body { padding: 1.25rem; }
+.score-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: 1.25rem;
+  border: 1px solid #e5e9f0;
+  border-radius: .4rem;
+
+  span { color: #6c757d; font-size: .95rem; }
+  .summary-value { font-size: 2.25rem; line-height: 1.15; font-variant-numeric: tabular-nums; }
+}
+
+.summary-card--overall, .summary-card--level {
+  background: #edf3ff;
+  border-color: #d2dffc;
+
+  span { color: #365aa8; }
+  .summary-value { color: #365aa8; font-size: 2.75rem; }
+}
+
+.summary-card--overall { border-left: 4px solid #567bd2; }
+.skill-section, .feedback-section { margin-top: 1.75rem; }
+.section-title { font-size: 1.05rem; font-weight: 600; margin: 0 0 1rem; }
+.interview-scores { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; }
+.skill-card {
+  border: 1px solid #e5e9f0;
+  border-radius: .35rem;
+  padding: 1rem;
+
+  span { display: block; color: #6c757d; font-size: .95rem; }
+  strong { display: block; font-size: 2rem; margin-top: .5rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+}
+
+.speaking-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 2rem;
+  margin: 1rem 0 0;
+  padding: .75rem 1rem;
+  background: #f8f9fa;
+  border-radius: .35rem;
+  font-size: .875rem;
+
+  div { display: flex; gap: .5rem; }
+  dt { color: #6c757d; font-weight: 400; }
+  dd { margin: 0; font-weight: 600; }
+}
+
+.feedback-section { border-top: 1px solid #e5e9f0; padding-top: 1.5rem; }
+.report-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.report-section {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid #e5e9f0;
+  border-radius: .35rem;
+  overflow-wrap: anywhere;
+
+  h5 { font-size: 1rem; font-weight: 600; margin: 0 0 .75rem; }
+  ul { padding-left: 1.25rem; margin: 0; }
+  li { margin-bottom: .65rem; white-space: pre-wrap; line-height: 1.65; }
+  li:last-child { margin-bottom: 0; }
+}
+
+@media (max-width: 900px) {
+  .score-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .interview-scores { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .english-interview { padding: .5rem; }
+  .interview-result-header, .interview-body, .report-section { padding: 1rem; }
+  .score-overview, .interview-scores { gap: .75rem; }
+  .summary-card { padding: 1rem; }
+  .summary-card .summary-value { font-size: 2rem; }
+  .summary-card--overall .summary-value, .summary-card--level .summary-value { font-size: 2.5rem; }
+  .interview-scores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-sections { grid-template-columns: minmax(0, 1fr); }
+}

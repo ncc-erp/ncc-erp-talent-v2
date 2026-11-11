@@ -201,6 +201,11 @@ namespace TalentV2.Configuration
                     _defaultValue.MezonBotSignature,
                     scopes:SettingScopes.Application | SettingScopes.Tenant
                 ),
+                new SettingDefinition(
+                    AppSettingNames.AIInterviewWebhookSecret,
+                    _defaultValue.AIInterviewWebhookSecret,
+                    scopes:SettingScopes.Application | SettingScopes.Tenant
+                ),
             };
         }
     }

@@ -197,5 +197,20 @@
         ></talent-application-history>
       </ng-template>
     </p-tabPanel>
+    <p-tabPanel header="EnglishInterview" [disabled]="!hasCandidate()" [cache]="false">
+      <ng-template pTemplate="header">
+        <div class="tab-header">
+          <i class="fas fa-language"></i>
+          <span>English Interview</span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content" *ngIf="validPermissionUserType(
+        userType,
+        PS.Pages_CandidateIntern_ViewDetail_PersonInfo_View,
+        PS.Pages_CandidateStaff_ViewDetail_PersonInfo_View
+      )">
+        <talent-english-interview [candidateId]="candidateId"></talent-english-interview>
+      </ng-template>
+    </p-tabPanel>
   </p-tabView>
 </section>

@@ -8,6 +8,11 @@
   width: max-content;
 }
 
+:host ::ng-deep .section-tab .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  border-bottom: 3px solid var(--primary-color, #2196f3);
+  margin-bottom: 0;
+}
+
 .breadcrum-container {
   display: flex;
   margin-right: -7.5px;

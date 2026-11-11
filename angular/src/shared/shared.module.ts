@@ -89,6 +89,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { PasswordModule } from 'primeng/password';
 
 import { CreateCandidateComponent } from './pages/create-candidate/create-candidate.component';
+import { EnglishInterviewComponent } from './pages/create-candidate/english-interview/english-interview.component';
 import { PersonalInfoComponent } from './pages/create-candidate/personal-info/personal-info.component';
 import { CandidateEducationComponent } from './pages/create-candidate/candidate-education/candidate-education.component';
 import { CandidateSkillComponent } from './pages/create-candidate/candidate-skill/candidate-skill.component';
@@ -180,6 +181,7 @@ const materialLibs = [
 const candidate = [
   CandidateInfoNewComponent,
   CreateCandidateComponent,
+  EnglishInterviewComponent,
   PersonalInfoComponent,
   CandidateEducationComponent,
   CandidateSkillComponent,
