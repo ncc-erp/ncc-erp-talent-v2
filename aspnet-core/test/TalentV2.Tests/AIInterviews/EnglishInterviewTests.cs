@@ -1,10 +1,18 @@
 using Abp.Dependency;
 using Abp.Authorization;
 using Abp.Domain.Uow;
+using Abp.Configuration;
 using Abp.Runtime.Session;
 using Castle.MicroKernel.Registration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using NSubstitute;
@@ -20,11 +28,13 @@ using TalentV2.Authorization.Users;
 using TalentV2.Authorization;
 using TalentV2.APIs;
 using TalentV2.Constants.Enum;
+using TalentV2.Configuration;
 using TalentV2.DomainServices.AIInterviews;
 using TalentV2.DomainServices.AIInterviews.Dtos;
 using TalentV2.Entities;
 using TalentV2.EntityFrameworkCore;
 using TalentV2.MultiTenancy;
+using TalentV2.Ncc;
 using TalentV2.NccCore;
 using TalentV2.WebServices.ExternalServices.Komu;
 using Xunit;
@@ -44,6 +54,7 @@ namespace TalentV2.Tests.AIInterviews
         private readonly TalentV2DbContext _applicationContext;
         private readonly IocManager _previousIocManager;
         private readonly IocManager _ioc = new IocManager();
+        private readonly RecordingLogger<AIInterviewManager> _logger = new RecordingLogger<AIInterviewManager>();
 
         public EnglishInterviewTests()
         {
@@ -77,7 +88,7 @@ namespace TalentV2.Tests.AIInterviews
                 ["App:ClientRootAddress"] = "http://talent.test/"
             }).Build();
             var komu = new KomuService(_client, config, NullLogger<KomuService>.Instance, NullAbpSession.Instance);
-            _manager = new AIInterviewManager(komu, config, NullLogger<AIInterviewManager>.Instance);
+            _manager = new AIInterviewManager(komu, config, _logger);
             var unitOfWorkManager = Substitute.For<IUnitOfWorkManager>();
             unitOfWorkManager.Current.Returns(Substitute.For<IActiveUnitOfWork>());
             _manager.UnitOfWorkManager = unitOfWorkManager;
@@ -112,6 +123,8 @@ namespace TalentV2.Tests.AIInterviews
             duplicate.ResultId.ShouldBe(result.ResultId);
             _handler.Messages.Count.ShouldBe(2);
             (await _context.Set<AIInterviewResult>().CountAsync()).ShouldBe(1);
+            _logger.Entries.Count(x => x.Message.Contains("accepted by Komu")).ShouldBe(2);
+            _logger.Entries.ShouldContain(x => x.Message.Contains("Duplicate session ignored") && x.Message.Contains("session-1"));
         }
 
         [Fact]
@@ -130,6 +143,59 @@ namespace TalentV2.Tests.AIInterviews
             var results = await _manager.GetResultsByCVId(10);
             results.Single().OverallScore.ShouldBe(0);
             results.Single().Report["key_strengths"][0].Value<string>().ShouldBe("Detailed assessment");
+            _logger.Entries.ShouldContain(x => x.Level == LogLevel.Error && x.Message.Contains("Candidate Komu DM failed")
+                && x.Message.Contains("session-1") && x.Message.Contains($"ResultId: {saved.Id}"));
+            _logger.Entries.ShouldContain(x => x.Message.Contains("HR Komu DM accepted by Komu"));
+        }
+
+        [Fact]
+        public async Task Unmatched_candidate_logs_saved_result_without_sending_DMs()
+        {
+            var response = await _manager.ReceiveResult(Payload());
+
+            response.Success.ShouldBeTrue();
+            _handler.Messages.ShouldBeEmpty();
+            _logger.Entries.ShouldContain(x => x.Level == LogLevel.Warning && x.Message.Contains("without a matching CV")
+                && x.Message.Contains("session-1") && x.Message.Contains($"ResultId: {response.ResultId}"));
+        }
+
+        [Theory]
+        [InlineData("configured-secret", "configured-secret", true)]
+        [InlineData("configured-secret", "wrong-secret", false)]
+        [InlineData("configured-secret", "", false)]
+        [InlineData("", "configured-secret", false)]
+        public async Task Webhook_logs_arrival_and_auth_rejection_without_exposing_keys(string secret, string received, bool accepted)
+        {
+            var settings = Substitute.For<ISettingManager>();
+            settings.GetSettingValueForApplication(AppSettingNames.AIInterviewWebhookSecret).Returns(secret);
+            _ioc.IocContainer.Register(Component.For<ISettingManager>().Instance(settings));
+            var logger = new RecordingLogger<AIInterviewBotAuthAttribute>();
+            using var services = new ServiceCollection().AddSingleton<ILogger<AIInterviewBotAuthAttribute>>(logger).BuildServiceProvider();
+            var http = new DefaultHttpContext { RequestServices = services, TraceIdentifier = "webhook-trace-1" };
+            http.Request.Headers["X-Secret-Key"] = received;
+            var action = new ActionContext(http, new RouteData(), new ActionDescriptor());
+            var filters = new List<IFilterMetadata>();
+            var executing = new ActionExecutingContext(action, filters,
+                new Dictionary<string, object> { ["input"] = Payload() }, new object());
+            var nextCalls = 0;
+
+            await new AIInterviewBotAuthAttribute().OnActionExecutionAsync(executing, () =>
+            {
+                nextCalls++;
+                return Task.FromResult(new ActionExecutedContext(action, filters, executing.Controller));
+            });
+
+            nextCalls.ShouldBe(accepted ? 1 : 0);
+            if (!accepted)
+            {
+                executing.Result.ShouldBeOfType<UnauthorizedObjectResult>().StatusCode.ShouldBe(401);
+                logger.Entries.ShouldContain(x => x.Level == LogLevel.Warning && x.Message.Contains("rejected (401)"));
+            }
+            logger.Entries.ShouldContain(x => x.Message.Contains("Webhook received") && x.Message.Contains("webhook-trace-1")
+                && x.Message.Contains("session-1"));
+            logger.Entries.ShouldContain(x => x.Message.Contains("Webhook finished") && x.Message.Contains("ElapsedMs:"));
+            string.Join("\n", logger.Entries.Select(x => x.Message)).ShouldNotContain("configured-secret");
+            string.Join("\n", logger.Entries.Select(x => x.Message)).ShouldNotContain("wrong-secret");
         }
 
         [Fact]
@@ -211,6 +277,15 @@ namespace TalentV2.Tests.AIInterviews
                 Messages.Add(payload);
                 return new HttpResponseMessage(payload["userId"] != null ? CandidateStatus : HttpStatusCode.OK);
             }
+        }
+
+        private class RecordingLogger<T> : ILogger<T>
+        {
+            public List<(LogLevel Level, string Message)> Entries { get; } = new List<(LogLevel, string)>();
+            public IDisposable BeginScope<TState>(TState state) => null;
+            public bool IsEnabled(LogLevel logLevel) => true;
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
+                Func<TState, Exception, string> formatter) => Entries.Add((logLevel, formatter(state, exception)));
         }
 
         // Limit the test model to this flow; the application's existing test model

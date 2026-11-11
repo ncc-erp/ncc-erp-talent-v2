@@ -49,6 +49,8 @@ namespace TalentV2.DomainServices.AIInterviews
                 .FirstOrDefaultAsync();
             if (existedId.HasValue)
             {
+                _logger.LogInformation("[AIInterview] Duplicate session ignored; no DMs sent. SessionId: {SessionId}, ResultId: {ResultId}, TenantId: {TenantId}",
+                    sessionId, existedId, AbpSession.TenantId);
                 return new AIInterviewWebhookResultDto
                 {
                     Success = true,
@@ -77,7 +79,8 @@ namespace TalentV2.DomainServices.AIInterviews
                 entity.ProcessStatus = AIInterviewProcessStatus.CandidateNotFound;
                 entity.Note = $"No CV found with email {email}";
                 var notFoundId = await WorkScope.InsertAndGetIdAsync(entity);
-                _logger.LogWarning($"[AIInterview] {entity.Note}. Session: {sessionId}");
+                _logger.LogWarning("[AIInterview] Result inserted without a matching CV; no DMs sent. SessionId: {SessionId}, ResultId: {ResultId}, TenantId: {TenantId}, ProcessStatus: {ProcessStatus}",
+                    sessionId, notFoundId, AbpSession.TenantId, entity.ProcessStatus);
                 return new AIInterviewWebhookResultDto
                 {
                     Success = true,
@@ -101,6 +104,9 @@ namespace TalentV2.DomainServices.AIInterviews
             var resultId = await WorkScope.InsertAndGetIdAsync(entity);
             await CurrentUnitOfWork.SaveChangesAsync();
 
+            _logger.LogInformation("[AIInterview] Result saved; starting notifications. SessionId: {SessionId}, ResultId: {ResultId}, TenantId: {TenantId}, CVId: {CVId}, RequestCVId: {RequestCVId}",
+                sessionId, resultId, AbpSession.TenantId, entity.CVId, entity.RequestCVId);
+
             var errors = await Notify(entity, cv);
             if (errors.Any())
             {
@@ -108,6 +114,9 @@ namespace TalentV2.DomainServices.AIInterviews
                 entity.Note = Truncate(string.Join("; ", errors), 2000);
                 await WorkScope.UpdateAsync(entity);
             }
+
+            _logger.LogInformation("[AIInterview] Result processed. SessionId: {SessionId}, ResultId: {ResultId}, ProcessStatus: {ProcessStatus}, NotificationErrors: {NotificationErrors}",
+                sessionId, resultId, entity.ProcessStatus, errors.Count);
 
             return new AIInterviewWebhookResultDto
             {
@@ -177,35 +186,42 @@ namespace TalentV2.DomainServices.AIInterviews
 
             if (!string.IsNullOrWhiteSpace(result.CandidateMezonUserId))
             {
-                await TrySend(errors, "Candidate Komu DM", () =>
+                await TrySend(errors, "Candidate Komu DM", result, () =>
                     _komuService.SendMessageToUserByIdAsync(result.CandidateMezonUserId, BuildCandidateMessage(result, cv)));
             }
             else
             {
                 errors.Add("Candidate Komu DM: user_id is missing");
+                _logger.LogWarning("[AIInterview] Candidate Komu DM skipped: user_id is missing. SessionId: {SessionId}, ResultId: {ResultId}",
+                    result.SessionId, result.Id);
             }
 
             if (string.IsNullOrEmpty(cv.HREmail))
             {
                 errors.Add("No HR in charge found for CV");
+                _logger.LogWarning("[AIInterview] HR Komu DM skipped: no HR found. SessionId: {SessionId}, ResultId: {ResultId}",
+                    result.SessionId, result.Id);
                 return errors;
             }
 
-            await TrySend(errors, "HR Komu DM", () =>
+            await TrySend(errors, "HR Komu DM", result, () =>
                 _komuService.SendMessageToUserAsync(CommonUtils.GetUserNameByEmail(cv.HREmail), BuildHRMessage(result, cv, cvLink)));
 
             return errors;
         }
 
-        private async Task TrySend(List<string> errors, string name, Func<Task> action)
+        private async Task TrySend(List<string> errors, string name, AIInterviewResult result, Func<Task> action)
         {
             try
             {
                 await action();
+                _logger.LogInformation("[AIInterview] {Notification} accepted by Komu. SessionId: {SessionId}, ResultId: {ResultId}",
+                    name, result.SessionId, result.Id);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"[AIInterview] {name} failed");
+                _logger.LogError(ex, "[AIInterview] {Notification} failed. SessionId: {SessionId}, ResultId: {ResultId}",
+                    name, result.SessionId, result.Id);
                 errors.Add($"{name}: {ex.Message}");
             }
         }

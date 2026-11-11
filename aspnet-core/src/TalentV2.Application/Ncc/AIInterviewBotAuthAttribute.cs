@@ -3,11 +3,16 @@ using Abp.Dependency;
 using Abp.Runtime.Session;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TalentV2.Configuration;
+using TalentV2.DomainServices.AIInterviews.Dtos;
 using TalentV2.MultiTenancy;
 
 namespace TalentV2.Ncc
@@ -20,6 +25,38 @@ namespace TalentV2.Ncc
     {
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AIInterviewBotAuthAttribute>>();
+            var traceId = context.HttpContext.TraceIdentifier;
+            var sessionId = context.ActionArguments.Values.OfType<AIInterviewWebhookDto>().FirstOrDefault()?.SessionId;
+            var timer = Stopwatch.StartNew();
+            logger.LogInformation("[AIInterview] Webhook received. TraceId: {TraceId}, SessionId: {SessionId}", traceId, sessionId);
+
+            try
+            {
+                await AuthorizeAndExecute(context, async () =>
+                {
+                    var executed = await next();
+                    if (executed.Exception != null)
+                        logger.LogError(executed.Exception,
+                            "[AIInterview] Webhook action failed. TraceId: {TraceId}, SessionId: {SessionId}", traceId, sessionId);
+                    return executed;
+                }, logger);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "[AIInterview] Webhook failed. TraceId: {TraceId}, SessionId: {SessionId}", traceId, sessionId);
+                throw;
+            }
+            finally
+            {
+                logger.LogInformation("[AIInterview] Webhook finished. TraceId: {TraceId}, SessionId: {SessionId}, ElapsedMs: {ElapsedMs}",
+                    traceId, sessionId, timer.ElapsedMilliseconds);
+            }
+        }
+
+        private static async Task AuthorizeAndExecute(ActionExecutingContext context, ActionExecutionDelegate next,
+            ILogger<AIInterviewBotAuthAttribute> logger)
+        {
             var settingManager = IocManager.Instance.Resolve<ISettingManager>();
             var tenantManager = IocManager.Instance.Resolve<TenantManager>();
             var abpSession = IocManager.Instance.Resolve<IAbpSession>();
@@ -30,6 +67,8 @@ namespace TalentV2.Ncc
 
             if (string.IsNullOrEmpty(secret) || !FixedTimeEquals(secret, received))
             {
+                logger.LogWarning("[AIInterview] Webhook rejected (401). TraceId: {TraceId}, Reason: {Reason}",
+                    context.HttpContext.TraceIdentifier, string.IsNullOrEmpty(secret) ? "Webhook secret is not configured" : "Missing or invalid secret key");
                 context.Result = new UnauthorizedObjectResult(new { success = false, message = "Invalid secret key" });
                 return;
             }
@@ -44,6 +83,8 @@ namespace TalentV2.Ncc
             var tenant = tenantManager.FindByTenancyName(tenantName);
             if (tenant == null)
             {
+                logger.LogWarning("[AIInterview] Webhook rejected (400): tenant not found. TraceId: {TraceId}",
+                    context.HttpContext.TraceIdentifier);
                 context.Result = new BadRequestObjectResult(new { success = false, message = $"Tenant '{tenantName}' not found" });
                 return;
             }
